@@ -1,5 +1,0 @@
-ASSUME search_setting COMPARATOR AS utf8;	
-ASSUME search_setting KEYS AS utf8;
-ASSUME search_setting VALIDATOR AS utf8;
-
-SET search_setting ['search.scollection.item.fields']['default']='gooruOId,contentId,sharing,goals,batchId,grade,resultUid,title,collaborators,folder,thumbnail,type,lastModified,addDate,network,creator,statistics,taxonomy,segment,distinguish,isFeatured,estimatedTime,assetURI,collectionType,narrationLink,notes,keyPoints,language,resourceGooruOIds,socialData,lastModifiedUserUid,description,category,owner,organization,collectionItemCount,collectionItem';
