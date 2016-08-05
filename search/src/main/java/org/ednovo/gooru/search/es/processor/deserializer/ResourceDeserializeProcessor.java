@@ -299,7 +299,7 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 			licenseAsMap.put(IndexFields.URL, licenseMap.get(IndexFields.URL));
 			resource.setLicense(licenseAsMap);
 		}
-
+	
 		Map<String, Object> infoMap = (Map<String, Object>) dataMap.get(IndexFields.INFO);
 		Map<String, Object> resourceSource = new HashMap<>();
 		Map<String, Object> domain = null;
@@ -308,8 +308,8 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 				domain = (Map<String, Object>) infoMap.get(IndexFields.DOMAIN);
 			}
 			if (infoMap.containsKey(IndexFields.PUBLISHER) && infoMap.get(IndexFields.PUBLISHER) != null) {
-				List<String> publisher = (List<String>) infoMap.get(IndexFields.PUBLISHER);
-				resource.setPublisher(publisher);
+				List<String> infoPublisher = (List<String>) infoMap.get(IndexFields.PUBLISHER);
+				resource.setPublisher(infoPublisher);
 			}
 			if (infoMap.containsKey(IndexFields.AGGREGATOR) && infoMap.get(IndexFields.AGGREGATOR) != null) {
 				List<String> aggregator = (List<String>) infoMap.get(IndexFields.AGGREGATOR);
@@ -318,11 +318,22 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 			if (infoMap.containsKey(IndexFields.OER) && infoMap.get(IndexFields.OER) != null) {
 				resource.setIsOer((Integer) infoMap.get(IndexFields.OER));
 			}
-            if(infoMap.containsKey(IndexFields.MOBILE_FRIENDLINESS) && infoMap.get(IndexFields.MOBILE_FRIENDLINESS) != null){
-            	resource.setMediaType((String) infoMap.get(IndexFields.MOBILE_FRIENDLINESS));
-            }
+			if (infoMap.containsKey(IndexFields.MOBILE_FRIENDLINESS) && infoMap.get(IndexFields.MOBILE_FRIENDLINESS) != null) {
+				resource.setMediaType((String) infoMap.get(IndexFields.MOBILE_FRIENDLINESS));
+			}
 		}
 		resource.setCustomFields(infoMap);
+
+		Boolean isCopyrightOwner = (Boolean) dataMap.get(IndexFields.IS_COPYRIGHT_OWNER);
+		if (resource.getPublisher() == null || resource.getPublisher().isEmpty()) {
+			List<String> publisher = new ArrayList<>();
+			if (isCopyrightOwner) {
+				if (user != null && user.getUsername() != null) publisher.add(user.getUsername());
+			} else if (dataMap.containsKey(IndexFields.COPYRIGHT_OWNER_LIST) && ((List<String>) dataMap.get(IndexFields.COPYRIGHT_OWNER_LIST)).size() > 0) {
+				publisher = (List<String>) dataMap.get(IndexFields.COPYRIGHT_OWNER_LIST);
+			}
+			resource.setPublisher((publisher != null && publisher.size() > 0) ? publisher : null);
+		}
 
 		resourceSource.put("attribution", domain != null ? domain.get(IndexFields.ATTRIBUTION) : null);
 		resourceSource.put("domainName", domain != null ? domain.get(IndexFields.NAME) : null);
