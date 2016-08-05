@@ -1,6 +1,0 @@
-ASSUME search_setting COMPARATOR AS utf8;	
-ASSUME search_setting KEYS AS utf8;
-ASSUME search_setting VALIDATOR AS utf8;
-
-SET search_setting ['search.resource.query.spellchecker.score.threshold']['default']='0.6';
-SET search_setting ['search.resource.query.spellchecker.frequency.threshold']['default']='10';

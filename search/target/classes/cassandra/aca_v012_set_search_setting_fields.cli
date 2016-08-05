@@ -1,6 +1,0 @@
- ASSUME search_setting COMPARATOR AS utf8;	
- ASSUME search_setting KEYS AS utf8;
- ASSUME search_setting VALIDATOR AS utf8;
-
-
-SET search_setting ['search.resource.fields']['default']='activeStatus,gooruOId,addDate,documentid,documentkey,assetURI,license,batchId,category,recordSource,resourceType,sharing,siteName,size,standards,tags,text,thumbnail,timeToCompleteInSec,title,type,typeEscaped,updatedCustomFields,url,contentId,distinguish,description,folder,grade,isFeatured,organization,owner,creator,partyPermissionsMap,lastModified,customFields,mediaType,statistics,socialData,averageTime,taxonomy,resourceFeed,resourceInfo.tags,,resourceInfo.numOfPages,question,resourceSource,customField';

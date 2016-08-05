@@ -1,9 +1,0 @@
- ASSUME search_setting COMPARATOR AS utf8;	
- ASSUME search_setting KEYS AS utf8;
- ASSUME search_setting VALIDATOR AS utf8;
- 
- SET search_setting ['search.resource.query.min_score.category.image']['default']='0.1';
- SET search_setting ['search.resource.query.min_score.category.challenge']['default']='0.1';
- SET search_setting ['search.resource.query.min_score.category.book']['default']='0.1';
- SET search_setting ['search.resource.query.min_score.category.audio']['default']='0.1';
- SET search_setting ['search.resource.query.min_score.category.mooc']['default']='0.1';

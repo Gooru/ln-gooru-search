@@ -1,9 +1,0 @@
-ASSUME search_setting COMPARATOR AS utf8;
-ASSUME search_setting KEYS AS utf8;
-ASSUME search_setting VALIDATOR AS utf8;
-
-SET search_setting ['search.elasticsearch.point']['default']='http://localhost:9200';
-SET search_setting ['search.elasticsearch.point.username']['default']='gooru';
-SET search_setting ['search.elasticsearch.point.password']['default']='local@2013';
-SET search_setting ['search.elasticsearch.index.prefix']['default']='gooru_';
-SET search_setting ['search.elasticsearch.index.suffix']['default']='_v2';
