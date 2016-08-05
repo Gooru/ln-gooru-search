@@ -1,0 +1,26 @@
+package org.ednovo.gooru.search.es.processor.filter.constructor;
+
+import org.ednovo.gooru.search.es.model.SearchData;
+import org.ednovo.gooru.search.es.model.SearchResponse;
+import org.ednovo.gooru.search.es.processor.SearchProcessorType;
+import org.springframework.stereotype.Component;
+
+@Component
+public class CourseFilterConstructionProcessor extends FilterConstructionProcessor {
+
+
+	@Override
+	public void process(SearchData searchData, SearchResponse<Object> response) {
+		super.process(searchData, response);
+		if(searchData != null && searchData.getFilters() != null && searchData.getFilters().containsKey(FLT_COURSE_TYPE)){
+			searchData.putFilter(IS_FEATURED, 1);
+			searchData.getFilters().remove(FLT_COURSE_TYPE);
+		}
+	}
+
+	@Override
+	protected SearchProcessorType getType() {
+		return SearchProcessorType.CourseFilterConstruction;
+	}
+
+}

@@ -1,0 +1,257 @@
+/**
+ * 
+ */
+package org.ednovo.gooru.search.es.service;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+
+import org.ednovo.gooru.search.es.constant.SearchSettingType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+/**
+ * @author SearchTeam
+ * 
+ */
+@Component
+public final class SearchSettingService {
+
+	private static SearchSettingService instance = null;
+
+	private static String FILTER_ALIAS = "filter-alias@";
+
+	private static String FILTER_DETECTION = "filter-detection@";
+
+	// Don't change order. Add new keys at the end since key position is used.
+	private static String[] settingsListKeys = { "filter-case@lowercase", "filter-splitBy@approx", "filter-skipWords@all", "search.resource.filter_detection", "search.scollection.filter_detection", "search.question.filter_detection", "search.collection.filter_detection",
+		"search.quiz.filter_detection", "index-splitBy@singleTilta", "search-splitBy@singleTilta", "index-case@lowercase","search.content.colon_filter_detection","search.schooldistirct.filter_detection" };
+
+	private static String[] settingsMapKeys = { "filter-detection@url", "filter-detection@category", "filter-detection@grade","filter-detection@resourceFormat","filter-detection@grade_colon","filter-detection@resourceFormat_colon","filter-detection@subjectName_colon","filter-detection@filter-name" };
+	
+	private static Map<String, Object> cache = new HashMap<String, Object>();
+
+	private static String cachedVersion = "";
+
+	private static String profileName = "default";
+		
+  @Autowired
+  @Resource(name = "configSettings")
+  private Properties searchSettings;
+  
+  protected Properties getSearchSettings() {
+    return this.searchSettings;
+  }
+    
+	public SearchSettingService() {
+		if(instance == null)
+		instance = this;
+	}
+
+	@PostConstruct
+	public final void init() {
+		validateCache();
+	}
+
+	private static String getProfileName() {
+		return profileName;
+	}
+	
+	private static String getSearchSetting(String key) {
+		if(cache.containsKey(key + getProfileName())) {
+			return cache.get(key + getProfileName()).toString();
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Check if the 'search.profile' is changed changed in config_setting table.
+	 * If Yes, reset the cache of search settings. else, skip reset cache.
+	 */
+	public static final void validateCache() {
+
+		String version = instance.getSearchSettings().getProperty("setting.version");
+		// Check if the search version is changed.
+		if (version.equals(cachedVersion)) {
+			return;
+		}
+		synchronized (cache) {
+			profileName = instance.getSearchSettings().getProperty("search.profile");
+			if (profileName == null) {
+				profileName = "default";
+			}
+
+			for (String setting : instance.getSearchSettings().stringPropertyNames()) {
+				cache.put(setting + profileName, instance.getSearchSettings().getProperty(setting));
+			}
+			cachedVersion = version;
+			for (String key : settingsListKeys) {
+				initListFilters(key);
+			}
+			for (String key : settingsMapKeys) {
+				initMapFilters(key);
+			}
+
+		}
+	}
+
+
+	/**
+	 * Copy all the search settings from sourceProfile to destProfile
+	 * 
+	 * @param sourceProfile
+	 *            - the profile from which search settings need to be copied.
+	 * @param destProfile
+	 *            - the profile to which the search settings need to be copied.
+	 * @param rewrite
+	 *            true - to override all settings in destProfile.
+	 */
+	//Disabled while removing cassandra dependency
+/*	public void copyProfile(String sourceProfile, String destProfile, boolean rewrite) {
+		Rows<String, String> rows = instance.searchSettingCassandraService.getAll();
+		if (!rewrite) {
+			for (Row<String, String> row : rows) {
+				String sourceValue = null;
+				boolean write = true;
+				for (Column<String> column : row.getColumns()) {
+					if (column.getName().equals(sourceProfile) && column.hasValue()) {
+						sourceValue = column.getStringValue();
+					} else if (column.getName().equals(destProfile) && column.hasValue()) {
+						write = false;
+					}
+				}
+				if (!write || sourceValue == null) {
+					continue;
+				}
+				instance.searchSettingCassandraService.save(row.getKey(), destProfile, sourceValue);
+			}
+		} else {
+			for (Row<String, String> row : rows) {
+				for (Column<String> column : row.getColumns()) {
+					if (column.getName().equals(sourceProfile) && column.hasValue()) {
+						instance.searchSettingCassandraService.save(row.getKey(), destProfile, column.getStringValue());
+					}
+				}
+			}
+		}
+	}*/
+
+	private static void initListFilters(String key) {
+		String settingData = getSearchSetting(key);
+		if (settingData == null) {
+			return;
+		}
+		cache.put(key + getProfileName(), new ArrayList<String>(0));
+		getCacheList(key).addAll(Arrays.asList(settingData.split(",")));
+	}
+
+	private static void initMapFilters(String key) {
+		String settingData = getSearchSetting(key);
+		if (settingData == null) {
+			return;
+		}
+		cache.put(key + getProfileName(), new HashMap<String, String>(0));
+		Map<String, String> filters = getCacheMap(key);
+		for (String filter : settingData.split(",")) {
+			String[] filterParam = filter.split("~~");
+			filters.put(filterParam[0], filterParam[1]);
+		}
+		if(filters!= null){
+			cache.put(key + getProfileName(), filters);
+		}
+	}
+	
+	protected static List<String> getCacheList(String key) {
+		Object result = cache.get(key + getProfileName());
+		return result instanceof List ? (List<String>) result : null;
+	}
+
+	protected static Map<String, String> getCacheMap(String key) {
+		Object result = cache.get(key + getProfileName());
+		return result instanceof Map ? (Map<String, String>) result : null;
+	}
+
+	protected static String getCache(String key) {
+		return ((String) cache.get(key + getProfileName()));
+	}
+
+	public static String getFilterAlias(String name) {
+		String value = getCache(FILTER_ALIAS + name);
+		return value != null ? value : name;
+	}
+
+	public static Map<String, String> getFilterDetection(String name) {
+		return getCacheMap(FILTER_DETECTION + name);
+	}
+
+	public static List<String> getListByName(String name) {
+		return getCacheList(name);
+	}
+
+	public static String getByName(String name) {
+		return getCache(name);
+	}
+
+	public static boolean isLowerCaseFilter(String name) {
+		return getCacheList(settingsListKeys[0]) != null ? getCacheList(settingsListKeys[0]).contains(name) : false;
+	}
+
+	public static boolean isSplitByApproxFilter(String name) {
+		return getCacheList(settingsListKeys[1]) != null ? getCacheList(settingsListKeys[1]).contains(name) : false;
+	}
+
+	public static boolean isSkipAllValueFilter(String name) {
+		return getCacheList(settingsListKeys[2]) != null ? getCacheList(settingsListKeys[2]).contains(name) : false;
+	}
+
+	public static String getSetting(String name) {
+		SearchSettingType configConstant = SearchSettingType.valueOf(name);
+		return getSetting(configConstant);
+	}
+
+	public static Float getSettingAsFloat(String name) {
+		SearchSettingType configConstant = SearchSettingType.valueOf(name);
+		return getSettingAsFloat(configConstant);
+	}
+
+	public static Float getSettingAsFloat(String name, Float defaultValue) {
+		String value = getByName(name);
+		return value != null ? Float.valueOf(value) : defaultValue;
+	}
+	
+	 public static int getSettingAsInteger(String name, Integer defaultValue) {
+	    String value = getByName(name);
+	    return value != null ? Integer.valueOf(value) : defaultValue;
+	  }
+
+	public static String getSetting(SearchSettingType settingConstant) {
+		String value = getCache(settingConstant.getName());
+		return value != null ? value : (String) settingConstant.getDefaultValue();
+	}
+
+	public static Float getSettingAsFloat(SearchSettingType settingConstant) {
+		String value = getCache(settingConstant.getName());
+		return value != null ? Float.valueOf(value) : (Float) settingConstant.getDefaultValue();
+	}
+
+	public static boolean isSplitBySingleTiltaForIndex(String name) {
+		return getCacheList(settingsListKeys[8]) != null ? getCacheList(settingsListKeys[8]).contains(name) : false;
+	}
+	
+	public static boolean isSplitBySingleTiltaForSearch(String name) {
+		return getCacheList(settingsListKeys[9]) != null ? getCacheList(settingsListKeys[9]).contains(name) : false;
+	}
+	
+	public static boolean isLowercaseForIndex(String name) {
+		return getCacheList(settingsListKeys[10]) != null ? getCacheList(settingsListKeys[10]).contains(name) : false;
+	}
+	
+}

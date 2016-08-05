@@ -1,0 +1,5 @@
+ ASSUME search_setting COMPARATOR AS utf8;	
+ ASSUME search_setting KEYS AS utf8;
+ ASSUME search_setting VALIDATOR AS utf8;
+ 
+ SET search_setting ['search.user.fields']['default']='userID,firstName,lastName,userName,gooruUID,accountId,grade,network,emailID,createdOn,roleSet,confirmStatus,userProfileImage,lastLogin,isDeleted,aboutMe,profileVisibility,notes,accountRegisterType,parentAccountUserName,childAccountCount';

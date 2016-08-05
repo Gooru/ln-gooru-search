@@ -1,0 +1,5 @@
+ ASSUME search_setting COMPARATOR AS utf8;	
+ ASSUME search_setting KEYS AS utf8;
+ ASSUME search_setting VALIDATOR AS utf8;
+
+SET search_setting ['search.resource.query.fields']['default']='_all,collection.classplanContent,collection.lesson,segment.titles,description,resourceInfo.tags,titleStandard,owner.usernameDisplay,creator.usernameDisplay,owner.usernameDisplaySnowball,creator.usernameDisplaySnowball';

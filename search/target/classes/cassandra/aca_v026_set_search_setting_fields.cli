@@ -1,0 +1,6 @@
+ASSUME search_setting COMPARATOR AS utf8;	
+ASSUME search_setting KEYS AS utf8;
+ASSUME search_setting VALIDATOR AS utf8;
+
+SET search_setting ['search.scollection.query.fields']['default']='_all,description,goals,owner.usernameDisplay,creator.usernameDisplay,owner.usernameDisplaySnowball,creator.usernameDisplaySnowball,title,taxonomy.subject.label,taxonomy.course.label,taxonomy.lesson.label,taxonomy.unit.label,taxonomy.topic.label,attribution,attributionSnowball,sourceName,sourceNameSnowball,license,questionCount,resourceCount';
+SET search_setting ['filter-alias@licenseCode']['default']='license.code';

@@ -1,0 +1,11 @@
+ ASSUME search_setting COMPARATOR AS utf8;	
+ ASSUME search_setting KEYS AS utf8;
+ ASSUME search_setting VALIDATOR AS utf8;
+
+// IMPORTANT - Donot use debug setting of nativescript
+
+SET search_setting ['search.resource.query.nativescore.enablefallback']['default']='true';
+SET search_setting ['search.resource.query.nativescore.script']['default']='gooru';
+SET search_setting ['search.resource.query.nativescore.field']['default']='statistics.pcWeight';
+SET search_setting ['search.resource.query.nativescore.debug']['default']='false';
+SET search_setting ['search.resource.query.nativescore.lang']['default']='local';

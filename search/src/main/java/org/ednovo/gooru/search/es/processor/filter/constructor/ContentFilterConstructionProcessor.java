@@ -1,0 +1,107 @@
+/**
+ * 
+ */
+package org.ednovo.gooru.search.es.processor.filter.constructor;
+
+import org.apache.commons.lang.StringUtils;
+import org.ednovo.gooru.search.es.model.PublishedStatus;
+import org.ednovo.gooru.search.es.model.SearchData;
+import org.ednovo.gooru.search.es.model.SearchResponse;
+import org.ednovo.gooru.search.es.processor.SearchProcessorType;
+import org.ednovo.gooru.search.es.processor.util.GradeUtils;
+import org.springframework.stereotype.Component;
+
+/**
+ * @author SearchTeam
+ * 
+ */
+@Component
+public class ContentFilterConstructionProcessor extends FilterConstructionProcessor {
+
+	@Override
+	public void process(SearchData searchData,
+			SearchResponse<Object> response) {
+		super.process(searchData, response);
+		
+		// As default search will serve published contents only. If publish filter passed results will be filtered based on filter value.
+		if(searchData != null && searchData.getFilters() != null && !searchData.getFilters().containsKey(FLT_PUBLISH_STATUS)){
+			searchData.putFilter(FLT_PUBLISH_STATUS, PublishedStatus.PUBLISHED.getStatus());
+		}
+        
+		
+		//TO be enabled after testing
+		//searchData.putFilter("&^publishStatus", "published");
+/*		//User user = searchData.getUser();
+	//	if(!(searchData.getUser().getUserRoleSetString().contains(SEARCH_SUPER_ADMIN) || searchData.getUser().getUserRoleSetString().contains(SEARCH_CONTENT_ADMIN))) {
+		  if (!searchData.isRestricted() && !searchData.getType().equalsIgnoreCase(LIBRARY)) {
+			if (searchData.getType().equalsIgnoreCase(RESOURCE)) {
+				//searchData.putFilter("&^restricted", "sharing:public|creator.gooruUId:" + user.getGooruUId() + "|owner.gooruUId:" + user.getGooruUId());
+			} else {
+				//searchData.putFilter("&^restricted", "sharing:public|creator.gooruUId:" + user.getGooruUId() + "|owner.gooruUId:" + user.getGooruUId() + "|partyPermissions@uId:" + StringUtils.join(UserGroupSupport.getPartyPermits(), ","));
+			}
+		  }
+	   // }
+     	searchData.putFilter("&^isCanonical", searchData.isShowCanonicalOnly() ? STR_ONE : STR_ZERO_COMMA_ONE);*/
+	}   
+
+	@Override
+	protected SearchProcessorType getType() {
+		return SearchProcessorType.ContentFilterConstruction;
+	}
+
+	@Override
+	protected boolean processFilter(SearchData searchData,
+			SearchResponse<Object> response,
+			String type,
+			String key,
+			Object values) {
+		super.processFilter(searchData, response, type, key, values);
+		if (key.equals(SEARCH_GRADE)) {
+			searchData.putFilter(type + "^grade", StringUtils.join(GradeUtils.parseGrade((String) values), ","));
+		} else if (key.equalsIgnoreCase(SEARCH_ADD_DATE) || key.equalsIgnoreCase(SEARCH_LAST_MDIFIED)) {
+			String filterDate[] = ((String) values).split("--");
+			if (filterDate != null && filterDate.length > 0) {
+				if (filterDate.length == 2) {
+					searchData.putFilter(type + "^" + key, filterDate[0] + "<>" + filterDate[1]);
+				} else {
+					searchData.putFilter(type + "^" + key, values + "<>" + values);
+				}
+			}
+		} else if (key.equalsIgnoreCase(SEARCH_HAS_ATTRIBUTION)) {
+			String value = "resourceSource.attribution:|#^resourceSource.attribution:";
+			if (((String) values).equalsIgnoreCase(SEARCH_VALUE_EMPTY)) {
+				searchData.putFilter("&^" + key, value);
+			} else if (((String) values).equalsIgnoreCase(SEARCH_VALUE_NOTEMPTY)) {
+				searchData.putFilter("!^" + key, value);
+			}
+		} else if (key.equalsIgnoreCase(SEARCH_HASNO_DESCRIPTION) || key.equalsIgnoreCase(SEARCH_HASNO_TAXONOMY)) {
+			if (((String) values).equalsIgnoreCase(SEARCH_VALUE_EMPTY)) {
+				searchData.putFilter(type + "^" + key, "1");
+			} else if (((String) values).equalsIgnoreCase(SEARCH_VALUE_NOTEMPTY)) {
+				searchData.putFilter(type + "^" + key, "0");
+			}
+		} else if (key.equalsIgnoreCase(SEARCH_HAS_NOSTANDARDS)) {
+			if (((String) values).equalsIgnoreCase(SEARCH_VALUE_EMPTY)) {
+				searchData.putFilter(type + "^" + SEARCH_HAS_STANDARDS, "0");
+			} else if (((String) values).equalsIgnoreCase(SEARCH_VALUE_NOTEMPTY)) {
+				searchData.putFilter(type + "^" + SEARCH_HAS_STANDARDS, "1");
+			}
+		} else {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	protected boolean processParam(SearchData searchData,
+			SearchResponse<Object> response,
+			String key,
+			Object values) {
+		if (key.equals(SEARCH_CATEGORY) && !((String) values).equalsIgnoreCase(SEARCH_CATEGORY_VALUES)) {
+			searchData.putFilter("&^category", values);
+			return true;
+		}
+		return false;
+	}
+
+}

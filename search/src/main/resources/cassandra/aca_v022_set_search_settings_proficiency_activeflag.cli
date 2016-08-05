@@ -1,0 +1,10 @@
+ ASSUME search_setting COMPARATOR AS utf8;	
+ ASSUME search_setting KEYS AS utf8;
+ ASSUME search_setting VALIDATOR AS utf8;
+ 
+ SET search_setting['search.resource.taxonomy.proficiency.suggest.active']['default'] = 'false';
+ SET search_setting['search.scollection.taxonomy.proficiency.suggest.active']['default'] = 'false';
+ SET search_setting['search.quiz.taxonomy.proficiency.suggest.active']['default'] = 'false';
+ SET search_setting['search.question.taxonomy.proficiency.suggest.active']['default'] = 'false';
+ SET search_setting['search.collection.taxonomy.proficiency.suggest.active']['default'] = 'false';
+ SET search_setting['search.dictionary.taxonomy.proficiency.suggest.active']['default'] = 'false';

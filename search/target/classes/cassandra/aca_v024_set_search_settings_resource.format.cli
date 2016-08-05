@@ -1,0 +1,34 @@
+ ASSUME search_setting COMPARATOR AS utf8;	
+ ASSUME search_setting KEYS AS utf8;
+ ASSUME search_setting VALIDATOR AS utf8;
+ 
+ 
+SET search_setting ['search.resource.query.min_score.resourceformat.webpage']['default']='0.1';
+
+SET search_setting ['search.resource.query.min_score.resourceformat.question']['default']='0.1';
+
+SET search_setting ['search.resource.query.min_score.resourceformat.video']['default']='0.1';
+
+SET search_setting ['search.resource.query.min_score.resourceformat.interactive']['default']='0.1';
+
+SET search_setting ['search.resource.query.min_score.resourceformat.image']['default']='0.1';
+ 
+SET search_setting ['search.resource.query.min_score.resourceformat.text']['default']='0.1';
+
+SET search_setting ['search.resource.query.min_score.resourceformat.audio']['default']='0.1';
+ 
+SET search_setting ['search.resource.user.preferred.resourceformat.boost']['default']='1.5';
+
+SET search_setting ['search.resource.user.preferred.resourceformat.boost']['default']='1.5';
+
+SET search_setting ['search.resource.filter_detection']['default']='url,grade,category,resourceFormat';
+
+SET search_setting ['filter-detection@resourceFormat']['default']='video~~(^|\\s)video(s)?(\\s|$),webpage~~(^|\\s)webpage(s|S)?(\\s|$),interactive~~(^|\\s)interactive(s)?(\\s|$),question~~(^|\\s)question(s)?(\\s|$),audio~~(^|\\s)audio(s)?(\\s|$),image~~(^|\\s)image(s)?(\\s|$),text~~(^|\\s)text(s)?(\\s|$)';
+
+SET search_setting ['filter-case@lowercase']['default']='category,standard,license,isbn,source,subjectName,courseName,topicName,unitName,lessonName,network,recordSource,mediaType,attribution,creatorEmailId,ownerEmailId,creatorUsername,ownerUsername,owner,creator,resourceFormat,instructional';
+
+SET search_setting ['search.quiz.fields']['default']='gooruOId,contentId,sharing,goals,description,category,batchId,grade,title,collaborators,folder,thumbnail,type,lastModified,addDate,network,creator,owner,statistics,socialData,taxonomy,segment,distinguish,isFeatured,assetURI,organization,collaboratorEmails,name,learningObjectives,quizCollection,vocabulary,collectionGooruOid,assessmentGooruOid';
+
+SET search_setting ['search.resource.fields']['default']='activeStatus,gooruOId,addDate,documentid,documentkey,assetURI,license,batchId,category,recordSource,resourceType,sharing,siteName,size,standards,tags,text,thumbnail,timeToCompleteInSec,title,type,typeEscaped,updatedCustomFields,url,contentId,distinguish,description,folder,grade,isFeatured,organization,owner,creator,partyPermissionsMap,lastModified,customFields,mediaType,statistics,socialData,averageTime,taxonomy,resourceFeed,resourceInfo.tags,,resourceInfo.numOfPages,question,resourceSource,customField,resourceFormat,instructional';
+
+SET search_setting ['search.question.fields']['default']='resultUid,gooruOId,owner,creator,sharing,type,isFeatured,distinguish,collaborators,grade,taxonomy,question,contentId,assetURI,lastModified,addDate,socialData,statistics,organization,category,thumbnail,license,batchId,recordSource,resourceType,standards,tags,text,title,typeEscaped,updatedCustomFields,url,description,mediaType,resourceFeed,resourceInfo.tags,resourceInfo.numOfPages,resourceSource,customField,folder,resourceFormat,instructional';

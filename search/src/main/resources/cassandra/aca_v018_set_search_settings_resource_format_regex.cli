@@ -1,0 +1,9 @@
+ASSUME search_setting KEYS AS utf8;
+ASSUME search_setting COMPARATOR AS utf8;
+ASSUME search_setting VALIDATOR AS utf8;
+
+SET search_setting ['filter-detection@resourceFormat']['default']='video~~(^|\\s)video(s)?(\\s|$),webpage~~(^|\\s)webpage(s|S)?(\\s|$),interactive~~(^|\\s)interactive(s)?(\\s|$),exam~~(^|\\s)exam(s)?(\\s|$),textbook~~(^|\\s)textbook(s)?(\\s|$),handout~~(^|\\s)handout(s)?(\\s|$),question~~(^|\\s)question(s)?(\\s|$),lesson~~(^|\\s)lesson(s)?(\\s|$),slide~~(^|\\s)slide(s)?(\\s|$),audio~~(^|\\s)audio(s)?(\\s|$),image~~(^|\\s)image(s)?(\\s|$)';
+SET search_setting ['filter-detection@url']['default']='url~~((?:https?|ftp|mailto)\:?((\/\/)?|www\.)(?:[-a-zA-Z0-9]+\.)*[-a-zA-Z0-9]+.*)';
+
+
+SET search_setting ['filter-case@lowercase']['default']='category,standard,license,isbn,source,subjectName,courseName,topicName,unitName,lessonName,network,recordSource,mediaType,attribution,creatorEmailId,ownerEmailId,creatorUsername,ownerUsername,owner,creator,resourceFormat,instructional';

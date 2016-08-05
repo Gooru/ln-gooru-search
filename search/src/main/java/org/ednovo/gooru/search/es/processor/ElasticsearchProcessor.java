@@ -1,0 +1,137 @@
+/**
+ * 
+ */
+package org.ednovo.gooru.search.es.processor;
+
+import io.searchbox.client.JestClient;
+import io.searchbox.client.JestClientFactory;
+import io.searchbox.client.JestResult;
+import io.searchbox.client.config.HttpClientConfig;
+import io.searchbox.core.Search;
+
+import static org.ednovo.gooru.search.es.constant.SearchSettingType.S_ES_INDEX_PREFIX;
+import static org.ednovo.gooru.search.es.constant.SearchSettingType.S_ES_INDEX_SUFFIX;
+import static org.ednovo.gooru.search.es.constant.SearchSettingType.S_ES_POINT;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jettison.json.JSONObject;
+import org.ednovo.gooru.search.es.exception.BadRequestException;
+import org.ednovo.gooru.search.es.model.SearchData;
+import org.ednovo.gooru.search.es.model.SearchResponse;
+import org.springframework.stereotype.Component;
+
+
+/**
+ * @author SearchTeam
+ * 
+ */
+@Component
+public class ElasticsearchProcessor extends SearchProcessor<SearchData, Object> {
+
+	private static JestClient client = null;
+
+	@PostConstruct
+	public void onStartUp() {
+		// Configuration
+
+		HttpClientConfig clientConfig = new HttpClientConfig.Builder(Arrays.asList(getSetting(S_ES_POINT).split(","))).multiThreaded(true)
+				.maxTotalConnection(500).defaultMaxTotalConnectionPerRoute(100).readTimeout(30000).build();
+
+		// Construct a new Jest client according to configuration via factory
+		JestClientFactory factory = new JestClientFactory();
+		factory.setHttpClientConfig(clientConfig);
+		setClient(factory.getObject());
+		LOG.info("IP included to jest client: " + getSetting(S_ES_POINT));
+		LOG.info("Creating Jest client...");
+
+	}
+
+	@PreDestroy
+	public void onStop() {
+		getClient().shutdownClient();
+		LOG.info("Jest client shutdown");
+	}
+
+	@Override
+	public void process(SearchData searchData, SearchResponse<Object> response)  {
+		String indexName = searchData.getIndexType().getName();
+		String indexType = searchData.getType().toLowerCase();
+		if (indexType.equalsIgnoreCase(SEARCH_QUESTION) || indexType.equalsIgnoreCase("attribution") || indexType.equalsIgnoreCase(TAXONOMY_SUB_LEVEL)
+				|| indexType.equalsIgnoreCase(MULTI_RESOURCE) || indexType.equalsIgnoreCase("source") || indexType.equalsIgnoreCase(AUTO_COMPLETE)
+            || indexType.equalsIgnoreCase(SPELLCHECKER)) {
+			indexType = indexName;
+		} else if (indexType.equalsIgnoreCase(TYPE_SCOLLECTION)) {
+			indexType = TYPE_COLLECTION;
+		}
+
+		try {
+			String searchQuery = SERIAILIZER.writeValueAsString(searchData.getQueryDsl().getValues());
+			if (searchData.getPretty().equals("1")) {
+				ObjectMapper mapper = new ObjectMapper();
+				Object json = mapper.readValue(searchQuery, Map.class);
+				LOG.info("IndexName:"+getSetting(S_ES_INDEX_PREFIX) + indexName + getSetting(S_ES_INDEX_SUFFIX)+"/"+indexType);
+				LOG.info(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json));
+				
+			}
+			
+	    Search search=null;	
+	    Collection<String> indexNames;
+	    Collection<String> indexTypes ;
+		if (searchData.getType().equalsIgnoreCase(CONTRIBUTOR)&& searchData.getContributorType().equalsIgnoreCase(RESOURCE)) {
+		    indexNames = new ArrayList<String>();
+			indexNames.add(getSetting(S_ES_INDEX_PREFIX) + TYPE_USER + getSetting(S_ES_INDEX_SUFFIX));
+			indexNames.add(getSetting(S_ES_INDEX_PREFIX) + CONTENT_PROVIDER + getSetting(S_ES_INDEX_SUFFIX));
+		    indexTypes = new ArrayList<String>();
+			indexTypes.add(TYPE_USER);
+			indexTypes.add(PUBLISHER);
+			indexTypes.add(AGGREGATOR);
+		    search = new Search.Builder(searchQuery).addIndex(indexNames).addType(indexTypes).build();
+		} else if(searchData.getType().equalsIgnoreCase(CONTRIBUTOR)&& searchData.getContributorType().equalsIgnoreCase(COLLECTION)){
+			indexNames = new ArrayList<String>();
+			indexNames.add(getSetting(S_ES_INDEX_PREFIX) + TYPE_USER + getSetting(S_ES_INDEX_SUFFIX));
+			indexTypes = new ArrayList<String>();
+			indexTypes.add(TYPE_USER);
+		  }else {
+			 search = new Search.Builder(searchQuery)
+					.addIndex(getSetting(S_ES_INDEX_PREFIX) + indexName + getSetting(S_ES_INDEX_SUFFIX)).addType(indexType).build();
+		   }
+			long start = System.currentTimeMillis();
+			JestResult jestResult = getClient().execute(search);
+	 	    if (jestResult.getErrorMessage()!= null) {
+	        	JSONObject responseStatus = new JSONObject(jestResult.getJsonString());
+	        	if ((Integer)responseStatus.get(SEARCH_STATUS) == 400 || (Integer)responseStatus.get(SEARCH_STATUS) == 503) {
+	        		 throw new BadRequestException("Please check request param input values");
+		        }
+	         } 
+		     searchData.setSearchResultText(jestResult.getJsonString());
+			 if(LOG.isDebugEnabled()){
+				 LOG.debug("Elapsed Time for " + indexType + " : " + (System.currentTimeMillis() - start) + " ms");
+			 }	
+		} catch (BadRequestException e) {
+			throw new BadRequestException("Please check request input param values" + e);		
+		} catch (Exception e) {
+			LOG.error("Search Error"+ e); 
+		}
+	}
+
+	@Override
+	protected SearchProcessorType getType() {
+		return SearchProcessorType.Elasticsearch;
+	}
+
+	public static JestClient getClient() {
+		return client;
+	}
+
+	public static void setClient(JestClient client) {
+		ElasticsearchProcessor.client = client;
+	}
+}

@@ -1,0 +1,76 @@
+package org.ednovo.gooru.search.web.filter;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.ednovo.gooru.responses.auth.AuthPrefsResponseHolder;
+import org.ednovo.gooru.responses.auth.AuthPrefsResponseHolderBuilder;
+import org.ednovo.gooru.search.es.constant.Constants;
+import org.ednovo.gooru.search.es.exception.UnauthorizedException;
+import org.ednovo.gooru.search.es.model.User;
+import org.ednovo.gooru.search.es.service.RedisClient;
+import org.ednovo.gooru.search.model.GooruAuthenticationToken;
+import org.ednovo.gooru.search.model.UserCredential;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+public class DoAuthorization {
+
+	@Autowired
+	private RedisClient redisClient;
+
+	private static final Logger logger = LoggerFactory.getLogger(DoAuthorization.class);
+
+	public static final String PARAM_ACCESS_TOKEN_VALIDITY = "provided_at";
+
+	public void doFilter(final String sessionToken, final HttpServletRequest request) throws JSONException {
+		User user = null;
+
+		logger.info("Received session token : " + sessionToken);
+		if (sessionToken != null) {
+			JSONObject accessToken = getAccessToken(sessionToken);
+			if (accessToken == null) {
+				throw new AccessDeniedException("Invalid session token : " + sessionToken);
+			}
+			logger.info("Accesstoken data fetched from redis : " + accessToken);
+			try {
+				AuthPrefsResponseHolder responseHolder = AuthPrefsResponseHolderBuilder.build(accessToken);
+				if (!responseHolder.isAuthorized()) {
+					throw new UnauthorizedException("Unauthorized");
+				}
+				if (!responseHolder.getUser().isEmpty() && responseHolder.getUser() != null) {
+					Authentication auth = new GooruAuthenticationToken(responseHolder.getUser(), null, new UserCredential());
+					SecurityContextHolder.getContext().setAuthentication(auth);
+					logger.info("Authorization succeded for user : " + responseHolder.getUser() + " , forwarding request to next route !");
+					user = new User();
+					String gooruUId = responseHolder.getUser();
+					user.setPartyUid(gooruUId);
+					user.setGooruUId(gooruUId);
+					request.setAttribute(Constants.USER, user);
+					request.setAttribute(Constants.SESSION_TOKEN_SEARCH, sessionToken);
+					request.setAttribute(Constants.CLIENT_ID, responseHolder.getClientId());
+					request.setAttribute(Constants.CONTENT_CDN_URL, responseHolder.getContentCDN());
+				}
+			} catch (Exception e) {
+				logger.error("Error processing authorize request " + e);
+			}
+		}
+	}
+
+	private JSONObject getAccessToken(String token) throws JSONException {
+		try {
+
+			JSONObject accessToken = redisClient.getJsonObject(token);
+			return accessToken;
+		} catch (Exception e) {
+			logger.error("Read from redis failed", e);
+		}
+		return null;
+	}
+
+}

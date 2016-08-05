@@ -1,0 +1,6 @@
+ ASSUME search_setting COMPARATOR AS utf8;	
+ ASSUME search_setting KEYS AS utf8;
+ ASSUME search_setting VALIDATOR AS utf8;
+ 
+ SET search_setting ['update.resource.rescoring']['default']= 'false';
+ SET search_setting ['update.scollection.rescoring']['default']= 'false';
