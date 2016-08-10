@@ -324,7 +324,7 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 		}
 		resource.setCustomFields(infoMap);
 
-		Boolean isCopyrightOwner = (Boolean) dataMap.get(IndexFields.IS_COPYRIGHT_OWNER);
+		Boolean isCopyrightOwner = dataMap.get(IndexFields.IS_COPYRIGHT_OWNER) == null ? false : (Boolean)dataMap.get(IndexFields.IS_COPYRIGHT_OWNER);
 		if (resource.getPublisher() == null || resource.getPublisher().isEmpty()) {
 			List<String> publisher = new ArrayList<>();
 			if (isCopyrightOwner) {
