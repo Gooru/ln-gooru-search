@@ -75,7 +75,7 @@ public class IndexFields {
 	public static final String OER = "oer";
 	public static final String MOBILE_FRIENDLINESS = "mobileFriendliness";
 	public static final String IS_COPYRIGHT_OWNER = "isCopyrightOwner";
-	public static final String COPYRIGHT_OWNER_LIST = "copyrightOwner";
+	public static final String COPYRIGHT_OWNER_LIST = "copyrightOwnerList";
 	
 	// course fields 
 	
