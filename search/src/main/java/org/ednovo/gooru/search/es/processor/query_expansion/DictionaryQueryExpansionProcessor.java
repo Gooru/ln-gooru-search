@@ -27,7 +27,7 @@ public class DictionaryQueryExpansionProcessor extends SearchProcessor<SearchDat
 	
 	@Override
 	public void process(SearchData searchData, SearchResponse<Object> response) {
-		if (searchData.getQueryString().equals("*") || searchData.getQueryString().equals("*:*") || StringUtils.trimToEmpty(searchData.getQueryString()).length() == 0 || emailValidate(searchData.getQueryString().toLowerCase()) || uuidValidate(searchData.getQueryString().toLowerCase()) || expressionValidate(searchData.getQueryString()) || standardValidate(searchData) || libararyNameValidate(searchData.getQueryString().toLowerCase())) {
+		if (searchData.getQueryString().equals("*") || searchData.getQueryString().equals("*:*") || StringUtils.trimToEmpty(searchData.getQueryString()).length() == 0 || emailValidate(searchData.getQueryString().toLowerCase()) || uuidValidate(searchData.getQueryString().toLowerCase()) || expressionValidate(searchData.getQueryString()) || standardValidate(searchData)) {
 			if(logger.isDebugEnabled()){
 				logger.debug("Skiping Dictionary Procesor !");
 			}

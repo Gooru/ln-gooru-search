@@ -27,6 +27,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -227,6 +228,8 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			type = COLLECTION;
 		} else if (type.equalsIgnoreCase(QUIZ_SUGGEST)) {
 			type = TYPE_QUIZ;
+		} else if(type.equalsIgnoreCase(TYPE_USER)) {
+			throw new SearchException(HttpStatus.NOT_IMPLEMENTED, "Not supported");
 		}
 
 		searchData.setType(type);

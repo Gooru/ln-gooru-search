@@ -145,10 +145,10 @@ public class FilterDetectionProcessor extends SearchProcessor<SearchData, Object
 		}
 		
 		String orgQuery = searchData.getQueryString().toLowerCase().trim();
-		if(libraryName.get(orgQuery) != null){
+		/*if(libraryName.get(orgQuery) != null){
 			searchData.setQueryString("*");
 			searchData.putFilter("&^libraryName", libraryName.get(orgQuery));
-		}
+		}*/
 		
 		
 		/*String orgQuery = searchData.getQueryString().toLowerCase();
