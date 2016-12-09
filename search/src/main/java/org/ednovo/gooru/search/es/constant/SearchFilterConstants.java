@@ -43,7 +43,7 @@ public class SearchFilterConstants {
 	}
 
 	public static String getContentSubFormatMapValue(String key) {
-		return contentSubFormatFilterMap.containsKey(key) ? contentSubFormatFilterMap.get(key.toLowerCase()) : null;
+		return contentSubFormatFilterMap.containsKey(key.toLowerCase()) ? contentSubFormatFilterMap.get(key.toLowerCase()) : null;
 	}
 
 	public static Boolean contentSubFormatKeySetContains(String key) {

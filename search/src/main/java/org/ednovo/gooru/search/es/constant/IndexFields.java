@@ -72,7 +72,7 @@ public class IndexFields {
 	public static final String GRADE = "grade";
 	public static final String EDUCATIONAL_USE = "educationalUse";
 	public static final String MOMENTS_OF_LEARNING = "momentsOfLearning";
-	public static final String OER = "oer";
+	public static final String OER = "isOer";
 	public static final String MOBILE_FRIENDLINESS = "mobileFriendliness";
 	public static final String IS_COPYRIGHT_OWNER = "isCopyrightOwner";
 	public static final String COPYRIGHT_OWNER_LIST = "copyrightOwnerList";
