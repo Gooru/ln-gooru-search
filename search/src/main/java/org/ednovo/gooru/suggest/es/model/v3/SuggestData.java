@@ -1,9 +1,10 @@
 /**
  * 
  */
-package org.ednovo.gooru.search.es.model;
+package org.ednovo.gooru.suggest.es.model.v3;
 
-import org.ednovo.gooru.suggest.es.model.v3.SuggestV3Context;
+import org.ednovo.gooru.search.es.model.SearchData;
+import org.ednovo.gooru.search.es.model.SuggestContext;
 
 /**
  * @author SearchTeam
