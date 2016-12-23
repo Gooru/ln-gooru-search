@@ -3,8 +3,6 @@
  */
 package org.ednovo.gooru.search.es.model;
 
-import org.ednovo.gooru.suggest.es.model.v3.SuggestV3Context;
-
 /**
  * @author SearchTeam
  * 
@@ -21,8 +19,6 @@ public class SuggestData extends SearchData {
 	
 	private SuggestContext suggestContext;
 
-	private SuggestV3Context suggestV3Context;
-
 	public String getContext() {
 		return context;
 	}
@@ -38,13 +34,5 @@ public class SuggestData extends SearchData {
 	public SuggestContext getSuggestContext() {
 		return suggestContext;
 	}
-	
-	 public void setSuggestV3Context(SuggestV3Context suggestV3Context) {
-	    this.suggestV3Context = suggestV3Context;
-	  }
-
-	  public SuggestV3Context getSuggestV3Context() {
-	    return suggestV3Context;
-	  }
 
 }
