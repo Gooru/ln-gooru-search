@@ -1,4 +1,4 @@
-package org.ednovo.gooru.search.es.handler.v3;
+package org.ednovo.gooru.suggest.v3.handler;
 
 import java.io.Serializable;
 

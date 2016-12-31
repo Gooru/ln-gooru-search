@@ -1,4 +1,4 @@
-package org.ednovo.gooru.search.es.handler.v3;
+package org.ednovo.gooru.suggest.v3.handler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,7 +41,7 @@ public abstract class SuggestHandler<O> implements SuggestBaseHandler<Object>{
 			handlers.put(getName(), suggestHandlers);
 		}
 		
-		//System.out.println("REgistered suggest handlers :" + handlers.toString());
+		//System.out.println("Registered suggest handlers :" + handlers.toString());
 	}
 	
 	/**

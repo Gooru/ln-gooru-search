@@ -26,6 +26,8 @@ import org.codehaus.jettison.json.JSONObject;
 import org.ednovo.gooru.search.es.exception.BadRequestException;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.SearchResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 
@@ -35,6 +37,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ElasticsearchProcessor extends SearchProcessor<SearchData, Object> {
+
+	protected static final Logger LOG = LoggerFactory.getLogger(ElasticsearchProcessor.class);
 
 	private static JestClient client = null;
 
@@ -79,7 +83,6 @@ public class ElasticsearchProcessor extends SearchProcessor<SearchData, Object> 
 				Object json = mapper.readValue(searchQuery, Map.class);
 				LOG.info("IndexName:"+getSetting(S_ES_INDEX_PREFIX) + indexName + getSetting(S_ES_INDEX_SUFFIX)+"/"+indexType);
 				LOG.info(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json));
-				
 			}
 			
 	    Search search=null;	

@@ -1,4 +1,4 @@
-package org.ednovo.gooru.suggest.es.model.v3;
+package org.ednovo.gooru.suggest.v3.model;
 
 import java.io.Serializable;
 import java.util.HashMap;

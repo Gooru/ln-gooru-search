@@ -3,6 +3,7 @@ package org.ednovo.gooru.controllers.api.v3;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,10 +15,11 @@ import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.exception.BadRequestException;
 import org.ednovo.gooru.search.es.exception.SearchException;
 import org.ednovo.gooru.search.es.model.MapWrapper;
-import org.ednovo.gooru.search.es.model.SuggestData;
+import org.ednovo.gooru.search.es.model.SuggestResponse;
 import org.ednovo.gooru.search.es.model.User;
-import org.ednovo.gooru.search.es.service.SuggestV3Service;
-import org.ednovo.gooru.suggest.es.model.v3.SuggestV3Context;
+import org.ednovo.gooru.suggest.v3.model.SuggestData;
+import org.ednovo.gooru.suggest.v3.model.SuggestV3Context;
+import org.ednovo.gooru.suggest.v3.service.SuggestV3Service;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -37,42 +39,38 @@ public class SuggestV3RestController extends BaseController {
 
 	protected static final Logger LOG = LoggerFactory.getLogger(SuggestV3RestController.class);
 
-	private static final String SINGLE_EXCLUDES[] = { "*.organization", "fileData", "fileHash", "fromQa", "isFeaturedBoolean", "isLive", "isNew", "lessonsString", "new", "parentUrl",
-			"resourceInstances", "resourceLearnguides", "resourceMetaData", "resourceOid", "resourceSegments", "responses", "score", "siteName", "sourceReference", "subscriptions", "taxonomySet.*",
-			"text", "userPermSet", "userUploadedImage", "vocaularyString", "*.class", "*.answerId", "*.answerType", "*.isCorrect", "*.matchingAnswer", "*.question", "*.sequence", "*.unit",
-			"*.hintId", "*.assessmentCode", "*.assessmentGooruId", "*.assets", "*.codes", "*.creator", "*.difficultyLevel", "*.helpContentLink", "*.importCode", "*.instruction", "*.isFolderAbsent",
-			"*.quizNetwork", "*.scorePoints", "*.sourceContentInfo", "*.user", "*.userVote", "*.queryUId" };
-
+	public static final String SINGLE_EXCLUDES[] = { "*.text", "*.class", "*.answer", "*.isCorrect", "*.question", "*.sequence", "*.unit", "*.hintId",
+			"*.assets", "*.codes","*.importCode", "*.queryUId", "*.resource.indexType","*.resource.recordSource", "*.brokenStatus","*.assetURI","*.category","*.contentId","*.contentPermissions",
+			"creator.isDeleted","*.emailId","*.organizationName","*.partyUid","*.userRoleSetString","*.distinguish","*.entryId","*.folder","*.indexId","*.isDeleted",
+			"*.isOer","*.libraryNames","*.ratings.*","*.*.recordSource","*.resourceAddedCount","*.resourceTags","*.resourceType","*.resourceUsedUserCount","*.resultUId","*.s3UploadFlag","*.sharing","*.taxonomyDataSet",
+			"*.thumbnail","*.thumbnails","*.viewCount","*.resourceSource","*.course"};
 	@Autowired
 	private SuggestV3Service suggestService;
 
 	@RequestMapping(method = { RequestMethod.GET }, value = "/{type}")
 	public ModelAndView suggest(HttpServletRequest request, HttpServletResponse response, 
-			@RequestParam(required = false) String sessionToken,
+			@RequestParam(required = false) String sessionToken, 
 			@RequestParam(defaultValue = "0") Integer startAt,
-			@RequestParam(defaultValue = "10", value="limit") Integer pageSize,
-      @RequestParam(defaultValue = "1") Integer pageNum,
-			@RequestParam(required = true) String context, 
-      @RequestParam(required = true) String id, 
-      @RequestParam(required = true) String userId, 
-      @RequestParam(required = false) String containerId, 
-      @RequestParam(required = false) String courseId, 
-      @RequestParam(required = false) String unitId, 
-      @RequestParam(required = false) String lessonId, 
-      @RequestParam(defaultValue = "0") String pretty,
-			@PathVariable String type) throws Exception {
+			@RequestParam(defaultValue = "10", value = "limit") Integer pageSize, 
+			@RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(required = true) String context,
+			@RequestParam(required = true) String id, @RequestParam(required = true) String userId, 
+			@RequestParam(required = false) String containerId, @RequestParam(required = false) String courseId,
+			@RequestParam(required = false) String unitId, @RequestParam(required = false) String lessonId, 
+			@RequestParam(defaultValue = "0") String pretty, @PathVariable String type)
+			throws Exception {
+
 		if(sessionToken == null){
 			sessionToken = getSessionToken(request);
 		}
 		User apiCaller = (User) request.getAttribute(Constants.USER);
 		SuggestData suggestData = new SuggestData();
 		SuggestV3RequestData suggestRequestData = new SuggestV3RequestData();
-    
+
 		@SuppressWarnings("unchecked")
-    MapWrapper<Object> suggestParamMap = new MapWrapper<Object>(request.getParameterMap());
+		MapWrapper<Object> suggestParamMap = new MapWrapper<Object>(request.getParameterMap());
 		suggestData.setParameters(suggestParamMap);
 		if (suggestParamMap != null) {
-		  SuggestV3Context suggestContext = getContextData(suggestParamMap, suggestRequestData);
+			SuggestV3Context suggestContext = getContextData(suggestParamMap, suggestRequestData);
 			if (apiCaller != null) {
 				suggestContext.setUserId(apiCaller.getGooruUId());
 			}
@@ -90,10 +88,10 @@ public class SuggestV3RestController extends BaseController {
 		suggestData.setRemoteAddress(request.getRemoteAddr());
 		suggestData.setUser(apiCaller);
 
-		try {
-      String result = getSuggestCannedResponse().toJSONString();
-			/*List<SuggestResponse<Object>> suggestResults = suggestService.suggest(suggestData);
-			String result = serialize(suggestResults, JSON, SINGLE_EXCLUDES, true);*/
+		try{
+			//String result = getSuggestCannedResponse().toJSONString();
+			List<SuggestResponse<Object>> suggestResults = suggestService.suggest(suggestData);
+			String result = serialize(suggestResults, JSON, SINGLE_EXCLUDES, true);
 			//LOG.info("Total latency suggest " , System.currentTimeMillis() - start);
 			return toModelAndView(result);
 		} catch (SearchException searchException) {
@@ -109,25 +107,25 @@ public class SuggestV3RestController extends BaseController {
       for (String key : inputParameters.keySet()) {
         switch (key) {
         case "id":
-          suggestContext.setId(inputParameters.get(key).toString());
+          suggestContext.setId(((String[]) inputParameters.get(key))[0]);
           break;
         case "context":
-          suggestContext.setContext(inputParameters.get(key).toString());
+          suggestContext.setContext(((String[]) inputParameters.get(key))[0]);
           break;
         case "userId":
-          suggestContext.setUserId(inputParameters.get(key).toString());
+          suggestContext.setUserId(((String[]) inputParameters.get(key))[0]);
           break;
         case "containerId":
-          suggestContext.setContainerId(inputParameters.get(key).toString());
+          suggestContext.setContainerId(((String[]) inputParameters.get(key))[0]);
           break;
         case "courseId":
-          suggestContext.setCourseId(inputParameters.get(key).toString());
+          suggestContext.setCourseId(((String[]) inputParameters.get(key))[0]);
           break;
         case "unitId":
-          suggestContext.setUnitId(inputParameters.get(key).toString());
+          suggestContext.setUnitId(((String[]) inputParameters.get(key))[0]);
           break;
         case "lessonId":
-          suggestContext.setLessonId(inputParameters.get(key).toString());
+          suggestContext.setLessonId(((String[]) inputParameters.get(key))[0]);
           break;
         case "limit":
             Integer limit = Integer.parseInt(((String[]) inputParameters.get(key))[0]);
@@ -146,9 +144,8 @@ public class SuggestV3RestController extends BaseController {
     JSONArray json = new JSONArray();
     JSONParser parser = new JSONParser();
     try {
-     Object object =  parser.parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("suggest_canned_response.txt")));
-     json = (JSONArray) object; 
-     return json;
+      json = (JSONArray) parser.parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("suggest_canned_response.txt")));
+      return json;
     } catch (ParseException e) {
       LOG.error("Unable to Parse Canned response");
     } catch (FileNotFoundException e) {

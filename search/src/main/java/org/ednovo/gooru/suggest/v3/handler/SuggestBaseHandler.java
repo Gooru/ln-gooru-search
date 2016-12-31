@@ -1,11 +1,11 @@
-package org.ednovo.gooru.search.es.handler.v3;
+package org.ednovo.gooru.suggest.v3.handler;
 
 import java.util.List;
 import java.util.Map;
 
-import org.ednovo.gooru.search.es.handler.SuggestDataProviderType;
-import org.ednovo.gooru.search.es.model.SuggestData;
 import org.ednovo.gooru.search.es.model.SuggestResponse;
+import org.ednovo.gooru.suggest.v3.data.provider.model.SuggestDataProviderType;
+import org.ednovo.gooru.suggest.v3.model.SuggestData;
 
 public interface SuggestBaseHandler <O extends Object> {
 
