@@ -37,35 +37,7 @@ public class ContentRepositoryImpl extends BaseRepository implements ContentRepo
 			resultMap.put("taxonomy", (taxonomyString != null) ? new JSONObject(taxonomyString) : null);
 		}
 		return resultMap;
-	}
-	
-	@Override
-	public String getParentTaxonomyCode(String code) {
-		String sql = "select parent_taxonomy_code_id from taxonomy_code where id =:ID";
-		Query query = getSessionFactory().getCurrentSession().createSQLQuery(sql)
-				.addScalar("parent_taxonomy_code_id", StringType.INSTANCE)
-				.setParameter("ID", code, StringType.INSTANCE);
-		String parentCode = null;
-		if (query != null && list(query).size() > 0) {
-			parentCode = list(query).get(0).toString();
-		}
-		return parentCode;
-	}
-	
-	@Override
-	public List<String> getConceptNeighbours(String code, String parentCode) {
-		String sql = "select id from taxonomy_code where parent_taxonomy_code_id =:PARENT_ID and id !=:ID";
-		Query query = getSessionFactory().getCurrentSession().createSQLQuery(sql)
-				.addScalar("id", StringType.INSTANCE)
-				.setParameter("PARENT_ID", parentCode, StringType.INSTANCE)
-				.setParameter("ID", code, StringType.INSTANCE);
-		List<String> resultList = null;
-		if (query != null && list(query).size() > 0) {
-			resultList = list(query);
-		}
-		return resultList;
-	}
-	
+	}	
 	
 	@Override
 	public List<Map<String, Object>> getItems(String collectionId) {

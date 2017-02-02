@@ -24,21 +24,26 @@ import org.ednovo.gooru.search.es.processor.query_builder.ResourceEsDslQueryBuil
 import org.ednovo.gooru.search.es.service.SearchSettingService;
 import org.ednovo.gooru.search.model.ActivityStreamRawData;
 import org.ednovo.gooru.suggest.v3.data.provider.model.SuggestDataProviderType;
+import org.ednovo.gooru.suggest.v3.model.CollectionContextData;
 import org.ednovo.gooru.suggest.v3.model.ResourceContextData;
 import org.ednovo.gooru.suggest.v3.model.SuggestData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>> {
 
-	private static final String RESOURCE_REMOVE = "item.delete";
+	protected static final Logger LOG = LoggerFactory.getLogger(ResourceV3SuggestHandler.class);
 
 	private static Integer threadPoolLength = 3;
 
 	private ExecutorService doerService;
 
 	private static final String RESOURCE_STUDY_SUGGEST = "resource-study-suggest";
+
+	private static final String COLLECTION_STUDY = "collection-study";
 
 	private static final String RESOURCE_PLAY_ACTIVITY = "resource.play";
 
@@ -55,7 +60,7 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 	@Autowired
 	private ResourceDeserializeProcessor resourceDeserializeProcessor;
 
-	private SuggestDataProviderType[] suggestDataProviders = { SuggestDataProviderType.RESOURCE };
+	private SuggestDataProviderType[] suggestDataProviders = { SuggestDataProviderType.RESOURCE,SuggestDataProviderType.COLLECTION };
 
 	@Override
 	protected SuggestHandlerType getType() {
@@ -84,9 +89,9 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 		}
 
 		List<Callable<SuggestResponse<Object>>> tasks = new ArrayList<Callable<SuggestResponse<Object>>>();
-		final List<String> recentlyRemovedResIds = new ArrayList<String>();
 		final List<String> recentlyPlayedResIds = new ArrayList<String>();
 		final ResourceContextData resourceData = (ResourceContextData) dataProviderInput.get(SuggestDataProviderType.RESOURCE);
+		final CollectionContextData collectionData = (CollectionContextData) dataProviderInput.get(SuggestDataProviderType.COLLECTION);
 		final List<ActivityStreamRawData> activityList = (List<ActivityStreamRawData>) dataProviderInput.get(SuggestDataProviderType.USER_ACTIVITY);
 
 		if ((activityList != null && activityList.size() > 0)) {
@@ -108,22 +113,13 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 			public SuggestResponse<Object> call() throws Exception {
 				try {
 					String queryString = "*";
+					//suggestData.putFilter("&^publishStatus", "published");
+					suggestData.putFilter("&^contentFormat", "resource");
+					suggestData.putFilter("&^statistics.statusIsBroken", 0);
 					if (eventName.equalsIgnoreCase(RESOURCE_STUDY_SUGGEST)) {
 						if (resourceData != null) {
 
-							suggestData.putFilter("&^publishStatus", "published");
-							suggestData.putFilter("&^contentFormat", "resource");
-							suggestData.putFilter("&^statistics.statusIsBroken", 0);
-							suggestData.putFilter("!^id", suggestData.getSuggestV3Context().getId()); 
-
-							/*
-							 * if (recentlyRemovedResIds.size() > 0) { 
-							 * collectionData.getCollectionResourceIds().addAll(recentlyRemovedResIds); 
-							 * } 
-							 * if (collectionData.getCollectionResourceIds() != null && collectionData.getCollectionResourceIds().size() > 0) { 
-							 * suggestData.putFilter("!^id", StringUtils.join(collectionData.getCollectionResourceIds(), ",")); 
-							 * }
-							 */
+							suggestData.putFilter("!^id", suggestData.getSuggestV3Context().getId());
 
 							// Search query formation: If query string is null in the request,
 							// build the search query with resource keywords OR resource title
@@ -132,46 +128,66 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 							StringBuilder suggestQuery = new StringBuilder();
 							if (StringUtils.isNotBlank(resourceData.getKeywords())) {
 								for (String keyword : resourceData.getKeywords().trim().split(",")) {
-									if(suggestQuery.length() > 0) {
+									if (suggestQuery.length() > 0) {
 										suggestQuery.append(OR_DELIMETER);
 									}
 									suggestQuery.append(keyword);
 								}
 							}
 							if (StringUtils.isNotBlank(resourceData.getTitle())) {
-								if(suggestQuery.length() > 0) {
+								if (suggestQuery.length() > 0) {
 									suggestQuery.append(OR_DELIMETER);
 								}
 								suggestQuery.append(resourceData.getTitle().trim());
 							}
+							if (StringUtils.isNotBlank(resourceData.getDescription())) {
+								if (suggestQuery.length() > 0) {
+									suggestQuery.append(OR_DELIMETER);
+								}
+								suggestQuery.append(resourceData.getDescription().trim());
+							}
 
-							if (suggestQuery.length() == 0){
+							if (suggestQuery.length() == 0) {
 								queryString = "*";
 							} else {
 								queryString = suggestQuery.toString();
 							}
 
-							/*StringBuilder orFilterData = new StringBuilder();
-							if (resourceData.getCourseId() != null && resourceData.getCourseId().size() > 0) {
-								orFilterData.append("taxonomy.course.codeId:" + StringUtils.join(resourceData.getCourseId(), ","));
-							} else if (resourceData.getSubjectId() != null && resourceData.getSubjectId().size() > 0) {
-								orFilterData.append("taxonomy.subject.codeId:" + StringUtils.join(resourceData.getSubjectId(), ","));
-							}
-							if (resourceData.getStandards() != null && resourceData.getStandards().size() > 0) {
-								if (orFilterData.length() > 0) {
-									orFilterData.append("|");
+							if (collectionData != null) {
+								if (collectionData.getTaxonomyDomains() != null && collectionData.getTaxonomyDomains().size() > 0) {
+									suggestData.putFilter("&^domain", StringUtils.join(collectionData.getTaxonomyDomains(), ","));
+								} else if (collectionData.getTaxonomyLeafSLInternalCodes() != null && collectionData.getTaxonomyLeafSLInternalCodes().size() > 0) {
+									suggestData.putFilter("&^taxonomy.leafInternalCodes", StringUtils.join(collectionData.getTaxonomyLeafSLInternalCodes(), ","));
 								}
-								orFilterData.append("taxonomy.leafInternalCodes:" + StringUtils.join(resourceData.getStandards(), ","));
-							}
-
-							if (orFilterData.length() > 0) {
-								suggestData.putFilter("&^orFilters", orFilterData.toString());
-							}*/
-							if (resourceData.getConceptNodeNeighbours() != null && resourceData.getConceptNodeNeighbours().size() > 0) {
-								suggestData.putFilter("|^taxonomy.leafInternalCodes", StringUtils.join(resourceData.getConceptNodeNeighbours(), ","));
 							}
 						}
+					} else if (eventName.equalsIgnoreCase(COLLECTION_STUDY) && collectionData != null) {
+						StringBuilder suggestQuery = new StringBuilder();
 
+						if (StringUtils.isNotBlank(collectionData.getTitle())) {
+							if (suggestQuery.length() > 0) {
+								suggestQuery.append(OR_DELIMETER);
+							}
+							suggestQuery.append(collectionData.getTitle().trim());
+						}
+						if (StringUtils.isNotBlank(collectionData.getLearningObjective())) {
+							if (suggestQuery.length() > 0) {
+								suggestQuery.append(OR_DELIMETER);
+							}
+							suggestQuery.append(collectionData.getLearningObjective().trim());
+						}
+
+						if (suggestQuery.length() == 0) {
+							queryString = "*";
+						} else {
+							queryString = suggestQuery.toString();
+						}
+
+						if (collectionData.getTaxonomyDomains() != null && collectionData.getTaxonomyDomains().size() > 0) {
+							suggestData.putFilter("&^domain", StringUtils.join(collectionData.getTaxonomyDomains(), ","));
+						} else if (collectionData.getTaxonomyLeafSLInternalCodes() != null && collectionData.getTaxonomyLeafSLInternalCodes().size() > 0) {
+							suggestData.putFilter("&^taxonomy.leafInternalCodes", StringUtils.join(collectionData.getTaxonomyLeafSLInternalCodes(), ","));
+						}
 					}
 
 					if (queryString.contains(OR_DELIMETER)) {
@@ -243,7 +259,7 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 					wordsBuilder.append(word);
 				}
 				if (queryStringBuilder.length() > 0 && word.trim().length() > 0) {
-					queryStringBuilder.append(" OR ");
+					queryStringBuilder.append(" AND ");
 				}
 				queryStringBuilder.append(wordsBuilder.toString());
 			}

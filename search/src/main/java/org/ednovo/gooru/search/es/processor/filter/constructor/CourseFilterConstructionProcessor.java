@@ -1,5 +1,6 @@
 package org.ednovo.gooru.search.es.processor.filter.constructor;
 
+import org.apache.commons.lang.StringUtils;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
@@ -16,6 +17,7 @@ public class CourseFilterConstructionProcessor extends FilterConstructionProcess
 			searchData.putFilter(IS_FEATURED, 1);
 			searchData.getFilters().remove(FLT_COURSE_TYPE);
 		}
+		searchData.putFilter(FLT_TENANT_ID, StringUtils.join(searchData.getUserPermits(), ","));
 	}
 
 	@Override

@@ -106,7 +106,8 @@ public class SearchData implements Serializable {
 	
 	private String contentCdnUrl;
 
-
+	private List<String> userPermits;
+	
 	public boolean isShowCanonicalOnly() {
 		return showCanonicalOnly;
 	}
@@ -485,6 +486,14 @@ public class SearchData implements Serializable {
 
 	public void setContentCdnUrl(String contentCdnUrl) {
 		this.contentCdnUrl = contentCdnUrl;
+	}
+
+	public List<String> getUserPermits() {
+		return userPermits;
+	}
+
+	public void setUserPermits(List<String> userPermits) {
+		this.userPermits = userPermits;
 	}
 
 }

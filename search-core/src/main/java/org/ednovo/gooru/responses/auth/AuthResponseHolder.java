@@ -1,6 +1,7 @@
 package org.ednovo.gooru.responses.auth;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 public interface AuthResponseHolder {
   
@@ -13,4 +14,6 @@ public interface AuthResponseHolder {
   String getClientId() throws JSONException;
   
   String getContentCDN() throws JSONException;
+
+  JSONObject getTenant() throws JSONException;
 }

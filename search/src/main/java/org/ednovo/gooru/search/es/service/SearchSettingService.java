@@ -14,6 +14,8 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.ednovo.gooru.search.es.constant.SearchSettingType;
+import org.ednovo.gooru.search.es.repository.TenantRepository;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -41,18 +43,21 @@ public final class SearchSettingService {
 	private static String cachedVersion = "";
 
 	private static String profileName = "default";
-		
-  @Autowired
-  @Resource(name = "configSettings")
-  private Properties searchSettings;
-  
-  protected Properties getSearchSettings() {
-    return this.searchSettings;
-  }
+
+	@Autowired
+	@Resource(name = "configSettings")
+	private Properties searchSettings;
+
+	protected Properties getSearchSettings() {
+		return this.searchSettings;
+	}
     
+	@Autowired
+	static TenantRepository tenantRepository;
+
 	public SearchSettingService() {
-		if(instance == null)
-		instance = this;
+		if (instance == null)
+			instance = this;
 	}
 
 	@PostConstruct
@@ -63,9 +68,9 @@ public final class SearchSettingService {
 	private static String getProfileName() {
 		return profileName;
 	}
-	
+
 	private static String getSearchSetting(String key) {
-		if(cache.containsKey(key + getProfileName())) {
+		if (cache.containsKey(key + getProfileName())) {
 			return cache.get(key + getProfileName()).toString();
 		} else {
 			return null;
@@ -99,8 +104,14 @@ public final class SearchSettingService {
 			for (String key : settingsMapKeys) {
 				initMapFilters(key);
 			}
+			initializeDiscoverableTenants();
 
 		}
+	}
+
+	private static void initializeDiscoverableTenants() {
+		Map<String, Object> discoverableTenants = tenantRepository.getAllDiscoverableTenants();
+		cache.put("discoverableTenantIds" + getProfileName(), discoverableTenants.get("discoverableTenantIds"));
 	}
 
 
@@ -252,6 +263,10 @@ public final class SearchSettingService {
 	
 	public static boolean isLowercaseForIndex(String name) {
 		return getCacheList(settingsListKeys[10]) != null ? getCacheList(settingsListKeys[10]).contains(name) : false;
+	}
+	
+	public static List<String> getDiscoverableTenantIds(String name) {
+		return getCacheList(name);
 	}
 	
 }

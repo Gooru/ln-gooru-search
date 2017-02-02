@@ -16,9 +16,10 @@ class AuthPrefsMessageBusJsonResponseHolder implements AuthPrefsResponseHolder {
   public static final String MSG_USER_ID = "user_id";
   public static final String MSG_USER_ANONYMOUS = "anonymous";
   public static final String MSG_CLIENT_ID = "client_id";
-  public static final String CDN_URLS = "cdn_urls";
-  public static final String CONTENT_CDN_URL = "content_cdn_url";
-  
+  public static final String MSG_CDN_URLS = "cdn_urls";
+  public static final String MSG_CONTENT_CDN_URL = "content_cdn_url";
+  public static final String MSG_TENANT = "tenant";
+
   public AuthPrefsMessageBusJsonResponseHolder(JSONObject message) {
     System.out.println("json on auth pref class : " + message.toString());
     this.message = message;
@@ -61,19 +62,24 @@ class AuthPrefsMessageBusJsonResponseHolder implements AuthPrefsResponseHolder {
     return message.getString(MSG_USER_ID);
   }
   
-  @Override
-  public String getClientId() throws JSONException {
-    return message.getString(MSG_CLIENT_ID);
-  }
+	@Override
+	public String getClientId() throws JSONException {
+		return message.getString(MSG_CLIENT_ID);
+	}
 
 	@Override
 	public String getContentCDN() throws JSONException {
 		String contentCDNURL = null;
-		JSONObject json = message.getJSONObject(CDN_URLS);
-		if(json != null){
-			contentCDNURL = json.getString(CONTENT_CDN_URL);
+		JSONObject json = message.getJSONObject(MSG_CDN_URLS);
+		if (json != null) {
+			contentCDNURL = json.getString(MSG_CONTENT_CDN_URL);
 		}
 		return contentCDNURL;
+	}
+
+	@Override
+	public JSONObject getTenant() throws JSONException {
+		return message.getJSONObject(MSG_TENANT);
 	}
 
 }

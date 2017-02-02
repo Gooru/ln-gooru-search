@@ -12,6 +12,8 @@ public class ResourceContextData {
 
 	private String title;
 
+	private String description;
+
 	private String contentFormat;
 
 	private String contentSubFormat;
@@ -48,6 +50,14 @@ public class ResourceContextData {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public String getContentFormat() {

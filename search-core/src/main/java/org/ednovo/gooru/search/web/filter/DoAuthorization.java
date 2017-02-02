@@ -7,6 +7,7 @@ import org.ednovo.gooru.responses.auth.AuthPrefsResponseHolderBuilder;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.exception.UnauthorizedException;
 import org.ednovo.gooru.search.es.model.User;
+import org.ednovo.gooru.search.es.model.UserGroupSupport;
 import org.ednovo.gooru.search.es.service.RedisClient;
 import org.ednovo.gooru.search.model.GooruAuthenticationToken;
 import org.ednovo.gooru.search.model.UserCredential;
@@ -55,6 +56,11 @@ public class DoAuthorization {
 					request.setAttribute(Constants.SESSION_TOKEN_SEARCH, sessionToken);
 					request.setAttribute(Constants.CLIENT_ID, responseHolder.getClientId());
 					request.setAttribute(Constants.CONTENT_CDN_URL, responseHolder.getContentCDN());
+					UserGroupSupport userGroup = new UserGroupSupport();
+					JSONObject tenant = responseHolder.getTenant();
+					userGroup.setTenantId(tenant.getString(Constants.TENANT_ID));
+					userGroup.setTenantRoot(tenant.getString(Constants.TENANT_ROOT));
+					request.setAttribute(Constants.TENANT, userGroup);
 				}
 			} catch (Exception e) {
 				logger.error("Error processing authorize request " + e);

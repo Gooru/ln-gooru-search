@@ -2,6 +2,8 @@ package org.ednovo.gooru.suggest.v3.model;
 
 import java.io.Serializable;
 
+import com.google.gson.JsonObject;
+
 public class SuggestV3Context implements Serializable {
 
 	/**
@@ -22,6 +24,8 @@ public class SuggestV3Context implements Serializable {
 	private String unitId;
 
 	private String lessonId;
+	
+	private JsonObject metrics;
 
 	public String getUserId() {
 		return userId;
@@ -77,6 +81,14 @@ public class SuggestV3Context implements Serializable {
 
 	public void setLessonId(String lessonId) {
 		this.lessonId = lessonId;
+	}
+
+	public JsonObject getMetrics() {
+		return metrics;
+	}
+
+	public void setMetrics(JsonObject metrics) {
+		this.metrics = metrics;
 	}
 
 }

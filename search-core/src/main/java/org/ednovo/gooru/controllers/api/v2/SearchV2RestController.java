@@ -1,5 +1,6 @@
 package org.ednovo.gooru.controllers.api.v2;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,8 +22,10 @@ import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.model.SessionContextSupport;
 import org.ednovo.gooru.search.es.model.User;
+import org.ednovo.gooru.search.es.model.UserGroupSupport;
 import org.ednovo.gooru.search.es.processor.util.SerializerUtil;
 import org.ednovo.gooru.search.es.service.SearchService;
+import org.ednovo.gooru.search.es.service.SearchSettingService;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,7 +110,15 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
         // Set content cdn url 
 		String contentCdnUrl = (String) request.getAttribute(Constants.CONTENT_CDN_URL);
 		searchData.setContentCdnUrl(contentCdnUrl);
-		
+		//Set user permits
+		UserGroupSupport userGroup = (UserGroupSupport) request.getAttribute(Constants.TENANT);
+		List<String> userPermits = new ArrayList<>();
+		String userTenantId = userGroup.getTenantId();
+		userPermits.add(userTenantId);
+		List<String> discoverableTenantIds = SearchSettingService.getDiscoverableTenantIds(Constants.DISCOVERABLE_TENANT_IDS);
+		if(discoverableTenantIds != null && !discoverableTenantIds.isEmpty()) userPermits.addAll(discoverableTenantIds);
+		searchData.setUserPermits(userPermits);
+
 		if (sessionToken == null) {
 			sessionToken = BaseController.getSessionToken(request);
 		}
@@ -117,6 +128,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			session.put(Constants.CLIENT_ID, request.getAttribute(Constants.CLIENT_ID));
 			session.put(API_KEY, "");
 			session.put(Constants.SEARCH_ORGANIZATION_UID, "");
+			session.put(Constants.TENANT_ID, userTenantId);
 			/*if (userToken != null) {
 				if (userToken.getApplication() != null) {
 					session.put(API_KEY, userToken.getApplication().getKey());

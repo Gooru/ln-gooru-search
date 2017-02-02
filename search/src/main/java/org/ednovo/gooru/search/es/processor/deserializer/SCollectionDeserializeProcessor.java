@@ -55,8 +55,6 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 	CollectionSearchResult collect(Map<String, Object> model, SearchData searchData, CollectionSearchResult searchResult) {
 		CollectionSearchResult output = new CollectionSearchResult();
 		Integer questionCount = 0;
-		Integer itemCount = (Integer) model.get(IndexFields.CONTENT_COUNT);
-		output.setCollectionItemCount(itemCount != null ? itemCount : 0);
 		output.setCollectionType((String) model.get(IndexFields.CONTENT_FORMAT));
 		output.setNarrationLink(null);
 		output.setNotes(null);
@@ -66,66 +64,6 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 			output.setThumbnail((String) model.get(IndexFields.THUMBNAIL));
 		}
 
-		/*		List<ContentSearchResult> collectionItems = new ArrayList<ContentSearchResult>();
-		int flag = 0;
-		List<Map<String, Object>> collectionItemList = (List<Map<String, Object>>) model.get(IndexFields.COLLECTION_CONTENTS);
-		if (collectionItemList != null) {
-			if (searchData.getParameters().containsKey("includeCIMetaData") && searchData.getParameters().getBoolean("includeCIMetaData")) {
-				for (Map<String, Object> item : collectionItemList) {
-					if (flag <= 3) {
-						ContentSearchResult resource = new ContentSearchResult();
-						resource.setGooruOid((String) item.get(IndexFields.ID));
-						resource.setThumbnail((String) item.get(IndexFields.THUMBNAIL));
-						resource.setTitle((String) item.get(IndexFields.TITLE));
-						resource.setDescription((String) item.get(IndexFields.DESCRIPTION));
-						resource.setCategory(null);
-						String resourceType = (String) item.get(IndexFields.CONTENT_SUB_FORMAT);
-						if (resourceType != null) {
-							Map<String, String> resourceTypeValueAsMap = new HashMap<>(1);
-							resourceTypeValueAsMap.put(SEARCH_NAME, resourceType);
-							resource.setResourceType(resourceTypeValueAsMap);
-						}
-						String resourceFormat = (String) item.get(IndexFields.CONTENT_FORMAT);
-						if (resourceFormat != null) {
-							Map<String, String> resourceFormatValueAsMap = new HashMap<>(1);
-							resourceFormatValueAsMap.put(VALUE, resourceFormat);
-							resource.setResourceFormat(resourceFormatValueAsMap);
-						}
-						resource.setUrl((String) item.get(IndexFields.URL));
-						collectionItems.add(resource);
-						flag = flag + 1;
-					}
-				}
-				output.setCollectionItems(collectionItems);
-			} else {
-				for (Map<String, Object> item : collectionItemList) {
-					ContentSearchResult resource = new ContentSearchResult();
-					resource.setContentId(0L);
-					resource.setCategory(null);
-					resource.setGooruOid((String) item.get(IndexFields.ID));
-					resource.setDescription((String) item.get(IndexFields.DESCRIPTION));
-					resource.setUrl((String) item.get(IndexFields.URL));
-					resource.setThumbnail((String) item.get(IndexFields.THUMBNAIL));
-					resource.setTitle((String) item.get(IndexFields.TITLE));
-					String resourceType = (String) item.get(IndexFields.CONTENT_SUB_FORMAT);
-					if (resourceType != null) {
-						Map<String, String> resourceTypeValueAsMap = new HashMap<>(1);
-						resourceTypeValueAsMap.put(SEARCH_NAME, resourceType);
-						resource.setResourceType(resourceTypeValueAsMap);
-					}
-					String resourceFormat = (String) item.get(IndexFields.CONTENT_FORMAT);
-					if (resourceFormat != null) {
-						Map<String, String> resourceFormatValueAsMap = new HashMap<>(1);
-						resourceFormatValueAsMap.put(VALUE, resourceFormat);
-						resource.setResourceFormat(resourceFormatValueAsMap);
-					}
-					collectionItems.add(resource);
-				}
-			}
-			output.setCollectionItems(collectionItems);
-		}
-*/		
-		output.setNumberOfResources(itemCount);
 		if (model.get(IndexFields.METADATA) != null) {
 			Map<String, List<String>> metadata = (Map<String, List<String>>) model.get(IndexFields.METADATA);
 
@@ -253,6 +191,9 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 			Integer resourceCount = (Integer) statisticsMap.get(IndexFields.RESOURCE_COUNT);
 			output.setResourceCount(String.valueOf(resourceCount != null ? resourceCount : 0));
 		}
+		Integer itemCount = (Integer) statisticsMap.get(IndexFields.CONTENT_COUNT);
+		output.setCollectionItemCount(itemCount != null ? itemCount : 0);
+		output.setNumberOfResources(itemCount);
 
 		String type = (String) model.get(IndexFields.CONTENT_FORMAT);
 		output.setType(type);

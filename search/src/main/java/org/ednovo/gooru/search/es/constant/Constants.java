@@ -590,6 +590,7 @@ public interface Constants {
 	public static final String FLT_STATUS_BROKEN = "&^statistics.statusIsBroken";
 	public static final String FLT_CONTENT_FORMAT = "&^contentFormat";
 	public static final String FLT_COURSE_ID = "&^courseId";
+	public static final String FLT_TENANT_ID = "&^tenant.tenantId";
 
 	public static final String CONTENT_CDN_URL = "contentCDN";
 
@@ -597,6 +598,11 @@ public interface Constants {
 	public static final String SEARCH_REQ_20 = "2.0";
 	public static  final String SESSION_TOKEN_20 = "special-token-2.0";
 
-	
+	public static final String TENANT_ID = "tenant_id";
+	public static final String TENANT_ROOT = "tenant_root";
+
+	public static final String TENANT = "tenant";
+
+	public static final String DISCOVERABLE_TENANT_IDS = "discoverableTenantIds";
 
 }
