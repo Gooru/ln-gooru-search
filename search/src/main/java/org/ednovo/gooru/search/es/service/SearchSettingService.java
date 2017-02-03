@@ -15,7 +15,6 @@ import javax.annotation.Resource;
 
 import org.ednovo.gooru.search.es.constant.SearchSettingType;
 import org.ednovo.gooru.search.es.repository.TenantRepository;
-import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -44,6 +43,8 @@ public final class SearchSettingService {
 
 	private static String profileName = "default";
 
+	private static Map<String, Object> discoverableTenants = new HashMap<String, Object>(); 
+			
 	@Autowired
 	@Resource(name = "configSettings")
 	private Properties searchSettings;
@@ -53,7 +54,7 @@ public final class SearchSettingService {
 	}
     
 	@Autowired
-	static TenantRepository tenantRepository;
+	private TenantRepository tenantRepository;
 
 	public SearchSettingService() {
 		if (instance == null)
@@ -104,16 +105,14 @@ public final class SearchSettingService {
 			for (String key : settingsMapKeys) {
 				initMapFilters(key);
 			}
-			initializeDiscoverableTenants();
-
+			setDiscoverableTenants();
 		}
 	}
 
-	private static void initializeDiscoverableTenants() {
-		Map<String, Object> discoverableTenants = tenantRepository.getAllDiscoverableTenants();
-		cache.put("discoverableTenantIds" + getProfileName(), discoverableTenants.get("discoverableTenantIds"));
+	private static void setDiscoverableTenants() {
+		discoverableTenants = instance.tenantRepository.getAllDiscoverableTenants();
+		cache.put("discoverableTenantIds" + getProfileName(), ((discoverableTenants != null && !discoverableTenants.isEmpty()) ? discoverableTenants.get("discoverableTenantIds") : null));
 	}
-
 
 	/**
 	 * Copy all the search settings from sourceProfile to destProfile
@@ -267,6 +266,12 @@ public final class SearchSettingService {
 	
 	public static List<String> getDiscoverableTenantIds(String name) {
 		return getCacheList(name);
+	}
+	
+
+	public static List<String> getDiscoverableTenants() {
+		Map<String, Object> discoverableTenants = instance.tenantRepository.getAllDiscoverableTenants();
+		return (discoverableTenants != null && !discoverableTenants.isEmpty()) ? (List<String>)discoverableTenants.get("discoverableTenantIds") : null;
 	}
 	
 }
