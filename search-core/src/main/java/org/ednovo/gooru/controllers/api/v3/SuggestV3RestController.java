@@ -70,12 +70,13 @@ public class SuggestV3RestController extends BaseController {
 			@RequestParam(required = false) String unitId, @RequestParam(required = false) String lessonId, 
 			@RequestParam(defaultValue = "0") String pretty, @PathVariable String type)
 			throws Exception {
-		SuggestData suggestData = suggestRequest(request, type, pageSize, null, pretty, sessionToken);
-		try{
-			//String result = getSuggestCannedResponse().toJSONString();
+		try {
+			long start = System.currentTimeMillis();
+			SuggestData suggestData = suggestRequest(request, type, pageSize, null, pretty, sessionToken);
+			// String result = getSuggestCannedResponse().toJSONString();
 			List<SuggestResponse<Object>> suggestResults = suggestService.suggest(suggestData);
 			String result = serialize(suggestResults, JSON, SINGLE_EXCLUDES, true);
-			//LOG.info("Total latency suggest " , System.currentTimeMillis() - start);
+			LOG.info("Total latency of suggest ", System.currentTimeMillis() - start);
 			return toModelAndView(result);
 		} catch (SearchException searchException) {
 			response.setStatus(searchException.getStatus().value());
@@ -90,6 +91,7 @@ public class SuggestV3RestController extends BaseController {
 			@RequestParam(defaultValue = "0") String pretty, @PathVariable String type,
 	        @RequestBody String contextPayload)
 			throws Exception {
+		long start = System.currentTimeMillis();
 		JsonObject requestContext = null;
 		if (!contextPayload.isEmpty()) {
 			try {
@@ -107,7 +109,7 @@ public class SuggestV3RestController extends BaseController {
 			// String result = getSuggestCannedResponse().toJSONString();
 			List<SuggestResponse<Object>> suggestResults = suggestService.suggest(suggestData);
 			String result = serialize(suggestResults, JSON, SINGLE_EXCLUDES, true);
-			// LOG.info("Total latency suggest " , System.currentTimeMillis() - start);
+			LOG.info("Total latency of suggest " , System.currentTimeMillis() - start);
 			return toModelAndView(result);
 		} catch (SearchException searchException) {
 			response.setStatus(searchException.getStatus().value());

@@ -20,7 +20,7 @@ public class ContentRepositoryImpl extends BaseRepository implements ContentRepo
 	public Map<String, Object> getContent(String id) throws JSONException {
 		Map<String, Object> resultMap = null;
 		UUID uuid = UUID.fromString(id);
-		String sql = "select id, title, description, taxonomy from original_resource where id =:ID and is_deleted = false";
+		String sql = "select id, title, description, taxonomy from content where id =:ID and is_deleted = false";
 		Query query = getSessionFactory().getCurrentSession().createSQLQuery(sql)
 				.addScalar("id", PostgresUUIDType.INSTANCE)
 				.addScalar("title", StringType.INSTANCE)

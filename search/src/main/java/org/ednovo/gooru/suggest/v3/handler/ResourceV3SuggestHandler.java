@@ -13,6 +13,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
+import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.EsIndex;
 import org.ednovo.gooru.search.es.exception.SearchException;
 import org.ednovo.gooru.search.es.model.ContentSearchResult;
@@ -33,7 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>> {
+public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>> implements Constants {
 
 	protected static final Logger LOG = LoggerFactory.getLogger(ResourceV3SuggestHandler.class);
 
@@ -116,6 +117,7 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 					//suggestData.putFilter("&^publishStatus", "published");
 					suggestData.putFilter("&^contentFormat", "resource");
 					suggestData.putFilter("&^statistics.statusIsBroken", 0);
+					suggestData.putFilter(FLT_TENANT_ID, StringUtils.join(suggestData.getUserPermits(), ","));
 					if (eventName.equalsIgnoreCase(RESOURCE_STUDY_SUGGEST)) {
 						if (resourceData != null) {
 
