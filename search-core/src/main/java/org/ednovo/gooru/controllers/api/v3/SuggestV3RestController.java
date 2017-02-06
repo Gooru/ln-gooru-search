@@ -18,6 +18,7 @@ import org.ednovo.gooru.search.es.exception.SearchException;
 import org.ednovo.gooru.search.es.model.MapWrapper;
 import org.ednovo.gooru.search.es.model.SuggestResponse;
 import org.ednovo.gooru.search.es.model.User;
+import org.ednovo.gooru.search.es.model.UserGroupSupport;
 import org.ednovo.gooru.search.es.service.SearchSettingService;
 import org.ednovo.gooru.suggest.v3.model.SuggestData;
 import org.ednovo.gooru.suggest.v3.model.SuggestV3Context;
@@ -135,12 +136,15 @@ public class SuggestV3RestController extends BaseController {
 			}
 			suggestData.setSuggestV3Context(suggestContext);
 		}
-		//Set user permits
-		JSONObject tenant = (JSONObject) request.getAttribute(Constants.TENANT);
+
+		// Set user permits
+		UserGroupSupport userGroup = (UserGroupSupport) request.getAttribute(Constants.TENANT);
 		List<String> userPermits = new ArrayList<>();
-		userPermits.add(tenant.getString(Constants.TENANT_ID));
+		String userTenantId = userGroup.getTenantId();
+		userPermits.add(userTenantId);
 		List<String> discoverableTenantIds = SearchSettingService.getDiscoverableTenantIds(Constants.DISCOVERABLE_TENANT_IDS);
-		if(!discoverableTenantIds.isEmpty()) userPermits.addAll(discoverableTenantIds);
+		if (discoverableTenantIds != null && !discoverableTenantIds.isEmpty())
+			userPermits.addAll(discoverableTenantIds);
 		suggestData.setUserPermits(userPermits);
 
 		suggestData.setType(type);
