@@ -529,7 +529,7 @@ public interface Constants {
 	public static final String SEARCH_RESOURCE_COUNT = "resourceCount";
 	public static final Short SHORT_ZERO = 0;
 	public static final String API_KEY = "apiKey";
-	public static final String CLIENT_ID = "clientId";
+	public static final String PARTNER_ID = "partnerId";
 	public static final String SESSION_TOKEN_SEARCH = "sessionToken";
 	public static final String SESSION_SEARCH = "session";
 	public static final String GOORU_HEADER_SESSION_TOKEN = "Gooru-Session-Token";
@@ -604,5 +604,7 @@ public interface Constants {
 	public static final String TENANT = "tenant";
 
 	public static final String DISCOVERABLE_TENANT_IDS = "discoverableTenantIds";
+
+	public static final String APP_ID = "appId";
 
 }

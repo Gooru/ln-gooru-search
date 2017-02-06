@@ -54,7 +54,8 @@ public class DoAuthorization {
 					user.setGooruUId(gooruUId);
 					request.setAttribute(Constants.USER, user);
 					request.setAttribute(Constants.SESSION_TOKEN_SEARCH, sessionToken);
-					request.setAttribute(Constants.CLIENT_ID, responseHolder.getClientId());
+					request.setAttribute(Constants.APP_ID, responseHolder.getAppId());
+					request.setAttribute(Constants.PARTNER_ID, responseHolder.getPartnerId());
 					request.setAttribute(Constants.CONTENT_CDN_URL, responseHolder.getContentCDN());
 					UserGroupSupport userGroup = new UserGroupSupport();
 					JSONObject tenant = responseHolder.getTenant();
