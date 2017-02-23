@@ -86,6 +86,8 @@ public class ContentSearchResult extends ContentUnusedFields implements Serializ
 	
 	private String category;
 
+	private Boolean isCrosswalked;
+
 	public String getMediaType() {
 		return mediaType;
 	}
@@ -414,6 +416,14 @@ public class ContentSearchResult extends ContentUnusedFields implements Serializ
 
 	public void setCategory(String category) {
 		this.category = category;
+	}
+
+	public Boolean getIsCrosswalked() {
+		return isCrosswalked;
+	}
+
+	public void setIsCrosswalked(Boolean isCrosswalked) {
+		this.isCrosswalked = isCrosswalked;
 	}
 
 }

@@ -22,6 +22,7 @@ import org.ednovo.gooru.search.es.model.SuggestResponse;
 import org.ednovo.gooru.search.es.processor.ElasticsearchProcessor;
 import org.ednovo.gooru.search.es.processor.deserializer.ResourceDeserializeProcessor;
 import org.ednovo.gooru.search.es.processor.query_builder.ResourceEsDslQueryBuildProcessor;
+import org.ednovo.gooru.search.es.repository.ConceptSuggestionRepository;
 import org.ednovo.gooru.search.es.service.SearchSettingService;
 import org.ednovo.gooru.search.model.ActivityStreamRawData;
 import org.ednovo.gooru.suggest.v3.data.provider.model.SuggestDataProviderType;
@@ -60,7 +61,10 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 
 	@Autowired
 	private ResourceDeserializeProcessor resourceDeserializeProcessor;
-
+	
+	@Autowired
+	private ConceptSuggestionRepository conceptSuggestionRepository;
+	
 	private SuggestDataProviderType[] suggestDataProviders = { SuggestDataProviderType.RESOURCE,SuggestDataProviderType.COLLECTION };
 
 	@Override
@@ -107,6 +111,8 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 		final SearchResponse<List<ContentSearchResult>> searchResponseResource = new SearchResponse<List<ContentSearchResult>>();
 		final SearchResponse<Object> searchRes = new SearchResponse<Object>();
 		final String eventName = suggestData.getSuggestV3Context().getContext();
+		final Integer score = suggestData.getSuggestV3Context().getScore();
+		final Long timespent = suggestData.getSuggestV3Context().getTimeSpent();
 
 		tasks.add(new Callable<SuggestResponse<Object>>() {
 
@@ -115,7 +121,7 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 				try {
 					String queryString = "*";
 					//suggestData.putFilter("&^publishStatus", "published");
-					suggestData.putFilter("&^contentFormat", "resource");
+					//suggestData.putFilter("&^contentFormat", "resource");
 					suggestData.putFilter("&^statistics.statusIsBroken", 0);
 					suggestData.putFilter(FLT_TENANT_ID, StringUtils.join(suggestData.getUserPermits(), ","));
 					if (eventName.equalsIgnoreCase(RESOURCE_STUDY_SUGGEST)) {
@@ -185,10 +191,12 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 							queryString = suggestQuery.toString();
 						}
 
-						if (collectionData.getTaxonomyDomains() != null && collectionData.getTaxonomyDomains().size() > 0) {
-							suggestData.putFilter("&^domain", StringUtils.join(collectionData.getTaxonomyDomains(), ","));
-						} else if (collectionData.getTaxonomyLeafSLInternalCodes() != null && collectionData.getTaxonomyLeafSLInternalCodes().size() > 0) {
-							suggestData.putFilter("&^taxonomy.leafInternalCodes", StringUtils.join(collectionData.getTaxonomyLeafSLInternalCodes(), ","));
+						String scoreRange = getScoreRange(score);
+						List<String> ids = conceptSuggestionRepository.getSuggestionByPerfConceptNode(collectionData.getTaxonomyLeafSLInternalCodes(), scoreRange);
+						if (ids != null && !ids.isEmpty()) {
+							suggestData.putFilter("&id", StringUtils.join(ids, ","));
+						} else {
+							suggestData.setSize(0);
 						}
 					}
 
@@ -228,6 +236,16 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 				return suggestResponse;
 			}
 
+			private String getScoreRange(Integer score) {
+				String scoreRange = "low";
+				if (score >= 80) {
+					scoreRange = "high";
+				} else if (score >= 50 && score < 80) {
+					scoreRange = "medium";
+				}
+				return scoreRange;
+			}
+
 		});
 
 		try {
@@ -261,7 +279,7 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 					wordsBuilder.append(word);
 				}
 				if (queryStringBuilder.length() > 0 && word.trim().length() > 0) {
-					queryStringBuilder.append(" AND ");
+					queryStringBuilder.append(" OR ");
 				}
 				queryStringBuilder.append(wordsBuilder.toString());
 			}

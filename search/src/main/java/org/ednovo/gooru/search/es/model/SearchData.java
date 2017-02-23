@@ -108,6 +108,8 @@ public class SearchData implements Serializable {
 
 	private List<String> userPermits;
 	
+	private boolean isCrosswalk;
+	
 	public boolean isShowCanonicalOnly() {
 		return showCanonicalOnly;
 	}
@@ -494,6 +496,14 @@ public class SearchData implements Serializable {
 
 	public void setUserPermits(List<String> userPermits) {
 		this.userPermits = userPermits;
+	}
+
+	public boolean isCrosswalk() {
+		return isCrosswalk;
+	}
+
+	public void setCrosswalk(boolean isCrosswalk) {
+		this.isCrosswalk = isCrosswalk;
 	}
 
 }

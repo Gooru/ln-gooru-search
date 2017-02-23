@@ -45,38 +45,42 @@ public class ContainerDataProviderServiceImpl implements ContainerDataProviderSe
 	@Override
 	public CollectionContextData getCollectionData(CollectionDataProviderCriteria collectionDataProviderCriteria) {
 		CollectionContextData collectionContextDo = new CollectionContextData();
-		String collectionId = collectionDataProviderCriteria.getCollectionId();
-		if (collectionId != null) {
-			Map<String, Object> collectionSrc = collectionRepository.getCollectionData(collectionId);
-			collectionContextDo.setId(collectionId);
-			if (collectionSrc != null) {
-				if (collectionSrc.get("title") != null)
-					collectionContextDo.setTitle(collectionSrc.get("title").toString());
-				if (collectionSrc.get("description") != null)
-					collectionContextDo.setLearningObjective(collectionSrc.get("description").toString());
-				Map<String, Object> conceptNodeJson = getTaxonomy((collectionSrc.get("taxonomy") != null) ? (JSONObject) collectionSrc.get("taxonomy") : null);
-				if (conceptNodeJson != null && !conceptNodeJson.isEmpty()) {
-					collectionContextDo.setTaxonomyDomains((ArrayList<String>) conceptNodeJson.get("domains"));
-					collectionContextDo.setStandards((ArrayList<String>) conceptNodeJson.get("standards"));
-					collectionContextDo.setTaxonomyLeafSLInternalCodes((ArrayList<String>) conceptNodeJson.get("leafSLInternalCodes"));
-					collectionContextDo.setTaxonomyConceptNodeNeighbours((ArrayList<String>) conceptNodeJson.get("conceptNodeNeighbours"));
-				}
-				if (collectionSrc.get("course_id") != null) {
-					String courseId = collectionSrc.get("course_id").toString();
-					collectionContextDo.setCourseId(courseId);
-					Map<String, Object> courseMetaMap = courseRepository.getCourseData(courseId);
-					if (courseMetaMap != null && courseMetaMap.get("title") != null) {
-						collectionContextDo.setCourseTitle(courseMetaMap.get("title").toString());
+		try {
+			String collectionId = collectionDataProviderCriteria.getCollectionId();
+			if (collectionId != null) {
+				Map<String, Object> collectionSrc = collectionRepository.getCollectionData(collectionId);
+				collectionContextDo.setId(collectionId);
+				if (collectionSrc != null) {
+					if (collectionSrc.get("title") != null)
+						collectionContextDo.setTitle(collectionSrc.get("title").toString());
+					if (collectionSrc.get("description") != null)
+						collectionContextDo.setLearningObjective(collectionSrc.get("description").toString());
+					Map<String, Object> conceptNodeJson = getTaxonomy((collectionSrc.get("taxonomy") != null) ? (JSONObject) collectionSrc.get("taxonomy") : null);
+					if (conceptNodeJson != null && !conceptNodeJson.isEmpty()) {
+						collectionContextDo.setTaxonomyDomains((ArrayList<String>) conceptNodeJson.get("domains"));
+						collectionContextDo.setStandards((ArrayList<String>) conceptNodeJson.get("standards"));
+						collectionContextDo.setTaxonomyLeafSLInternalCodes((ArrayList<String>) conceptNodeJson.get("leafSLInternalCodes"));
+						collectionContextDo.setTaxonomyConceptNodeNeighbours((ArrayList<String>) conceptNodeJson.get("conceptNodeNeighbours"));
 					}
+					if (collectionSrc.get("course_id") != null) {
+						String courseId = collectionSrc.get("course_id").toString();
+						collectionContextDo.setCourseId(courseId);
+						Map<String, Object> courseMetaMap = courseRepository.getCourseData(courseId);
+						if (courseMetaMap != null && courseMetaMap.get("title") != null) {
+							collectionContextDo.setCourseTitle(courseMetaMap.get("title").toString());
+						}
+					}
+					List<Map<String, Object>> itemList = contentRepository.getItems(collectionId);
+					Set<String> itemIds = new HashSet<>();
+					itemList.forEach(item -> {
+						itemIds.add(item.get("id").toString());
+					});
+					collectionContextDo.setItemIds(itemIds);
+					collectionContextDo.setItemCount(itemList.size());
 				}
-				List<Map<String, Object>> itemList = contentRepository.getItems(collectionId);
-				Set<String> itemIds = new HashSet<>();
-				itemList.forEach(item -> {
-					itemIds.add(item.get("id").toString());
-				});
-				collectionContextDo.setItemIds(itemIds);
-				collectionContextDo.setItemCount(itemList.size());
 			}
+		} catch (Exception e) {
+			LOG.error("Unable to fetch from DB : {} :: {}", collectionDataProviderCriteria.getCollectionId(), e.getMessage());
 		}
 		return collectionContextDo;
 	}

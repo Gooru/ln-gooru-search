@@ -74,6 +74,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			@RequestParam(required = false, defaultValue= "false") boolean includeCIMetaData, 
 			@RequestParam(required = false, defaultValue= "false") boolean bsSearch,
 			@RequestParam(required = false, defaultValue= "true") boolean showCanonicalOnly,
+			@RequestParam(required = false, defaultValue= "false") boolean isCrosswalk,
 			@RequestParam(required = false, defaultValue = "false") boolean disableSpellCheck) throws Exception {
 
 		SearchData searchData = new SearchData();
@@ -177,6 +178,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		searchData.setSessionToken(sessionToken);
 		searchData.setBsSearch(bsSearch);
 		searchData.setShowCanonicalOnly(showCanonicalOnly);
+		searchData.setCrosswalk(isCrosswalk);
 
 		if (facet != null && facet.trim().length() > 0) {
 			searchData.setFacet(facet);

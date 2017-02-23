@@ -13,7 +13,7 @@ public enum SuggestHandlerType {
 
 	QUESTION(),
 
-	SCOLLECTION(),
+	COLLECTION(),
 
 	DICTIONARY(),
 

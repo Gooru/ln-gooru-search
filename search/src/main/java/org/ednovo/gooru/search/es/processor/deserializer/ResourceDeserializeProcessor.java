@@ -274,6 +274,20 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 
 		Map<String, Object> taxonomyMap = (Map<String, Object>) dataMap.get(IndexFields.TAXONOMY);
 		if (taxonomyMap != null) {
+			if (input.isCrosswalk()) {
+				String fltStandard = null;
+				String fltStandardDisplay = null;
+				if(input.getFilters().containsKey(AMPERSAND_EQ_INTERNAL_CODE)) fltStandard = input.getFilters().get(AMPERSAND_EQ_INTERNAL_CODE).toString();
+				if(input.getFilters().containsKey(AMPERSAND_EQ_DISPLAY_CODE)) fltStandardDisplay = input.getFilters().get(AMPERSAND_EQ_DISPLAY_CODE).toString();
+				Boolean isCrosswalked = true;
+				List<String> leafInternalCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_INTERNAL_CODES);
+				List<String> leafDisplayCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_DISPLAY_CODES);
+				if ((leafInternalCodes != null && leafInternalCodes.size() > 0 && fltStandard != null && leafInternalCodes.contains(fltStandard))
+						|| (leafDisplayCodes != null && leafDisplayCodes.size() > 0 && fltStandardDisplay != null && leafDisplayCodes.contains(fltStandardDisplay))) {
+					isCrosswalked = false;
+				}
+				resource.setIsCrosswalked(isCrosswalked);
+			}
 			resource.setTaxonomyDataSet((String) taxonomyMap.get(IndexFields.TAXONOMY_DATA_SET));
 			resource.setTaxonomySet((Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET));
 		}

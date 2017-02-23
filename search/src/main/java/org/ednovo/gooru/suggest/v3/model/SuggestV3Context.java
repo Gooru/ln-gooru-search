@@ -17,6 +17,10 @@ public class SuggestV3Context implements Serializable {
 
 	private String context;
 
+	private String contextPath;
+
+	private String contextSubPath;
+
 	private String containerId;
 
 	private String courseId;
@@ -27,6 +31,10 @@ public class SuggestV3Context implements Serializable {
 	
 	private JsonObject metrics;
 
+	private Integer score;
+	
+	private Long timeSpent;
+	
 	public String getUserId() {
 		return userId;
 	}
@@ -49,6 +57,22 @@ public class SuggestV3Context implements Serializable {
 
 	public void setContext(String context) {
 		this.context = context;
+	}
+
+	public String getContextPath() {
+		return contextPath;
+	}
+
+	public void setContextPath(String contextPath) {
+		this.contextPath = contextPath;
+	}
+
+	public String getContextSubPath() {
+		return contextSubPath;
+	}
+
+	public void setContextSubPath(String contextSubPath) {
+		this.contextSubPath = contextSubPath;
 	}
 
 	public String getContainerId() {
@@ -89,6 +113,28 @@ public class SuggestV3Context implements Serializable {
 
 	public void setMetrics(JsonObject metrics) {
 		this.metrics = metrics;
+	}
+	
+	public Integer getScore() {
+		return score;
+	}
+
+	public void setScore(Integer score) {
+		if (score == null) {
+			this.score = 0;
+		}
+		this.score = score;
+	}
+	
+	public Long getTimeSpent() {
+		return timeSpent;
+	}
+
+	public void setTimeSpent(Long timeSpent) {
+		if (timeSpent == null) {
+			this.timeSpent = 0L;
+		}
+		this.timeSpent = timeSpent;
 	}
 
 }

@@ -281,7 +281,7 @@ public class SerializerUtil {
 					}
 					try {
 						if (data != null) {
-							payLoadObject.put("data", data);
+							payLoadObject.put("data", new JSONObject(data));
 						}
 					} catch (Exception e) {
 						LOGGER.error("Error: " + e);
@@ -291,7 +291,7 @@ public class SerializerUtil {
 					LOGGER.error("Error : " + e);
 				}
 
-				SessionContextSupport.putLogParameter("payLoadObject", payLoadObject.toString());
+				SessionContextSupport.putLogParameter("payLoadObject", payLoadObject);
 			}
 		}
 	}

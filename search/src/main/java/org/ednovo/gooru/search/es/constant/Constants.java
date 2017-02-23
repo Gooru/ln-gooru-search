@@ -606,5 +606,10 @@ public interface Constants {
 	public static final String DISCOVERABLE_TENANT_IDS = "discoverableTenantIds";
 
 	public static final String APP_ID = "appId";
+	public static final String AMPERSAND_STANDARD = "&^standard";
+	public static final String AMPERSAND_STANDARD_DISPLAY = "&^standardDisplay";
+	public static final String AMPERSAND_EQ_INTERNAL_CODE = "&^taxonomy.allEquivalentInternalCodes";
+	public static final String AMPERSAND_EQ_DISPLAY_CODE = "&^taxonomy.allEquivalentDisplayCodes";
+	public static final String AMPERSAND_EQ_FRAMEWORK_CODE = "&^taxonomy.allEquivalentFrameworkCodes";
 
 }

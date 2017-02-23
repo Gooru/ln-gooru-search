@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.ednovo.gooru.controllers.api.BaseController;
 import org.ednovo.gooru.search.es.constant.Constants;
@@ -65,7 +66,7 @@ public class SuggestV3RestController extends BaseController {
 			@RequestParam(defaultValue = "0") Integer startAt,
 			@RequestParam(defaultValue = "10", value = "limit") Integer pageSize, 
 			@RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(required = true) String context,
-			@RequestParam(required = true) String id, @RequestParam(required = true) String userId, 
+			@RequestParam(required = true) String resourceId, @RequestParam(required = true) String userId, 
 			@RequestParam(required = false) String containerId, @RequestParam(required = false) String courseId,
 			@RequestParam(required = false) String unitId, @RequestParam(required = false) String lessonId, 
 			@RequestParam(defaultValue = "0") String pretty, @PathVariable String type)
@@ -84,7 +85,7 @@ public class SuggestV3RestController extends BaseController {
 		}
 	}
 
-	@RequestMapping(method = { RequestMethod.POST }, value = "/{type}", headers = "Content-Type=application/json")
+	@RequestMapping(method = { RequestMethod.POST }, value = "/{type}")
 	public ModelAndView suggest(HttpServletRequest request, HttpServletResponse response, 
 			@RequestParam(required = false) String sessionToken, 
 			@RequestParam(defaultValue = "10", value = "limit") Integer pageSize, 
@@ -106,10 +107,17 @@ public class SuggestV3RestController extends BaseController {
 		}
 		SuggestData suggestData = suggestRequest(request, type, pageSize, requestContext, pretty, sessionToken);
 		try {
-			// String result = getSuggestCannedResponse().toJSONString();
-			List<SuggestResponse<Object>> suggestResults = suggestService.suggest(suggestData);
-			String result = serialize(suggestResults, JSON, SINGLE_EXCLUDES, true);
-			LOG.info("Total latency of suggest " , System.currentTimeMillis() - start);
+			String result = null;
+			if(type.equalsIgnoreCase(RESOURCE)) {
+				result = getSuggestCannedResourceResponse().toJSONString();
+			} else if (type.equalsIgnoreCase(COLLECTION)){
+				result = getSuggestCannedCollectionResponse().toJSONString();
+				/*List<SuggestResponse<Object>> suggestResults = suggestService.suggest(suggestData);
+				result = serialize(suggestResults, JSON, SINGLE_EXCLUDES, true);*/
+			}else {
+				throw new BadRequestException("Invalid Type is passed. For now, the support types are resource and collection.");
+			}
+			LOG.info("Total latency of suggest " + (System.currentTimeMillis() - start));
 			return toModelAndView(result);
 		} catch (SearchException searchException) {
 			response.setStatus(searchException.getStatus().value());
@@ -123,13 +131,13 @@ public class SuggestV3RestController extends BaseController {
 		}
 		User apiCaller = (User) request.getAttribute(Constants.USER);
 		SuggestData suggestData = new SuggestData();
-		SuggestV3RequestData suggestRequestData = new SuggestV3RequestData();
+		suggestData.setType(type);
 
 		@SuppressWarnings("unchecked")
 		MapWrapper<Object> suggestParamMap = new MapWrapper<Object>(request.getParameterMap());
 		suggestData.setParameters(suggestParamMap);
 		if (suggestParamMap != null) {
-			SuggestV3Context suggestContext = getContextData(suggestParamMap, requestContext, suggestRequestData);
+			SuggestV3Context suggestContext = getContextData(suggestParamMap, requestContext, suggestData);
 			if (apiCaller != null) {
 				suggestContext.setUserId(apiCaller.getGooruUId());
 			}
@@ -149,7 +157,6 @@ public class SuggestV3RestController extends BaseController {
 			userPermits.addAll(discoverableTenantIds);
 		suggestData.setUserPermits(userPermits);
 
-		suggestData.setType(type);
 		suggestData.setFrom(0);
 		suggestData.setSize(pageSize);
 		suggestData.setPretty(pretty);
@@ -159,47 +166,81 @@ public class SuggestV3RestController extends BaseController {
 		return suggestData;
 	}
 
-	private SuggestV3Context getContextData(MapWrapper<Object> suggestParamMap, JsonObject requestContext, SuggestV3RequestData suggestData) {
+	private SuggestV3Context getContextData(MapWrapper<Object> suggestParamMap, JsonObject requestContext, SuggestData suggestData) {
 		SuggestV3Context suggestContext = new SuggestV3Context();
 		Map<String, Object> inputParameters = suggestParamMap.getValues();
-		if (inputParameters.containsKey("id") && inputParameters.containsKey("context") && inputParameters.containsKey("userId") && inputParameters.containsKey("containerId")) {
+		if (inputParameters.containsKey("resourceId") && inputParameters.containsKey("context") && inputParameters.containsKey("userId")) {
 			processRequestParams(inputParameters, suggestContext);
 		} else if (requestContext != null) {
-			processRequestPaload(requestContext, suggestContext);
+			processRequestPaload(requestContext, suggestContext, suggestData);
 		} else {
 			throw new BadRequestException("Please refer the document to pass correct parameters");
 		}
 		return suggestContext;
 	}
 
-	private void processRequestPaload(JsonObject requestContext, SuggestV3Context suggestContext) {
+	private void processRequestPaload(JsonObject requestContext, SuggestV3Context suggestContext, SuggestData suggestData) {
 		if(requestContext.has("context")) {
 			JsonObject context = requestContext.getAsJsonObject("context");
-			if (context != null && context.has("contextType") && context.has("userId") && context.has("containerId")) {
+			if (context != null && context.has("contextType") && context.has("userId")) {
+				if (suggestData.getType().matches("collection|resource") && context.get("contextType").getAsString().equalsIgnoreCase("collection-study")) {
+					if ((context.has("contextPath") && StringUtils.isNotBlank(context.get("contextPath").getAsString()))
+							&& (context.has("contextSubPath") && context.get("contextSubPath") != null && StringUtils.isNotBlank(context.get("contextSubPath").getAsString()))) {
+						suggestContext.setContextPath(context.get("contextPath").getAsString());
+						suggestContext.setContextSubPath(context.get("contextSubPath").getAsString());
+						if ((!context.get("contextSubPath").getAsString().equalsIgnoreCase("pre-test")) && context.has("containerId")
+								&& StringUtils.isNotBlank(context.get("containerId").getAsString())) {
+							suggestContext.setContainerId(context.get("containerId").getAsString());
+						} else if (context.get("contextSubPath").getAsString().equalsIgnoreCase("pre-test")
+								&& ((context.has("lessonId") && StringUtils.isNotBlank(context.get("lessonId").getAsString())))
+								|| (context.has("containerId") && StringUtils.isNotBlank(context.get("containerId").getAsString()))) {
+							if (context.has("containerId")) {
+								suggestContext.setContainerId(context.get("containerId").getAsString());
+							} else if (context.has("lessonId")) {
+								suggestContext.setLessonId(context.get("lessonId").getAsString());
+							}
+						} else {
+							throw new BadRequestException("Please refer the document to pass correct parameters");
+						}
+					}
+				} else if (suggestData.getType().equalsIgnoreCase("resource") && context.get("contextType").getAsString().equalsIgnoreCase("resource-study") && context.has("resourceId") && StringUtils.isNotBlank(context.get("resourceId").getAsString())) {
+					suggestContext.setId(context.get("resourceId").getAsString());
+				} else {
+					throw new BadRequestException("Please refer the document to pass correct parameters");
+				}
 				suggestContext.setContext(context.get("contextType").getAsString());
 				suggestContext.setUserId(context.get("userId").getAsString());
-				suggestContext.setContainerId(context.get("containerId").getAsString());
-				if (context.has("resourceId"))
-					suggestContext.setId(context.get("resourceId").getAsString());
+				if (context.has("containerId"))
+					suggestContext.setContainerId(context.get("containerId").getAsString());
 				if (context.has("courseId"))
 					suggestContext.setCourseId(context.get("courseId").getAsString());
 				if (context.has("unitId"))
 					suggestContext.setUnitId(context.get("unitId").getAsString());
 				if (context.has("lessonId"))
 					suggestContext.setLessonId(context.get("lessonId").getAsString());
+
+			} else {
+				throw new BadRequestException("Please refer the document to pass correct parameters");
 			}
+		} else {
+			throw new BadRequestException("Please refer the document to pass correct parameters");
 		}
-		if(requestContext.has("metrics")) {
+		if (requestContext.has("metrics")) {
 			JsonObject metrics = requestContext.getAsJsonObject("metrics");
-				if (metrics != null)
-					suggestContext.setMetrics(metrics);
+			if (metrics != null) {
+				suggestContext.setMetrics(metrics);
+				if (metrics.has("score"))
+					suggestContext.setScore(metrics.get("score").getAsInt());
+				if (metrics.has("timespent"))
+					suggestContext.setTimeSpent(metrics.get("timespent").getAsLong());
+			}
 		}
 	}
 
 	private void processRequestParams(Map<String, Object> inputParameters, SuggestV3Context suggestContext) {
 		for (String key : inputParameters.keySet()) {
 			switch (key) {
-			case "id":
+			case "resourceId":
 				suggestContext.setId(((String[]) inputParameters.get(key))[0]);
 				break;
 			case "context":
@@ -229,11 +270,27 @@ public class SuggestV3RestController extends BaseController {
 		}
 	}
 
-	private JSONArray getSuggestCannedResponse() {
+	private JSONArray getSuggestCannedResourceResponse() {
 		JSONArray json = new JSONArray();
 		JSONParser parser = new JSONParser();
 		try {
-			json = (JSONArray) parser.parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("suggest_canned_response.txt")));
+			json = (JSONArray) parser.parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("suggest_canned_resource_response.txt")));
+			return json;
+		} catch (ParseException e) {
+			LOG.error("Unable to Parse Canned response");
+		} catch (FileNotFoundException e) {
+			LOG.error("Canned response file not found");
+		} catch (IOException e) {
+			LOG.error("IOException on getting canned response file renu");
+		}
+		return json;
+	}
+	
+	private JSONArray getSuggestCannedCollectionResponse() {
+		JSONArray json = new JSONArray();
+		JSONParser parser = new JSONParser();
+		try {
+			json = (JSONArray) parser.parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("suggest_canned_collection_response.txt")));
 			return json;
 		} catch (ParseException e) {
 			LOG.error("Unable to Parse Canned response");

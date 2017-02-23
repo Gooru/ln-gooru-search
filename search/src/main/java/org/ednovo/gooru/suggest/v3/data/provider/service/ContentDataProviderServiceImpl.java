@@ -15,11 +15,15 @@ import org.ednovo.gooru.suggest.v3.data.provider.model.ResourceDataProviderCrite
 import org.ednovo.gooru.suggest.v3.model.ResourceContextData;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ContentDataProviderServiceImpl implements ContentDataProviderService, Constants {
+
+	private static final Logger LOG = LoggerFactory.getLogger(ContentDataProviderServiceImpl.class);
 
 	@Autowired
 	private ContentRepository contentRepository;
@@ -32,21 +36,25 @@ public class ContentDataProviderServiceImpl implements ContentDataProviderServic
 	public ResourceContextData getResourceContextData(ResourceDataProviderCriteria resourceDataProviderCriteria) throws JSONException {
 		ResourceContextData resourceContextDo = null;
 		if (resourceDataProviderCriteria.getResourceId() != null) {
-			Map<String, Object> resourceData = contentRepository.getContent(resourceDataProviderCriteria.getResourceId());
-			if (resourceData == null) {
-				return null;
+			try {
+				Map<String, Object> resourceData = contentRepository.getContent(resourceDataProviderCriteria.getResourceId());
+				if (resourceData == null) {
+					return null;
+				}
+				resourceContextDo = new ResourceContextData();
+				resourceContextDo.setId((String) resourceData.get("id"));
+				resourceContextDo.setTitle((String) resourceData.get("title"));
+				resourceContextDo.setDescription((String) resourceData.get("description"));
+				resourceContextDo.setContentFormat(((String) resourceData.get("contentFormat") != null) ? (String) resourceData.get("contentFormat") : null);
+				resourceContextDo.setContentSubFormat((String) resourceData.get("contentSubFormat"));
+				resourceContextDo.setCreatorId((String) resourceData.get("creatorId"));
+				resourceContextDo.setKeywords(((String) resourceData.get("keywords") != null) ? (String) resourceData.get("keywords") : null);
+				Map<String, Object> conceptNodeJson = getTaxonomy((resourceData.get("taxonomy") != null) ? (JSONObject) resourceData.get("taxonomy") : null);
+				resourceContextDo.setStandards((ArrayList<String>) conceptNodeJson.get("leafSLInternalCodes"));
+				resourceContextDo.setConceptNodeNeighbours((ArrayList<String>) conceptNodeJson.get("conceptNodeNeighbours"));
+			} catch(Exception e) {
+				LOG.error("Unable to fetch from DB : Resource ID may be a copied resource", e.getMessage());
 			}
-			resourceContextDo = new ResourceContextData();
-			resourceContextDo.setId((String) resourceData.get("id"));
-			resourceContextDo.setTitle((String) resourceData.get("title"));
-			resourceContextDo.setDescription((String) resourceData.get("description"));
-			resourceContextDo.setContentFormat(((String) resourceData.get("contentFormat") != null) ? (String) resourceData.get("contentFormat") : null);
-			resourceContextDo.setContentSubFormat((String) resourceData.get("contentSubFormat"));
-			resourceContextDo.setCreatorId((String) resourceData.get("creatorId"));
-			resourceContextDo.setKeywords(((String) resourceData.get("keywords") != null) ? (String) resourceData.get("keywords") : null);
-			Map<String, Object> conceptNodeJson = getTaxonomy((resourceData.get("taxonomy") != null) ? (JSONObject) resourceData.get("taxonomy") : null);
-			resourceContextDo.setStandards((ArrayList<String>) conceptNodeJson.get("leafSLInternalCodes"));
-			resourceContextDo.setConceptNodeNeighbours((ArrayList<String>) conceptNodeJson.get("conceptNodeNeighbours"));
 		}
 		return resourceContextDo;
 	}

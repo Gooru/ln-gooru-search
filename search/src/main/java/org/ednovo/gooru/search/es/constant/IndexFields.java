@@ -93,5 +93,6 @@ public class IndexFields {
 	public static final String LICENSE_URL = "url";
 	public static final String LICENSE_NAME = "name";
 	
-
+	public static final String LEAF_INTERNAL_CODES = "leafInternalCodes";
+	public static final Object LEAF_DISPLAY_CODES = "leafDisplayCodes";
 }

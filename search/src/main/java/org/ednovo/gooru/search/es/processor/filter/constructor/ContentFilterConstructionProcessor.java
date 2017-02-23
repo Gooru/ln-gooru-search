@@ -24,8 +24,20 @@ public class ContentFilterConstructionProcessor extends FilterConstructionProces
 		super.process(searchData, response);
 		
 		// As default search will serve published contents only. If publish filter passed results will be filtered based on filter value.
-		if(searchData != null && searchData.getFilters() != null && !searchData.getFilters().containsKey(FLT_PUBLISH_STATUS)){
-			searchData.putFilter(FLT_PUBLISH_STATUS, PublishedStatus.PUBLISHED.getStatus());
+		if(searchData != null && searchData.getFilters() != null) { 
+			if (!searchData.getFilters().containsKey(FLT_PUBLISH_STATUS)) {
+				searchData.putFilter(FLT_PUBLISH_STATUS, PublishedStatus.PUBLISHED.getStatus());
+			}
+			if (searchData.isCrosswalk()) {
+				if (searchData.getFilters().containsKey(AMPERSAND_STANDARD) && StringUtils.isNotBlank(searchData.getFilters().get(AMPERSAND_STANDARD).toString())) {
+					searchData.putFilter(AMPERSAND_EQ_INTERNAL_CODE, searchData.getFilters().get(AMPERSAND_STANDARD).toString().toLowerCase());
+					searchData.getFilters().remove(AMPERSAND_STANDARD);
+				}
+				if (searchData.getFilters().containsKey(AMPERSAND_STANDARD_DISPLAY) && StringUtils.isNotBlank(searchData.getFilters().get(AMPERSAND_STANDARD_DISPLAY).toString())) {
+					searchData.putFilter(AMPERSAND_EQ_DISPLAY_CODE, searchData.getFilters().get(AMPERSAND_STANDARD_DISPLAY).toString().toLowerCase());
+					searchData.getFilters().remove(AMPERSAND_STANDARD_DISPLAY);
+				}
+			}
 		}
         
 		searchData.putFilter(FLT_TENANT_ID, StringUtils.join(searchData.getUserPermits(), ","));
