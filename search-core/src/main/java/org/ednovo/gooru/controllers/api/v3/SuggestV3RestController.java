@@ -109,7 +109,9 @@ public class SuggestV3RestController extends BaseController {
 		try {
 			String result = null;
 			if(type.equalsIgnoreCase(RESOURCE)) {
-				result = getSuggestCannedResourceResponse().toJSONString();
+				//result = getSuggestCannedResourceResponse().toJSONString();
+				List<SuggestResponse<Object>> suggestResults = suggestService.suggest(suggestData);
+				result = serialize(suggestResults, JSON, SINGLE_EXCLUDES, true);
 			} else if (type.equalsIgnoreCase(COLLECTION)){
 				result = getSuggestCannedCollectionResponse().toJSONString();
 				/*List<SuggestResponse<Object>> suggestResults = suggestService.suggest(suggestData);

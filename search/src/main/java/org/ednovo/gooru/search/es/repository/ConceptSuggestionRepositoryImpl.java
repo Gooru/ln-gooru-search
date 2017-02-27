@@ -21,12 +21,17 @@ public class ConceptSuggestionRepositoryImpl extends BaseRepository implements C
 	private static final Logger LOG = LoggerFactory.getLogger(CollectionRepositoryImpl.class);
 
 	@Override
-	public List<String> getSuggestionByPerfConceptNode(List<String> conceptNode, String perf) {
+	public List<String> getSuggestionByPerfConceptNode(List<String> idsToFilter, String ctxPath, String performance_range, String suggestType) {
 		List<String> ids = null;
 		try {
-			Type intArrayType = new TypeLocatorImpl(new TypeResolver()).custom(StringArrayType.class);
-			String sql = "select suitable_suggestions from concept_node_suggest where context_type = 'collection-study' and id in (:IDS) and performance = :PERF";
-			Query query = getSessionFactory().getCurrentSession().createSQLQuery(sql).addScalar("suitable_suggestions", intArrayType).setParameter("PERF", perf).setParameterList("IDS", conceptNode);
+			Type textArrayType = new TypeLocatorImpl(new TypeResolver()).custom(StringArrayType.class);
+			String sql = "select suitable_suggestions from concept_based_suggest where ctx_path = :CTX_PATH and competency_internal_code in (:IDS) and performance = :PERFORMANCE and suggest_type = :SUGGEST_TYPE";
+			Query query = getSessionFactory().getCurrentSession().createSQLQuery(sql)
+					.addScalar("suitable_suggestions", textArrayType)
+					.setParameter("PERFORMANCE", performance_range)
+					.setParameter("CTX_PATH", ctxPath)
+					.setParameter("SUGGEST_TYPE", suggestType)
+					.setParameterList("IDS", idsToFilter);
 			Map<String, Object> resultMap = null;
 			if (query != null && list(query).size() > 0) {
 				resultMap = new HashMap<>();
@@ -37,9 +42,12 @@ public class ConceptSuggestionRepositoryImpl extends BaseRepository implements C
 					}
 				}
 				resultMap.put("suggestion_ids", ids);
+			} else {
+				System.out.println("No Results");
 			}
 		} catch (Exception e) {
-			LOG.error("Unable to fetch suggestions from DB for Concept Node : {} : Exception :: {}", conceptNode.toString(), e.getMessage());
+			e.printStackTrace();
+			System.out.println("Unable to fetch suggestions from DB for Concept Node : {} : Exception :: {}"+ idsToFilter.toString()+ e.getMessage());
 		}
 		return ids;
 	}

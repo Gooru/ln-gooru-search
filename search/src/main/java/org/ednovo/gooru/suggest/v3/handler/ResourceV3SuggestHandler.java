@@ -110,7 +110,7 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 
 		final SearchResponse<List<ContentSearchResult>> searchResponseResource = new SearchResponse<List<ContentSearchResult>>();
 		final SearchResponse<Object> searchRes = new SearchResponse<Object>();
-		final String eventName = suggestData.getSuggestV3Context().getContext();
+		final String contextPath = suggestData.getSuggestV3Context().getContext();
 		final Integer score = suggestData.getSuggestV3Context().getScore();
 		final Long timespent = suggestData.getSuggestV3Context().getTimeSpent();
 
@@ -124,7 +124,7 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 					//suggestData.putFilter("&^contentFormat", "resource");
 					suggestData.putFilter("&^statistics.statusIsBroken", 0);
 					suggestData.putFilter(FLT_TENANT_ID, StringUtils.join(suggestData.getUserPermits(), ","));
-					if (eventName.equalsIgnoreCase(RESOURCE_STUDY_SUGGEST)) {
+					if (contextPath.equalsIgnoreCase(RESOURCE_STUDY_SUGGEST)) {
 						if (resourceData != null) {
 
 							suggestData.putFilter("!^id", suggestData.getSuggestV3Context().getId());
@@ -169,10 +169,10 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 								}
 							}
 						}
-					} else if (eventName.equalsIgnoreCase(COLLECTION_STUDY) && collectionData != null) {
+					} else if (contextPath.equalsIgnoreCase(COLLECTION_STUDY) && collectionData != null) {
 						StringBuilder suggestQuery = new StringBuilder();
 
-						if (StringUtils.isNotBlank(collectionData.getTitle())) {
+						/*if (StringUtils.isNotBlank(collectionData.getTitle())) {
 							if (suggestQuery.length() > 0) {
 								suggestQuery.append(OR_DELIMETER);
 							}
@@ -183,7 +183,7 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 								suggestQuery.append(OR_DELIMETER);
 							}
 							suggestQuery.append(collectionData.getLearningObjective().trim());
-						}
+						}*/
 
 						if (suggestQuery.length() == 0) {
 							queryString = "*";
@@ -191,11 +191,18 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 							queryString = suggestQuery.toString();
 						}
 
-						String scoreRange = getScoreRange(score);
-						List<String> ids = conceptSuggestionRepository.getSuggestionByPerfConceptNode(collectionData.getTaxonomyLeafSLInternalCodes(), scoreRange);
+						String range = "M";
+						if (score != null) {
+							range = getScoreRange(score);
+						} else if (timespent != null) {
+							range = getTimespentRange(timespent);
+						}
+						
+						List<String> ids = conceptSuggestionRepository.getSuggestionByPerfConceptNode(collectionData.getTaxonomyLeafSLInternalCodes(), contextPath, range, SuggestHandlerType.RESOURCE.name().toLowerCase());
 						if (ids != null && !ids.isEmpty()) {
 							suggestData.putFilter("&id", StringUtils.join(ids, ","));
 						} else {
+							LOG.info("Suggestions unavailable for concept nodes : " + collectionData.getTaxonomyLeafSLInternalCodes());
 							suggestData.setSize(0);
 						}
 					}
@@ -236,16 +243,6 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 				return suggestResponse;
 			}
 
-			private String getScoreRange(Integer score) {
-				String scoreRange = "low";
-				if (score >= 80) {
-					scoreRange = "high";
-				} else if (score >= 50 && score < 80) {
-					scoreRange = "medium";
-				}
-				return scoreRange;
-			}
-
 		});
 
 		try {
@@ -265,6 +262,26 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 		return suggestResponse;
 	}
 
+	private String getScoreRange(Integer score) {
+		String scoreRange = "L";
+		if (score >= 80) {
+			scoreRange = "H";
+		} else if (score >= 50 && score < 80) {
+			scoreRange = "M";
+		}
+		return scoreRange;
+	}
+
+	private String getTimespentRange(Long timespent) {
+		String timespentRange = "L";
+		if (timespent >= 900000) {
+			timespentRange = "H";
+		} else if (timespent >= 120000 && timespent < 900000) {
+			timespentRange = "M";
+		}
+		return timespentRange;
+	}
+	
 	protected EsIndex getIndexType() {
 		return EsIndex.RESOURCE;
 	}

@@ -146,7 +146,7 @@ public class ContainerDataProviderServiceImpl implements ContainerDataProviderSe
 			conceptNodeJson.put("subjects", subjectArray);
 			conceptNodeJson.put("courses", courseArray);
 			conceptNodeJson.put("domains", domainArray);
-			conceptNodeJson.put("leafSLInternalCodes", leafSLInternalCodes.stream().map(String::toLowerCase).collect(Collectors.toList()));
+			conceptNodeJson.put("leafSLInternalCodes", leafSLInternalCodes);
 			conceptNodeJson.put("conceptNodeNeighbours", conceptNodeNeighbours.stream().map(String::toLowerCase).collect(Collectors.toList()));
 		}
 		return conceptNodeJson;
