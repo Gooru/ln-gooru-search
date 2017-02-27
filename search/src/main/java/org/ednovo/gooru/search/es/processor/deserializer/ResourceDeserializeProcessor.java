@@ -282,11 +282,14 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 				Boolean isCrosswalked = true;
 				List<String> leafInternalCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_INTERNAL_CODES);
 				List<String> leafDisplayCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_DISPLAY_CODES);
+				List<String> allEquivalentDisplayCodes = (List<String>) taxonomyMap.get(IndexFields.ALL_EQUIVALENT_DISPLAY_CODES);
 				if ((leafInternalCodes != null && leafInternalCodes.size() > 0 && fltStandard != null && leafInternalCodes.contains(fltStandard))
 						|| (leafDisplayCodes != null && leafDisplayCodes.size() > 0 && fltStandardDisplay != null && leafDisplayCodes.contains(fltStandardDisplay))) {
 					isCrosswalked = false;
 				}
+				allEquivalentDisplayCodes.removeAll(leafDisplayCodes);
 				resource.setIsCrosswalked(isCrosswalked);
+				resource.setEquivalentCodes(allEquivalentDisplayCodes);
 			}
 			resource.setTaxonomyDataSet((String) taxonomyMap.get(IndexFields.TAXONOMY_DATA_SET));
 			resource.setTaxonomySet((Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET));

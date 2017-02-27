@@ -95,4 +95,6 @@ public class IndexFields {
 	
 	public static final String LEAF_INTERNAL_CODES = "leafInternalCodes";
 	public static final Object LEAF_DISPLAY_CODES = "leafDisplayCodes";
+	public static final Object ALL_EQUIVALENT_DISPLAY_CODES = "allEquivalentDisplayCodes";
+
 }
