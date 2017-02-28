@@ -274,7 +274,7 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 
 		Map<String, Object> taxonomyMap = (Map<String, Object>) dataMap.get(IndexFields.TAXONOMY);
 		if (taxonomyMap != null) {
-			if (input.isCrosswalk()) {
+			if (input.isStandardsSearch() && input.isCrosswalk()) {
 				String fltStandard = null;
 				String fltStandardDisplay = null;
 				if(input.getFilters().containsKey(AMPERSAND_EQ_INTERNAL_CODE)) fltStandard = input.getFilters().get(AMPERSAND_EQ_INTERNAL_CODE).toString();

@@ -74,7 +74,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			@RequestParam(required = false, defaultValue= "false") boolean includeCIMetaData, 
 			@RequestParam(required = false, defaultValue= "false") boolean bsSearch,
 			@RequestParam(required = false, defaultValue= "true") boolean showCanonicalOnly,
-			@RequestParam(required = false, defaultValue= "false") boolean isCrosswalk,
+			@RequestParam(required = false, defaultValue= "true") boolean isCrosswalk,
 			@RequestParam(required = false, defaultValue = "false") boolean disableSpellCheck) throws Exception {
 
 		SearchData searchData = new SearchData();
@@ -160,7 +160,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		searchDataMap.put("allowDuplicates", true);
 		searchDataMap.put("includeCollectionItem", includeCollectionItem);
 		searchDataMap.put("includeCIMin", includeCIMetaData);
-		if (searchDataMap.containsKey("flt.standard")) {
+		if (searchDataMap.containsKey("flt.standard") || searchDataMap.containsKey("flt.standardDisplay")) {
 			searchData.setStandardsSearch(true);
 		}
 
