@@ -197,8 +197,15 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 						} else if (timespent != null) {
 							range = getTimespentRange(timespent);
 						}
-						
-						List<String> ids = conceptSuggestionRepository.getSuggestionByPerfConceptNode(collectionData.getTaxonomyLeafSLInternalCodes(), contextPath, range, SuggestHandlerType.RESOURCE.name().toLowerCase());
+						List<String> ids = null;
+						if (collectionData != null) {
+							if (collectionData.getTaxonomyLearningTargets() != null && collectionData.getTaxonomyLearningTargets().size() > 0) {
+								ids = conceptSuggestionRepository.getSuggestionByMicroCompetency(collectionData.getTaxonomyLearningTargets(), contextPath, range,
+										SuggestHandlerType.RESOURCE.name().toLowerCase());
+							} else if (collectionData.getStandards() != null && collectionData.getStandards().size() > 0) {
+								ids = conceptSuggestionRepository.getSuggestionByCompetency(collectionData.getStandards(), contextPath, range, SuggestHandlerType.RESOURCE.name().toLowerCase());
+							}
+						}
 						if (ids != null && !ids.isEmpty()) {
 							suggestData.putFilter("&id", StringUtils.join(ids, ","));
 						} else {

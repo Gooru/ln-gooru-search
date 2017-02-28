@@ -59,6 +59,7 @@ public class ContainerDataProviderServiceImpl implements ContainerDataProviderSe
 					if (conceptNodeJson != null && !conceptNodeJson.isEmpty()) {
 						collectionContextDo.setTaxonomyDomains((ArrayList<String>) conceptNodeJson.get("domains"));
 						collectionContextDo.setStandards((ArrayList<String>) conceptNodeJson.get("standards"));
+						collectionContextDo.setTaxonomyLearningTargets((ArrayList<String>) conceptNodeJson.get("learningTargets"));
 						collectionContextDo.setTaxonomyLeafSLInternalCodes((ArrayList<String>) conceptNodeJson.get("leafSLInternalCodes"));
 						collectionContextDo.setTaxonomyConceptNodeNeighbours((ArrayList<String>) conceptNodeJson.get("conceptNodeNeighbours"));
 					}
@@ -146,6 +147,7 @@ public class ContainerDataProviderServiceImpl implements ContainerDataProviderSe
 			conceptNodeJson.put("subjects", subjectArray);
 			conceptNodeJson.put("courses", courseArray);
 			conceptNodeJson.put("domains", domainArray);
+			conceptNodeJson.put("learningTargets", learningTargetArray);
 			conceptNodeJson.put("leafSLInternalCodes", leafSLInternalCodes);
 			conceptNodeJson.put("conceptNodeNeighbours", conceptNodeNeighbours.stream().map(String::toLowerCase).collect(Collectors.toList()));
 		}

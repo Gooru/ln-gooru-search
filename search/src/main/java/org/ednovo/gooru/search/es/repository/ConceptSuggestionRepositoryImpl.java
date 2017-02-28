@@ -21,7 +21,7 @@ public class ConceptSuggestionRepositoryImpl extends BaseRepository implements C
 	private static final Logger LOG = LoggerFactory.getLogger(CollectionRepositoryImpl.class);
 
 	@Override
-	public List<String> getSuggestionByPerfConceptNode(List<String> idsToFilter, String ctxPath, String performance_range, String suggestType) {
+	public List<String> getSuggestionByCompetency(List<String> idsToFilter, String ctxPath, String performance_range, String suggestType) {
 		List<String> ids = null;
 		try {
 			Type textArrayType = new TypeLocatorImpl(new TypeResolver()).custom(StringArrayType.class);
@@ -43,11 +43,41 @@ public class ConceptSuggestionRepositoryImpl extends BaseRepository implements C
 				}
 				resultMap.put("suggestion_ids", ids);
 			} else {
-				System.out.println("No Results");
+				LOG.info("There are no suggestions for c_internal_code" + idsToFilter);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("Unable to fetch suggestions from DB for Concept Node : {} : Exception :: {}"+ idsToFilter.toString()+ e.getMessage());
+			LOG.error("Unable to fetch suggestions from DB for Concept Node : {} : Exception :: {}"+ idsToFilter.toString()+ e.getMessage());
+		}
+		return ids;
+	}
+	
+	@Override
+	public List<String> getSuggestionByMicroCompetency(List<String> idsToFilter, String ctxPath, String performance_range, String suggestType) {
+		List<String> ids = null;
+		try {
+			Type textArrayType = new TypeLocatorImpl(new TypeResolver()).custom(StringArrayType.class);
+			String sql = "select suitable_suggestions from concept_based_suggest where ctx_path = :CTX_PATH and micro_competency_internal_code in (:IDS) and performance = :PERFORMANCE and suggest_type = :SUGGEST_TYPE";
+			Query query = getSessionFactory().getCurrentSession().createSQLQuery(sql)
+					.addScalar("suitable_suggestions", textArrayType)
+					.setParameter("PERFORMANCE", performance_range)
+					.setParameter("CTX_PATH", ctxPath)
+					.setParameter("SUGGEST_TYPE", suggestType)
+					.setParameterList("IDS", idsToFilter);
+			Map<String, Object> resultMap = null;
+			if (query != null && list(query).size() > 0) {
+				resultMap = new HashMap<>();
+				ids = new ArrayList<>();
+				for (Object[] object : arrayList(query)) {
+					for (int i = 0; i < object.length; i++) {
+						ids.add(object[i].toString());
+					}
+				}
+				resultMap.put("suggestion_ids", ids);
+			} else {
+				LOG.info("There are no suggestions for mc_internal_code" + idsToFilter);
+			}
+		} catch (Exception e) {
+			LOG.error("Unable to fetch suggestions from DB for Micro Concept Node : {} : Exception :: {}"+ idsToFilter.toString()+ e.getMessage());
 		}
 		return ids;
 	}

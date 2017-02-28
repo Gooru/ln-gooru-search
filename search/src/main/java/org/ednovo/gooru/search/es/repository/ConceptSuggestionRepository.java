@@ -4,6 +4,8 @@ import java.util.List;
 
 public interface ConceptSuggestionRepository {
 
-	List<String> getSuggestionByPerfConceptNode(List<String> idsToFilter, String ctxPath, String performance_range, String suggestType);
+	List<String> getSuggestionByCompetency(List<String> idsToFilter, String ctxPath, String performance_range, String suggestType);
+
+	List<String> getSuggestionByMicroCompetency(List<String> idsToFilter, String ctxPath, String performance_range, String suggestType);
 
 }

@@ -88,7 +88,7 @@ public class CollectionV3SuggestHandler extends SuggestHandler<Map<String, Objec
 								range = getTimespentRange(timespent);
 							}
 							if (scollectionData != null && scollectionData.getTaxonomyLeafSLInternalCodes() != null && scollectionData.getTaxonomyLeafSLInternalCodes().size() > 0) {
-								ids = conceptSuggestionRepository.getSuggestionByPerfConceptNode(scollectionData.getTaxonomyLeafSLInternalCodes(), contextPath, range,
+								ids = conceptSuggestionRepository.getSuggestionByCompetency(scollectionData.getTaxonomyLeafSLInternalCodes(), contextPath, range,
 										SuggestHandlerType.COLLECTION.name().toLowerCase());
 							}
 							if (ids != null && !ids.isEmpty()) {

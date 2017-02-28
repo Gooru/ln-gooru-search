@@ -44,6 +44,8 @@ public class CollectionContextData {
 	
 	private List<String> itemTitles;
 
+	private List<String> taxonomyLearningTargets;
+
 	public String getId() {
 		return id;
 	}
@@ -186,6 +188,14 @@ public class CollectionContextData {
 
 	public void setItemTitles(List<String> itemTitles) {
 		this.itemTitles = itemTitles;
+	}
+	
+	public List<String> getTaxonomyLearningTargets() {
+		return taxonomyLearningTargets;
+	}
+
+	public void setTaxonomyLearningTargets(List<String> taxonomyLearningTargets) {
+		this.taxonomyLearningTargets = taxonomyLearningTargets;
 	}
 
 }
