@@ -137,6 +137,7 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 					Map<String, String> txCodes = crosswalkResult.get(framework);
 					if (txCodes != null) {
 						txCodes.put(LEAF_INTERNAL_CODE, internalCode);
+						txCodes.put(PARENT_TITLE, codeAsMap.get(PARENT_TITLE));
 						txCurriculumInfoAsList.add(txCodes);
 						isTransformed = true;
 					}
