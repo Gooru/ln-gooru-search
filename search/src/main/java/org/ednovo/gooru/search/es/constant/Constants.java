@@ -614,5 +614,8 @@ public interface Constants {
 	public static final String AMPERSAND_EQ_FRAMEWORK_CODE = "&^taxonomy.allEquivalentFrameworkCodes";
 
 	public static final String STANDARD_PREFERENCE = "standard_preference";
+	
+	public static final String LEAF_INTERNAL_CODE = "leafInternalCode";
+
 
 }

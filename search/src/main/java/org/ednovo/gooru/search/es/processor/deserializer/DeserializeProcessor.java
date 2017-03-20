@@ -88,24 +88,22 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 		}
 		List<Map<String, String>> txCurriculumInfoAsList = new ArrayList<>();
 		JSONObject standardPrefs = input.getUserTaxonomyPreference();
-		if (standardPrefs != null) {
-			List<String> leafInternalCodes = (List<String>)taxonomyMap.get(IndexFields.LEAF_INTERNAL_CODES);
-			if (leafInternalCodes != null) {
-				List<Map<String, Object>> crosswalkResponse = searchCrosswalk(input, leafInternalCodes);
-				Map<String, Object> curriculumAsMap = (Map<String, Object>) taxonomySetAsMap.get(IndexFields.CURRICULUM);
-				List<Map<String, String>> curriculumInfoAsList = (List<Map<String, String>>) curriculumAsMap.get(IndexFields.CURRICULUM_INFO);
-				if (curriculumInfoAsList != null) {
-					curriculumInfoAsList.forEach(code -> {
-						Map<String, String> codeAsMap = code;
-						String id = codeAsMap.get(IndexFields.ID);
+		List<String> leafInternalCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_INTERNAL_CODES);
+		if (leafInternalCodes != null) {
+			List<Map<String, Object>> crosswalkResponse = searchCrosswalk(input, leafInternalCodes);
+			Map<String, Object> curriculumAsMap = (Map<String, Object>) taxonomySetAsMap.get(IndexFields.CURRICULUM);
+			List<Map<String, String>> curriculumInfoAsList = (List<Map<String, String>>) curriculumAsMap.get(IndexFields.CURRICULUM_INFO);
+			if (curriculumInfoAsList != null) {
+				curriculumInfoAsList.forEach(code -> {
+					Map<String, String> codeAsMap = code;
+					String id = codeAsMap.get(IndexFields.ID);
 
-						Map<String, Map<String, String>> crosswalkResult = null;
-						crosswalkResult = deserializeCrosswalkResponse(crosswalkResponse, id, crosswalkResult);
-						transformToPreferredCode(txCurriculumInfoAsList, standardPrefs, codeAsMap, crosswalkResult);
-					});
-					curriculumAsMap.put(IndexFields.CURRICULUM_INFO, txCurriculumInfoAsList);
-					taxonomySetAsMap.put(IndexFields.CURRICULUM, curriculumAsMap);
-				}
+					Map<String, Map<String, String>> crosswalkResult = null;
+					crosswalkResult = deserializeCrosswalkResponse(crosswalkResponse, id, crosswalkResult);
+					transformToPreferredCode(txCurriculumInfoAsList, standardPrefs, codeAsMap, crosswalkResult);
+				});
+				curriculumAsMap.put(IndexFields.CURRICULUM_INFO, txCurriculumInfoAsList);
+				taxonomySetAsMap.put(IndexFields.CURRICULUM, curriculumAsMap);
 			}
 		}
 		return taxonomySetAsMap;
@@ -130,25 +128,26 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 	private void transformToPreferredCode(List<Map<String, String>> txCurriculumInfoAsList, JSONObject standardPrefs, Map<String, String> codeAsMap, Map<String, Map<String, String>> crosswalkResult) {
 		String internalCode = codeAsMap.get(IndexFields.ID);
 		final String subject = getSubjectFromCodeId(internalCode);
-		if (standardPrefs.has(subject)) {
-			String framework = null;
-			try {
+		String framework = null;
+		Boolean isTransformed = false;
+		try {
+			if (standardPrefs != null && standardPrefs.has(subject)) {
 				framework = standardPrefs.getString(subject);
-				if (framework != null) {
-					if (!internalCode.startsWith(framework + DOT) && crosswalkResult != null) {
-						Map<String, String> txCodes = crosswalkResult.get(framework);
-						if (txCodes != null) {
-							txCodes.put("leafInternalCode", internalCode);
-							txCurriculumInfoAsList.add(txCodes);
-						}
-					} else if (internalCode.startsWith(framework + DOT)) {
-						codeAsMap.put("leafInternalCode", internalCode);
-						txCurriculumInfoAsList.add(codeAsMap);
+				if (framework != null && !internalCode.startsWith(framework + DOT) && crosswalkResult != null) {
+					Map<String, String> txCodes = crosswalkResult.get(framework);
+					if (txCodes != null) {
+						txCodes.put(LEAF_INTERNAL_CODE, internalCode);
+						txCurriculumInfoAsList.add(txCodes);
+						isTransformed = true;
 					}
 				}
-			} catch (JSONException e) {
-				logger.error("JsonException during taxonomy tranformation!", e.getMessage());
 			}
+			if(!isTransformed) {
+				codeAsMap.put(LEAF_INTERNAL_CODE, internalCode);
+				txCurriculumInfoAsList.add(codeAsMap);
+			}
+		} catch (JSONException e) {
+			logger.error("JsonException during taxonomy tranformation!", e.getMessage());
 		}
 	}
 
