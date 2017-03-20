@@ -51,7 +51,9 @@ public enum SearchHandlerType {
 	
 	CONTRIBUTOR(),
 	
-	COURSE();
+	COURSE(),
+	
+	CROSSWALK();
 
 	private SearchHandlerType() {
 	}

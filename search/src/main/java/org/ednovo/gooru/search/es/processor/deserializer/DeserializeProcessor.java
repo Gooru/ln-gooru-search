@@ -3,19 +3,24 @@
  */
 package org.ednovo.gooru.search.es.processor.deserializer;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.ednovo.gooru.search.es.constant.Constants;
+import org.ednovo.gooru.search.es.constant.EsIndex;
 import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.exception.SearchException;
+import org.ednovo.gooru.search.es.handler.SearchHandler;
+import org.ednovo.gooru.search.es.handler.SearchHandlerType;
 import org.ednovo.gooru.search.es.model.Code;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.processor.SearchProcessor;
-import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -31,6 +36,7 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 
 	abstract S collect(Map<String, Object> model, SearchData input, S output);
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public final void process(SearchData searchData, SearchResponse<O> response) {
 		try {
@@ -73,169 +79,109 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 			throw new SearchException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}
-    protected String updateTeksCode(Map<String, Object> taxonomyMap, String userTaxonomyPreference) {/*
-    	   String taxonomyDataSet = (String) taxonomyMap.get(TAXONOMYDATASET);
-           String rootNodeId = null;
-           if (taxonomyDataSet != null) {
-               try {
-                   JSONObject taxonomyDataSetObject = new JSONObject(taxonomyDataSet);
-                   JSONObject curriculumObject = taxonomyDataSetObject.getJSONObject(SEARCH_CURRICULUM);
-                   if (curriculumObject != null) {
-                       JSONArray userPreferredTaxCode = new JSONArray();
-                       JSONArray userPreferredTaxDesc = new JSONArray();
-                       if(userTaxonomyPreference != null && userTaxonomyPreference.trim().length() > 0){
-                           String taxonomyRootCodes = taxonomyRespository.getFindTaxonomyCodeList(userTaxonomyPreference);
-                           if(taxonomyRootCodes != null && taxonomyRootCodes.trim().length() > 0){
-                               List<String> taxonomyRootCodeList = Arrays.asList(taxonomyRootCodes.split(","));
-                               JSONArray curriculumCodeArray = curriculumObject.getJSONArray(SEARCH_CURRICULUM_CODE);
-                               JSONArray curriculumDescArray = curriculumObject.getJSONArray(SEARCH_CURRICULUM_DESC);
-                               List<String> preferenceTax = Arrays.asList(userTaxonomyPreference.split(","));
-                               if (curriculumCodeArray != null) {
-                                   for (int i = 0; i < curriculumCodeArray.length(); i++) {
-                                       for(String taxonomyRootCode : taxonomyRootCodeList){
-                                           // temp fix for #DO-5256
-                                           String code = (String) curriculumCodeArray.get(i);
-                                           if(code.startsWith("CA")){
-                                               rootNodeId = taxonomyRespository.findTaxonomyRootCode(code);
-                                               if(preferenceTax.contains(rootNodeId) && !stdValueExists(userPreferredTaxCode,code)){
-                                            	   userPreferredTaxCode.put((String) curriculumCodeArray.get(i));
-                                            	   userPreferredTaxDesc.put((String) curriculumDescArray.get(i));
-                                               }
-                                           } else if(((String) curriculumCodeArray.get(i)).startsWith(taxonomyRootCode) && !stdValueExists(userPreferredTaxCode,code)){
-                                        	   userPreferredTaxCode.put((String) curriculumCodeArray.get(i));
-                                        	   userPreferredTaxDesc.put((String) curriculumDescArray.get(i));
-                                               break;
-                                           }
-                                       }
-                                       
-                                   }
-                               }
-                           }
-                   }
-                       curriculumObject.put("curriculumCode", userPreferredTaxCode);
-                       curriculumObject.put("curriculumDesc", userPreferredTaxDesc);
-                       if(taxonomyDataSetObject.isNull("subject")) {
-                    	   taxonomyDataSetObject.put("subject", new JSONArray());
-                       }
-                       if(taxonomyDataSetObject.isNull("course")) {
-                    	   taxonomyDataSetObject.put("course", new JSONArray());
-                       }
-                       taxonomyDataSetObject.put("curriculum", curriculumObject);
-               }
-               return taxonomyDataSetObject.toString();
-               } catch (JSONException e) {
-                   LOG.error("taxonomyDataSet parsing: " + e.getMessage());
-               }
-           }
-           return taxonomyDataSet;
-       */return null;}
-		
-	boolean stdValueExists(JSONArray userTaxPref, String stdCode) throws JSONException{
-		for(int stdCodeIndex=0; stdCodeIndex < userTaxPref.length() ; stdCodeIndex++){
-			if(userTaxPref.get(stdCodeIndex).equals(stdCode)){
-				return true;
-			}
+
+	@SuppressWarnings("unchecked")
+	protected Map<String, Object> transformTaxonomy(Map<String, Object> taxonomyMap, SearchData input) {
+		Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
+		if (taxonomySetAsMap == null) {
+			return taxonomyMap;
 		}
-		return false;
-	}
-	
-	protected String updateTeksCode(Map<String, Object> taxonomyMap, String userTaxonomyPreference,String rootId) {/*
-		String taxonomyDataSet = (String) taxonomyMap.get(TAXONOMYDATASET);
-		if (taxonomyDataSet != null) {
-			try {
-				JSONObject taxonomyDataSetObject = new JSONObject(taxonomyDataSet);
-				JSONObject curriculumObject = taxonomyDataSetObject.getJSONObject(SEARCH_CURRICULUM);
-				if (curriculumObject != null) {
-					JSONArray userPreferenceTaxonomy = new JSONArray();
-					JSONArray userPreferredCurriculumDesc = new JSONArray();
-					if(userTaxonomyPreference != null && userTaxonomyPreference.trim().length() > 0  && rootId != null){
-						JSONArray curriculumCodeArray = curriculumObject.getJSONArray(SEARCH_CURRICULUM_CODE);
-						if (curriculumCodeArray != null) {
-								List <String> userPreference = Arrays.asList(userTaxonomyPreference.split(","));
-								String keyValuePair = rootId.substring(1,rootId.indexOf("}"));
-								String [] splitBykeyValue = keyValuePair.split("#");
-							for(int temp=0 ;temp < splitBykeyValue.length;temp++){
-								String [] splitStandards = splitBykeyValue[temp].split("=");
-									if(temp>0){
-										  if(userPreference.contains(splitStandards[0].substring(2, splitStandards[0].length()))){
-								    	        String [] splitKeyValues = splitStandards[1].split(",");
-										     for(int j=0; j< splitKeyValues.length;j++){
-											          String []tempStandards=splitKeyValues[j].split("~");
-											          userPreferenceTaxonomy.put(tempStandards[0]);
-											          if(tempStandards.length > 1 && !tempStandards[1].isEmpty()){
-											          userPreferredCurriculumDesc.put(tempStandards[1]);
-											          }
-										           }
-									          }
-									 }
-									else {
-								    	    if(userPreference.contains(splitStandards[0])){
-								    	        String [] splitKeyValues = splitStandards[1].split(",");
-											       for(int j=0; j< splitKeyValues.length;j++){
-												            String []tempStandards=splitKeyValues[j].split("~");
-												            userPreferenceTaxonomy.put(tempStandards[0]);
-												            if(tempStandards.length > 1 && !tempStandards[1].isEmpty()){
-														          userPreferredCurriculumDesc.put(tempStandards[1]);
-														     }
-											             
-									                 }
-								             }				     
-							         }           
-						      
-
-						  }
-					}
-				}
-					   curriculumObject.put("curriculumDesc", userPreferredCurriculumDesc);
-					   curriculumObject.put("curriculumCode", userPreferenceTaxonomy);
-					   taxonomyDataSetObject.put("curriculum", curriculumObject);
-			    }
-
-			List<CodeEo> courseList = (List<CodeEo>) taxonomyMap.get(SEARCH_COURSE);
-			List<String> courseCodeIds = new ArrayList<String>();
-			for(int courseIndex=0; courseList.size() > courseIndex; courseIndex++){
-				Map<String,String> courseMap = (Map<String, String>) courseList.get(courseIndex);
-					courseCodeIds.add(courseMap.get(SEARCH_CODE_ID));
-			}
-				
-			JSONArray taxonomyCourseArr = new JSONArray();
-				String coursesStr = null;
-				if(courseCodeIds.size() > 0){
-					coursesStr = taxonomyRespository.findGooruTaxonomyCourse(courseCodeIds);
-				}
-				if(coursesStr != null){
-					for(String courseStr : coursesStr.split(",")){
-						taxonomyCourseArr.put(courseStr);
-					}
-				}
-				taxonomyDataSetObject.put("course", taxonomyCourseArr);
- 
-			return taxonomyDataSetObject.toString();
-			} catch (JSONException e) {
-				LOG.error("taxonomyDataSet parsing: " + e.getMessage());
-			}
+		List<Map<String, String>> txCurriculumInfoAsList = new ArrayList<>();
+		JSONObject standardPrefs = input.getUserTaxonomyPreference();
+		if (standardPrefs != null) {
+			List<String> leafInternalCodes = (List<String>)taxonomyMap.get(IndexFields.LEAF_INTERNAL_CODES);
+			List<Map<String, Object>> crosswalkResponse = searchCrosswalk(input, leafInternalCodes);
 			
+			Map<String, Object> curriculumAsMap = (Map<String, Object>) taxonomySetAsMap.get(IndexFields.CURRICULUM);
+			List<Map<String, String>> curriculumInfoAsList = (List<Map<String, String>>) curriculumAsMap.get(IndexFields.CURRICULUM_INFO);
+			if (curriculumInfoAsList != null) {
+				curriculumInfoAsList.forEach(code -> {
+					Map<String, String> codeAsMap = code;
+					String id = codeAsMap.get(IndexFields.ID);
+
+					Map<String, Map<String, String>> crosswalkResult = null;
+					crosswalkResult = deserializeCrosswalkResponse(crosswalkResponse, id, crosswalkResult);
+					transformToPreferredCode(txCurriculumInfoAsList, standardPrefs, codeAsMap, crosswalkResult);
+				});
+				curriculumAsMap.put(IndexFields.CURRICULUM_INFO, txCurriculumInfoAsList);
+				taxonomySetAsMap.put(IndexFields.CURRICULUM, curriculumAsMap);
+			}
 		}
-		return taxonomyDataSet;
-	*/return null;}
-	
-	protected Long getAvgTimeSpent(Object avgTimeSpentObj){
-	   	   Long avgTimeSpent = 0L;
-    	   try{
-    		   Integer avgTSInt = (Integer) avgTimeSpentObj;
-    		   avgTimeSpent = avgTSInt.longValue();
-    	   }
-    	   catch(Exception e){
-    		   if(e instanceof ClassCastException){
-    			   avgTimeSpent = (Long)avgTimeSpentObj;
-    		   }
-    		   else{
-    			   logger.error("Error in setting avg timespnet " + e);
-    		   }
-    	   }
-    	   
-    	   return avgTimeSpent;
+		return taxonomySetAsMap;
 	}
+
+	@SuppressWarnings("unchecked")
+	private Map<String, Map<String, String>> deserializeCrosswalkResponse(List<Map<String, Object>> crosswalkResponse, String id, Map<String, Map<String, String>> crosswalkResult) {
+		if (crosswalkResponse != null && !crosswalkResponse.isEmpty()) {
+			for (Map<String, Object> response : crosswalkResponse) {
+				Map<String, Object> source = (Map<String, Object>) response.get(SEARCH_SOURCE);
+				String crosswalkId = (String) source.get(IndexFields.ID);
+				if (!crosswalkId.equalsIgnoreCase(id)) {
+					continue;
+				} else {
+					crosswalkResult = (Map<String, Map<String, String>>) source.get(IndexFields.EQUIVALENT_COMPETENCIES);
+				}
+			}
+		}
+		return crosswalkResult;
+	}
+
+	private void transformToPreferredCode(List<Map<String, String>> txCurriculumInfoAsList, JSONObject standardPrefs, Map<String, String> codeAsMap, Map<String, Map<String, String>> crosswalkResult) {
+		String internalCode = codeAsMap.get(IndexFields.ID);
+		final String subject = getSubjectFromCodeId(internalCode);
+		if (standardPrefs.has(subject)) {
+			String framework = null;
+			try {
+				framework = standardPrefs.getString(subject);
+				if (framework != null) {
+					if (!internalCode.startsWith(framework + DOT) && crosswalkResult != null) {
+						Map<String, String> txCodes = crosswalkResult.get(framework);
+						if (txCodes != null) {
+							txCodes.put("leafInternalCode", internalCode);
+							txCurriculumInfoAsList.add(txCodes);
+						}
+					} else if (internalCode.startsWith(framework + DOT)) {
+						codeAsMap.put("leafInternalCode", internalCode);
+						txCurriculumInfoAsList.add(codeAsMap);
+					}
+				}
+			} catch (JSONException e) {
+				logger.error("JsonException during taxonomy tranformation!", e.getMessage());
+			}
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<Map<String, Object>> searchCrosswalk(SearchData input, List<String> leafInternalCodes) {
+		SearchData crosswalkRequest = new SearchData();
+		crosswalkRequest.setPretty(input.getPretty());
+		crosswalkRequest.setIndexType(EsIndex.CROSSWALK);
+		crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.ID, (StringUtils.join(leafInternalCodes,",")));
+		crosswalkRequest.setQueryString(STAR);
+		List<Map<String, Object>> searchResponse = (List<Map<String, Object>>) SearchHandler.getSearcher(SearchHandlerType.CROSSWALK.name()).search(crosswalkRequest).getSearchResults();
+		return searchResponse;
+	}
+
+	private String getSubjectFromCodeId(String codeId) {
+		return codeId.substring((codeId.indexOf(DOT) + 1), codeId.indexOf(HYPHEN));
+	}
+
+	protected Long getAvgTimeSpent(Object avgTimeSpentObj) {
+		Long avgTimeSpent = 0L;
+		try {
+			Integer avgTSInt = (Integer) avgTimeSpentObj;
+			avgTimeSpent = avgTSInt.longValue();
+		} catch (Exception e) {
+			if (e instanceof ClassCastException) {
+				avgTimeSpent = (Long) avgTimeSpentObj;
+			} else {
+				logger.error("Error in setting avg timespnet " + e);
+			}
+		}
+
+		return avgTimeSpent;
+	}
+	
 	protected String getTaxonomyMetadataLabel(List<Code> taxonomyMetadatas) {
 		if (taxonomyMetadatas != null) {
 			String label = "";

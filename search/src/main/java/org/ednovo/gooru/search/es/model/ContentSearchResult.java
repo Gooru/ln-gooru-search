@@ -86,10 +86,12 @@ public class ContentSearchResult extends ContentUnusedFields implements Serializ
 	
 	private String category;
 
-	private Boolean isCrosswalked;
+	private Boolean isCrosswalked = false;
 	
 	private List<String> equivalentCodes;
 
+	private List<Map<String, Object>> taxonomyEquivalentCompetencies;
+	
 	public String getMediaType() {
 		return mediaType;
 	}
@@ -428,12 +430,12 @@ public class ContentSearchResult extends ContentUnusedFields implements Serializ
 		this.isCrosswalked = isCrosswalked;
 	}
 	
-	public List<String> getEquivalentCodes() {
-		return equivalentCodes;
+	public List<Map<String, Object>> getTaxonomyEquivalentCompetencies() {
+		return taxonomyEquivalentCompetencies;
 	}
 
-	public void setEquivalentCodes(List<String> equivalentCodes) {
-		this.equivalentCodes = equivalentCodes;
+	public void setTaxonomyEquivalentCompetencies(List<Map<String, Object>> taxonomyEquivalentCompetencies) {
+		this.taxonomyEquivalentCompetencies = taxonomyEquivalentCompetencies;
 	}
 
 }

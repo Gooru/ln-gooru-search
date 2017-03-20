@@ -11,8 +11,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.json.JsonObject;
+
 import org.ednovo.gooru.search.es.constant.EsIndex;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
+import org.json.JSONObject;
 
 /**
  * @author SearchTeam
@@ -90,7 +93,7 @@ public class SearchData implements Serializable {
 	
 	private boolean isFacetSubjectSearch = false;
 	
-	private String userTaxonomyPreference;
+	private JSONObject userTaxonomyPreference;
 
 	private boolean showSingleSubjectResults;
 	
@@ -418,11 +421,11 @@ public class SearchData implements Serializable {
 		this.isBsSearch = isBsSearch;
 	}
 
-	public String getUserTaxonomyPreference() {
+	public JSONObject getUserTaxonomyPreference() {
 		return userTaxonomyPreference;
 	}
 
-	public void setUserTaxonomyPreference(String userTaxonomyPreference) {
+	public void setUserTaxonomyPreference(JSONObject userTaxonomyPreference) {
 		this.userTaxonomyPreference = userTaxonomyPreference;
 	}
 

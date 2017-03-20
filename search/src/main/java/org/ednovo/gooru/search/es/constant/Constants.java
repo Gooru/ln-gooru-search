@@ -593,6 +593,7 @@ public interface Constants {
 	public static final String FLT_TENANT_ID = "&^tenant.tenantId";
 
 	public static final String CONTENT_CDN_URL = "contentCDN";
+	public static final String USER_PREFERENCES = "userPreferences";
 
 	public static final String THUMBNAIL_URL = "url";
 	public static final String SEARCH_REQ_20 = "2.0";
@@ -611,5 +612,7 @@ public interface Constants {
 	public static final String AMPERSAND_EQ_INTERNAL_CODE = "&^taxonomy.allEquivalentInternalCodes";
 	public static final String AMPERSAND_EQ_DISPLAY_CODE = "&^taxonomy.allEquivalentDisplayCodes";
 	public static final String AMPERSAND_EQ_FRAMEWORK_CODE = "&^taxonomy.allEquivalentFrameworkCodes";
+
+	public static final String STANDARD_PREFERENCE = "standard_preference";
 
 }

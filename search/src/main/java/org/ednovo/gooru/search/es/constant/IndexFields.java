@@ -94,7 +94,12 @@ public class IndexFields {
 	public static final String LICENSE_NAME = "name";
 	
 	public static final String LEAF_INTERNAL_CODES = "leafInternalCodes";
-	public static final Object LEAF_DISPLAY_CODES = "leafDisplayCodes";
-	public static final Object ALL_EQUIVALENT_DISPLAY_CODES = "allEquivalentDisplayCodes";
+	public static final String LEAF_DISPLAY_CODES = "leafDisplayCodes";
+	public static final String ALL_EQUIVALENT_DISPLAY_CODES = "allEquivalentDisplayCodes";
+	public static final String EQUIVALENT_COMPETENCIES = "equivalentCompetencies";
+	
+	public static final String CURRICULUM = "curriculum";
+	public static final String CURRICULUM_INFO = "curriculumInfo";
+
 
 }

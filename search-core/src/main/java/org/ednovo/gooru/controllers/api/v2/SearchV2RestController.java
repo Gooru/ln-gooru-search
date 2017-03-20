@@ -154,7 +154,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 				searchData.skipType(SearchProcessorType.BlackListQueryValidation);
 			}
 		}*/
-
+		searchData.setUserTaxonomyPreference((JSONObject) request.getAttribute(Constants.USER_PREFERENCES));
 		MapWrapper<Object> searchDataMap = new MapWrapper<Object>(request.getParameterMap());
 
 		searchDataMap.put("allowDuplicates", true);
@@ -238,6 +238,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 
 		searchData.setType(type);
 		searchData.setFrom(startAt);
+		searchData.setPageNum(pageNum);
 		if (type.equalsIgnoreCase(TYPE_SCOLLECTION) && includeCollectionItem) {
 			searchData.setSize(5);
 		} else {

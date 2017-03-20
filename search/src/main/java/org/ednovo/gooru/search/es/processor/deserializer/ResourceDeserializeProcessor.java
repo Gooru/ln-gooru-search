@@ -11,8 +11,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.ednovo.gooru.search.es.constant.EsIndex;
 import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.constant.SearchFilterConstants;
+import org.ednovo.gooru.search.es.handler.SearchHandler;
+import org.ednovo.gooru.search.es.handler.SearchHandlerType;
 import org.ednovo.gooru.search.es.model.Answer;
 import org.ednovo.gooru.search.es.model.ContentFormat;
 import org.ednovo.gooru.search.es.model.ContentSearchResult;
@@ -22,6 +25,8 @@ import org.ednovo.gooru.search.es.model.Question;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.User;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -37,6 +42,7 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 	protected static final String UN_RESTRICTED_SEARCH = "unrestrictedSearch";
 	protected static final String ALLOW_DUPLICATES = "allowDuplicates";
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<ContentSearchResult> deserialize(Map<String, Object> model, SearchData searchData, List<ContentSearchResult> output) {
 		output = new ArrayList<ContentSearchResult>();
@@ -121,6 +127,7 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 		return deserializeToResource(model, input);
 	}
 
+	@SuppressWarnings("unchecked")
 	private ContentSearchResult deserializeToResource(Map<String, Object> dataMap, SearchData input) {
 		String contentFormat = (String) dataMap.get(IndexFields.CONTENT_FORMAT);
 		String contentSubFormat = (String) dataMap.get(IndexFields.CONTENT_SUB_FORMAT);
@@ -274,25 +281,16 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 
 		Map<String, Object> taxonomyMap = (Map<String, Object>) dataMap.get(IndexFields.TAXONOMY);
 		if (taxonomyMap != null) {
+			Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
 			if (input.isStandardsSearch() && input.isCrosswalk()) {
-				String fltStandard = null;
-				String fltStandardDisplay = null;
-				if(input.getFilters().containsKey(AMPERSAND_EQ_INTERNAL_CODE)) fltStandard = input.getFilters().get(AMPERSAND_EQ_INTERNAL_CODE).toString();
-				if(input.getFilters().containsKey(AMPERSAND_EQ_DISPLAY_CODE)) fltStandardDisplay = input.getFilters().get(AMPERSAND_EQ_DISPLAY_CODE).toString();
-				Boolean isCrosswalked = true;
-				List<String> leafInternalCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_INTERNAL_CODES);
-				List<String> leafDisplayCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_DISPLAY_CODES);
-				List<String> allEquivalentDisplayCodes = (List<String>) taxonomyMap.get(IndexFields.ALL_EQUIVALENT_DISPLAY_CODES);
-				if (!(leafInternalCodes != null && leafInternalCodes.size() > 0 && fltStandard != null && leafInternalCodes.contains(fltStandard.toUpperCase()))
-						&& !(leafDisplayCodes != null && leafDisplayCodes.size() > 0 && fltStandardDisplay != null && leafDisplayCodes.contains(fltStandardDisplay.toUpperCase()))) {
-					isCrosswalked = false;
-				}
-				allEquivalentDisplayCodes.removeAll(leafDisplayCodes);
-				resource.setIsCrosswalked(isCrosswalked);
-				resource.setEquivalentCodes(allEquivalentDisplayCodes);
+				setCrosswalkData(input, resource, taxonomyMap);
+			} else if (input.getUserTaxonomyPreference() != null) {
+				long start = System.currentTimeMillis();
+				taxonomySetAsMap = transformTaxonomy(taxonomyMap, input);
+				logger.info("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
 			}
+			resource.setTaxonomySet(taxonomySetAsMap);		
 			resource.setTaxonomyDataSet((String) taxonomyMap.get(IndexFields.TAXONOMY_DATA_SET));
-			resource.setTaxonomySet((Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET));
 		}
 
 		if (dataMap.get(IndexFields.COLLECTION_TITLES) != null) {
@@ -370,7 +368,27 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 
 		return resource;
 	}
+	
+	@SuppressWarnings("unchecked")
+	private void setCrosswalkData(SearchData input, ContentSearchResult resource, Map<String, Object> taxonomyMap) {
+		String fltStandard = null;
+		String fltStandardDisplay = null;
+		if(input.getFilters().containsKey(AMPERSAND_EQ_INTERNAL_CODE)) fltStandard = input.getFilters().get(AMPERSAND_EQ_INTERNAL_CODE).toString();
+		if(input.getFilters().containsKey(AMPERSAND_EQ_DISPLAY_CODE)) fltStandardDisplay = input.getFilters().get(AMPERSAND_EQ_DISPLAY_CODE).toString();
+		Boolean isCrosswalked = false;
+		List<String> leafInternalCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_INTERNAL_CODES);
+		List<String> leafDisplayCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_DISPLAY_CODES);
+		List<Map<String, Object>> equivalentCompetencies = (List<Map<String, Object>>) taxonomyMap.get(IndexFields.EQUIVALENT_COMPETENCIES);
 
+		if (!(leafInternalCodes != null && leafInternalCodes.size() > 0 && fltStandard != null && leafInternalCodes.contains(fltStandard.toUpperCase()))
+				&& !(leafDisplayCodes != null && leafDisplayCodes.size() > 0 && fltStandardDisplay != null && leafDisplayCodes.contains(fltStandardDisplay.toUpperCase()))) {
+			isCrosswalked = true;
+		}
+		resource.setIsCrosswalked(isCrosswalked);
+		resource.setTaxonomyEquivalentCompetencies(equivalentCompetencies);
+	}
+
+	@SuppressWarnings("unchecked")
 	private Question convertToQuestion(Map<String, Object> source) {
 		Question question = new Question();
 		Map<String, Object> questionMap = (Map<String, Object>) (source.get(IndexFields.QUESTION));
@@ -405,5 +423,4 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 		}
 		return question;
 	}
-
 }

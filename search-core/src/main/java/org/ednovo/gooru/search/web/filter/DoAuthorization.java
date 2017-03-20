@@ -62,6 +62,10 @@ public class DoAuthorization {
 					userGroup.setTenantId(tenant.getString(Constants.TENANT_ID));
 					userGroup.setTenantRoot(tenant.getString(Constants.TENANT_ROOT));
 					request.setAttribute(Constants.TENANT, userGroup);
+					JSONObject stdPref = null;
+					if(responseHolder.getPreferences() != null && responseHolder.getPreferences().has(Constants.STANDARD_PREFERENCE))
+						stdPref  = responseHolder.getPreferences().getJSONObject(Constants.STANDARD_PREFERENCE);
+					request.setAttribute(Constants.USER_PREFERENCES, stdPref);
 				}
 			} catch (Exception e) {
 				logger.error("Error processing authorize request " + e);
