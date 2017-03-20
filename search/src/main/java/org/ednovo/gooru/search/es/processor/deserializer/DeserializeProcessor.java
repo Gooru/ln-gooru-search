@@ -144,7 +144,6 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 				}
 			}
 			if(!isTransformed) {
-				codeAsMap.put(LEAF_INTERNAL_CODE, internalCode);
 				txCurriculumInfoAsList.add(codeAsMap);
 			}
 		} catch (JSONException e) {
