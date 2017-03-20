@@ -61,7 +61,9 @@ public class CollectionSearchResult extends CollectionUnUsedFields implements Se
 	private String userProfileImage;
 	private Map<String, Object> course;
 	private Map<String, Object> taxonomySet;
-
+	private Boolean isCrosswalked = false;
+	private List<Map<String, Object>> taxonomyEquivalentCompetencies;
+	
 	public CollectionSearchResult() {
 	}
 
@@ -435,6 +437,22 @@ public class CollectionSearchResult extends CollectionUnUsedFields implements Se
 
 	public void setTaxonomySet(Map<String, Object> taxonomySet) {
 		this.taxonomySet = taxonomySet;
+	}
+	
+	public Boolean getIsCrosswalked() {
+		return isCrosswalked;
+	}
+
+	public void setIsCrosswalked(Boolean isCrosswalked) {
+		this.isCrosswalked = isCrosswalked;
+	}
+	
+	public List<Map<String, Object>> getTaxonomyEquivalentCompetencies() {
+		return taxonomyEquivalentCompetencies;
+	}
+
+	public void setTaxonomyEquivalentCompetencies(List<Map<String, Object>> taxonomyEquivalentCompetencies) {
+		this.taxonomyEquivalentCompetencies = taxonomyEquivalentCompetencies;
 	}
 
 }

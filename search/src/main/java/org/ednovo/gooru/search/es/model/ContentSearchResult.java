@@ -88,8 +88,6 @@ public class ContentSearchResult extends ContentUnusedFields implements Serializ
 
 	private Boolean isCrosswalked = false;
 	
-	private List<String> equivalentCodes;
-
 	private List<Map<String, Object>> taxonomyEquivalentCompetencies;
 	
 	public String getMediaType() {

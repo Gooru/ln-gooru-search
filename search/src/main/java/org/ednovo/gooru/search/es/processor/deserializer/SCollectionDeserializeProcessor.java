@@ -32,6 +32,7 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 	public static final String SHARING_PUBLIC = "public";
 	public static final String SHARING_PRIVATE = "private";
 
+	@SuppressWarnings("unchecked")
 	@Override
 	List<CollectionSearchResult> deserialize(Map<String, Object> model, SearchData searchData, List<CollectionSearchResult> output) {
 		Map<String, Object> hitsMap = (Map<String, Object>) model.get(SEARCH_HITS);
@@ -51,6 +52,7 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 		return output;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	CollectionSearchResult collect(Map<String, Object> model, SearchData searchData, CollectionSearchResult searchResult) {
 		CollectionSearchResult output = new CollectionSearchResult();
@@ -255,9 +257,17 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 			taxonomyMap = (Map<String, Object>) model.get(IndexFields.TAXONOMY);
 		}
 		if (taxonomyMap != null) {
+			Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
+			if (searchData.isStandardsSearch() && searchData.isCrosswalk()) {
+				setCrosswalkData(searchData, output, taxonomyMap);
+			} else if (searchData.getUserTaxonomyPreference() != null) {
+				long start = System.currentTimeMillis();
+				taxonomySetAsMap = transformTaxonomy(taxonomyMap, searchData);
+				logger.info("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
+			}
+			output.setTaxonomySet(taxonomySetAsMap);		
 			output.setTaxonomyDataSet((String) taxonomyMap.get(IndexFields.TAXONOMY_DATA_SET));
-			output.setTaxonomySet((Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET));
-			output.setTaxonomySkills((String) taxonomyMap.get(IndexFields.SKILLS));
+		
 			List<Code> taxonomySubject = (List<Code>) taxonomyMap.get(IndexFields.SUBJECT);
 			output.setSubject(getTaxonomyMetadataLabel(taxonomySubject));
 		}
@@ -265,6 +275,25 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 		return output;
 	}
 
+	@SuppressWarnings("unchecked")
+	private void setCrosswalkData(SearchData input, CollectionSearchResult collection, Map<String, Object> taxonomyMap) {
+		String fltStandard = null;
+		String fltStandardDisplay = null;
+		if(input.getFilters().containsKey(AMPERSAND_EQ_INTERNAL_CODE)) fltStandard = input.getFilters().get(AMPERSAND_EQ_INTERNAL_CODE).toString();
+		if(input.getFilters().containsKey(AMPERSAND_EQ_DISPLAY_CODE)) fltStandardDisplay = input.getFilters().get(AMPERSAND_EQ_DISPLAY_CODE).toString();
+		Boolean isCrosswalked = false;
+		List<String> leafInternalCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_INTERNAL_CODES);
+		List<String> leafDisplayCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_DISPLAY_CODES);
+		List<Map<String, Object>> equivalentCompetencies = (List<Map<String, Object>>) taxonomyMap.get(IndexFields.EQUIVALENT_COMPETENCIES);
+
+		if (!(leafInternalCodes != null && leafInternalCodes.size() > 0 && fltStandard != null && leafInternalCodes.contains(fltStandard.toUpperCase()))
+				&& !(leafDisplayCodes != null && leafDisplayCodes.size() > 0 && fltStandardDisplay != null && leafDisplayCodes.contains(fltStandardDisplay.toUpperCase()))) {
+			isCrosswalked = true;
+		}
+		collection.setIsCrosswalked(isCrosswalked);
+		collection.setTaxonomyEquivalentCompetencies(equivalentCompetencies);
+	}
+	
 	@Override
 	protected SearchProcessorType getType() {
 		return SearchProcessorType.SCollectionDeserializer;
