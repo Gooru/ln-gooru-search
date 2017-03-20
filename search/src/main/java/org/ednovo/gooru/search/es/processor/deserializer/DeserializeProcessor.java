@@ -90,21 +90,22 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 		JSONObject standardPrefs = input.getUserTaxonomyPreference();
 		if (standardPrefs != null) {
 			List<String> leafInternalCodes = (List<String>)taxonomyMap.get(IndexFields.LEAF_INTERNAL_CODES);
-			List<Map<String, Object>> crosswalkResponse = searchCrosswalk(input, leafInternalCodes);
-			
-			Map<String, Object> curriculumAsMap = (Map<String, Object>) taxonomySetAsMap.get(IndexFields.CURRICULUM);
-			List<Map<String, String>> curriculumInfoAsList = (List<Map<String, String>>) curriculumAsMap.get(IndexFields.CURRICULUM_INFO);
-			if (curriculumInfoAsList != null) {
-				curriculumInfoAsList.forEach(code -> {
-					Map<String, String> codeAsMap = code;
-					String id = codeAsMap.get(IndexFields.ID);
+			if (leafInternalCodes != null) {
+				List<Map<String, Object>> crosswalkResponse = searchCrosswalk(input, leafInternalCodes);
+				Map<String, Object> curriculumAsMap = (Map<String, Object>) taxonomySetAsMap.get(IndexFields.CURRICULUM);
+				List<Map<String, String>> curriculumInfoAsList = (List<Map<String, String>>) curriculumAsMap.get(IndexFields.CURRICULUM_INFO);
+				if (curriculumInfoAsList != null) {
+					curriculumInfoAsList.forEach(code -> {
+						Map<String, String> codeAsMap = code;
+						String id = codeAsMap.get(IndexFields.ID);
 
-					Map<String, Map<String, String>> crosswalkResult = null;
-					crosswalkResult = deserializeCrosswalkResponse(crosswalkResponse, id, crosswalkResult);
-					transformToPreferredCode(txCurriculumInfoAsList, standardPrefs, codeAsMap, crosswalkResult);
-				});
-				curriculumAsMap.put(IndexFields.CURRICULUM_INFO, txCurriculumInfoAsList);
-				taxonomySetAsMap.put(IndexFields.CURRICULUM, curriculumAsMap);
+						Map<String, Map<String, String>> crosswalkResult = null;
+						crosswalkResult = deserializeCrosswalkResponse(crosswalkResponse, id, crosswalkResult);
+						transformToPreferredCode(txCurriculumInfoAsList, standardPrefs, codeAsMap, crosswalkResult);
+					});
+					curriculumAsMap.put(IndexFields.CURRICULUM_INFO, txCurriculumInfoAsList);
+					taxonomySetAsMap.put(IndexFields.CURRICULUM, curriculumAsMap);
+				}
 			}
 		}
 		return taxonomySetAsMap;
