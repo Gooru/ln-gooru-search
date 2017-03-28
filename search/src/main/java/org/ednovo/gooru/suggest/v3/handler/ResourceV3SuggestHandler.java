@@ -22,7 +22,7 @@ import org.ednovo.gooru.search.es.model.SuggestResponse;
 import org.ednovo.gooru.search.es.processor.ElasticsearchProcessor;
 import org.ednovo.gooru.search.es.processor.deserializer.ResourceDeserializeProcessor;
 import org.ednovo.gooru.search.es.processor.query_builder.ResourceEsDslQueryBuildProcessor;
-import org.ednovo.gooru.search.es.repository.ConceptSuggestionRepository;
+import org.ednovo.gooru.search.es.repository.ConceptBasedResourceSuggestRepository;
 import org.ednovo.gooru.search.es.service.SearchSettingService;
 import org.ednovo.gooru.search.model.ActivityStreamRawData;
 import org.ednovo.gooru.suggest.v3.data.provider.model.SuggestDataProviderType;
@@ -43,7 +43,7 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 
 	private ExecutorService doerService;
 
-	private static final String RESOURCE_STUDY_SUGGEST = "resource-study-suggest";
+	private static final String RESOURCE_STUDY = "resource-study";
 
 	private static final String COLLECTION_STUDY = "collection-study";
 
@@ -63,7 +63,7 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 	private ResourceDeserializeProcessor resourceDeserializeProcessor;
 	
 	@Autowired
-	private ConceptSuggestionRepository conceptSuggestionRepository;
+	private ConceptBasedResourceSuggestRepository conceptSuggestionRepository;
 	
 	private SuggestDataProviderType[] suggestDataProviders = { SuggestDataProviderType.RESOURCE,SuggestDataProviderType.COLLECTION };
 
@@ -110,9 +110,9 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 
 		final SearchResponse<List<ContentSearchResult>> searchResponseResource = new SearchResponse<List<ContentSearchResult>>();
 		final SearchResponse<Object> searchRes = new SearchResponse<Object>();
-		final String contextPath = suggestData.getSuggestV3Context().getContext();
-		final Integer score = suggestData.getSuggestV3Context().getScore();
-		final Long timespent = suggestData.getSuggestV3Context().getTimeSpent();
+		final String contextType = suggestData.getSuggestContextData().getContextType();
+		final Integer score = suggestData.getSuggestContextData().getScore();
+		final Long timespent = suggestData.getSuggestContextData().getTimeSpent();
 
 		tasks.add(new Callable<SuggestResponse<Object>>() {
 
@@ -124,10 +124,10 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 					//suggestData.putFilter("&^contentFormat", "resource");
 					suggestData.putFilter("&^statistics.statusIsBroken", 0);
 					suggestData.putFilter(FLT_TENANT_ID, StringUtils.join(suggestData.getUserPermits(), ","));
-					if (contextPath.equalsIgnoreCase(RESOURCE_STUDY_SUGGEST)) {
+					if (contextType.equalsIgnoreCase(RESOURCE_STUDY)) {
 						if (resourceData != null) {
 
-							suggestData.putFilter("!^id", suggestData.getSuggestV3Context().getId());
+							suggestData.putFilter("!^id", suggestData.getSuggestContextData().getResourceId());
 
 							// Search query formation: If query string is null in the request,
 							// build the search query with resource keywords OR resource title
@@ -169,7 +169,7 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 								}
 							}
 						}
-					} else if (contextPath.equalsIgnoreCase(COLLECTION_STUDY) && collectionData != null) {
+					} else if (contextType.equalsIgnoreCase(COLLECTION_STUDY) && collectionData != null) {
 						StringBuilder suggestQuery = new StringBuilder();
 
 						/*if (StringUtils.isNotBlank(collectionData.getTitle())) {
@@ -200,10 +200,10 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 						List<String> ids = null;
 						if (collectionData != null) {
 							if (collectionData.getTaxonomyLearningTargets() != null && collectionData.getTaxonomyLearningTargets().size() > 0) {
-								ids = conceptSuggestionRepository.getSuggestionByMicroCompetency(collectionData.getTaxonomyLearningTargets(), contextPath, range,
+								ids = conceptSuggestionRepository.getSuggestionByMicroCompetency(collectionData.getTaxonomyLearningTargets(), contextType, range,
 										SuggestHandlerType.RESOURCE.name().toLowerCase());
 							} else if (collectionData.getStandards() != null && collectionData.getStandards().size() > 0) {
-								ids = conceptSuggestionRepository.getSuggestionByCompetency(collectionData.getStandards(), contextPath, range, SuggestHandlerType.RESOURCE.name().toLowerCase());
+								ids = conceptSuggestionRepository.getSuggestionByCompetency(collectionData.getStandards(), contextType, range, SuggestHandlerType.RESOURCE.name().toLowerCase());
 							}
 						}
 						if (ids != null && !ids.isEmpty()) {

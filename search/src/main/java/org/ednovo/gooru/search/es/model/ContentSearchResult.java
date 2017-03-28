@@ -43,9 +43,9 @@ public class ContentSearchResult extends ContentUnusedFields implements Serializ
 
 	private Integer collaboratorCount;
 
-	private String scollectionTitles;
+	private List<String> scollectionTitles;
 
-	private String scollectionIds;
+	private List<String> scollectionIds;
 
 	private Boolean hasFrameBreaker;
 
@@ -230,19 +230,19 @@ public class ContentSearchResult extends ContentUnusedFields implements Serializ
 		this.collaboratorCount = collaboratorCount;
 	}
 
-	public String getScollectionTitles() {
+	public List<String> getScollectionTitles() {
 		return scollectionTitles;
 	}
 
-	public void setScollectionTitles(String scollectionTitles) {
+	public void setScollectionTitles(List<String> scollectionTitles) {
 		this.scollectionTitles = scollectionTitles;
 	}
 
-	public String getScollectionIds() {
+	public List<String> getScollectionIds() {
 		return scollectionIds;
 	}
 
-	public void setScollectionIds(String scollectionIds) {
+	public void setScollectionIds(List<String> scollectionIds) {
 		this.scollectionIds = scollectionIds;
 	}
 

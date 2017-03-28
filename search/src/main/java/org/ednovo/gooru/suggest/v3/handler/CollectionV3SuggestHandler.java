@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
 import org.ednovo.gooru.search.domain.service.CollectionSearchResult;
+import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.EsIndex;
 import org.ednovo.gooru.search.es.exception.SearchException;
 import org.ednovo.gooru.search.es.model.SearchResponse;
@@ -18,14 +19,16 @@ import org.ednovo.gooru.search.es.model.SuggestResponse;
 import org.ednovo.gooru.search.es.processor.ElasticsearchProcessor;
 import org.ednovo.gooru.search.es.processor.deserializer.SCollectionDeserializeProcessor;
 import org.ednovo.gooru.search.es.processor.query_builder.EsDslQueryBuildProcessor;
-import org.ednovo.gooru.search.es.repository.ConceptSuggestionRepository;
+import org.ednovo.gooru.search.es.repository.ConceptBasedCollectionSuggestRepository;
 import org.ednovo.gooru.search.es.service.SearchSettingService;
 import org.ednovo.gooru.suggest.v3.data.provider.model.SuggestDataProviderType;
 import org.ednovo.gooru.suggest.v3.model.CollectionContextData;
+import org.ednovo.gooru.suggest.v3.model.LessonContextData;
 import org.ednovo.gooru.suggest.v3.model.SuggestData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -47,22 +50,25 @@ public class CollectionV3SuggestHandler extends SuggestHandler<Map<String, Objec
 	private SCollectionDeserializeProcessor scollectionDeserializeProcessor;
 	
 	@Autowired
-	private ConceptSuggestionRepository conceptSuggestionRepository;
+	private ConceptBasedCollectionSuggestRepository conceptSuggestionRepository;
 	
 	private static final String COLLECTION_STUDY = "collection-study";	
 
 	private static final String OR_DELIMETER = "~~@@";
 
-	private SuggestDataProviderType[] suggestDataProviders = { SuggestDataProviderType.RESOURCE,SuggestDataProviderType.COLLECTION };
+	protected static final String STUDY_PLAYER = "study-player";
+
+	private SuggestDataProviderType[] suggestDataProviders = { SuggestDataProviderType.RESOURCE,SuggestDataProviderType.COLLECTION,SuggestDataProviderType.LESSON };
 
 	@Override
 	public SuggestResponse<Object> suggest(SuggestData suggestData, Map<SuggestDataProviderType, Object> dataProviderInput) {
 		final SearchResponse<Object> searchResponse = new SearchResponse<Object>();
 		final SuggestResponse<Object> suggestResponse = new SuggestResponse<Object>();
 		final SearchResponse<List<CollectionSearchResult>> searchCollectionResult = new SearchResponse<List<CollectionSearchResult>>();
-		final String contextPath = suggestData.getSuggestV3Context().getContext();
-		final Integer score = suggestData.getSuggestV3Context().getScore();
-		final Long timespent = suggestData.getSuggestV3Context().getTimeSpent();
+		final String contextArea = suggestData.getSuggestContextData().getContextArea();
+		final String contextType = suggestData.getSuggestContextData().getContextType();
+		final Integer score = suggestData.getSuggestContextData().getScore();
+		final Long timespent = suggestData.getSuggestContextData().getTimeSpent();
 
 		StringBuilder suggestQuery = new StringBuilder();
 
@@ -73,49 +79,52 @@ public class CollectionV3SuggestHandler extends SuggestHandler<Map<String, Objec
 		tasks.add(new Callable<SuggestResponse<Object>>() {
 			@Override
 			public SuggestResponse<Object> call() throws Exception {
+				
 				String queryString = "*";
 				for (SuggestDataProviderType suggestDataProviderType : suggestDataProviderTypes()) {
 					if (suggestDataProviderType != null && suggestDataProviderType == SuggestDataProviderType.COLLECTION && dataProviderInput.get(SuggestDataProviderType.COLLECTION) != null) {
-						final CollectionContextData scollectionData = (CollectionContextData) dataProviderInput.get(SuggestDataProviderType.COLLECTION);
-						if (contextPath.equalsIgnoreCase(COLLECTION_STUDY)) {
-							if (StringUtils.isNotBlank(suggestData.getSuggestV3Context().getContainerId()))
-								suggestData.putFilter("!^id", suggestData.getSuggestV3Context().getContainerId());
-							List<String> ids = null;
-							String range = "M";
-							if (score != null) {
-								range = getScoreRange(score);
-							} else if (timespent != null) {
-								range = getTimespentRange(timespent);
-							}
-							if (scollectionData != null && scollectionData.getTaxonomyLeafSLInternalCodes() != null && scollectionData.getTaxonomyLeafSLInternalCodes().size() > 0) {
-								ids = conceptSuggestionRepository.getSuggestionByCompetency(scollectionData.getTaxonomyLeafSLInternalCodes(), contextPath, range,
-										SuggestHandlerType.COLLECTION.name().toLowerCase());
-							}
-							if (ids != null && !ids.isEmpty()) {
-								suggestData.putFilter("&id", StringUtils.join(ids, ","));
-							} else {
-								LOG.info("Suggestions unavailable for concept nodes : " + scollectionData.getTaxonomyLeafSLInternalCodes());
-								suggestData.setSize(0);
-							}
+						final CollectionContextData collectionData = (CollectionContextData) dataProviderInput.get(SuggestDataProviderType.COLLECTION);
+						final LessonContextData lessonData = (LessonContextData) dataProviderInput.get(SuggestDataProviderType.LESSON);
+						if (contextType.equalsIgnoreCase(COLLECTION_STUDY)) {
+							if (contextArea.equalsIgnoreCase(STUDY_PLAYER)) {
+								if (StringUtils.isNotBlank(suggestData.getSuggestContextData().getCollectionId()))
+									suggestData.putFilter("!^id", suggestData.getSuggestContextData().getCollectionId());
+								List<String> ids = null;
+								String range = "M";
+								if (score != null) {
+									range = getScoreRange(score);
+								} else if (timespent != null) {
+									range = getTimespentRange(timespent);
+								}
+								
+								ids = fetchPrePopulatedSuggestions(suggestData, contextType, collectionData, lessonData, ids, range);
 
-							/*if (StringUtils.isNotBlank(scollectionData.getTitle())) {
-							if (suggestQuery.length() > 0) {
-								suggestQuery.append(OR_DELIMETER);
+								if (ids != null && !ids.isEmpty()) {
+									suggestData.putFilter("&id", StringUtils.join(ids, ","));
+								} else {
+									LOG.info("Suggestions unavailable for concept nodes : " + collectionData.getTaxonomyLeafSLInternalCodes());
+									suggestData.setSize(0);
+								}
+
+								if (suggestQuery.length() == 0) {
+									queryString = "*";
+								} else {
+									queryString = suggestQuery.toString();
+								}
 							}
-							suggestQuery.append(scollectionData.getTitle().trim());
-						}
-						if (StringUtils.isNotBlank(scollectionData.getLearningObjective())) {
-							if (suggestQuery.length() > 0) {
-								suggestQuery.append(OR_DELIMETER);
+							/*if (StringUtils.isNotBlank(collectionData.getTitle())) {
+								if (suggestQuery.length() > 0) {
+									suggestQuery.append(OR_DELIMETER);
+								}
+								suggestQuery.append(collectionData.getTitle().trim());
 							}
-							suggestQuery.append(scollectionData.getLearningObjective().trim());
-						}
-*/
-							if (suggestQuery.length() == 0) {
-								queryString = "*";
-							} else {
-								queryString = suggestQuery.toString();
-							}
+							if (StringUtils.isNotBlank(collectionData.getLearningObjective())) {
+								if (suggestQuery.length() > 0) {
+									suggestQuery.append(OR_DELIMETER);
+								}
+								suggestQuery.append(collectionData.getLearningObjective().trim());
+							}*/
+							
 
 						}
 
@@ -173,6 +182,35 @@ public class CollectionV3SuggestHandler extends SuggestHandler<Map<String, Objec
 		}
 		suggestResponse.setSuggestedType(SuggestHandlerType.COLLECTION.name().toLowerCase());
 		return suggestResponse;
+	}
+	
+	private List<String> fetchPrePopulatedSuggestions(SuggestData suggestData, final String contextType, final CollectionContextData collectionData, final LessonContextData lessonData,
+			List<String> ids, String range) {
+		switch (suggestData.getSuggestContextData().getRequestedSubType()) {
+		case Constants.PRE_TEST:
+			if (lessonData != null && lessonData.getStandards() != null && lessonData.getStandards().size() > 0) {
+				ids = conceptSuggestionRepository.getSuggestionByCompetency(lessonData.getStandards(), contextType, range,
+						suggestData.getSuggestContextData().getRequestedSubType());
+			}
+			break;
+		case Constants.POST_TEST:
+		case Constants.BACKFILL:
+			if (collectionData != null && collectionData.getStandards() != null && collectionData.getStandards().size() > 0) {
+				ids = conceptSuggestionRepository.getSuggestionByCompetency(collectionData.getStandards(), contextType, range,
+						suggestData.getSuggestContextData().getRequestedSubType());
+			}
+			break;
+		case Constants.BENCHMARK:
+			if (collectionData != null && collectionData.getTaxonomyLearningTargets() != null && collectionData.getTaxonomyLearningTargets().size() > 0) {
+				ids = conceptSuggestionRepository.getSuggestionByMicroCompetency(collectionData.getTaxonomyLearningTargets(), contextType, range,
+						suggestData.getSuggestContextData().getRequestedSubType());
+			}
+			break;
+		default:
+			LOG.info("Invalid Collection Subtype requested for Study player suggestion" );
+			throw new SearchException(HttpStatus.BAD_REQUEST, "Invalid Collection Subtype requested for Study player suggestion");
+		}
+		return ids;
 	}
 
 	private String getScoreRange(Integer score) {

@@ -14,6 +14,8 @@ public enum SuggestDataProviderType {
 	
 	QUESTION(),
 	
+	LESSON(),
+	
 	USER_ACTIVITY();
 	
 	private SuggestDataProviderType() {

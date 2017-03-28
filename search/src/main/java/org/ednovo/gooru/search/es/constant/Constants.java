@@ -2,6 +2,7 @@ package org.ednovo.gooru.search.es.constant;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 public interface Constants {
 
@@ -618,4 +619,12 @@ public interface Constants {
 	public static final String LEAF_INTERNAL_CODE = "leafInternalCode";
 	public static final String PARENT_TITLE = "parentTitle";
 
+	public static final String PRE_TEST = "pre-test";
+	public static final String POST_TEST = "post-test";
+	public static final String BENCHMARK = "benchmark";
+	public static final String BACKFILL = "backfill";
+	public static final Pattern POST_TEST_OR_BENCHMARK = Pattern.compile("post-test|benchmark");
+	public static final String STUDY_PLAYER = "study-player";
+	public static final String RESOURCE_STUDY = "resource-study";
+	public static final String COLLECTION_STUDY = "collection-study";
 }

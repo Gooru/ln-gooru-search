@@ -16,20 +16,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional
-public class ConceptSuggestionRepositoryImpl extends BaseRepository implements ConceptSuggestionRepository {
+public class ConceptBasedResourceSuggestRepositoryImpl extends BaseRepository implements ConceptBasedResourceSuggestRepository {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(CollectionRepositoryImpl.class);
 
 	@Override
-	public List<String> getSuggestionByCompetency(List<String> idsToFilter, String ctxPath, String performance_range, String suggestType) {
+	public List<String> getSuggestionByCompetency(List<String> idsToFilter, String ctxType, String performanceRange, String suggestType) {
 		List<String> ids = null;
 		try {
 			Type textArrayType = new TypeLocatorImpl(new TypeResolver()).custom(StringArrayType.class);
-			String sql = "select suitable_suggestions from concept_based_suggest where ctx_path = :CTX_PATH and competency_internal_code in (:IDS) and performance = :PERFORMANCE and suggest_type = :SUGGEST_TYPE";
+			String sql = "select ids_to_suggest from concept_based_resource_suggest where ctx_type = :CTX_TYPE and competency_internal_code in (:IDS) and performance_range = :PERFORMANCE and suggest_type = :SUGGEST_TYPE";
 			Query query = getSessionFactory().getCurrentSession().createSQLQuery(sql)
-					.addScalar("suitable_suggestions", textArrayType)
-					.setParameter("PERFORMANCE", performance_range)
-					.setParameter("CTX_PATH", ctxPath)
+					.addScalar("ids_to_suggest", textArrayType)
+					.setParameter("PERFORMANCE", performanceRange)
+					.setParameter("CTX_TYPE", ctxType)
 					.setParameter("SUGGEST_TYPE", suggestType)
 					.setParameterList("IDS", idsToFilter);
 			Map<String, Object> resultMap = null;
@@ -52,15 +52,15 @@ public class ConceptSuggestionRepositoryImpl extends BaseRepository implements C
 	}
 	
 	@Override
-	public List<String> getSuggestionByMicroCompetency(List<String> idsToFilter, String ctxPath, String performance_range, String suggestType) {
+	public List<String> getSuggestionByMicroCompetency(List<String> idsToFilter, String ctxType, String performanceRange, String suggestType) {
 		List<String> ids = null;
 		try {
 			Type textArrayType = new TypeLocatorImpl(new TypeResolver()).custom(StringArrayType.class);
-			String sql = "select suitable_suggestions from concept_based_suggest where ctx_path = :CTX_PATH and micro_competency_internal_code in (:IDS) and performance = :PERFORMANCE and suggest_type = :SUGGEST_TYPE";
+			String sql = "select ids_to_suggest from concept_based_resource_suggest where context_type = :CTX_TYPE and micro_competency_internal_code in (:IDS) and performance_range = :PERFORMANCE and suggest_type = :SUGGEST_TYPE";
 			Query query = getSessionFactory().getCurrentSession().createSQLQuery(sql)
-					.addScalar("suitable_suggestions", textArrayType)
-					.setParameter("PERFORMANCE", performance_range)
-					.setParameter("CTX_PATH", ctxPath)
+					.addScalar("ids_to_suggest", textArrayType)
+					.setParameter("PERFORMANCE", performanceRange)
+					.setParameter("CTX_TYPE", ctxType)
 					.setParameter("SUGGEST_TYPE", suggestType)
 					.setParameterList("IDS", idsToFilter);
 			Map<String, Object> resultMap = null;

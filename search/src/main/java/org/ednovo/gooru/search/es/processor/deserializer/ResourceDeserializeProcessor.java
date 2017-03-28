@@ -289,10 +289,10 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 		}
 
 		if (dataMap.get(IndexFields.COLLECTION_TITLES) != null) {
-			resource.setScollectionTitles(StringUtils.join((List<String>) dataMap.get(IndexFields.COLLECTION_TITLES), " || "));
+			resource.setScollectionTitles((List<String>) dataMap.get(IndexFields.COLLECTION_TITLES));
 		}
 		if (dataMap.get(IndexFields.COLLECTION_IDS) != null) {
-			resource.setScollectionIds(StringUtils.join((List<String>) dataMap.get(IndexFields.COLLECTION_IDS), " || "));
+			resource.setScollectionIds((List<String>) dataMap.get(IndexFields.COLLECTION_IDS));
 		}
 		
 		Map<String, Object> courseMap = (Map<String, Object>) dataMap.get(IndexFields.COURSE);

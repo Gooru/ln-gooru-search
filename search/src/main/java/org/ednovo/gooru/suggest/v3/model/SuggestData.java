@@ -17,14 +17,14 @@ public class SuggestData extends SearchData {
 	 */
 	private static final long serialVersionUID = 9127315652940617808L;
 
-	private SuggestV3Context suggestV3Context;
+	private SuggestContextData suggestContextData;
 
-	public void setSuggestV3Context(SuggestV3Context suggestV3Context) {
-		this.suggestV3Context = suggestV3Context;
+	public SuggestContextData getSuggestContextData() {
+		return suggestContextData;
 	}
 
-	public SuggestV3Context getSuggestV3Context() {
-		return suggestV3Context;
+	public void setSuggestContextData(SuggestContextData suggestContextData) {
+		this.suggestContextData = suggestContextData;
 	}
 
 }
