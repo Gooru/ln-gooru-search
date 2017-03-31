@@ -40,7 +40,7 @@ public class TenantRepositoryImpl extends BaseRepository implements TenantReposi
 				gobalTenantIds.add(id);
 				resultList.add(resultMap);
 			}
-			discoverableTenants.put("discoverableTenantIds", gobalTenantIds.stream().distinct().collect(Collectors.toList()));
+			discoverableTenants.put("discoverableTenantIds", gobalTenantIds.stream().collect(Collectors.toList()));
 			discoverableTenants.put("discoverableTenants", resultList);
 		}
 		return discoverableTenants;
