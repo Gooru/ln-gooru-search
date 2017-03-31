@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -120,7 +121,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		List<String> discoverableTenantIds = SearchSettingService.getDiscoverableTenantIds(Constants.DISCOVERABLE_TENANT_IDS);
 		if (discoverableTenantIds != null && !discoverableTenantIds.isEmpty())
 			userPermits.addAll(discoverableTenantIds);
-		searchData.setUserPermits(userPermits);
+		searchData.setUserPermits(userPermits.stream().distinct().collect(Collectors.toList()));
 
 		if (sessionToken == null) {
 			sessionToken = BaseController.getSessionToken(request);

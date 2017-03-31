@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.hibernate.Query;
 import org.hibernate.type.PostgresUUIDType;
@@ -39,7 +40,7 @@ public class TenantRepositoryImpl extends BaseRepository implements TenantReposi
 				gobalTenantIds.add(id);
 				resultList.add(resultMap);
 			}
-			discoverableTenants.put("discoverableTenantIds", gobalTenantIds);
+			discoverableTenants.put("discoverableTenantIds", gobalTenantIds.stream().distinct().collect(Collectors.toList()));
 			discoverableTenants.put("discoverableTenants", resultList);
 		}
 		return discoverableTenants;
