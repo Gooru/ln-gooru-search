@@ -62,7 +62,7 @@ public class SuggestV3RestController extends BaseController {
 			if (!(type.equalsIgnoreCase(RESOURCE) || type.equalsIgnoreCase(COLLECTION))) {
 				throw new BadRequestException("Invalid Type is passed. For now, the support types are resource and collection.");
 			}
-			List<SuggestResponse<Object>> suggestResults = suggestService.suggest(suggestData);
+			SuggestResponse<Object> suggestResults = suggestService.suggest(suggestData).get(0);
 			String result = serialize(suggestResults, JSON, SINGLE_EXCLUDES, true);
 			LOG.info("Total latency of suggest " + (System.currentTimeMillis() - start));
 			return toModelAndView(result);
@@ -151,8 +151,11 @@ public class SuggestV3RestController extends BaseController {
 							isValidRequest = true;
 						}
 					}
-				} else if (suggestData.getType().equalsIgnoreCase(RESOURCE) && context.getString(RequestContextFields.CONTEXT_TYPE).equalsIgnoreCase(RESOURCE_STUDY) && StringUtils.isNotBlank(suggestContext.getResourceId())) {
-					isValidRequest = true;
+				} else if (suggestData.getType().equalsIgnoreCase(RESOURCE)) {
+					if ((context.getString(RequestContextFields.CONTEXT_TYPE).equalsIgnoreCase(RESOURCE_STUDY) && StringUtils.isNotBlank(suggestContext.getResourceId()))
+							|| ((context.getString(RequestContextFields.CONTEXT_TYPE).equalsIgnoreCase(COLLECTION_STUDY) && StringUtils.isNotBlank(suggestContext.getCollectionId())))) {
+						isValidRequest = true;
+					}
 				}
 			}
 		}

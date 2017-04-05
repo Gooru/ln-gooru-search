@@ -56,7 +56,7 @@ public class ConceptBasedCollectionSuggestRepositoryImpl extends BaseRepository 
 		List<String> ids = null;
 		try {
 			Type textArrayType = new TypeLocatorImpl(new TypeResolver()).custom(StringArrayType.class);
-			String sql = "select ids_to_suggest from concept_based_collection_suggest where context_type = :CTX_TYPE and micro_competency_internal_code in (:IDS) and performance = :PERFORMANCE and subtype_to_suggest = :SUBTYPE_TO_SUGGEST";
+			String sql = "select ids_to_suggest from concept_based_collection_suggest where ctx_type = :CTX_TYPE and micro_competency_internal_code in (:IDS) and performance = :PERFORMANCE and subtype_to_suggest = :SUBTYPE_TO_SUGGEST";
 			Query query = getSessionFactory().getCurrentSession().createSQLQuery(sql)
 					.addScalar("ids_to_suggest", textArrayType)
 					.setParameter("PERFORMANCE", performanceRange)
