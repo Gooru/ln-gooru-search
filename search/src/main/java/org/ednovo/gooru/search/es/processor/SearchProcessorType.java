@@ -117,7 +117,15 @@ public enum SearchProcessorType {
 	
 	CourseDeserializeProcessor(),
 	
-	CourseFilterConstruction();
+	CourseFilterConstruction(),
+	
+	UnitFilterConstruction(),
+	
+	LessonFilterConstruction(),
+	
+	UnitDeserializeProcessor(),
+	
+	LessonDeserializeProcessor();
 
 	private SearchProcessorType() {
 	}

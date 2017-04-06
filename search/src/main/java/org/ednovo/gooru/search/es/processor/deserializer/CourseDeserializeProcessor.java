@@ -20,6 +20,7 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
 		return SearchProcessorType.CourseDeserializeProcessor;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	List<CourseSearchResult> deserialize(Map<String, Object> model, SearchData input, List<CourseSearchResult> output) {
 		Map<String, Object> hitsMap = (Map<String, Object>) model.get(SEARCH_HITS);
@@ -33,6 +34,7 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
 		return output;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	CourseSearchResult collect(Map<String, Object> model, SearchData input, CourseSearchResult courseResult) {
 		if(courseResult == null){
@@ -46,17 +48,31 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
 		courseResult.setLastModified((String) model.get(IndexFields.UPDATED_AT));
 		courseResult.setAddDate((String) model.get(IndexFields.CREATED_AT));
         courseResult.setLastModifiedBy((String) model.get(IndexFields.MODIFIER_ID));
-        courseResult.setSequence((Integer) model.get(IndexFields.SEQUENCE));
-        courseResult.setSubjectBucket((String) model.get(IndexFields.SUBJECT_BUCKET));
-        courseResult.setSubjectSequence((Integer) model.get(IndexFields.SUBJECT_SEQUENCE));
-        
+		if (model.containsKey(IndexFields.SEQUENCE)) {
+			courseResult.setSequence((Integer) model.get(IndexFields.SEQUENCE));
+		}
+		if (model.containsKey(IndexFields.SUBJECT_BUCKET)) {
+			courseResult.setSubjectBucket((String) model.get(IndexFields.SUBJECT_BUCKET));
+		}
+		if (model.containsKey(IndexFields.SUBJECT_SEQUENCE)) {
+			courseResult.setSubjectSequence((Integer) model.get(IndexFields.SUBJECT_SEQUENCE));
+		}
+		courseResult.setFormat((String) model.get(IndexFields.CONTENT_FORMAT));
+
+		
         // set counts
         if(model.get(IndexFields.STATISTICS) != null){
         	Map<String, Object> statistics = (Map<String, Object>) model.get(IndexFields.STATISTICS);
             courseResult.setUnitCount(statistics.get(IndexFields.UNIT_COUNT) != null ? (Integer) statistics.get(IndexFields.UNIT_COUNT) : 0);
             courseResult.setCourseRemixCount(statistics.get(IndexFields.COURSE_REMIXCOUNT) != null ? (Integer) statistics.get(IndexFields.COURSE_REMIXCOUNT) : 0); 
             courseResult.setCollaboratorCount(statistics.get(IndexFields.COLLABORATOR_COUNT) != null ? (Integer) statistics.get(IndexFields.COLLABORATOR_COUNT) : 0);
-            
+            courseResult.setLessonCount(statistics.get("lessonCount") != null ? (Integer) statistics.get("lessonCount") : 0);
+            courseResult.setContainingCollectionCount(statistics.get("containingCollectionsCount") != null ? (Integer) statistics.get("containingCollectionsCount") : 0);
+            courseResult.setCollectionCount(statistics.get("collectionCount") != null ? (Integer) statistics.get("collectionCount") : 0);
+            courseResult.setAssessmentCount(statistics.get("assessmentCount") != null ? (Integer) statistics.get("assessmentCount") : 0);
+            courseResult.setExternalAssessmentCount(statistics.get("externalAssessmentCount") != null ? (Integer) statistics.get("externalAssessmentCount") : 0);
+            courseResult.setIsFeatured(statistics.get("isFeatured") != null ? (Boolean) statistics.get("isFeatured") : false);
+
 			long viewsCount = 0L;
 			if (statistics.get(IndexFields.VIEWS_COUNT) != null) {
 				viewsCount = ((Number) statistics.get(IndexFields.VIEWS_COUNT)).longValue();
@@ -64,6 +80,21 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
 			}
         }
         
+		// set unitIds
+		if (model.get(IndexFields.UNIT_IDS) != null) {
+			courseResult.setUnitIds((List<String>) model.get(IndexFields.UNIT_IDS));
+		}
+		
+		// set lessonIds
+		if (model.get(IndexFields.LESSON_IDS) != null) {
+			courseResult.setLessonIds((List<String>) model.get(IndexFields.LESSON_IDS));
+		}
+
+		// set collectionIds
+		if (model.get(IndexFields.COLLECTION_IDS) != null) {
+			courseResult.setCollectionIds((List<String>) model.get(IndexFields.COLLECTION_IDS));
+		}
+		
         // set license 
         if(model.get(IndexFields.LICENSE) != null){
         	Map<String, Object> licenseData = (Map<String, Object>) model.get(IndexFields.LICENSE);
@@ -89,7 +120,7 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
 			courseResult.setOwner(setUser((Map<String, Object>) model.get(IndexFields.OWNER)));
 		}
 
-		// set orginalcreator 
+		// set original creator 
 		if(model.get(IndexFields.ORIGINAL_CREATOR) != null){
 			courseResult.setOrginalCreator(setUser((Map<String, Object>) model.get(IndexFields.ORIGINAL_CREATOR)));
 		}

@@ -586,7 +586,7 @@ public interface Constants {
 	
 	public static final String TYPE_COURSE = "course";
 	public static final String FLT_COURSE_TYPE = "&^courseType";
-	public static final String IS_FEATURED = "&^isFeatured";
+	public static final String FLT_IS_FEATURED = "&^isFeatured";
 	public static final String FLT_PUBLISH_STATUS = "&^publishStatus";
 	public static final String FLT_STATUS_BROKEN = "&^statistics.statusIsBroken";
 	public static final String FLT_CONTENT_FORMAT = "&^contentFormat";

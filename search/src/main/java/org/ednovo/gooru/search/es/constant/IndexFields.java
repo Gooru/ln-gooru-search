@@ -100,6 +100,10 @@ public class IndexFields {
 	
 	public static final String CURRICULUM = "curriculum";
 	public static final String CURRICULUM_INFO = "curriculumInfo";
+	public static final String UNIT = "unit";
+	public static final String LESSON = "lesson";
+	public static final String LESSON_IDS = "lessonIds";
+	public static final String UNIT_IDS = "unitIds";
 
 
 }

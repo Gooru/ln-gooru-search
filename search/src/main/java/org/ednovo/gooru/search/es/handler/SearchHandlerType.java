@@ -53,6 +53,10 @@ public enum SearchHandlerType {
 	
 	COURSE(),
 	
+	UNIT(),
+	
+	LESSON(),
+	
 	CROSSWALK();
 
 	private SearchHandlerType() {

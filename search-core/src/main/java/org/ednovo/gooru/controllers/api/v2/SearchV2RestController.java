@@ -117,6 +117,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		UserGroupSupport userGroup = (UserGroupSupport) request.getAttribute(Constants.TENANT);
 		List<String> userPermits = new ArrayList<>();
 		String userTenantId = userGroup.getTenantId();
+		searchData.setUserTenantId(userTenantId);
 		userPermits.add(userTenantId);
 		List<String> discoverableTenantIds = SearchSettingService.getDiscoverableTenantIds(Constants.DISCOVERABLE_TENANT_IDS);
 		if (discoverableTenantIds != null && !discoverableTenantIds.isEmpty())

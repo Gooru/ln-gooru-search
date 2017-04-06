@@ -120,8 +120,6 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 			public SuggestResponse<Object> call() throws Exception {
 				try {
 					String queryString = "*";
-					//suggestData.putFilter("&^publishStatus", "published");
-					//suggestData.putFilter("&^contentFormat", "resource");
 					suggestData.putFilter("&^statistics.statusIsBroken", 0);
 					suggestData.putFilter(FLT_TENANT_ID, StringUtils.join(suggestData.getUserPermits(), ","));
 					if (contextType.equalsIgnoreCase(RESOURCE_STUDY)) {

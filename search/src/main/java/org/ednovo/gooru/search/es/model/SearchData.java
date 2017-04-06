@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.json.JsonObject;
-
 import org.ednovo.gooru.search.es.constant.EsIndex;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
 import org.json.JSONObject;
@@ -112,6 +110,8 @@ public class SearchData implements Serializable {
 	private List<String> userPermits;
 	
 	private boolean isCrosswalk;
+	
+	private String userTenantId;
 	
 	public boolean isShowCanonicalOnly() {
 		return showCanonicalOnly;
@@ -507,6 +507,14 @@ public class SearchData implements Serializable {
 
 	public void setCrosswalk(boolean isCrosswalk) {
 		this.isCrosswalk = isCrosswalk;
+	}
+	
+	public String getUserTenantId() {
+		return userTenantId;
+	}
+
+	public void setUserTenantId(String userTenantId) {
+		this.userTenantId = userTenantId;
 	}
 
 }

@@ -20,6 +20,8 @@ public enum EsIndex {
     SCHOOL_DISTRICT("schooldistrict"),
 	ORGANIZATION("organization"),
 	COURSE("course"),
+	UNIT("unit"),
+	LESSON("lesson"),
 	CROSSWALK("crosswalk");
 
 	private String name;
