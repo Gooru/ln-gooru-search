@@ -46,7 +46,7 @@ public class SuggestV3RestController extends BaseController {
 	@Autowired
 	private SuggestV3Service suggestService;
 
-	@RequestMapping(method = { RequestMethod.POST }, value = "/{type}")
+	@RequestMapping(method = RequestMethod.POST , value = "/{type}", headers = "Content-Type=application/json")
 	public ModelAndView suggest(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) String sessionToken,
 			@RequestParam(defaultValue = "10", value = "limit") Integer pageSize, @RequestParam(defaultValue = "0") String pretty, @PathVariable String type, @RequestBody String contextPayload)
 			throws Exception {
@@ -124,10 +124,9 @@ public class SuggestV3RestController extends BaseController {
 		Boolean isValidRequest = false;
 		if (requestContext.has(RequestContextFields.CONTEXT)) {
 			JSONObject context = requestContext.getJSONObject(RequestContextFields.CONTEXT);
-			if (context != null && context.has(RequestContextFields.CONTEXT_AREA) && context.has(RequestContextFields.USER_ID)) {
-				suggestContext.setContextArea(context.getString(RequestContextFields.CONTEXT_AREA));
+			if (context != null && context.has(RequestContextFields.CONTEXT_TYPE) && context.has(RequestContextFields.USER_ID)) {
+				suggestContext.setContextType(context.getString(RequestContextFields.CONTEXT_TYPE));
 				suggestContext.setUserId(context.getString(RequestContextFields.USER_ID));
-				if (context.has(RequestContextFields.CONTEXT_TYPE)) suggestContext.setContextType(context.getString(RequestContextFields.CONTEXT_TYPE));
 				if (context.has(RequestContextFields.COLLECTION_ID)) suggestContext.setCollectionId(context.getString(RequestContextFields.COLLECTION_ID));
 				if (context.has(RequestContextFields.COLLECTION_TYPE)) suggestContext.setCollectionType(context.getString(RequestContextFields.COLLECTION_TYPE));
 				if (context.has(RequestContextFields.COLLECTION_SUBTYPE)) suggestContext.setCollectionSubType(context.getString(RequestContextFields.COLLECTION_SUBTYPE));
@@ -138,7 +137,8 @@ public class SuggestV3RestController extends BaseController {
 				if (context.has(RequestContextFields.CURRENT_ITEM_TYPE)) suggestContext.setCurrentItemType(context.getString(RequestContextFields.CURRENT_ITEM_TYPE));
 				if (context.has(RequestContextFields.RESOURCE_ID)) suggestContext.setResourceId(context.getString(RequestContextFields.RESOURCE_ID));
 
-				if (context.getString(RequestContextFields.CONTEXT_AREA).equalsIgnoreCase(STUDY_PLAYER)) {
+				if (context.has(RequestContextFields.CONTEXT_AREA) && context.getString(RequestContextFields.CONTEXT_AREA).equalsIgnoreCase(STUDY_PLAYER)) {
+					suggestContext.setContextArea(context.getString(RequestContextFields.CONTEXT_AREA));
 					if (suggestData.getType().equalsIgnoreCase(COLLECTION) && (context.has(RequestContextFields.REQUESTED_SUBTYPE) && StringUtils.isNotBlank(context.getString(RequestContextFields.REQUESTED_SUBTYPE)))) {
 						suggestContext.setRequestedSubType(context.getString(RequestContextFields.REQUESTED_SUBTYPE));
 						if ((suggestContext.getRequestedSubType().equalsIgnoreCase(PRE_TEST) && (StringUtils.isNotBlank(suggestContext.getLessonId()))) 
@@ -158,6 +158,8 @@ public class SuggestV3RestController extends BaseController {
 					}
 				}
 			}
+		} else {
+			isValidRequest = false;
 		}
 		if (requestContext.has(RequestContextFields.METRICS)) {
 			JSONObject metrics = requestContext.getJSONObject(RequestContextFields.METRICS);
