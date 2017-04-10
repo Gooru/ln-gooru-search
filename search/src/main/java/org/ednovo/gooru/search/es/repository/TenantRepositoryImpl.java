@@ -36,7 +36,6 @@ public class TenantRepositoryImpl extends BaseRepository implements TenantReposi
 				String id = ((UUID) object[0]).toString();
 				resultMap.put("id", id);
 				resultMap.put("content_visibility", object[1] != null ? object[1].toString() : null);
-				resultMap.put("parent_tenant", object[2] != null ? object[2].toString() : null);
 				gobalTenantIds.add(id);
 				resultList.add(resultMap);
 			}
