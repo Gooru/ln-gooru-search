@@ -189,7 +189,7 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 							queryString = suggestQuery.toString();
 						}
 
-						String range = "M";
+						String range = null;
 						if (score != null) {
 							range = getScoreRange(score);
 						} else if (timespent != null) {
@@ -200,7 +200,9 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 							if (collectionData.getTaxonomyLearningTargets() != null && collectionData.getTaxonomyLearningTargets().size() > 0) {
 								ids = conceptSuggestionRepository.getSuggestionByMicroCompetency(collectionData.getTaxonomyLearningTargets(), contextType, range,
 										SuggestHandlerType.RESOURCE.name().toLowerCase());
-							} else if (collectionData.getStandards() != null && collectionData.getStandards().size() > 0) {
+							} 
+							
+							if (ids == null && collectionData.getStandards() != null && collectionData.getStandards().size() > 0) {
 								ids = conceptSuggestionRepository.getSuggestionByCompetency(collectionData.getStandards(), contextType, range, SuggestHandlerType.RESOURCE.name().toLowerCase());
 							}
 						}
@@ -268,21 +270,31 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 	}
 
 	private String getScoreRange(Integer score) {
-		String scoreRange = "L";
-		if (score >= 80) {
-			scoreRange = "H";
-		} else if (score >= 50 && score < 80) {
-			scoreRange = "M";
+		String scoreRange = null;
+		if (score != null) {
+			Integer minScore = SearchSettingService.getSettingAsInteger(Constants.SCORE_AVERAGE_MIN, 50);
+			Integer maxScore = SearchSettingService.getSettingAsInteger(Constants.SCORE_AVERAGE_MAX, 80);
+			scoreRange = "L";
+			if (score >= maxScore) {
+				scoreRange = "H";
+			} else if (score >= minScore && score < maxScore) {
+				scoreRange = "M";
+			}
 		}
 		return scoreRange;
 	}
 
 	private String getTimespentRange(Long timespent) {
-		String timespentRange = "L";
-		if (timespent >= 900000) {
-			timespentRange = "H";
-		} else if (timespent >= 120000 && timespent < 900000) {
-			timespentRange = "M";
+		String timespentRange = null;
+		if (timespent != null) {
+			Integer minTS = SearchSettingService.getSettingAsInteger(Constants.TIMESPENT_AVERAGE_MIN, 120000);
+			Integer maxTS = SearchSettingService.getSettingAsInteger(Constants.TIMESPENT_AVERAGE_MAX, 900000);
+			timespentRange = "L";
+			if (timespent >= maxTS) {
+				timespentRange = "H";
+			} else if (timespent >= minTS && timespent < maxTS) {
+				timespentRange = "M";
+			}
 		}
 		return timespentRange;
 	}

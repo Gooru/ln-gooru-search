@@ -627,4 +627,10 @@ public interface Constants {
 	public static final String STUDY_PLAYER = "study-player";
 	public static final String RESOURCE_STUDY = "resource-study";
 	public static final String COLLECTION_STUDY = "collection-study";
+
+	public static final String SCORE_AVERAGE_MIN = "score.average.min";
+	public static final String SCORE_AVERAGE_MAX = "score.average.max";
+	public static final String TIMESPENT_AVERAGE_MIN = "timespent.average.min";
+	public static final String TIMESPENT_AVERAGE_MAX = "timespent.average.max";
+
 }
