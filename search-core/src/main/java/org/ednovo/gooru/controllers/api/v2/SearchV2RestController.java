@@ -339,5 +339,11 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		}
 		return query;
 	}
+	
+	@RequestMapping(method = RequestMethod.PUT, value = { "/refresh/tenants"})
+	public void refreshGlobalTenantsInCache(HttpServletRequest request,@RequestParam(required = false) String sessionToken, HttpServletResponse response,
+			final ModelMap model) throws Exception {
+		searchService.refreshGlobalTenantsInCache();
+	}
 		
 }

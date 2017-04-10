@@ -92,5 +92,11 @@ public class EsSearchServiceImpl implements SearchService, Constants {
 		searchFilters.setGradeLevels(GRADE_LEVELS);
 		return searchFilters;
 	}
+	
+	@Override
+	public void refreshGlobalTenantsInCache() {
+		SearchSettingService.refreshTenants();
+	}
+	
 
 }

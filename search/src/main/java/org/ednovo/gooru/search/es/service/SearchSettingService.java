@@ -274,4 +274,8 @@ public final class SearchSettingService {
 		return (discoverableTenants != null && !discoverableTenants.isEmpty()) ? (List<String>)discoverableTenants.get("discoverableTenantIds") : null;
 	}
 	
+	public static void refreshTenants() {
+		setDiscoverableTenants();
+	}
+	
 }
