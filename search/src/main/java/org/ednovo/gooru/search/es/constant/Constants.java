@@ -582,6 +582,7 @@ public interface Constants {
 	String INFO_DOT = "info.";
 	String AMPERSAND = "&";
 	String CARET_SYMBOL = "^";
+	String NOT_SYMBOL = "!";
 	String FLT_COURSE_MISSING = "#^courseMissing";
 	
 	public static final String TYPE_COURSE = "course";
@@ -632,5 +633,6 @@ public interface Constants {
 	public static final String SCORE_AVERAGE_MAX = "score.average.max";
 	public static final String TIMESPENT_AVERAGE_MIN = "timespent.average.min";
 	public static final String TIMESPENT_AVERAGE_MAX = "timespent.average.max";
+	public static final String CONTENT_SUB_FORMAT = "contentSubFormat";
 
 }
