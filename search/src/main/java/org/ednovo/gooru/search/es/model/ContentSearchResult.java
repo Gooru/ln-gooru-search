@@ -90,18 +90,12 @@ public class ContentSearchResult extends ContentUnusedFields implements Serializ
 	
 	private List<Map<String, Object>> taxonomyEquivalentCompetencies;
 	
-	public String getMediaType() {
-		return mediaType;
-	}
-
-	public void setMediaType(String mediaType) {
-		this.mediaType = mediaType;
-	}
-
 	private Map<String, Object> license;
 
 	private Map<String, Object> course;
-
+	
+	private List<String> twentyOneCenturySkills;
+	
 	public String getUrl() {
 		return url;
 	}
@@ -302,6 +296,14 @@ public class ContentSearchResult extends ContentUnusedFields implements Serializ
 		this.momentsOfLearning = momentsOfLearning;
 	}
 
+	public List<String> getTwentyOneCenturySkills() {
+		return twentyOneCenturySkills;
+	}
+
+	public void setTwentyOneCenturySkills(List<String> twentyOneCenturySkills) {
+		this.twentyOneCenturySkills = twentyOneCenturySkills;
+	}
+	
 	public static String getIndexType() {
 		return INDEX_TYPE;
 	}
@@ -434,6 +436,14 @@ public class ContentSearchResult extends ContentUnusedFields implements Serializ
 
 	public void setTaxonomyEquivalentCompetencies(List<Map<String, Object>> taxonomyEquivalentCompetencies) {
 		this.taxonomyEquivalentCompetencies = taxonomyEquivalentCompetencies;
+	}
+	
+	public String getMediaType() {
+		return mediaType;
+	}
+
+	public void setMediaType(String mediaType) {
+		this.mediaType = mediaType;
 	}
 
 }

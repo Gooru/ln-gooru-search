@@ -76,9 +76,9 @@ public class IndexFields {
 	public static final String MOBILE_FRIENDLINESS = "mobileFriendliness";
 	public static final String IS_COPYRIGHT_OWNER = "isCopyrightOwner";
 	public static final String COPYRIGHT_OWNER_LIST = "copyrightOwnerList";
+	public static final String TWENTY_ONE_CENTURY_SKILL = "21CenturySkills";
 	
 	// course fields 
-	
 	public static final String COURSE_REMIXCOUNT = "courseRemixCount";
 	public static final String UNIT_COUNT = "unitCount";
 	public static final String SEQUENCE = "sequenceId";

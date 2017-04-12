@@ -191,6 +191,12 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 					}
 				}
 				
+				// 21st century skill
+				List<String> twentyOneCenturySkills = metadata.get(IndexFields.TWENTY_ONE_CENTURY_SKILL);
+				if (twentyOneCenturySkills != null && !twentyOneCenturySkills.isEmpty()) {
+					resource.setTwentyOneCenturySkills(twentyOneCenturySkills);
+				}
+
 				List<String> grade = metadata.get(IndexFields.GRADE);
 				if(grade != null && grade.size() > 0){
 					resource.setGrade(String.join(SEARCH_COMMA_SEPERTOR, grade));
