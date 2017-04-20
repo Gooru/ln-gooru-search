@@ -125,7 +125,9 @@ public enum SearchProcessorType {
 	
 	UnitDeserializeProcessor(),
 	
-	LessonDeserializeProcessor();
+	LessonDeserializeProcessor(),
+
+	ResourceSuggestDeserializer();
 
 	private SearchProcessorType() {
 	}

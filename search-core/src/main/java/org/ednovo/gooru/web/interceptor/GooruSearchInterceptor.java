@@ -35,6 +35,7 @@ public class GooruSearchInterceptor extends HandlerInterceptorAdapter {
 	@Autowired
 	private KafkaRegistry kafkaHandler;
 
+	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
 		GooruAuthenticationToken authenticationContext = (GooruAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();

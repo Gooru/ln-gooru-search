@@ -18,6 +18,8 @@ public class SuggestData extends SearchData {
 	private static final long serialVersionUID = 9127315652940617808L;
 
 	private SuggestContextData suggestContextData;
+	
+	private Boolean isInternalSuggest;
 
 	public SuggestContextData getSuggestContextData() {
 		return suggestContextData;
@@ -25,6 +27,14 @@ public class SuggestData extends SearchData {
 
 	public void setSuggestContextData(SuggestContextData suggestContextData) {
 		this.suggestContextData = suggestContextData;
+	}
+
+	public Boolean getIsIntenralSuggest() {
+		return isInternalSuggest;
+	}
+
+	public void setIsInternalSuggest(Boolean isInternalSuggest) {
+		this.isInternalSuggest = isInternalSuggest;
 	}
 
 }

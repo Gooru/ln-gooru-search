@@ -17,10 +17,12 @@ import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.EsIndex;
 import org.ednovo.gooru.search.es.exception.SearchException;
 import org.ednovo.gooru.search.es.model.ContentSearchResult;
+import org.ednovo.gooru.search.es.model.ContentSuggestResult;
 import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.model.SuggestResponse;
 import org.ednovo.gooru.search.es.processor.ElasticsearchProcessor;
 import org.ednovo.gooru.search.es.processor.deserializer.ResourceDeserializeProcessor;
+import org.ednovo.gooru.search.es.processor.deserializer.ResourceSuggestDeserializeProcessor;
 import org.ednovo.gooru.search.es.processor.query_builder.ResourceEsDslQueryBuildProcessor;
 import org.ednovo.gooru.search.es.repository.ConceptBasedResourceSuggestRepository;
 import org.ednovo.gooru.search.es.service.SearchSettingService;
@@ -61,6 +63,9 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 
 	@Autowired
 	private ResourceDeserializeProcessor resourceDeserializeProcessor;
+	
+	@Autowired
+	private ResourceSuggestDeserializeProcessor resourceSuggestDeserializeProcessor;
 	
 	@Autowired
 	private ConceptBasedResourceSuggestRepository conceptSuggestionRepository;
@@ -108,6 +113,7 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 			}
 		}
 
+		final SearchResponse<List<ContentSuggestResult>> suggestResponseResource = new SearchResponse<List<ContentSuggestResult>>();
 		final SearchResponse<List<ContentSearchResult>> searchResponseResource = new SearchResponse<List<ContentSearchResult>>();
 		final SearchResponse<Object> searchRes = new SearchResponse<Object>();
 		final String contextType = suggestData.getSuggestContextData().getContextType();
@@ -169,20 +175,6 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 						}
 					} else if (contextType.equalsIgnoreCase(COLLECTION_STUDY) && collectionData != null) {
 						StringBuilder suggestQuery = new StringBuilder();
-
-						/*if (StringUtils.isNotBlank(collectionData.getTitle())) {
-							if (suggestQuery.length() > 0) {
-								suggestQuery.append(OR_DELIMETER);
-							}
-							suggestQuery.append(collectionData.getTitle().trim());
-						}
-						if (StringUtils.isNotBlank(collectionData.getLearningObjective())) {
-							if (suggestQuery.length() > 0) {
-								suggestQuery.append(OR_DELIMETER);
-							}
-							suggestQuery.append(collectionData.getLearningObjective().trim());
-						}*/
-
 						if (suggestQuery.length() == 0) {
 							queryString = "*";
 						} else {
@@ -241,8 +233,13 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 
 					resourceEsDslQueryProcessor.process(suggestData, searchRes);
 					elasticSearchProcessor.process(suggestData, searchRes);
-					resourceDeserializeProcessor.process(suggestData, searchResponseResource);
-					suggestResponse.setSuggestResults(searchResponseResource.getSearchResults());
+					if (suggestData.getIsIntenralSuggest()) {
+						resourceSuggestDeserializeProcessor.process(suggestData, suggestResponseResource);
+						suggestResponse.setSuggestResults(suggestResponseResource.getSearchResults());
+					} else {
+						resourceDeserializeProcessor.process(suggestData, searchResponseResource);
+						suggestResponse.setSuggestResults(searchResponseResource.getSearchResults());
+					}
 					suggestResponse.setExecutionTime(System.currentTimeMillis() - start);
 				} catch (Exception e) {
 					suggestData.setException(e);

@@ -634,5 +634,7 @@ public interface Constants {
 	public static final String TIMESPENT_AVERAGE_MIN = "timespent.average.min";
 	public static final String TIMESPENT_AVERAGE_MAX = "timespent.average.max";
 	public static final String CONTENT_SUB_FORMAT = "contentSubFormat";
+	public static final String INTERNAL = "internal";
+	public static final String EXTERNAL = "external";
 
 }

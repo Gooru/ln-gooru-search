@@ -288,7 +288,7 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 			} else if (input.getUserTaxonomyPreference() != null) {
 				long start = System.currentTimeMillis();
 				taxonomySetAsMap = transformTaxonomy(taxonomyMap, input);
-				logger.info("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
+				logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
 			}
 			resource.setTaxonomySet(taxonomySetAsMap);		
 			resource.setTaxonomyDataSet((String) taxonomyMap.get(IndexFields.TAXONOMY_DATA_SET));

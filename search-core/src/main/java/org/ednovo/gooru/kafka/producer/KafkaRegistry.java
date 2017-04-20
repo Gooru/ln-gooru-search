@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
@@ -54,7 +55,7 @@ public class KafkaRegistry {
 	public void push(String message) {
 		ProducerRecord<String, String> data = new ProducerRecord<String, String>(topic, "search-event", message);
 		try {
-			producer.send(data);
+			getProducer().send(data);
 		} catch (Exception e) {
 			LOGGER.error("Errror while sending data via kafka producer :" + e);
 		}
@@ -72,7 +73,7 @@ public class KafkaRegistry {
 			public void run() {
 				ProducerRecord<String, String> data = new ProducerRecord<String, String>(topic,"search-event",  message);
 				try {
-					producer.send(data);
+					getProducer().send(data);
 				} catch (Exception e) {
 					LOGGER.error("Error while sending data via kafka producer :" + e);
 				}
@@ -94,7 +95,7 @@ public class KafkaRegistry {
 			public void run() {
 				ProducerRecord<String, String> data = new ProducerRecord<String, String>(topic, eventName, message);
 				try {
-					producer.send(data);
+					getProducer().send(data);
 				} catch (Exception e) {
 					LOGGER.error("Error while sending data via kafka producer :" + e);
 				}
@@ -117,12 +118,22 @@ public class KafkaRegistry {
 			public void run() {
 				ProducerRecord<String, String> data = new ProducerRecord<String, String>(topic, eventName, message);
 				try {
-					producer.send(data);
+					getProducer().send(data);
 				} catch (Exception e) {
 					LOGGER.error("Error while sending data via kafka producer :" + e);
 				}
 			}
 		});
 	}
-
+	
+	@PreDestroy
+	public void onStop() {
+		getProducer().close();
+		executor.shutdown();
+		LOGGER.info("Kafka Producer shutdown");
+	}
+	
+	private Producer<String, String> getProducer() {
+		return producer;
+	}
 }
