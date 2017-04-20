@@ -263,7 +263,7 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 			} else if (searchData.getUserTaxonomyPreference() != null) {
 				long start = System.currentTimeMillis();
 				taxonomySetAsMap = transformTaxonomy(taxonomyMap, searchData);
-				logger.info("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
+				logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
 			}
 			output.setTaxonomySet(taxonomySetAsMap);		
 			output.setTaxonomyDataSet((String) taxonomyMap.get(IndexFields.TAXONOMY_DATA_SET));
@@ -298,4 +298,5 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 	protected SearchProcessorType getType() {
 		return SearchProcessorType.SCollectionDeserializer;
 	}
+	
 }
