@@ -44,7 +44,7 @@ public class EsDslQueryBuildProcessor extends SearchProcessor<SearchData, Object
 		}else if(searchDataType.equalsIgnoreCase(TYPE_SCOLLECTION) && (searchParameters != null && searchParameters.containsKey(INCLUDE_CIMIN) && searchParameters.getBoolean(INCLUDE_CIMIN))){
 			fields = getSetting("S_" + searchDataType + "_ITEM_SPECIFIC_FIELDS");
 		}else{
-			fields = getSetting("S_" + searchDataType + "_FIELDS");
+			fields = getSearchSetting("search." + typeLower + ".fields");
 		}
 		
 		if (fields != null && fields.trim().length() > 0) {
@@ -55,7 +55,7 @@ public class EsDslQueryBuildProcessor extends SearchProcessor<SearchData, Object
 			if(searchDataType.equalsIgnoreCase(SEARCH_TAXONOMY) && searchData.getParameters().containsKey("searchBy") && searchData.getParameters().getString("searchBy").equalsIgnoreCase("standard")){
 				queryField = getSetting("S_STANDARD_QUERY_FIELDS");
 			} else {
-				queryField = getSetting("S_" + searchDataType + "_QUERY_FIELDS");
+				queryField = getSearchSetting("search." + typeLower + ".query.fields");
 			}
 		}
 		
