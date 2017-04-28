@@ -63,6 +63,8 @@ public class CollectionSearchResult extends CollectionUnUsedFields implements Se
 	private Map<String, Object> taxonomySet;
 	private Boolean isCrosswalked = false;
 	private List<Map<String, Object>> taxonomyEquivalentCompetencies;
+	private Long remixedInCourseCount;
+	private Long usedByStudentCount;
 	
 	public CollectionSearchResult() {
 	}
@@ -453,6 +455,22 @@ public class CollectionSearchResult extends CollectionUnUsedFields implements Se
 
 	public void setTaxonomyEquivalentCompetencies(List<Map<String, Object>> taxonomyEquivalentCompetencies) {
 		this.taxonomyEquivalentCompetencies = taxonomyEquivalentCompetencies;
+	}
+
+	public Long getRemixedInCourseCount() {
+		return remixedInCourseCount;
+	}
+
+	public void setRemixedInCourseCount(Long remixedInCourseCount) {
+		this.remixedInCourseCount = remixedInCourseCount;
+	}
+
+	public Long getUsedByStudentCount() {
+		return usedByStudentCount;
+	}
+
+	public void setUsedByStudentCount(Long usedByStudentCount) {
+		this.usedByStudentCount = usedByStudentCount;
 	}
 
 }

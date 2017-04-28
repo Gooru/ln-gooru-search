@@ -26,7 +26,7 @@ public class CourseSearchResult implements Serializable {
 
 	private UserV2 owner;
 
-	private UserV2 orginalCreator;
+	private UserV2 originalCreator;
 
 	private License license;
 
@@ -75,6 +75,10 @@ public class CourseSearchResult implements Serializable {
 	private Integer assessmentCount;
 
 	private Integer externalAssessmentCount;
+	
+	private Long remixedInClassCount;
+
+	private Long usedByStudentCount;
 
 	public String getLastModified() {
 		return lastModified;
@@ -116,12 +120,12 @@ public class CourseSearchResult implements Serializable {
 		this.owner = owner;
 	}
 
-	public UserV2 getOrginalCreator() {
-		return orginalCreator;
+	public UserV2 getOriginalCreator() {
+		return originalCreator;
 	}
 
-	public void setOrginalCreator(UserV2 orginalCreator) {
-		this.orginalCreator = orginalCreator;
+	public void setOriginalCreator(UserV2 originalCreator) {
+		this.originalCreator = originalCreator;
 	}
 
 	public License getLicense() {
@@ -322,6 +326,22 @@ public class CourseSearchResult implements Serializable {
 
 	public void setExternalAssessmentCount(Integer externalAssessmentCount) {
 		this.externalAssessmentCount = externalAssessmentCount;
+	}
+
+	public Long getRemixedInClassCount() {
+		return remixedInClassCount;
+	}
+
+	public void setRemixedInClassCount(Long remixedInClassCount) {
+		this.remixedInClassCount = remixedInClassCount;
+	}
+
+	public Long getUsedByStudentCount() {
+		return usedByStudentCount;
+	}
+
+	public void setUsedByStudentCount(Long usedByStudentCount) {
+		this.usedByStudentCount = usedByStudentCount;
 	}
 
 }

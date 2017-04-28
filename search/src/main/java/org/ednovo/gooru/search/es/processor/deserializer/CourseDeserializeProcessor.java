@@ -72,7 +72,9 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
             courseResult.setAssessmentCount(statistics.get("assessmentCount") != null ? (Integer) statistics.get("assessmentCount") : 0);
             courseResult.setExternalAssessmentCount(statistics.get("externalAssessmentCount") != null ? (Integer) statistics.get("externalAssessmentCount") : 0);
             courseResult.setIsFeatured(statistics.get("isFeatured") != null ? (Boolean) statistics.get("isFeatured") : false);
-
+            courseResult.setRemixedInClassCount(statistics.get("remixedInClassCount") != null ? (Long) statistics.get("remixedInClassCount") : 0);
+            courseResult.setUsedByStudentCount(statistics.get("usedByStudentCount") != null ? (Long) statistics.get("usedByStudentCount") : 0);
+            
 			long viewsCount = 0L;
 			if (statistics.get(IndexFields.VIEWS_COUNT) != null) {
 				viewsCount = ((Number) statistics.get(IndexFields.VIEWS_COUNT)).longValue();
@@ -122,7 +124,7 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
 
 		// set original creator 
 		if(model.get(IndexFields.ORIGINAL_CREATOR) != null){
-			courseResult.setOrginalCreator(setUser((Map<String, Object>) model.get(IndexFields.ORIGINAL_CREATOR)));
+			courseResult.setOriginalCreator(setUser((Map<String, Object>) model.get(IndexFields.ORIGINAL_CREATOR)));
 		}
 
 		// set taxonomy

@@ -193,6 +193,9 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 			Integer resourceCount = (Integer) statisticsMap.get(IndexFields.RESOURCE_COUNT);
 			output.setResourceCount(String.valueOf(resourceCount != null ? resourceCount : 0));
 		}
+		output.setRemixedInCourseCount(statisticsMap.get(IndexFields.REMIXED_IN_COURSE_COUNT) != null ? (Long) statisticsMap.get(IndexFields.REMIXED_IN_COURSE_COUNT) : 0L);
+		output.setUsedByStudentCount(statisticsMap.get(IndexFields.USED_BY_STUDENT_COUNT) != null ? (Long) statisticsMap.get(IndexFields.USED_BY_STUDENT_COUNT) : 0L);
+        
 		Integer itemCount = (Integer) statisticsMap.get(IndexFields.CONTENT_COUNT);
 		output.setCollectionItemCount(itemCount != null ? itemCount : 0);
 		output.setNumberOfResources(itemCount);
