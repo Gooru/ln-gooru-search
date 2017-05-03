@@ -72,8 +72,8 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
             courseResult.setAssessmentCount(statistics.get("assessmentCount") != null ? (Integer) statistics.get("assessmentCount") : 0);
             courseResult.setExternalAssessmentCount(statistics.get("externalAssessmentCount") != null ? (Integer) statistics.get("externalAssessmentCount") : 0);
             courseResult.setIsFeatured(statistics.get("isFeatured") != null ? (Boolean) statistics.get("isFeatured") : false);
-            courseResult.setRemixedInClassCount(statistics.get("remixedInClassCount") != null ? (Long) statistics.get("remixedInClassCount") : 0);
-            courseResult.setUsedByStudentCount(statistics.get("usedByStudentCount") != null ? (Long) statistics.get("usedByStudentCount") : 0);
+            courseResult.setRemixedInClassCount(statistics.get(IndexFields.REMIXED_IN_CLASS_COUNT) != null ? ((Number) statistics.get(IndexFields.REMIXED_IN_CLASS_COUNT)).longValue() : 0L);
+            courseResult.setUsedByStudentCount(statistics.get(IndexFields.USED_BY_STUDENT_COUNT) != null ? ((Number) statistics.get(IndexFields.USED_BY_STUDENT_COUNT)).longValue() : 0L);
             
 			long viewsCount = 0L;
 			if (statistics.get(IndexFields.VIEWS_COUNT) != null) {

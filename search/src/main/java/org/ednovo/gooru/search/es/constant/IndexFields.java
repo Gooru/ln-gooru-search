@@ -108,5 +108,9 @@ public class IndexFields {
 	public static final String REMIXED_IN_CLASS_COUNT = "remixedInClassCount";
 	public static final String REMIXED_IN_COURSE_COUNT = "remixedInCourseCount";
 	public static final String USED_BY_STUDENT_COUNT = "usedByStudentCount";
+	public static final String COLLECTION_COUNT = "collectionCount";
+	public static final String ASSESSMENT_COUNT = "assessmentCount";
+	public static final String EXTERNAL_ASSESSMENT_COUNT = "externalAssessmentCount";
+
 
 }

@@ -252,8 +252,6 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 			LOG.debug("Error while parsing date", (String) dataMap.get(IndexFields.CREATED_AT));
 		}
 
-		// resource.setMediaType((String) dataMap.get(SEARCH_MEDIA_TYPE));
-
 		Map<String, Object> statisticsMap = (Map<String, Object>) dataMap.get(IndexFields.STATISTICS);
 		boolean hasFrameBreaker = false;
 		if (statisticsMap != null) {
@@ -278,6 +276,9 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 			if (statisticsMap.get(IndexFields.COLLABORATOR_COUNT) != null) {
 				resource.setCollaboratorCount(0);
 			}
+			resource.setRemixedInCollectionCount((statisticsMap.get(IndexFields.COLLECTION_COUNT) != null) ? ((Number) statisticsMap.get(IndexFields.COLLECTION_COUNT)).longValue() : 0);
+			resource.setRemixedInAssessmentCount((statisticsMap.get(IndexFields.ASSESSMENT_COUNT) != null) ? ((Number) statisticsMap.get(IndexFields.ASSESSMENT_COUNT)).longValue() : 0);
+			resource.setRemixedInExternalAssessmentCount((statisticsMap.get(IndexFields.EXTERNAL_ASSESSMENT_COUNT) != null) ? ((Number) statisticsMap.get(IndexFields.EXTERNAL_ASSESSMENT_COUNT)).longValue() : 0);
 		}
 
 		Map<String, Object> taxonomyMap = (Map<String, Object>) dataMap.get(IndexFields.TAXONOMY);
