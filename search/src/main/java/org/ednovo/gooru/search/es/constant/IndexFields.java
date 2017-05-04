@@ -111,6 +111,8 @@ public class IndexFields {
 	public static final String COLLECTION_COUNT = "collectionCount";
 	public static final String ASSESSMENT_COUNT = "assessmentCount";
 	public static final String EXTERNAL_ASSESSMENT_COUNT = "externalAssessmentCount";
-
+	public static final String CONTAINING_COLLECTIONS_COUNT = "containingCollectionsCount";
+	public static final String LESSON_COUNT = "lessonCount";
+	public static final String IS_FEATURED = "isFeatured";
 
 }
