@@ -26,7 +26,7 @@ public class CourseSearchResult implements Serializable {
 
 	private UserV2 owner;
 
-	private UserV2 orginalCreator;
+	private UserV2 originalCreator;
 
 	private License license;
 
@@ -64,17 +64,21 @@ public class CourseSearchResult implements Serializable {
 
 	private List<String> collectionIds;
 
-	private Integer lessonCount;
+	private Long lessonCount;
 
-	private Integer containingCollectionCount;
+	private Long containingCollectionCount;
 
 	private Boolean isFeatured;
 
-	private Integer collectionCount;
+	private Long collectionCount;
 
-	private Integer assessmentCount;
+	private Long assessmentCount;
 
-	private Integer externalAssessmentCount;
+	private Long externalAssessmentCount;
+	
+	private Long remixedInClassCount;
+
+	private Long usedByStudentCount;
 
 	public String getLastModified() {
 		return lastModified;
@@ -116,12 +120,12 @@ public class CourseSearchResult implements Serializable {
 		this.owner = owner;
 	}
 
-	public UserV2 getOrginalCreator() {
-		return orginalCreator;
+	public UserV2 getOriginalCreator() {
+		return originalCreator;
 	}
 
-	public void setOrginalCreator(UserV2 orginalCreator) {
-		this.orginalCreator = orginalCreator;
+	public void setOriginalCreator(UserV2 originalCreator) {
+		this.originalCreator = originalCreator;
 	}
 
 	public License getLicense() {
@@ -276,19 +280,19 @@ public class CourseSearchResult implements Serializable {
 		this.collectionIds = collectionIds;
 	}
 
-	public Integer getLessonCount() {
+	public Long getLessonCount() {
 		return lessonCount;
 	}
 
-	public void setLessonCount(Integer lessonCount) {
+	public void setLessonCount(Long lessonCount) {
 		this.lessonCount = lessonCount;
 	}
 
-	public Integer getContainingCollectionCount() {
+	public Long getContainingCollectionCount() {
 		return containingCollectionCount;
 	}
 
-	public void setContainingCollectionCount(Integer containingCollectionCount) {
+	public void setContainingCollectionCount(Long containingCollectionCount) {
 		this.containingCollectionCount = containingCollectionCount;
 	}
 
@@ -300,28 +304,44 @@ public class CourseSearchResult implements Serializable {
 		this.isFeatured = isFeatured;
 	}
 
-	public Integer getCollectionCount() {
+	public Long getCollectionCount() {
 		return collectionCount;
 	}
 
-	public void setCollectionCount(Integer collectionCount) {
+	public void setCollectionCount(Long collectionCount) {
 		this.collectionCount = collectionCount;
 	}
 
-	public Integer getAssessmentCount() {
+	public Long getAssessmentCount() {
 		return assessmentCount;
 	}
 
-	public void setAssessmentCount(Integer assessmentCount) {
+	public void setAssessmentCount(Long assessmentCount) {
 		this.assessmentCount = assessmentCount;
 	}
 
-	public Integer getExternalAssessmentCount() {
+	public Long getExternalAssessmentCount() {
 		return externalAssessmentCount;
 	}
 
-	public void setExternalAssessmentCount(Integer externalAssessmentCount) {
+	public void setExternalAssessmentCount(Long externalAssessmentCount) {
 		this.externalAssessmentCount = externalAssessmentCount;
+	}
+
+	public Long getRemixedInClassCount() {
+		return remixedInClassCount;
+	}
+
+	public void setRemixedInClassCount(Long remixedInClassCount) {
+		this.remixedInClassCount = remixedInClassCount;
+	}
+
+	public Long getUsedByStudentCount() {
+		return usedByStudentCount;
+	}
+
+	public void setUsedByStudentCount(Long usedByStudentCount) {
+		this.usedByStudentCount = usedByStudentCount;
 	}
 
 }

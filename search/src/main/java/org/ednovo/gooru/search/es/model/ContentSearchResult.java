@@ -96,6 +96,12 @@ public class ContentSearchResult extends ContentUnusedFields implements Serializ
 	
 	private List<String> twentyOneCenturySkills;
 	
+	private Long remixedInCollectionCount;
+	
+	private Long remixedInAssessmentCount;
+	
+	private Long remixedInExternalAssessmentCount;
+	
 	public String getUrl() {
 		return url;
 	}
@@ -444,6 +450,30 @@ public class ContentSearchResult extends ContentUnusedFields implements Serializ
 
 	public void setMediaType(String mediaType) {
 		this.mediaType = mediaType;
+	}
+
+	public Long getRemixedInCollectionCount() {
+		return remixedInCollectionCount;
+	}
+
+	public void setRemixedInCollectionCount(Long remixedInCollectionCount) {
+		this.remixedInCollectionCount = remixedInCollectionCount;
+	}
+
+	public Long getRemixedInAssessmentCount() {
+		return remixedInAssessmentCount;
+	}
+
+	public void setRemixedInAssessmentCount(Long remixedInAssessmentCount) {
+		this.remixedInAssessmentCount = remixedInAssessmentCount;
+	}
+
+	public Long getRemixedInExternalAssessmentCount() {
+		return remixedInExternalAssessmentCount;
+	}
+
+	public void setRemixedInExternalAssessmentCount(Long remixedInExternalAssessmentCount) {
+		this.remixedInExternalAssessmentCount = remixedInExternalAssessmentCount;
 	}
 
 }
