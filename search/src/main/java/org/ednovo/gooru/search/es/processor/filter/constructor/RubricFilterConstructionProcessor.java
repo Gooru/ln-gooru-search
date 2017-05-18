@@ -8,8 +8,7 @@ import org.ednovo.gooru.search.es.processor.SearchProcessorType;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LessonFilterConstructionProcessor extends FilterConstructionProcessor {
-
+public class RubricFilterConstructionProcessor extends FilterConstructionProcessor {
 
 	@Override
 	public void process(SearchData searchData, SearchResponse<Object> response) {
@@ -24,14 +23,13 @@ public class LessonFilterConstructionProcessor extends FilterConstructionProcess
 					searchData.putFilter(FLT_PUBLISH_STATUS, PublishedStatus.PUBLISHED.getStatus());
 				}
 			}
-		} else {
-			searchData.putFilter(FLT_PUBLISH_STATUS, PublishedStatus.PUBLISHED.getStatus());
 		}
 		searchData.putFilter(FLT_TENANT_ID, StringUtils.join(searchData.getUserPermits(), ","));
 	}
 
 	@Override
 	protected SearchProcessorType getType() {
-		return SearchProcessorType.LessonFilterConstruction;
+		return SearchProcessorType.RubricFilterConstruction;
 	}
+
 }
