@@ -53,7 +53,7 @@ public class RubricDeserializeProcessor extends DeserializeProcessor<List<Rubric
 		// set counts
 		if (model.get(IndexFields.STATISTICS) != null) {
 			Map<String, Object> statistics = (Map<String, Object>) model.get(IndexFields.STATISTICS);
-			output.setQuestionCount(statistics.get("questionCount") != null ? (Integer) statistics.get("questionCount") : 0);
+			output.setQuestionCount(statistics.get(IndexFields.QUESTION_COUNT) != null ? (Integer) statistics.get(IndexFields.QUESTION_COUNT) : 0);
 			long viewsCount = 0L;
 			if (statistics.get(IndexFields.VIEWS_COUNT) != null) {
 				viewsCount = ((Number) statistics.get(IndexFields.VIEWS_COUNT)).longValue();
