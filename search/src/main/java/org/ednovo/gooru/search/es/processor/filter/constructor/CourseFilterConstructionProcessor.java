@@ -15,22 +15,21 @@ public class CourseFilterConstructionProcessor extends FilterConstructionProcess
 	public void process(SearchData searchData, SearchResponse<Object> response) {
 		super.process(searchData, response);
 		if(searchData != null && searchData.getFilters() != null) {
-			searchData.putFilter(FLT_TENANT_ID, StringUtils.join(searchData.getUserPermits(), ","));	
 			if (!(searchData.getFilters().containsKey(FLT_PUBLISH_STATUS) || searchData.getFilters().containsKey(FLT_COURSE_TYPE))) {
 				searchData.putFilter(FLT_PUBLISH_STATUS, PublishedStatus.PUBLISHED.getStatus());
-			}
-			if (searchData.getFilters().containsKey(FLT_COURSE_TYPE)) {
-				// searchData.putFilter(IS_FEATURED, 1);
+			} else if (searchData.getFilters().containsKey(FLT_COURSE_TYPE)) {
 				searchData.putFilter(FLT_PUBLISH_STATUS, "published,featured");
 				searchData.getFilters().remove(FLT_COURSE_TYPE);
 				searchData.putFilter(FLT_TENANT_ID, searchData.getUserTenantId());
 			}
+		} else {
+			searchData.putFilter(FLT_PUBLISH_STATUS, PublishedStatus.PUBLISHED.getStatus());
 		}
+		if(!searchData.getFilters().containsKey(FLT_TENANT_ID)) searchData.putFilter(FLT_TENANT_ID, StringUtils.join(searchData.getUserPermits(), ","));
 	}
-
+	
 	@Override
 	protected SearchProcessorType getType() {
 		return SearchProcessorType.CourseFilterConstruction;
 	}
-
 }

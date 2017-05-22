@@ -127,7 +127,11 @@ public enum SearchProcessorType {
 	
 	LessonDeserializeProcessor(),
 
-	ResourceSuggestDeserializer();
+	ResourceSuggestDeserializer(),
+	
+	RubricFilterConstruction(),
+	
+	RubricDeserializeProcessor();
 
 	private SearchProcessorType() {
 	}

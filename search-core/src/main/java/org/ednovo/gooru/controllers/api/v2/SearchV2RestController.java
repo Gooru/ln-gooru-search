@@ -138,19 +138,8 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		}
 
 		SessionContextSupport.putLogParameter(SESSION_SEARCH, session);
-		/*if (!(type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(AUTO_COMPLETE))) {
-			PartyCustomField partyCustomField = partyService.getPartyCustomeField(apiCaller.getPartyUid(), USER_TAXONOMY_ROOT_CODE, null);
-			if (partyCustomField != null) {
-				searchData.setUserTaxonomyPreference(partyCustomField.getOptionalValue());
-			} else {
-				final String taxonomyCodeIds = (partyCustomField != null && partyCustomField.getOptionalValue() != null && partyCustomField.getOptionalValue().length() > 0)
-						? partyCustomField.getOptionalValue()
-						: this.getTaxonomyRespository().getFindTaxonomyList(settingService.getConfigSetting(ConfigGOORU_EXCLUDE_TAXONOMY_PREFERENCE, 0, apiCaller.getOrganization().getPartyUid()));
-				searchData.setUserTaxonomyPreference(taxonomyCodeIds);
-			}
-		}
 
-		Set<UserRoleAssoc> userRoleAssocs = (Set<UserRoleAssoc>) apiCaller.getUserRoleSet();
+		/*Set<UserRoleAssoc> userRoleAssocs = (Set<UserRoleAssoc>) apiCaller.getUserRoleSet();
 		for (UserRoleAssoc set : userRoleAssocs) {
 			if (set.getRole().getName().toString().equalsIgnoreCase(UserRole.UserRoleType.SUPER_ADMIN.getType().toString())) {
 				searchData.skipType(SearchProcessorType.BlackListQueryValidation);

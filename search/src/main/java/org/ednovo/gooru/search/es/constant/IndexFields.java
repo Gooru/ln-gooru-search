@@ -114,5 +114,7 @@ public class IndexFields {
 	public static final String CONTAINING_COLLECTIONS_COUNT = "containingCollectionsCount";
 	public static final String LESSON_COUNT = "lessonCount";
 	public static final String IS_FEATURED = "isFeatured";
+	public static final Object COLLECTION = "collection";
+	public static final Object CONTENT = "content";
 
 }

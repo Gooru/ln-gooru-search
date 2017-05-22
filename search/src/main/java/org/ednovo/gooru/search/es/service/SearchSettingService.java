@@ -268,7 +268,6 @@ public final class SearchSettingService {
 		return getCacheList(name);
 	}
 	
-
 	public static List<String> getDiscoverableTenants() {
 		Map<String, Object> discoverableTenants = instance.tenantRepository.getAllDiscoverableTenants();
 		return (discoverableTenants != null && !discoverableTenants.isEmpty()) ? (List<String>)discoverableTenants.get("discoverableTenantIds") : null;

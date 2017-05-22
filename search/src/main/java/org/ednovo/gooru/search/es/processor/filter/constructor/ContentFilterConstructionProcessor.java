@@ -38,6 +38,8 @@ public class ContentFilterConstructionProcessor extends FilterConstructionProces
 					searchData.getFilters().remove(AMPERSAND_STANDARD_DISPLAY);
 				}
 			}
+		} else {
+			searchData.putFilter(FLT_PUBLISH_STATUS, PublishedStatus.PUBLISHED.getStatus());
 		}
         
 		searchData.putFilter(FLT_TENANT_ID, StringUtils.join(searchData.getUserPermits(), ","));

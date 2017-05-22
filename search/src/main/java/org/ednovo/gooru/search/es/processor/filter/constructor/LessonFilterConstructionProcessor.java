@@ -24,6 +24,8 @@ public class LessonFilterConstructionProcessor extends FilterConstructionProcess
 					searchData.putFilter(FLT_PUBLISH_STATUS, PublishedStatus.PUBLISHED.getStatus());
 				}
 			}
+		} else {
+			searchData.putFilter(FLT_PUBLISH_STATUS, PublishedStatus.PUBLISHED.getStatus());
 		}
 		searchData.putFilter(FLT_TENANT_ID, StringUtils.join(searchData.getUserPermits(), ","));
 	}

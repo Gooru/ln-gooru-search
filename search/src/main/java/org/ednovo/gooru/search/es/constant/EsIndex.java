@@ -22,7 +22,8 @@ public enum EsIndex {
 	COURSE("course"),
 	UNIT("unit"),
 	LESSON("lesson"),
-	CROSSWALK("crosswalk");
+	CROSSWALK("crosswalk"),
+	RUBRIC("rubric");
 
 	private String name;
 	
