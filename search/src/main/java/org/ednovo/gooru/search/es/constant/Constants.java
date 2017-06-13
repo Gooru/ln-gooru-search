@@ -636,5 +636,7 @@ public interface Constants {
 	public static final String CONTENT_SUB_FORMAT = "contentSubFormat";
 	public static final String INTERNAL = "internal";
 	public static final String EXTERNAL = "external";
+	public static final String TYPE_CONCEPT_GRAPH = "concept-graph";
+	public static final String KEYWORDCONCEPT = "keywordconcept";
 
 }
