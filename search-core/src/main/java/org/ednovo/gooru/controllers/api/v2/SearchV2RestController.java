@@ -225,6 +225,8 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			type = TYPE_QUIZ;
 		} else if(type.equalsIgnoreCase(TYPE_USER)) {
 			throw new SearchException(HttpStatus.NOT_IMPLEMENTED, "Not supported");
+		} else if (type.equalsIgnoreCase(TYPE_CONCEPT_GRAPH)) {
+			type = KEYWORDCONCEPT;
 		}
 
 		searchData.setType(type);
@@ -299,6 +301,8 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			} else if (type.equalsIgnoreCase(TYPE_LIBRARY)) {
 				return toModelAndView(searchResponse.getSearchResults().toString());
 			} else if (type.equalsIgnoreCase(TYPE_ATTRIBUTION) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(TYPE_PUBLISHER) || type.equalsIgnoreCase(TYPE_AGGREGATOR)) {
+				return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
+			} else if (type.equalsIgnoreCase(KEYWORDCONCEPT)) {
 				return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
 			}
 			return toModelAndView(serialize(searchResponse, JSON, excludeAttributeArray, true, false));
