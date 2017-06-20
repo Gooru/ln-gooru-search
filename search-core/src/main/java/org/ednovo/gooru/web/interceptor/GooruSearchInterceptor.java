@@ -65,7 +65,8 @@ public class GooruSearchInterceptor extends HandlerInterceptorAdapter {
 		response.setHeader("X-REQUEST-UUID", eventUUID);
 		SessionContextSupport.putLogParameter("eventId", eventUUID);
 		JSONObject context = new JSONObject();
-		context.put("url", request.getRequestURI());
+		context.put(Constants.SEARCH_URL, request.getRequestURI());
+		context.put(Constants.CLIENT_SOURCE, Constants.CAMELCASE_SEARCH);
 		SessionContextSupport.putLogParameter("context", context);
 
 		request.getHeader("VIA");
