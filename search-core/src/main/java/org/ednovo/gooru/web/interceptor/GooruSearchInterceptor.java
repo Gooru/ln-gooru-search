@@ -84,7 +84,7 @@ public class GooruSearchInterceptor extends HandlerInterceptorAdapter {
 		SessionContextSupport.putLogParameter("user", user);
 
 		JSONObject version = new JSONObject();
-		version.put("logApi", "0.1");
+		version.put("logApi", "0.4");
 		SessionContextSupport.putLogParameter("version", version);
 		return true;
 	}
