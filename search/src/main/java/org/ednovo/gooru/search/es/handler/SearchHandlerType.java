@@ -59,9 +59,7 @@ public enum SearchHandlerType {
 	
 	RUBRIC(),
 	
-	CROSSWALK(),
-	
-	KEYWORDCONCEPT();
+	CROSSWALK();
 
 	private SearchHandlerType() {
 	}

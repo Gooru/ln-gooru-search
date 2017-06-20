@@ -39,9 +39,9 @@ public abstract class SearchProcessor<I extends SearchData, O extends Object> im
 
 	private boolean isSessionInfoRequired = false;
 
-	public static Set<String> RESOURCE_FORMAT_LIST = new HashSet<>();
+	public static Set<String> RESOURCE_FORMAT_LIST = new HashSet();
 	
-	public static Set<Map<String,String>> RESOURCE_FORMAT_VALUE = new HashSet<>();
+	public static Set<Map<String,String>> RESOURCE_FORMAT_VALUE = new HashSet();
 	
 	public static Map<String,String> RESOURCE_FORMAT_KEY_VALUE = new HashMap<String, String>();
 	
