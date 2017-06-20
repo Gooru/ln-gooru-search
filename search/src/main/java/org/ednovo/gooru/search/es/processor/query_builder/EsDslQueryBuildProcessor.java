@@ -87,41 +87,18 @@ public class EsDslQueryBuildProcessor extends SearchProcessor<SearchData, Object
 		}
 		
 		Map<String, Object> customQuery = new HashMap<String, Object>(1);
-    if (score != null && searchDataType.equalsIgnoreCase(SearchType.SIMPLE_COLLECTION.getType())) {
-      Map<String, Object> query = new HashMap<String, Object>(3);
-      Map<String, Object> scriptScore = new HashMap<String, Object>(1);
-      Map<String, Object> script = new HashMap<String, Object>(3);
-      customQuery.put("function_score", query);
-      query.put("query", queryString);
-      if (((lang != null) && lang.equalsIgnoreCase("native"))) {
-        query.put("script_score", scriptScore);
-        scriptScore.put("script", script);
-        script.put("inline", getSearchSetting("search." + searchData.getType().toLowerCase() + ".query.nativescore.script", "gooru-v2"));
-        script.put("lang", getSearchSetting("search." + searchData.getType().toLowerCase() + ".query.nativescore.lang", "native"));
-        Map<String, Object> params = new HashMap<String, Object>();
-        params.put("field", getSearchSetting("search." + searchData.getType().toLowerCase() + ".query.nativescore.field"));
-        if (searchData.isStandardsSearch()) {
-          params.put("standardField", "standardsWeight." + searchData.getQueryString().toUpperCase());
-        } else {
-          params.put("standardField", "none");
-        }
-        params.put("debug", getSearchSetting("search." + searchData.getType().toLowerCase() + ".query.nativescore.debug", "false"));
-        params.put("enableFallback", getSearchSetting("search." + searchData.getType().toLowerCase() + ".query.nativescore.enablefallback", "true"));
-        params.put("textRelavanceWeight", 60);
-        params.put("resourceType", TYPE_SCOLLECTION);
-        params.put("ownerId", searchData.getUser().getGooruUId());
-        params.put("viewCount", 15);
-        script.put("params", params);
-      } else if (!searchData.getType().equalsIgnoreCase(CONTRIBUTOR)) {
-        script.put("inline", score);
-      }
-      if (searchDataType.equalsIgnoreCase(SearchType.SIMPLE_COLLECTION.getType()) && lang != null && !(lang.equalsIgnoreCase("native"))) {
-        query.put("script_score", scriptScore);
-        scriptScore.put("script", score);
-        scriptScore.put("lang", "groovy");
-      }
-      searchData.getQueryDsl().put("query", customQuery);
-    } else {
+		if (score != null && searchDataType.equalsIgnoreCase(SearchType.SIMPLE_COLLECTION.getType())) {
+			Map<String, Object> query = new HashMap<String, Object>(3);
+			Map<String, Object> scriptScore = new HashMap<String, Object>(1);
+			customQuery.put("function_score", query);
+			query.put("query", queryString);
+			if (searchDataType.equalsIgnoreCase(SearchType.SIMPLE_COLLECTION.getType()) && lang != null && !(lang.equalsIgnoreCase("native"))) {
+				query.put("script_score", scriptScore);
+				scriptScore.put("script", score);
+				scriptScore.put("lang", "groovy");
+			}
+			searchData.getQueryDsl().put("query", customQuery);
+		} else {
 			searchData.getQueryDsl().put("query", queryString);
 		}
 		if (!searchData.isQueriesEmpty()) {

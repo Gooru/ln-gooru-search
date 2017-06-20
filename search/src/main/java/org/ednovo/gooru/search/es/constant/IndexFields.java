@@ -116,5 +116,7 @@ public class IndexFields {
 	public static final String IS_FEATURED = "isFeatured";
 	public static final Object COLLECTION = "collection";
 	public static final Object CONTENT = "content";
+	public static final String GUT_CODE = "gutCode";
+	public static final String CROSSWALK_CODES = "crosswalkCodes";
 
 }
