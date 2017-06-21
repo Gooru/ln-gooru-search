@@ -32,6 +32,12 @@ public class ResourceContextData {
 
 	private List<String> courseId;
 
+	private List<String> taxonomyDomains;
+
+	private List<String> taxonomyLearningTargets;
+	
+	private List<String> taxonomyLeafSLInternalCodes;
+
 	private ArrayList<String> standards;
 
 	private ArrayList<String> conceptNodeNeighbours;
@@ -130,6 +136,30 @@ public class ResourceContextData {
 
 	public void setCourseId(List<String> courseId) {
 		this.courseId = courseId;
+	}
+
+	public List<String> getTaxonomyDomains() {
+		return taxonomyDomains;
+	}
+
+	public void setTaxonomyDomains(List<String> taxonomyDomains) {
+		this.taxonomyDomains = taxonomyDomains;
+	}
+
+	public List<String> getTaxonomyLearningTargets() {
+		return taxonomyLearningTargets;
+	}
+
+	public void setTaxonomyLearningTargets(List<String> taxonomyLearningTargets) {
+		this.taxonomyLearningTargets = taxonomyLearningTargets;
+	}
+
+	public List<String> getTaxonomyLeafSLInternalCodes() {
+		return taxonomyLeafSLInternalCodes;
+	}
+
+	public void setTaxonomyLeafSLInternalCodes(List<String> taxonomyLeafSLInternalCodes) {
+		this.taxonomyLeafSLInternalCodes = taxonomyLeafSLInternalCodes;
 	}
 
 	public ArrayList<String> getStandards() {
