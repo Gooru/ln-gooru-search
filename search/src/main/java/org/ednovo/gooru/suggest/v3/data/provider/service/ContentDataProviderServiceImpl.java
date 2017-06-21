@@ -50,10 +50,7 @@ public class ContentDataProviderServiceImpl implements ContentDataProviderServic
 				resourceContextDo.setCreatorId((String) resourceData.get("creatorId"));
 				resourceContextDo.setKeywords(((String) resourceData.get("keywords") != null) ? (String) resourceData.get("keywords") : null);
 				Map<String, Object> conceptNodeJson = getTaxonomy((resourceData.get("taxonomy") != null) ? (JSONObject) resourceData.get("taxonomy") : null);
-				resourceContextDo.setTaxonomyDomains((ArrayList<String>) conceptNodeJson.get("domains"));
-				resourceContextDo.setStandards((ArrayList<String>) conceptNodeJson.get("standards"));
-				resourceContextDo.setTaxonomyLearningTargets((ArrayList<String>) conceptNodeJson.get("learningTargets"));
-				resourceContextDo.setTaxonomyLeafSLInternalCodes((ArrayList<String>) conceptNodeJson.get("leafSLInternalCodes"));
+				resourceContextDo.setStandards((ArrayList<String>) conceptNodeJson.get("leafSLInternalCodes"));
 				resourceContextDo.setConceptNodeNeighbours((ArrayList<String>) conceptNodeJson.get("conceptNodeNeighbours"));
 			} catch(Exception e) {
 				LOG.error("Unable to fetch from DB : Resource ID may be a copied resource", e.getMessage());
@@ -122,7 +119,6 @@ public class ContentDataProviderServiceImpl implements ContentDataProviderServic
 			conceptNodeJson.put("subjects", subjectArray);
 			conceptNodeJson.put("courses", courseArray);
 			conceptNodeJson.put("domains", domainArray);
-			conceptNodeJson.put("learningTargets", learningTargetArray);
 			conceptNodeJson.put("leafSLInternalCodes", leafSLInternalCodes);
 			conceptNodeJson.put("conceptNodeNeighbours", conceptNodeNeighbours.stream().map(String::toLowerCase).collect(Collectors.toList()));
 		}
