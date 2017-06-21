@@ -14,7 +14,7 @@ public class RubricFilterConstructionProcessor extends FilterConstructionProcess
 	public void process(SearchData searchData, SearchResponse<Object> response) {
 		super.process(searchData, response);
 		if (((searchData != null && searchData.getFilters() != null) && (!searchData.getFilters().containsKey(FLT_PUBLISH_STATUS))) || (searchData == null || searchData.getFilters() == null)) {
-				searchData.putFilter(FLT_PUBLISH_STATUS, PublishedStatus.PUBLISHED.getStatus());
+			searchData.putFilter(FLT_PUBLISH_STATUS, PublishedStatus.PUBLISHED.getStatus());
 		}
 		searchData.putFilter(FLT_TENANT_ID, StringUtils.join(searchData.getUserPermits(), ","));
 	}
