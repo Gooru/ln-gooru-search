@@ -31,6 +31,32 @@ public class SearchResponse<R> implements Serializable {
 
   private Map<String, Object> stats;
 
+  /*
+   * private String category;
+   * 
+   * private String currentSubject;
+   * 
+   * private Object facets;
+   * 
+   * private List<String> suggestText;
+   * 
+   * private List<String> relatedSubject;
+   * 
+   * private List<Map<String, Object>> relatedSubjectMap;
+   * 
+   * private String spellCheckQueryString;
+   * 
+   * private String searchType;
+   * 
+   * private Map<String, Object> searchInfo;
+   * 
+   * private String userInput;
+   * 
+   * // original query string put in by user private String userQueryString;
+   * 
+   * private String queryUId;
+   */
+
   public R getSearchResults() {
     return searchResults;
   }
@@ -86,5 +112,101 @@ public class SearchResponse<R> implements Serializable {
   public void setStats(Map<String, Object> stats) {
     this.stats = stats;
   }
+
+/*  public String getUserInput() {
+    return userInput;
+  }
+
+  public void setUserInput(String userInput) {
+    this.userInput = userInput;
+  }
+
+  public String getSearchType() {
+    return searchType;
+  }
+
+  public void setSearchType(String searchType) {
+    this.searchType = searchType;
+  }
+
+  public String getCategory() {
+    return category;
+  }
+
+  public void setCategory(String category) {
+    this.category = category;
+  }
+
+  public Map<String, Object> getSearchInfo() {
+    return searchInfo;
+  }
+
+  public void setSearchInfo(Map<String, Object> searchInfo) {
+    this.searchInfo = searchInfo;
+  }
+
+  public String getQueryUId() {
+    return queryUId;
+  }
+
+  public void setQueryUId(String queryUId) {
+    this.queryUId = queryUId;
+  }
+
+  public List<String> getSuggestText() {
+    return suggestText;
+  }
+
+  public void setSuggestText(List<String> suggestText) {
+    this.suggestText = suggestText;
+  }
+
+  public Object getFacets() {
+    return facets;
+  }
+
+  public void setFacets(Object facets) {
+    this.facets = facets;
+  }
+
+  public void setCurrentSubject(String currentSubject) {
+    this.currentSubject = currentSubject;
+  }
+
+  public String getCurrentSubject() {
+    return currentSubject;
+  }
+
+  public void setRelatedSubject(List<String> relatedSubject) {
+    this.relatedSubject = relatedSubject;
+  }
+
+  public List<String> getRelatedSubject() {
+    return relatedSubject;
+  }
+
+  public void setRelatedSubjectMap(List<Map<String, Object>> relatedSubjectMap) {
+    this.relatedSubjectMap = relatedSubjectMap;
+  }
+
+  public List<Map<String, Object>> getRelatedSubjectMap() {
+    return relatedSubjectMap;
+  }
+
+  public String getUserQueryString() {
+    return userQueryString;
+  }
+
+  public void setUserQueryString(String userQueryString) {
+    this.userQueryString = userQueryString;
+  }
+
+  public String getSpellCheckQueryString() {
+    return spellCheckQueryString;
+  }
+
+  public void setSpellCheckQueryString(String spellCheckQueryString) {
+    this.spellCheckQueryString = spellCheckQueryString;
+  }*/
 
 }

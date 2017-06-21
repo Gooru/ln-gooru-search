@@ -95,10 +95,12 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 			List<Map<String, String>> curriculumInfoAsList = (List<Map<String, String>>) curriculumAsMap.get(IndexFields.CURRICULUM_INFO);
 			if (curriculumInfoAsList != null) {
 				curriculumInfoAsList.forEach(code -> {
-					String id = code.get(IndexFields.ID);
-					List<Map<String, String>> crosswalkCodes = null;
-					crosswalkCodes = deserializeCrosswalkResponse(crosswalkResponse, id, crosswalkCodes);
-					transformToPreferredCode(txCurriculumInfoAsList, standardPrefs, code, crosswalkCodes);
+					Map<String, String> codeAsMap = code;
+					String id = codeAsMap.get(IndexFields.ID);
+
+					Map<String, Map<String, String>> crosswalkResult = null;
+					crosswalkResult = deserializeCrosswalkResponse(crosswalkResponse, id, crosswalkResult);
+					transformToPreferredCode(txCurriculumInfoAsList, standardPrefs, codeAsMap, crosswalkResult);
 				});
 				curriculumAsMap.put(IndexFields.CURRICULUM_INFO, txCurriculumInfoAsList);
 				taxonomySetAsMap.put(IndexFields.CURRICULUM, curriculumAsMap);
@@ -108,25 +110,22 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<Map<String, String>> deserializeCrosswalkResponse(List<Map<String, Object>> crosswalkResponses, String id, List<Map<String, String>> crosswalkResult) {
-		if (crosswalkResponses != null && !crosswalkResponses.isEmpty()) {
-			for (Map<String, Object> response : crosswalkResponses) {
+	private Map<String, Map<String, String>> deserializeCrosswalkResponse(List<Map<String, Object>> crosswalkResponse, String id, Map<String, Map<String, String>> crosswalkResult) {
+		if (crosswalkResponse != null && !crosswalkResponse.isEmpty()) {
+			for (Map<String, Object> response : crosswalkResponse) {
 				Map<String, Object> source = (Map<String, Object>) response.get(SEARCH_SOURCE);
-				List<Map<String, String>> crosswalkCodes = (List<Map<String, String>>) source.get(IndexFields.CROSSWALK_CODES);
-				for (Map<String, String> code : crosswalkCodes) {
-					String crosswalkId = (String) code.get(IndexFields.ID);
-					if (!crosswalkId.equalsIgnoreCase(id)) {
-						continue;
-					} else {
-						crosswalkResult = (List<Map<String, String>>) source.get(IndexFields.CROSSWALK_CODES);
-					}
+				String crosswalkId = (String) source.get(IndexFields.ID);
+				if (!crosswalkId.equalsIgnoreCase(id)) {
+					continue;
+				} else {
+					crosswalkResult = (Map<String, Map<String, String>>) source.get(IndexFields.EQUIVALENT_COMPETENCIES);
 				}
 			}
 		}
 		return crosswalkResult;
 	}
-	
-	private void transformToPreferredCode(List<Map<String, String>> txCurriculumInfoAsList, JSONObject standardPrefs, Map<String, String> codeAsMap, List<Map<String, String>> crosswalkCodes) {
+
+	private void transformToPreferredCode(List<Map<String, String>> txCurriculumInfoAsList, JSONObject standardPrefs, Map<String, String> codeAsMap, Map<String, Map<String, String>> crosswalkResult) {
 		String internalCode = codeAsMap.get(IndexFields.ID);
 		final String subject = getSubjectFromCodeId(internalCode);
 		String framework = null;
@@ -134,14 +133,12 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 		try {
 			if (standardPrefs != null && standardPrefs.has(subject)) {
 				framework = standardPrefs.getString(subject);
-				if (framework != null && !internalCode.startsWith(framework + DOT) && crosswalkCodes != null) {
-					for (Map<String, String> crosswalk : crosswalkCodes) {
-						if (!crosswalk.get(FRAMEWORK_CODE).equalsIgnoreCase(framework)) {
-							continue;
-						}
-						crosswalk.put(LEAF_INTERNAL_CODE, internalCode);
-						crosswalk.put(PARENT_TITLE, codeAsMap.get(PARENT_TITLE));
-						txCurriculumInfoAsList.add(crosswalk);
+				if (framework != null && !internalCode.startsWith(framework + DOT) && crosswalkResult != null) {
+					Map<String, String> txCodes = crosswalkResult.get(framework);
+					if (txCodes != null) {
+						txCodes.put(LEAF_INTERNAL_CODE, internalCode);
+						txCodes.put(PARENT_TITLE, codeAsMap.get(PARENT_TITLE));
+						txCurriculumInfoAsList.add(txCodes);
 						isTransformed = true;
 					}
 				}
@@ -159,7 +156,7 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 		SearchData crosswalkRequest = new SearchData();
 		crosswalkRequest.setPretty(input.getPretty());
 		crosswalkRequest.setIndexType(EsIndex.CROSSWALK);
-		crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CROSSWALK_CODES + DOT + IndexFields.ID, (StringUtils.join(leafInternalCodes,",")));
+		crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.ID, (StringUtils.join(leafInternalCodes,",")));
 		crosswalkRequest.setQueryString(STAR);
 		List<Map<String, Object>> searchResponse = (List<Map<String, Object>>) SearchHandler.getSearcher(SearchHandlerType.CROSSWALK.name()).search(crosswalkRequest).getSearchResults();
 		return searchResponse;

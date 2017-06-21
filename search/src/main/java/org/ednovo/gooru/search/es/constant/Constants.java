@@ -636,11 +636,7 @@ public interface Constants {
 	public static final String CONTENT_SUB_FORMAT = "contentSubFormat";
 	public static final String INTERNAL = "internal";
 	public static final String EXTERNAL = "external";
-	public static final String FRAMEWORK_CODE = "frameworkCode";
-	public static final String TYPE_CONCEPT_GRAPH = "concept-graph";
-	public static final String KEYWORDCONCEPT = "keywordconcept";
-	public static final String BELOW_AVERAGE = "below-average";
-	public static final String ABOVE_AVERAGE = "above-average";
-	public static final String AVERAGE = "average";
+	public static final String CLIENT_SOURCE = "clientSource";
+	public static final String CAMELCASE_SEARCH = "Search";
 
 }
