@@ -3,19 +3,11 @@
  */
 package org.ednovo.gooru.search.es.processor;
 
-import io.searchbox.client.JestClient;
-import io.searchbox.client.JestClientFactory;
-import io.searchbox.client.JestResult;
-import io.searchbox.client.config.HttpClientConfig;
-import io.searchbox.core.Search;
-
 import static org.ednovo.gooru.search.es.constant.SearchSettingType.S_ES_INDEX_PREFIX;
 import static org.ednovo.gooru.search.es.constant.SearchSettingType.S_ES_INDEX_SUFFIX;
 import static org.ednovo.gooru.search.es.constant.SearchSettingType.S_ES_POINT;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -29,6 +21,12 @@ import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import io.searchbox.client.JestClient;
+import io.searchbox.client.JestClientFactory;
+import io.searchbox.client.JestResult;
+import io.searchbox.client.config.HttpClientConfig;
+import io.searchbox.core.Search;
 
 
 /**
@@ -68,12 +66,10 @@ public class ElasticsearchProcessor extends SearchProcessor<SearchData, Object> 
 	public void process(SearchData searchData, SearchResponse<Object> response)  {
 		String indexName = searchData.getIndexType().getName();
 		String indexType = searchData.getType().toLowerCase();
-		if (indexType.equalsIgnoreCase(SEARCH_QUESTION) || indexType.equalsIgnoreCase("attribution") || indexType.equalsIgnoreCase(TAXONOMY_SUB_LEVEL)
-				|| indexType.equalsIgnoreCase(MULTI_RESOURCE) || indexType.equalsIgnoreCase("source") || indexType.equalsIgnoreCase(AUTO_COMPLETE)
-            || indexType.equalsIgnoreCase(SPELLCHECKER)) {
-			indexType = indexName;
-		} else if (indexType.equalsIgnoreCase(TYPE_SCOLLECTION)) {
+		if (indexType.equalsIgnoreCase(TYPE_SCOLLECTION)) {
 			indexType = TYPE_COLLECTION;
+		} else if (indexType.equalsIgnoreCase(KEYWORDCONCEPT)) {
+			indexType = TYPE_TAXONOMY;
 		}
 
 		try {
@@ -81,43 +77,24 @@ public class ElasticsearchProcessor extends SearchProcessor<SearchData, Object> 
 			if (searchData.getPretty().equals("1")) {
 				ObjectMapper mapper = new ObjectMapper();
 				Object json = mapper.readValue(searchQuery, Map.class);
-				LOG.info("IndexName:"+getSetting(S_ES_INDEX_PREFIX) + indexName + getSetting(S_ES_INDEX_SUFFIX)+"/"+indexType);
+				LOG.info("IndexName:" + getSetting(S_ES_INDEX_PREFIX) + indexName + getSetting(S_ES_INDEX_SUFFIX) + "/" + indexType);
 				LOG.info(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json));
 			}
-			
-	    Search search=null;	
-	    Collection<String> indexNames;
-	    Collection<String> indexTypes ;
-		if (searchData.getType().equalsIgnoreCase(CONTRIBUTOR)&& searchData.getContributorType().equalsIgnoreCase(RESOURCE)) {
-		    indexNames = new ArrayList<String>();
-			indexNames.add(getSetting(S_ES_INDEX_PREFIX) + TYPE_USER + getSetting(S_ES_INDEX_SUFFIX));
-			indexNames.add(getSetting(S_ES_INDEX_PREFIX) + CONTENT_PROVIDER + getSetting(S_ES_INDEX_SUFFIX));
-		    indexTypes = new ArrayList<String>();
-			indexTypes.add(TYPE_USER);
-			indexTypes.add(PUBLISHER);
-			indexTypes.add(AGGREGATOR);
-		    search = new Search.Builder(searchQuery).addIndex(indexNames).addType(indexTypes).build();
-		} else if(searchData.getType().equalsIgnoreCase(CONTRIBUTOR)&& searchData.getContributorType().equalsIgnoreCase(COLLECTION)){
-			indexNames = new ArrayList<String>();
-			indexNames.add(getSetting(S_ES_INDEX_PREFIX) + TYPE_USER + getSetting(S_ES_INDEX_SUFFIX));
-			indexTypes = new ArrayList<String>();
-			indexTypes.add(TYPE_USER);
-		  }else {
-			 search = new Search.Builder(searchQuery)
-					.addIndex(getSetting(S_ES_INDEX_PREFIX) + indexName + getSetting(S_ES_INDEX_SUFFIX)).addType(indexType).build();
-		   }
+
+			Search search = new Search.Builder(searchQuery).addIndex(getSetting(S_ES_INDEX_PREFIX) + indexName + getSetting(S_ES_INDEX_SUFFIX)).addType(indexType).build();
+
 			long start = System.currentTimeMillis();
 			JestResult jestResult = getClient().execute(search);
-	 	    if (jestResult.getErrorMessage()!= null) {
-	        	JSONObject responseStatus = new JSONObject(jestResult.getJsonString());
-	        	if ((Integer)responseStatus.get(SEARCH_STATUS) == 400 || (Integer)responseStatus.get(SEARCH_STATUS) == 503) {
-	        		 throw new BadRequestException("Please check request param input values");
-		        }
-	         } 
-		     searchData.setSearchResultText(jestResult.getJsonString());
-			 if(LOG.isDebugEnabled()){
-				 LOG.debug("Elapsed Time for " + indexType + " : " + (System.currentTimeMillis() - start) + " ms");
-			 }	
+			if (jestResult.getErrorMessage() != null) {
+				JSONObject responseStatus = new JSONObject(jestResult.getJsonString());
+				if ((Integer) responseStatus.get(SEARCH_STATUS) == 400 || (Integer) responseStatus.get(SEARCH_STATUS) == 503) {
+					throw new BadRequestException("Please check request param input values");
+				}
+			}
+			searchData.setSearchResultText(jestResult.getJsonString());
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Elapsed Time for " + indexType + " : " + (System.currentTimeMillis() - start) + " ms");
+			}
 		} catch (BadRequestException e) {
 			throw new BadRequestException("Please check request input param values" + e);		
 		} catch (Exception e) {
