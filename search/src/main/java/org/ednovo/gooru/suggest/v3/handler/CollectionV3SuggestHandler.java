@@ -90,7 +90,7 @@ public class CollectionV3SuggestHandler extends SuggestHandler<Map<String, Objec
 								if (StringUtils.isNotBlank(suggestData.getSuggestContextData().getCollectionId()))
 									suggestData.putFilter("!^id", suggestData.getSuggestContextData().getCollectionId());
 								List<String> ids = null;
-								String range = "M";
+								String range = SearchSettingService.getByName(Constants.AVERAGE);
 								if (score != null) {
 									range = getScoreRange(score);
 								} else if (timespent != null) {
@@ -214,21 +214,31 @@ public class CollectionV3SuggestHandler extends SuggestHandler<Map<String, Objec
 	}
 
 	private String getScoreRange(Integer score) {
-		String scoreRange = "L";
-		if (score >= 80) {
-			scoreRange = "H";
-		} else if (score >= 50 && score < 80) {
-			scoreRange = "M";
+		String scoreRange = null;
+		if (score != null) {
+			Integer minScore = SearchSettingService.getSettingAsInteger(Constants.SCORE_AVERAGE_MIN, 50);
+			Integer maxScore = SearchSettingService.getSettingAsInteger(Constants.SCORE_AVERAGE_MAX, 80);
+			scoreRange = SearchSettingService.getByName(Constants.BELOW_AVERAGE);
+			if (score >= maxScore) {
+				scoreRange = SearchSettingService.getByName(Constants.ABOVE_AVERAGE);
+			} else if (score >= minScore && score < maxScore) {
+				scoreRange = SearchSettingService.getByName(Constants.AVERAGE);
+			}
 		}
 		return scoreRange;
 	}
 
 	private String getTimespentRange(Long timespent) {
-		String timespentRange = "L";
-		if (timespent >= 900000) {
-			timespentRange = "H";
-		} else if (timespent >= 120000 && timespent < 900000) {
-			timespentRange = "M";
+		String timespentRange = null;
+		if (timespent != null) {
+			Integer minTS = SearchSettingService.getSettingAsInteger(Constants.TIMESPENT_AVERAGE_MIN, 120000);
+			Integer maxTS = SearchSettingService.getSettingAsInteger(Constants.TIMESPENT_AVERAGE_MAX, 900000);
+			timespentRange = SearchSettingService.getByName(Constants.BELOW_AVERAGE);
+			if (timespent >= maxTS) {
+				timespentRange = SearchSettingService.getByName(Constants.ABOVE_AVERAGE);
+			} else if (timespent >= minTS && timespent < maxTS) {
+				timespentRange = SearchSettingService.getByName(Constants.AVERAGE);
+			}
 		}
 		return timespentRange;
 	}
