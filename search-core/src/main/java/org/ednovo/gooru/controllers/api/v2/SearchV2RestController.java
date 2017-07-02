@@ -46,7 +46,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 	
 	@Autowired
 	private SearchService searchService;
-	
+
 	protected static final Logger logger = LoggerFactory.getLogger(SearchV2RestController.class);
 	
 	@RequestMapping(method = RequestMethod.GET, value = { "/index/filters"})
@@ -56,6 +56,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		return toModelAndView(serializeToJson(searchService.getSearchFilters(codeId, type), SEARCH_FORMAT));
 	}
 	  
+	@SuppressWarnings("unchecked")
 	@RequestMapping(method = {RequestMethod.GET}, value = "/{type}")
 	public ModelAndView search(HttpServletRequest request, HttpServletResponse response, 
 			@RequestParam(required = false) String sessionToken,
@@ -225,6 +226,8 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			type = TYPE_QUIZ;
 		} else if(type.equalsIgnoreCase(TYPE_USER)) {
 			throw new SearchException(HttpStatus.NOT_IMPLEMENTED, "Not supported");
+		} else if (type.equalsIgnoreCase(TYPE_COMPETENCY_GRAPH)) {
+			type = KEYWORD_COMPETENCY;
 		}
 
 		searchData.setType(type);
@@ -284,8 +287,8 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			} else if (type.equalsIgnoreCase(SearchHandlerType.MULTI_RESOURCE.name()) && searchDataMap.getString(QUERY_TYPE) != null) {
 				Object serializeResult = searchResponse;
 				if (searchDataMap.getString(SearchInputType.FETCH_HITS_IN_MULTI.getName()).equals(SearchInputType.FETCH_HITS_IN_MULTI.getDefaultValue())) {
-					if (searchResponse.getSearchResults() instanceof List && ((List) searchResponse.getSearchResults()).size() > 0) {
-						serializeResult = ((List) searchResponse.getSearchResults()).get(0);
+					if (searchResponse.getSearchResults() instanceof List && ((List<?>) searchResponse.getSearchResults()).size() > 0) {
+						serializeResult = ((List<?>) searchResponse.getSearchResults()).get(0);
 					} else {
 						serializeResult = null;
 					}
@@ -299,6 +302,8 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			} else if (type.equalsIgnoreCase(TYPE_LIBRARY)) {
 				return toModelAndView(searchResponse.getSearchResults().toString());
 			} else if (type.equalsIgnoreCase(TYPE_ATTRIBUTION) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(TYPE_PUBLISHER) || type.equalsIgnoreCase(TYPE_AGGREGATOR)) {
+				return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
+			} else if (type.equalsIgnoreCase(KEYWORD_COMPETENCY)) {
 				return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
 			}
 			return toModelAndView(serialize(searchResponse, JSON, excludeAttributeArray, true, false));
@@ -334,5 +339,5 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			final ModelMap model) throws Exception {
 		searchService.refreshGlobalTenantsInCache();
 	}
-		
+	
 }
