@@ -645,4 +645,6 @@ public interface Constants {
 	public static final String ABOVE_AVERAGE = "above-average";
 	public static final String AVERAGE = "average";
 
+	public static final String TOKEN = "Token";
+
 }
