@@ -284,12 +284,14 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 		Map<String, Object> taxonomyMap = (Map<String, Object>) dataMap.get(IndexFields.TAXONOMY);
 		if (taxonomyMap != null) {
 			Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
-			if (input.isStandardsSearch() && input.isCrosswalk()) {
-				setCrosswalkData(input, resource, taxonomyMap);
-			} else if (input.getUserTaxonomyPreference() != null) {
-				long start = System.currentTimeMillis();
-				taxonomySetAsMap = transformTaxonomy(taxonomyMap, input);
-				logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
+			if (input.isCrosswalk()) {
+				if (input.isStandardsSearch()) {
+					setCrosswalkData(input, resource, taxonomyMap);
+				} else if (input.getUserTaxonomyPreference() != null) {
+					long start = System.currentTimeMillis();
+					taxonomySetAsMap = transformTaxonomy(taxonomyMap, input);
+					logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
+				}
 			}
 			resource.setTaxonomySet(taxonomySetAsMap);		
 			resource.setTaxonomyDataSet((String) taxonomyMap.get(IndexFields.TAXONOMY_DATA_SET));
