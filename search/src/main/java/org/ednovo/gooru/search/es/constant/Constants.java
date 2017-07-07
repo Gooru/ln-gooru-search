@@ -651,4 +651,5 @@ public interface Constants {
 	public static final String TOKEN_SPACE = "Token ";
 	public static final String API_COMPETENCY_NODE = "api.competency.node";
 	public static final String DNS_ENV = "dns.env";
+	public static final String KEYWORDS = "keywords";
 }

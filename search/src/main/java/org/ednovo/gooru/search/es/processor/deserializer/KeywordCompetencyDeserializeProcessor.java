@@ -27,18 +27,22 @@ public class KeywordCompetencyDeserializeProcessor extends DeserializeProcessor<
 	CompetencySearchResult deserialize(Map<String, Object> model, SearchData searchData, CompetencySearchResult output) {
 		Map<String, Object> hitsMap = (Map<String, Object>) model.get(SEARCH_HITS);
 		List<Map<String, Object>> hits = (List<Map<String, Object>>) (hitsMap).get(SEARCH_HITS);
+		output = new CompetencySearchResult();
 		if (hits != null && hits.size() > 0) {
 			Set<String> gutCodes = new HashSet<String>();
+			Set<String> ids = new HashSet<String>();
 			for (Map<String, Object> hit : hits) {
 				Map<String, Object> fields = (Map<String, Object>) hit.get(SEARCH_SOURCE);
 				String gutCode = (String) fields.get(IndexFields.GUT_CODE);
-				if (gutCode != null)
+				String id = (String) fields.get(IndexFields.ID);
+				if (gutCode != null) {
 					gutCodes.add(gutCode);
+					ids.add(id);
+				}
 			}
-			LOG.info("Matched gutCodes : " + gutCodes);
+			LOG.info("Matched Ids : {} GutCodes : {}", ids, gutCodes);
 			if (gutCodes != null && gutCodes.size() > 0) {
 				List<CompetencyNodeDTO> competencyList = new ArrayList<>();
-				output = new CompetencySearchResult();
 				competencyList = competencyNodeDataProviderService.getCompetencyNode(gutCodes.parallelStream().collect(Collectors.toList()), searchData, competencyList);
 				if (competencyList.size() > 0)
 					output.setCompetency_graph(competencyList);
