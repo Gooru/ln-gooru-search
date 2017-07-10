@@ -131,7 +131,11 @@ public enum SearchProcessorType {
 	
 	RubricFilterConstruction(),
 	
-	RubricDeserializeProcessor();
+	RubricDeserializeProcessor(),
+	
+	KeywordCompetencyFilterConstruction(),
+	
+	KeywordCompetencyDeserializer();
 
 	private SearchProcessorType() {
 	}

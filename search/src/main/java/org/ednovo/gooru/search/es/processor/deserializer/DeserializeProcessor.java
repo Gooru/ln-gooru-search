@@ -108,7 +108,7 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<Map<String, String>> deserializeCrosswalkResponse(List<Map<String, Object>> crosswalkResponses, String id, List<Map<String, String>> crosswalkResult) {
+	protected List<Map<String, String>> deserializeCrosswalkResponse(List<Map<String, Object>> crosswalkResponses, String id, List<Map<String, String>> crosswalkResult) {
 		if (crosswalkResponses != null && !crosswalkResponses.isEmpty()) {
 			for (Map<String, Object> response : crosswalkResponses) {
 				Map<String, Object> source = (Map<String, Object>) response.get(SEARCH_SOURCE);
@@ -118,7 +118,7 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 					if (!crosswalkId.equalsIgnoreCase(id)) {
 						continue;
 					} else {
-						crosswalkResult = (List<Map<String, String>>) source.get(IndexFields.CROSSWALK_CODES);
+						return crosswalkCodes;
 					}
 				}
 			}
@@ -155,7 +155,7 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<Map<String, Object>> searchCrosswalk(SearchData input, List<String> leafInternalCodes) {
+	protected List<Map<String, Object>> searchCrosswalk(SearchData input, List<String> leafInternalCodes) {
 		SearchData crosswalkRequest = new SearchData();
 		crosswalkRequest.setPretty(input.getPretty());
 		crosswalkRequest.setIndexType(EsIndex.CROSSWALK);

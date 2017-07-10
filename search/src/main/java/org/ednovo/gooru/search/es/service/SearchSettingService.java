@@ -13,6 +13,7 @@ import java.util.Properties;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.SearchSettingType;
 import org.ednovo.gooru.search.es.repository.TenantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,46 +115,6 @@ public final class SearchSettingService {
 		cache.put("discoverableTenantIds" + getProfileName(), ((discoverableTenants != null && !discoverableTenants.isEmpty()) ? discoverableTenants.get("discoverableTenantIds") : null));
 	}
 
-	/**
-	 * Copy all the search settings from sourceProfile to destProfile
-	 * 
-	 * @param sourceProfile
-	 *            - the profile from which search settings need to be copied.
-	 * @param destProfile
-	 *            - the profile to which the search settings need to be copied.
-	 * @param rewrite
-	 *            true - to override all settings in destProfile.
-	 */
-	//Disabled while removing cassandra dependency
-/*	public void copyProfile(String sourceProfile, String destProfile, boolean rewrite) {
-		Rows<String, String> rows = instance.searchSettingCassandraService.getAll();
-		if (!rewrite) {
-			for (Row<String, String> row : rows) {
-				String sourceValue = null;
-				boolean write = true;
-				for (Column<String> column : row.getColumns()) {
-					if (column.getName().equals(sourceProfile) && column.hasValue()) {
-						sourceValue = column.getStringValue();
-					} else if (column.getName().equals(destProfile) && column.hasValue()) {
-						write = false;
-					}
-				}
-				if (!write || sourceValue == null) {
-					continue;
-				}
-				instance.searchSettingCassandraService.save(row.getKey(), destProfile, sourceValue);
-			}
-		} else {
-			for (Row<String, String> row : rows) {
-				for (Column<String> column : row.getColumns()) {
-					if (column.getName().equals(sourceProfile) && column.hasValue()) {
-						instance.searchSettingCassandraService.save(row.getKey(), destProfile, column.getStringValue());
-					}
-				}
-			}
-		}
-	}*/
-
 	private static void initListFilters(String key) {
 		String settingData = getSearchSetting(key);
 		if (settingData == null) {
@@ -179,11 +140,13 @@ public final class SearchSettingService {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	protected static List<String> getCacheList(String key) {
 		Object result = cache.get(key + getProfileName());
 		return result instanceof List ? (List<String>) result : null;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected static Map<String, String> getCacheMap(String key) {
 		Object result = cache.get(key + getProfileName());
 		return result instanceof Map ? (Map<String, String>) result : null;
@@ -268,13 +231,18 @@ public final class SearchSettingService {
 		return getCacheList(name);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static List<String> getDiscoverableTenants() {
 		Map<String, Object> discoverableTenants = instance.tenantRepository.getAllDiscoverableTenants();
-		return (discoverableTenants != null && !discoverableTenants.isEmpty()) ? (List<String>)discoverableTenants.get("discoverableTenantIds") : null;
+		return (discoverableTenants != null && !discoverableTenants.isEmpty()) ? (List<String>) discoverableTenants.get("discoverableTenantIds") : null;
 	}
-	
+
 	public static void refreshTenants() {
 		setDiscoverableTenants();
+	}
+
+	public static String getCompetencyNodeURI() {
+		return (getCache(Constants.DNS_ENV) != null && getCache(Constants.API_COMPETENCY_NODE) != null) ? (getByName(Constants.DNS_ENV) + getByName(Constants.API_COMPETENCY_NODE)) : null;
 	}
 	
 }

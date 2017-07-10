@@ -68,7 +68,7 @@ public class ElasticsearchProcessor extends SearchProcessor<SearchData, Object> 
 		String indexType = searchData.getType().toLowerCase();
 		if (indexType.equalsIgnoreCase(TYPE_SCOLLECTION)) {
 			indexType = TYPE_COLLECTION;
-		} else if (indexType.equalsIgnoreCase(KEYWORDCONCEPT)) {
+		} else if (indexType.equalsIgnoreCase(KEYWORD_COMPETENCY)) {
 			indexType = TYPE_TAXONOMY;
 		}
 

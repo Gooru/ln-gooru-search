@@ -142,15 +142,13 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 							range = getTimespentRange(timespent);
 						}
 						List<String> ids = null;
-						if (resourceData != null) {
-							if (resourceData.getTaxonomyLearningTargets() != null && resourceData.getTaxonomyLearningTargets().size() > 0) {
-								ids = conceptSuggestionRepository.getSuggestionByMicroCompetency(resourceData.getTaxonomyLearningTargets(), COLLECTION_STUDY, range,
-										SuggestHandlerType.RESOURCE.name().toLowerCase());
-							}
+						if (resourceData.getTaxonomyLearningTargets() != null && resourceData.getTaxonomyLearningTargets().size() > 0) {
+							ids = conceptSuggestionRepository.getSuggestionByMicroCompetency(resourceData.getTaxonomyLearningTargets(), COLLECTION_STUDY, range,
+									SuggestHandlerType.RESOURCE.name().toLowerCase());
+						}
 
-							if (ids == null && resourceData.getStandards() != null && resourceData.getStandards().size() > 0) {
-								ids = conceptSuggestionRepository.getSuggestionByCompetency(resourceData.getStandards(), COLLECTION_STUDY, range, SuggestHandlerType.RESOURCE.name().toLowerCase());
-							}
+						if (ids == null && resourceData.getStandards() != null && resourceData.getStandards().size() > 0) {
+							ids = conceptSuggestionRepository.getSuggestionByCompetency(resourceData.getStandards(), COLLECTION_STUDY, range, SuggestHandlerType.RESOURCE.name().toLowerCase());
 						}
 						if (ids != null && !ids.isEmpty()) {
 							suggestData.putFilter("&id", StringUtils.join(ids, ","));

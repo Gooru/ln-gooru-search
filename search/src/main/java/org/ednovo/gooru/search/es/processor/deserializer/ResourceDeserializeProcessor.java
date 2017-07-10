@@ -284,12 +284,14 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 		Map<String, Object> taxonomyMap = (Map<String, Object>) dataMap.get(IndexFields.TAXONOMY);
 		if (taxonomyMap != null) {
 			Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
-			if (input.isStandardsSearch() && input.isCrosswalk()) {
-				setCrosswalkData(input, resource, taxonomyMap);
-			} else if (input.getUserTaxonomyPreference() != null) {
-				long start = System.currentTimeMillis();
-				taxonomySetAsMap = transformTaxonomy(taxonomyMap, input);
-				logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
+			if (input.isCrosswalk()) {
+				if (input.isStandardsSearch()) {
+					setCrosswalkData(input, resource, taxonomyMap);
+				} else if (input.getUserTaxonomyPreference() != null) {
+					long start = System.currentTimeMillis();
+					taxonomySetAsMap = transformTaxonomy(taxonomyMap, input);
+					logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
+				}
 			}
 			resource.setTaxonomySet(taxonomySetAsMap);		
 			resource.setTaxonomyDataSet((String) taxonomyMap.get(IndexFields.TAXONOMY_DATA_SET));
@@ -380,14 +382,29 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 		Boolean isCrosswalked = false;
 		List<String> leafInternalCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_INTERNAL_CODES);
 		List<String> leafDisplayCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_DISPLAY_CODES);
-		List<Map<String, Object>> equivalentCompetencies = (List<Map<String, Object>>) taxonomyMap.get(IndexFields.EQUIVALENT_COMPETENCIES);
-
+		List<Map<String, Object>> equivalentCompetencies = new ArrayList<>();
+		fetchCrosswalks(input, leafInternalCodes, equivalentCompetencies);
+	
 		if (!(leafInternalCodes != null && leafInternalCodes.size() > 0 && fltStandard != null && leafInternalCodes.contains(fltStandard.toUpperCase()))
 				&& !(leafDisplayCodes != null && leafDisplayCodes.size() > 0 && fltStandardDisplay != null && leafDisplayCodes.contains(fltStandardDisplay.toUpperCase()))) {
 			isCrosswalked = true;
 		}
 		resource.setIsCrosswalked(isCrosswalked);
-		resource.setTaxonomyEquivalentCompetencies(equivalentCompetencies);
+		if (equivalentCompetencies.size() > 0) resource.setTaxonomyEquivalentCompetencies(equivalentCompetencies);
+	}
+
+	private void fetchCrosswalks(SearchData input, List<String> leafInternalCodes, List<Map<String, Object>> equivalentCompetencies) {
+		List<Map<String, Object>> crosswalkResponses = searchCrosswalk(input, leafInternalCodes);
+		if (crosswalkResponses != null && !crosswalkResponses.isEmpty()) {
+			leafInternalCodes.forEach(leafInternalCode -> {
+				Map<String, Object> crosswalksAsMap = new HashMap<>();
+				crosswalksAsMap.put(IndexFields.ID, leafInternalCode);
+				List<Map<String, String>> crosswalkCodes = null;
+				crosswalkCodes = deserializeCrosswalkResponse(crosswalkResponses, leafInternalCode, crosswalkCodes);
+				crosswalksAsMap.put(IndexFields.CROSSWALK_CODES, crosswalkCodes);
+				if (crosswalkCodes != null && crosswalkCodes.size() > 0) equivalentCompetencies.add(crosswalksAsMap);
+			});
+		}
 	}
 
 	@SuppressWarnings("unchecked")

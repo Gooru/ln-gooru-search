@@ -639,10 +639,17 @@ public interface Constants {
 	public static final String CLIENT_SOURCE = "clientSource";
 	public static final String CAMELCASE_SEARCH = "Search";
 	public static final String FRAMEWORK_CODE = "frameworkCode";
-	public static final String TYPE_CONCEPT_GRAPH = "concept-graph";
-	public static final String KEYWORDCONCEPT = "keywordconcept";
+	public static final String TYPE_COMPETENCY_GRAPH = "competency-graph";
+	public static final String KEYWORD_COMPETENCY = "keywordcompetency";
 	public static final String BELOW_AVERAGE = "below-average";
 	public static final String ABOVE_AVERAGE = "above-average";
 	public static final String AVERAGE = "average";
 
+	public static final String TOKEN = "Token";
+	public static final String GUT_COMPETENCY_ID = "gutCompetencyId";
+	public static final String AUTHORIZATION = "Authorization";
+	public static final String TOKEN_SPACE = "Token ";
+	public static final String API_COMPETENCY_NODE = "api.competency.node";
+	public static final String DNS_ENV = "dns.env";
+	public static final String KEYWORDS = "keywords";
 }

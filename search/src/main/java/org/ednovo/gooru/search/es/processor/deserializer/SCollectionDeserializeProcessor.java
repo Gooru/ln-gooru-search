@@ -287,14 +287,29 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 		Boolean isCrosswalked = false;
 		List<String> leafInternalCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_INTERNAL_CODES);
 		List<String> leafDisplayCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_DISPLAY_CODES);
-		List<Map<String, Object>> equivalentCompetencies = (List<Map<String, Object>>) taxonomyMap.get(IndexFields.EQUIVALENT_COMPETENCIES);
+		List<Map<String, Object>> equivalentCompetencies = new ArrayList<>();
+		fetchCrosswalks(input, leafInternalCodes, equivalentCompetencies);
 
 		if (!(leafInternalCodes != null && leafInternalCodes.size() > 0 && fltStandard != null && leafInternalCodes.contains(fltStandard.toUpperCase()))
 				&& !(leafDisplayCodes != null && leafDisplayCodes.size() > 0 && fltStandardDisplay != null && leafDisplayCodes.contains(fltStandardDisplay.toUpperCase()))) {
 			isCrosswalked = true;
 		}
 		collection.setIsCrosswalked(isCrosswalked);
-		collection.setTaxonomyEquivalentCompetencies(equivalentCompetencies);
+		if (equivalentCompetencies.size() > 0) collection.setTaxonomyEquivalentCompetencies(equivalentCompetencies);
+	}
+	
+	private void fetchCrosswalks(SearchData input, List<String> leafInternalCodes, List<Map<String, Object>> equivalentCompetencies) {
+		List<Map<String, Object>> crosswalkResponses = searchCrosswalk(input, leafInternalCodes);
+		if (crosswalkResponses != null && !crosswalkResponses.isEmpty()) {
+			leafInternalCodes.forEach(leafInternalCode -> {
+				Map<String, Object> crosswalksAsMap = new HashMap<>();
+				crosswalksAsMap.put(IndexFields.ID, leafInternalCode);
+				List<Map<String, String>> crosswalkCodes = null;
+				crosswalkCodes = deserializeCrosswalkResponse(crosswalkResponses, leafInternalCode, crosswalkCodes);
+				crosswalksAsMap.put(IndexFields.CROSSWALK_CODES, crosswalkCodes);
+				if (crosswalkCodes != null && crosswalkCodes.size() > 0) equivalentCompetencies.add(crosswalksAsMap);
+			});
+		}
 	}
 	
 	@Override
