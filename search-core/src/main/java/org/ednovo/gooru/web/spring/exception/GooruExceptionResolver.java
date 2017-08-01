@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException;
 import org.apache.commons.lang.NotImplementedException;
 import org.ednovo.gooru.search.es.constant.Constants;
+import org.ednovo.gooru.search.es.constant.EventConstants;
 import org.ednovo.gooru.search.es.exception.BadRequestException;
 import org.ednovo.gooru.search.es.exception.MethodFailureException;
 import org.ednovo.gooru.search.es.exception.NotAllowedException;
@@ -87,7 +88,7 @@ public class GooruExceptionResolver extends SimpleMappingExceptionResolver {
 			try {
 				inputParams.put("parameters", new JSONObject(map));
 				inputParams.put(Constants.SESSION_TOKEN, request.getHeader(Constants.GOORU_SESSION_TOKEN));
-				inputParams.put(Constants.API_KEY, request.getHeader(Constants.GOORU_API_KEY));
+				inputParams.put(EventConstants.API_KEY, request.getHeader(Constants.GOORU_API_KEY));
 			} catch (JSONException e) {
 			}
 		}

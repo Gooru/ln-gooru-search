@@ -43,7 +43,6 @@ public class ElasticsearchProcessor extends SearchProcessor<SearchData, Object> 
 	@PostConstruct
 	public void onStartUp() {
 		// Configuration
-
 		HttpClientConfig clientConfig = new HttpClientConfig.Builder(Arrays.asList(getSetting(S_ES_POINT).split(","))).multiThreaded(true)
 				.maxTotalConnection(500).defaultMaxTotalConnectionPerRoute(100).readTimeout(30000).build();
 
@@ -70,6 +69,8 @@ public class ElasticsearchProcessor extends SearchProcessor<SearchData, Object> 
 			indexType = TYPE_COLLECTION;
 		} else if (indexType.equalsIgnoreCase(KEYWORD_COMPETENCY)) {
 			indexType = TYPE_TAXONOMY;
+		} else if (indexType.equalsIgnoreCase(AUTOCOMPLETE_KEYWORD)) {
+			indexType = KEYWORD;
 		}
 
 		try {

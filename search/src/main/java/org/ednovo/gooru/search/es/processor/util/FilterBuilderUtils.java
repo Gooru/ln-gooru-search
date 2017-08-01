@@ -21,7 +21,6 @@ import org.ednovo.gooru.search.es.filter.RangeFilter;
 import org.ednovo.gooru.search.es.filter.ShouldQuery;
 import org.ednovo.gooru.search.es.filter.TermFilter;
 import org.ednovo.gooru.search.es.filter.TermsFilter;
-import org.ednovo.gooru.search.es.processor.SearchProcessor;
 import org.ednovo.gooru.search.es.service.SearchSettingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
