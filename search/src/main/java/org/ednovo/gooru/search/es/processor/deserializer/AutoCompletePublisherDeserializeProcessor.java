@@ -11,7 +11,7 @@ import org.ednovo.gooru.search.es.processor.SearchProcessorType;
 import org.springframework.stereotype.Component;
 
 @Component
-public class KeywordAutoCompleteDeserializeProcessor<O extends Map<String, Object>, S extends Map<String, Object>> extends DeserializeProcessor<O, S> {
+public class AutoCompletePublisherDeserializeProcessor<O extends Map<String, Object>, S extends Map<String, Object>> extends DeserializeProcessor<O, S> {
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -25,9 +25,9 @@ public class KeywordAutoCompleteDeserializeProcessor<O extends Map<String, Objec
 				return output;
 			}
 			Map<String, Object> fields = (Map<String, Object>) hit.get(SEARCH_SOURCE);
-			values.add((String) fields.get(KEYWORD));
+			values.add((String) fields.get(PUBLISHER));
 		}
-		output.put(KEYWORDS, values);
+		output.put(PUBLISHERS, values);
 		return output;
 	}
 
@@ -40,7 +40,7 @@ public class KeywordAutoCompleteDeserializeProcessor<O extends Map<String, Objec
 
 	@Override
 	protected SearchProcessorType getType() {
-		return SearchProcessorType.AutoCompleteKeywordDeserializeProcessor;
+		return SearchProcessorType.AutoCompletePublisherDeserializeProcessor;
 	}
 
 }

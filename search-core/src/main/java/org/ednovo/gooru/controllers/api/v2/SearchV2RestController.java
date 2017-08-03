@@ -376,10 +376,10 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		searchData.setSessionToken(sessionToken);
 		searchData.setUserTenantId(((UserGroupSupport) request.getAttribute(TENANT)).getTenantId());
 
-		if (type.equalsIgnoreCase(TYPE_PUBLISHER) || type.equalsIgnoreCase(TYPE_AGGREGATOR)) {
+		if (type.equalsIgnoreCase(TYPE_AGGREGATOR)) {
 			searchData.setType(type);
 			searchData.setQueryString(searchData.getQueryString() + STAR);
-		} else if (type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(KEYWORD)) {
+		} else if (type.equalsIgnoreCase(TYPE_PUBLISHER) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(KEYWORD)) {
 			String expandedQuery = searchData.getQueryString().replace("\"", EMPTY_STRING).replace(" ", "_").replaceAll("([^a-z0-9A-Z_])", "\\\\$1");
 			if (expandedQuery == EMPTY_STRING) {
 				expandedQuery = STAR;
@@ -387,6 +387,9 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			if (type.equalsIgnoreCase(KEYWORD)) {
 				searchData.setQueryString(expandedQuery);
 				type = SearchHandlerType.AUTOCOMPLETE_KEYWORD.name();
+			} else if (type.equalsIgnoreCase(PUBLISHER)) {
+				expandedQuery = expandedQuery.replaceAll(FIND_SPECIAL_CHARACTERS_REGEX, EMPTY_STRING);
+				searchData.setQueryString(expandedQuery);
 			} else if (type.equalsIgnoreCase(SEARCH_QUERY)) {
 				String queryString = "querysuggestion: " + expandedQuery + " OR querysuggestion: " + expandedQuery + STAR;
 				searchData.setQueryString(queryString);

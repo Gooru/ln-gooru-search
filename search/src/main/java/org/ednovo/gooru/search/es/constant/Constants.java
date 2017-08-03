@@ -653,5 +653,7 @@ public interface Constants {
 	public static final String AUTOCOMPLETE_KEYWORD = "autocomplete_keyword";
 	public static final String TEXT = "text";
 	public static final String SEARCH = "search";
+	public static final String PUBLISHERS = "publishers";
+
 
 }
