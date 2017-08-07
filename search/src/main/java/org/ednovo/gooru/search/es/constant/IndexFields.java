@@ -118,6 +118,6 @@ public class IndexFields {
 	public static final Object CONTENT = "content";
 	public static final String GUT_CODE = "gutCode";
 	public static final String CROSSWALK_CODES = "crosswalkCodes";
-	public static final String PUBLISHER_SUGGEST = "publisherSugggest";
+	public static final String PUBLISHER_SUGGEST = "publisherSuggest";
 
 }

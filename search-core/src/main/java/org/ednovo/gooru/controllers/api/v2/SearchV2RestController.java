@@ -108,7 +108,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		JSONObject payloadObject = new JSONObject();
 		JSONObject session = new JSONObject();
 		SessionContextSupport.putLogParameter("eventName", "item.search");
-		payloadObject.put("text", query);
+		payloadObject.put(TEXT, query);
 		long start = System.currentTimeMillis();
 		User apiCaller = (User) request.getAttribute(USER);
 		
@@ -136,8 +136,8 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			session.put(EventConstants.PARTNER_ID, request.getAttribute(EventConstants.PARTNER_ID));
 			session.put(EventConstants.APP_ID, request.getAttribute(EventConstants.APP_ID));
 			session.put(EventConstants.TENANT_ID, userTenantId);
-			session.put(EventConstants.API_KEY, "");
-			session.put(SEARCH_ORGANIZATION_UID, "");
+			session.put(EventConstants.API_KEY, EMPTY_STRING);
+			session.put(SEARCH_ORGANIZATION_UID, EMPTY_STRING);
 		}
 
 		SessionContextSupport.putLogParameter(EventConstants.SESSION, session);
@@ -163,7 +163,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		searchData.setParameters(searchDataMap);
 
 		if (query.contains("!")) {
-			query = query.replace("!", "");
+			query = query.replace("!", EMPTY_STRING);
 		}
 		searchData.setOriginalQuery(query);
 		searchData.setQueryString(query);
@@ -213,11 +213,11 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		} else if (type.equalsIgnoreCase(COLLECTION_QUIZ)) {
 			type = TYPE_LIBRARY;
 		} else if (type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(AUTO_COMPLETE)) {
-			String expandedQuery = searchData.getQueryString().replace("\"", "").replace(" ", "_").replaceAll("([^a-z0-9A-Z_])", "\\\\$1");
-			if (expandedQuery == "") {
-				expandedQuery = "*";
+			String expandedQuery = searchData.getQueryString().replace("\"", EMPTY_STRING).replace(" ", "_").replaceAll("([^a-z0-9A-Z_])", "\\\\$1");
+			if (expandedQuery == EMPTY_STRING) {
+				expandedQuery = STAR;
 			}
-			String queryString = "querysuggestion: " + expandedQuery + " OR querysuggestion: " + expandedQuery + "*";
+			String queryString = "querysuggestion: " + expandedQuery + " OR querysuggestion: " + expandedQuery + STAR;
 			searchData.setQueryString(queryString);
 			if (type.equalsIgnoreCase(AUTO_COMPLETE)) {
 				type = SearchHandlerType.AUTOCOMPLETE.name();

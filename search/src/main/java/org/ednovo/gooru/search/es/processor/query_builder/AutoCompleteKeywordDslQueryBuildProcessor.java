@@ -20,6 +20,7 @@ public class AutoCompleteKeywordDslQueryBuildProcessor extends SearchProcessor<S
 		
 		Map<String, Object> matchQuery = constructMatchQuery(searchData);
 		searchData.getQueryDsl().put(QUERY, matchQuery);
+		searchData.getQueryDsl().put(FROM, searchData.isPaginated() ? searchData.getFrom() * searchData.getSize() : searchData.getFrom()).put(SIZE, searchData.getSize());
 	}
 
 	private Map<String, Object> constructMatchQuery(SearchData searchData) {
