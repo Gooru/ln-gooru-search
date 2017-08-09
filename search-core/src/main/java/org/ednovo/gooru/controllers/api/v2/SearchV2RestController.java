@@ -1,8 +1,10 @@
 package org.ednovo.gooru.controllers.api.v2;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,8 +23,10 @@ import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.model.SessionContextSupport;
 import org.ednovo.gooru.search.es.model.User;
+import org.ednovo.gooru.search.es.model.UserGroupSupport;
 import org.ednovo.gooru.search.es.processor.util.SerializerUtil;
 import org.ednovo.gooru.search.es.service.SearchService;
+import org.ednovo.gooru.search.es.service.SearchSettingService;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +46,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 	
 	@Autowired
 	private SearchService searchService;
-	
+
 	protected static final Logger logger = LoggerFactory.getLogger(SearchV2RestController.class);
 	
 	@RequestMapping(method = RequestMethod.GET, value = { "/index/filters"})
@@ -52,6 +56,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		return toModelAndView(serializeToJson(searchService.getSearchFilters(codeId, type), SEARCH_FORMAT));
 	}
 	  
+	@SuppressWarnings("unchecked")
 	@RequestMapping(method = {RequestMethod.GET}, value = "/{type}")
 	public ModelAndView search(HttpServletRequest request, HttpServletResponse response, 
 			@RequestParam(required = false) String sessionToken,
@@ -71,6 +76,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			@RequestParam(required = false, defaultValue= "false") boolean includeCIMetaData, 
 			@RequestParam(required = false, defaultValue= "false") boolean bsSearch,
 			@RequestParam(required = false, defaultValue= "true") boolean showCanonicalOnly,
+			@RequestParam(required = false, defaultValue= "true") boolean isCrosswalk,
 			@RequestParam(required = false, defaultValue = "false") boolean disableSpellCheck) throws Exception {
 
 		SearchData searchData = new SearchData();
@@ -108,52 +114,45 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		String contentCdnUrl = (String) request.getAttribute(Constants.CONTENT_CDN_URL);
 		searchData.setContentCdnUrl(contentCdnUrl);
 		
+		// Set user permits
+		UserGroupSupport userGroup = (UserGroupSupport) request.getAttribute(Constants.TENANT);
+		List<String> userPermits = new ArrayList<>();
+		String userTenantId = userGroup.getTenantId();
+		searchData.setUserTenantId(userTenantId);
+		userPermits.add(userTenantId);
+		List<String> discoverableTenantIds = SearchSettingService.getDiscoverableTenantIds(Constants.DISCOVERABLE_TENANT_IDS);
+		if (discoverableTenantIds != null && !discoverableTenantIds.isEmpty())
+			userPermits.addAll(discoverableTenantIds);
+		searchData.setUserPermits(userPermits.stream().distinct().collect(Collectors.toList()));
+
 		if (sessionToken == null) {
 			sessionToken = BaseController.getSessionToken(request);
 		}
 
 		if (sessionToken != null) {
 			session.put(SESSION_TOKEN_SEARCH, sessionToken);
-			session.put(Constants.CLIENT_ID, request.getAttribute(Constants.CLIENT_ID));
+			session.put(PARTNER_ID, request.getAttribute(PARTNER_ID));
+			session.put(APP_ID, request.getAttribute(APP_ID));
+			session.put(TENANT_ID, userTenantId);
 			session.put(API_KEY, "");
 			session.put(Constants.SEARCH_ORGANIZATION_UID, "");
-			/*if (userToken != null) {
-				if (userToken.getApplication() != null) {
-					session.put(API_KEY, userToken.getApplication().getKey());
-				}
-
-				if (userToken.getUser() != null && userToken.getUser().getOrganization() != null) {
-					session.put(SEARCH_ORGANIZATION_UID, userToken.getUser().getOrganization().getPartyUid());
-				}
-			}*/
 		}
 
 		SessionContextSupport.putLogParameter(SESSION_SEARCH, session);
-		/*if (!(type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(AUTO_COMPLETE))) {
-			PartyCustomField partyCustomField = partyService.getPartyCustomeField(apiCaller.getPartyUid(), USER_TAXONOMY_ROOT_CODE, null);
-			if (partyCustomField != null) {
-				searchData.setUserTaxonomyPreference(partyCustomField.getOptionalValue());
-			} else {
-				final String taxonomyCodeIds = (partyCustomField != null && partyCustomField.getOptionalValue() != null && partyCustomField.getOptionalValue().length() > 0)
-						? partyCustomField.getOptionalValue()
-						: this.getTaxonomyRespository().getFindTaxonomyList(settingService.getConfigSetting(ConfigGOORU_EXCLUDE_TAXONOMY_PREFERENCE, 0, apiCaller.getOrganization().getPartyUid()));
-				searchData.setUserTaxonomyPreference(taxonomyCodeIds);
-			}
-		}
 
-		Set<UserRoleAssoc> userRoleAssocs = (Set<UserRoleAssoc>) apiCaller.getUserRoleSet();
+		/*Set<UserRoleAssoc> userRoleAssocs = (Set<UserRoleAssoc>) apiCaller.getUserRoleSet();
 		for (UserRoleAssoc set : userRoleAssocs) {
 			if (set.getRole().getName().toString().equalsIgnoreCase(UserRole.UserRoleType.SUPER_ADMIN.getType().toString())) {
 				searchData.skipType(SearchProcessorType.BlackListQueryValidation);
 			}
 		}*/
-
+		searchData.setUserTaxonomyPreference((JSONObject) request.getAttribute(Constants.USER_PREFERENCES));
 		MapWrapper<Object> searchDataMap = new MapWrapper<Object>(request.getParameterMap());
 
 		searchDataMap.put("allowDuplicates", true);
 		searchDataMap.put("includeCollectionItem", includeCollectionItem);
 		searchDataMap.put("includeCIMin", includeCIMetaData);
-		if (searchDataMap.containsKey("flt.standard")) {
+		if (searchDataMap.containsKey("flt.standard") || searchDataMap.containsKey("flt.standardDisplay")) {
 			searchData.setStandardsSearch(true);
 		}
 
@@ -171,11 +170,8 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		searchData.setSessionToken(sessionToken);
 		searchData.setBsSearch(bsSearch);
 		searchData.setShowCanonicalOnly(showCanonicalOnly);
+		searchData.setCrosswalk(isCrosswalk);
 
-		// set protocol supported
-		if (!(type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(AUTO_COMPLETE))) {
-			this.setRequestProtocol(protocolSupported, searchDataMap, request, searchData);
-		}
 		if (facet != null && facet.trim().length() > 0) {
 			searchData.setFacet(facet);
 		}
@@ -230,10 +226,13 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			type = TYPE_QUIZ;
 		} else if(type.equalsIgnoreCase(TYPE_USER)) {
 			throw new SearchException(HttpStatus.NOT_IMPLEMENTED, "Not supported");
+		} else if (type.equalsIgnoreCase(TYPE_COMPETENCY_GRAPH)) {
+			type = KEYWORD_COMPETENCY;
 		}
 
 		searchData.setType(type);
 		searchData.setFrom(startAt);
+		searchData.setPageNum(pageNum);
 		if (type.equalsIgnoreCase(TYPE_SCOLLECTION) && includeCollectionItem) {
 			searchData.setSize(5);
 		} else {
@@ -288,8 +287,8 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			} else if (type.equalsIgnoreCase(SearchHandlerType.MULTI_RESOURCE.name()) && searchDataMap.getString(QUERY_TYPE) != null) {
 				Object serializeResult = searchResponse;
 				if (searchDataMap.getString(SearchInputType.FETCH_HITS_IN_MULTI.getName()).equals(SearchInputType.FETCH_HITS_IN_MULTI.getDefaultValue())) {
-					if (searchResponse.getSearchResults() instanceof List && ((List) searchResponse.getSearchResults()).size() > 0) {
-						serializeResult = ((List) searchResponse.getSearchResults()).get(0);
+					if (searchResponse.getSearchResults() instanceof List && ((List<?>) searchResponse.getSearchResults()).size() > 0) {
+						serializeResult = ((List<?>) searchResponse.getSearchResults()).get(0);
 					} else {
 						serializeResult = null;
 					}
@@ -304,17 +303,14 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 				return toModelAndView(searchResponse.getSearchResults().toString());
 			} else if (type.equalsIgnoreCase(TYPE_ATTRIBUTION) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(TYPE_PUBLISHER) || type.equalsIgnoreCase(TYPE_AGGREGATOR)) {
 				return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
+			} else if (type.equalsIgnoreCase(KEYWORD_COMPETENCY)) {
+				return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
 			}
 			return toModelAndView(serialize(searchResponse, JSON, excludeAttributeArray, true, false));
 		} catch (SearchException searchException) {
 			response.setStatus(searchException.getStatus().value());
 			return toModelAndView(searchException.getMessage());
 		}
-	}
-
-	private ModelAndView searchCourse(){
-		String courseSearchResultJson = "{\"executionTime\":25,\"query\":{\"rewrittenQueryString\":\"\", \"userQueryString\":\"\"},\"searchResults\":[{\"addDate\": \"2015-10-28T04:31:26Z\",\"creator\":{\"firstname\":\"Rangapriya\", \"lastname\":\"Siddurangan\", \"usernameDisplay\":\"RangapriyaSiddu\", \"id\":\"74266efb-74eb-45de-a6a8-4052710af82c\", \"profileImage\":\"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\"},\"description\": \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam fringilla dolor sit amet elit aliquet, pharetra ornare sem commodo\",\"owner\":{\"firstname\":\"Rangapriya\", \"lastname\":\"Siddurangan\", \"usernameDisplay\":\"RangapriyaSiddu\", \"id\":\"74266efb-74eb-45de-a6a8-4052710af82c\", \"profileImage\":\"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\"},\"orginalCreator\":{\"firstname\":\"Rangapriya\", \"lastname\":\"Siddurangan\", \"usernameDisplay\":\"RangapriyaSiddu\", \"id\":\"74266efb-74eb-45de-a6a8-4052710af82c\", \"profileImage\":\"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\"},\"lastModified\": \"2015-10-28T04:31:26Z\",\"lastModifiedBy\": \"74266efb-74eb-45de-a6a8-4052710af82c\",\"license\": {\"name\":\"Creative Commons Attribution 3.0 Unported | Creative Commons Attribution-NonCommercial 3.0 Unported\",\"url\": \"http://creative.common.org\", \"code\": \"CC BY 3.0 | CC BY-NC 3.0\", \"icon\": \"license/CC_BY_NC.png\", \"definition\": \"You are free to:Share — copy and redistribute the material in any medium or format.Adapt — remix, transform, and build upon the material.\"},\"visibleOnProfile\": false,\"publishStatus\": \"unpublished\",\"unitCount\": 3,\"courseRemixCount\": 2,\"thumbnail\": \"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\",\"title\": \"Middle School Life Science\",\"viewCount\": 5, \"subjectBucket\":\"K12.Science\", \"sequence\":1, \"taxonomy\":{\"subject\":[\"science 6\", \"science 7\"]}, \"collaboratorCount\":2},{\"addDate\": \"2015-10-28T04:31:26Z\",\"creator\":{\"firstname\":\"Rangapriya\", \"lastname\":\"Siddurangan\", \"usernameDisplay\":\"RangapriyaSiddu\", \"id\":\"74266efb-74eb-45de-a6a8-4052710af82c\", \"profileImage\":\"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\"},\"description\": \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam fringilla dolor sit amet elit aliquet, pharetra ornare sem commodo\",\"owner\":{\"firstname\":\"Rangapriya\", \"lastname\":\"Siddurangan\", \"usernameDisplay\":\"RangapriyaSiddu\", \"id\":\"74266efb-74eb-45de-a6a8-4052710af82c\", \"profileImage\":\"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\"},\"orginalCreator\":{\"firstname\":\"Rangapriya\", \"lastname\":\"Siddurangan\", \"usernameDisplay\":\"RangapriyaSiddu\", \"id\":\"74266efb-74eb-45de-a6a8-4052710af82c\", \"profileImage\":\"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\"},\"lastModified\": \"2015-10-28T04:31:26Z\",\"lastModifiedBy\": \"74266efb-74eb-45de-a6a8-4052710af82c\",\"license\": {\"name\":\"Creative Commons Attribution 3.0 Unported | Creative Commons Attribution-NonCommercial 3.0 Unported\",\"url\": \"http://creative.common.org\", \"code\": \"CC BY 3.0 | CC BY-NC 3.0\", \"icon\": \"license/CC_BY_NC.png\", \"definition\": \"You are free to:Share — copy and redistribute the material in any medium or format.Adapt — remix, transform, and build upon the material.\"},\"visibleOnProfile\": false,\"publishStatus\": \"unpublished\",\"unitCount\": 3,\"courseRemixCount\": 2,\"thumbnail\": \"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\",\"title\": \"Middle School Life Science\",\"viewCount\": 5, \"subjectBucket\":\"K12.Science\", \"sequence\":2, \"taxonomy\":{\"subject\":[\"science 6\", \"science 7\"]}, \"collaboratorCount\":2},{\"addDate\": \"2015-10-28T04:31:26Z\",\"creator\":{\"firstname\":\"Rangapriya\", \"lastname\":\"Siddurangan\", \"usernameDisplay\":\"RangapriyaSiddu\", \"id\":\"74266efb-74eb-45de-a6a8-4052710af82c\", \"profileImage\":\"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\"},\"description\": \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam fringilla dolor sit amet elit aliquet, pharetra ornare sem commodo\",\"owner\":{\"firstname\":\"Rangapriya\", \"lastname\":\"Siddurangan\", \"usernameDisplay\":\"RangapriyaSiddu\", \"id\":\"74266efb-74eb-45de-a6a8-4052710af82c\", \"profileImage\":\"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\"},\"orginalCreator\":{\"firstname\":\"Rangapriya\", \"lastname\":\"Siddurangan\", \"usernameDisplay\":\"RangapriyaSiddu\", \"id\":\"74266efb-74eb-45de-a6a8-4052710af82c\", \"profileImage\":\"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\"},\"lastModified\": \"2015-10-28T04:31:26Z\",\"lastModifiedBy\": \"74266efb-74eb-45de-a6a8-4052710af82c\",\"license\": {\"name\":\"Creative Commons Attribution 3.0 Unported | Creative Commons Attribution-NonCommercial 3.0 Unported\",\"url\": \"http://creative.common.org\", \"code\": \"CC BY 3.0 | CC BY-NC 3.0\", \"icon\": \"license/CC_BY_NC.png\", \"definition\": \"You are free to:Share — copy and redistribute the material in any medium or format.Adapt — remix, transform, and build upon the material.\"},\"visibleOnProfile\": false,\"publishStatus\": \"unpublished\",\"unitCount\": 3,\"courseRemixCount\": 2,\"thumbnail\": \"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\",\"title\": \"Middle School Life Science\",\"viewCount\": 5, \"subjectBucket\":\"K12.Science\", \"sequence\":3, \"taxonomy\":{\"subject\":[\"science 6\", \"science 7\"]}, \"collaboratorCount\":2},{\"addDate\": \"2015-10-28T04:31:26Z\",\"creator\":{\"firstname\":\"Rangapriya\", \"lastname\":\"Siddurangan\", \"usernameDisplay\":\"RangapriyaSiddu\", \"id\":\"74266efb-74eb-45de-a6a8-4052710af82c\", \"profileImage\":\"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\"},\"description\": \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam fringilla dolor sit amet elit aliquet, pharetra ornare sem commodo\",\"owner\":{\"firstname\":\"Rangapriya\", \"lastname\":\"Siddurangan\", \"usernameDisplay\":\"RangapriyaSiddu\", \"id\":\"74266efb-74eb-45de-a6a8-4052710af82c\", \"profileImage\":\"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\"},\"orginalCreator\":{\"firstname\":\"Rangapriya\", \"lastname\":\"Siddurangan\", \"usernameDisplay\":\"RangapriyaSiddu\", \"id\":\"74266efb-74eb-45de-a6a8-4052710af82c\", \"profileImage\":\"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\"},\"lastModified\": \"2015-10-28T04:31:26Z\",\"lastModifiedBy\": \"74266efb-74eb-45de-a6a8-4052710af82c\",\"license\": {\"name\":\"Creative Commons Attribution 3.0 Unported | Creative Commons Attribution-NonCommercial 3.0 Unported\",\"url\": \"http://creative.common.org\", \"code\": \"CC BY 3.0 | CC BY-NC 3.0\", \"icon\": \"license/CC_BY_NC.png\", \"definition\": \"You are free to:Share — copy and redistribute the material in any medium or format.Adapt — remix, transform, and build upon the material.\"},\"visibleOnProfile\": false,\"publishStatus\": \"unpublished\",\"unitCount\": 3,\"courseRemixCount\": 2,\"thumbnail\": \"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\",\"title\": \"Middle School Life Science\",\"viewCount\": 5, \"subjectBucket\":\"K12.Math\", \"sequence\":1, \"taxonomy\":{\"subject\":[\"science 6\", \"science 7\"]}, \"collaboratorCount\":2},{\"addDate\": \"2015-10-28T04:31:26Z\",\"creator\":{\"firstname\":\"Rangapriya\", \"lastname\":\"Siddurangan\", \"usernameDisplay\":\"RangapriyaSiddu\", \"id\":\"74266efb-74eb-45de-a6a8-4052710af82c\", \"profileImage\":\"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\"},\"description\": \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam fringilla dolor sit amet elit aliquet, pharetra ornare sem commodo\",\"owner\":{\"firstname\":\"Rangapriya\", \"lastname\":\"Siddurangan\", \"usernameDisplay\":\"RangapriyaSiddu\", \"id\":\"74266efb-74eb-45de-a6a8-4052710af82c\", \"profileImage\":\"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\"},\"orginalCreator\":{\"firstname\":\"Rangapriya\", \"lastname\":\"Siddurangan\", \"usernameDisplay\":\"RangapriyaSiddu\", \"id\":\"74266efb-74eb-45de-a6a8-4052710af82c\", \"profileImage\":\"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\"},\"lastModified\": \"2015-10-28T04:31:26Z\",\"lastModifiedBy\": \"74266efb-74eb-45de-a6a8-4052710af82c\",\"license\": {\"name\":\"Creative Commons Attribution 3.0 Unported | Creative Commons Attribution-NonCommercial 3.0 Unported\",\"url\": \"http://creative.common.org\", \"code\": \"CC BY 3.0 | CC BY-NC 3.0\", \"icon\": \"license/CC_BY_NC.png\", \"definition\": \"You are free to:Share — copy and redistribute the material in any medium or format.Adapt — remix, transform, and build upon the material.\"},\"visibleOnProfile\": false,\"publishStatus\": \"unpublished\",\"unitCount\": 3,\"courseRemixCount\": 2,\"thumbnail\": \"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\",\"title\": \"Middle School Life Science\",\"viewCount\": 5, \"subjectBucket\":\"K12.Math\", \"sequence\":2, \"taxonomy\":{\"subject\":[\"science 6\", \"science 7\"]}, \"collaboratorCount\":2},{\"addDate\": \"2015-10-28T04:31:26Z\",\"creator\":{\"firstname\":\"Rangapriya\", \"lastname\":\"Siddurangan\", \"usernameDisplay\":\"RangapriyaSiddu\", \"id\":\"74266efb-74eb-45de-a6a8-4052710af82c\", \"profileImage\":\"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\"},\"description\": \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam fringilla dolor sit amet elit aliquet, pharetra ornare sem commodo\",\"owner\":{\"firstname\":\"Rangapriya\", \"lastname\":\"Siddurangan\", \"usernameDisplay\":\"RangapriyaSiddu\", \"id\":\"74266efb-74eb-45de-a6a8-4052710af82c\", \"profileImage\":\"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\"},\"orginalCreator\":{\"firstname\":\"Rangapriya\", \"lastname\":\"Siddurangan\", \"usernameDisplay\":\"RangapriyaSiddu\", \"id\":\"74266efb-74eb-45de-a6a8-4052710af82c\", \"profileImage\":\"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\"},\"lastModified\": \"2015-10-28T04:31:26Z\",\"lastModifiedBy\": \"74266efb-74eb-45de-a6a8-4052710af82c\",\"license\": {\"name\":\"Creative Commons Attribution 3.0 Unported | Creative Commons Attribution-NonCommercial 3.0 Unported\",\"url\": \"http://creative.common.org\", \"code\": \"CC BY 3.0 | CC BY-NC 3.0\", \"icon\": \"license/CC_BY_NC.png\", \"definition\": \"You are free to:Share — copy and redistribute the material in any medium or format.Adapt — remix, transform, and build upon the material.\"},\"visibleOnProfile\": false,\"publishStatus\": \"unpublished\",\"unitCount\": 3,\"courseRemixCount\": 2,\"thumbnail\": \"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\",\"title\": \"Middle School Life Science\",\"viewCount\": 5, \"subjectBucket\":\"K12.English Language Arts\", \"sequence\":1, \"taxonomy\":{\"subject\":[\"science 6\", \"science 7\"]}, \"collaboratorCount\":2},{\"addDate\": \"2015-10-28T04:31:26Z\",\"creator\":{\"firstname\":\"Rangapriya\", \"lastname\":\"Siddurangan\", \"usernameDisplay\":\"RangapriyaSiddu\", \"id\":\"74266efb-74eb-45de-a6a8-4052710af82c\", \"profileImage\":\"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\"},\"description\": \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam fringilla dolor sit amet elit aliquet, pharetra ornare sem commodo\",\"owner\":{\"firstname\":\"Rangapriya\", \"lastname\":\"Siddurangan\", \"usernameDisplay\":\"RangapriyaSiddu\", \"id\":\"74266efb-74eb-45de-a6a8-4052710af82c\", \"profileImage\":\"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\"},\"orginalCreator\":{\"firstname\":\"Rangapriya\", \"lastname\":\"Siddurangan\", \"usernameDisplay\":\"RangapriyaSiddu\", \"id\":\"74266efb-74eb-45de-a6a8-4052710af82c\", \"profileImage\":\"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\"},\"lastModified\": \"2015-10-28T04:31:26Z\",\"lastModifiedBy\": \"74266efb-74eb-45de-a6a8-4052710af82c\",\"license\": {\"name\":\"Creative Commons Attribution 3.0 Unported | Creative Commons Attribution-NonCommercial 3.0 Unported\",\"url\": \"http://creative.common.org\", \"code\": \"CC BY 3.0 | CC BY-NC 3.0\", \"icon\": \"license/CC_BY_NC.png\", \"definition\": \"You are free to:Share — copy and redistribute the material in any medium or format.Adapt — remix, transform, and build upon the material.\"},\"visibleOnProfile\": false,\"publishStatus\": \"unpublished\",\"unitCount\": 3,\"courseRemixCount\": 2,\"thumbnail\": \"2e24a72a-573d-408f-a49d-d5ad846ea7f9.png\",\"title\": \"Middle School Life Science\",\"viewCount\": 5, \"subjectBucket\":\"K12.English Language Arts\", \"sequence\":2, \"taxonomy\":{\"subject\":[\"science 6\", \"science 7\"]}, \"collaboratorCount\":2}],\"stats\":{\"pageSize\":5,\"totalHitCount\":20, \"pageNumber\":1}}";
-		return toModelAndView(courseSearchResultJson);
 	}
  
 	private String checkQueryValidity(String query, Map<String, Object> parameterMap) {
@@ -338,66 +334,10 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		return query;
 	}
 	
-	private void setRequestProtocol(String protocolSupported, MapWrapper<Object> searchDataMap, HttpServletRequest request, SearchData searchData ){
-/*
-		if(protocolSupported != null && protocolSupported.trim().length() > 0){
-			searchDataMap.put("protocolSupported", protocolSupported);
-			if(protocolSupported.equalsIgnoreCase("https,http") || protocolSupported.equalsIgnoreCase("http,https") ){
-				boolean isSecure = request.isSecure();
-				if(!isSecure){
-					String requestProtocol = request.getHeader(X_FORWARDED_PROTO);
-					if(requestProtocol != null && requestProtocol.equalsIgnoreCase(HTTPS_PROTOCOL_TYPE)){
-						isSecure = true;
-					}
-				}
-				if(isSecure){
-					request.setAttribute(REQUEST_PROTOCOL, HTTPS_PROTOCOL_TYPE);
-				} else {
-					request.setAttribute(REQUEST_PROTOCOL, HTTP_PROTOCOL_TYPE);
-				}
-			} else if(protocolSupported.equalsIgnoreCase("https")){
-				request.setAttribute(REQUEST_PROTOCOL, HTTPS_PROTOCOL_TYPE);
-			}else {
-				request.setAttribute(REQUEST_PROTOCOL, HTTP_PROTOCOL_TYPE);
-			}
-		} else {
-			if(searchData.getSessionToken() != null){
-				
-				boolean isSecure = request.isSecure();
-				if(!isSecure){
-					String requestProtocol = request.getHeader(X_FORWARDED_PROTO);
-					if(requestProtocol != null && requestProtocol.equalsIgnoreCase(HTTPS_PROTOCOL_TYPE)){
-						isSecure = true;
-					}
-				}
-				
-				UserToken userToken = userTokenService.findByToken(searchData.getSessionToken());
-				if(userToken != null && userToken.getApplication() != null  && API_KEYS.contains(userToken.getApplication().getKey())){
-					if(isSecure){
-						searchData.setProtocolType(HTTPS_PROTOCOL_TYPE);
-					}else{
-						searchData.setProtocolType(HTTP_PROTOCOL_TYPE);
-					}
-					logger.info("request protocol type from  gooru : " + searchData.getProtocolType());
-				} else if(request.getHeader(SEARCH_REFERER) != null){
-					String referrer  = request.getHeader(SEARCH_REFERER);
-					if(referrer.startsWith(HTTPS_PROTOCOL_TYPE)){
-						searchData.setProtocolType(HTTPS_PROTOCOL_TYPE);
-					} else {
-						searchData.setProtocolType(HTTP_PROTOCOL_TYPE);
-					}
-					logger.info("request protocol type from  partner : " + searchData.getProtocolType());
-				} else {
-					if(isSecure){
-						searchData.setProtocolType(HTTPS_PROTOCOL_TYPE);
-					}else{
-						searchData.setProtocolType(HTTP_PROTOCOL_TYPE);
-					}
-					logger.info("request protocol type : " + searchData.getProtocolType());
-				}
-				request.setAttribute(REQUEST_PROTOCOL, searchData.getProtocolType());
-			}
-		}*/
+	@RequestMapping(method = RequestMethod.PUT, value = { "/refresh/tenants"})
+	public void refreshGlobalTenantsInCache(HttpServletRequest request,@RequestParam(required = false) String sessionToken, HttpServletResponse response,
+			final ModelMap model) throws Exception {
+		searchService.refreshGlobalTenantsInCache();
 	}
-		
+	
 }

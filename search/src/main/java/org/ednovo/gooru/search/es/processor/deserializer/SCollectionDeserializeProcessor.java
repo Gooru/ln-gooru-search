@@ -32,6 +32,7 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 	public static final String SHARING_PUBLIC = "public";
 	public static final String SHARING_PRIVATE = "private";
 
+	@SuppressWarnings("unchecked")
 	@Override
 	List<CollectionSearchResult> deserialize(Map<String, Object> model, SearchData searchData, List<CollectionSearchResult> output) {
 		Map<String, Object> hitsMap = (Map<String, Object>) model.get(SEARCH_HITS);
@@ -51,12 +52,11 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 		return output;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	CollectionSearchResult collect(Map<String, Object> model, SearchData searchData, CollectionSearchResult searchResult) {
 		CollectionSearchResult output = new CollectionSearchResult();
 		Integer questionCount = 0;
-		Integer itemCount = (Integer) model.get(IndexFields.CONTENT_COUNT);
-		output.setCollectionItemCount(itemCount != null ? itemCount : 0);
 		output.setCollectionType((String) model.get(IndexFields.CONTENT_FORMAT));
 		output.setNarrationLink(null);
 		output.setNotes(null);
@@ -66,66 +66,6 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 			output.setThumbnail((String) model.get(IndexFields.THUMBNAIL));
 		}
 
-		/*		List<ContentSearchResult> collectionItems = new ArrayList<ContentSearchResult>();
-		int flag = 0;
-		List<Map<String, Object>> collectionItemList = (List<Map<String, Object>>) model.get(IndexFields.COLLECTION_CONTENTS);
-		if (collectionItemList != null) {
-			if (searchData.getParameters().containsKey("includeCIMetaData") && searchData.getParameters().getBoolean("includeCIMetaData")) {
-				for (Map<String, Object> item : collectionItemList) {
-					if (flag <= 3) {
-						ContentSearchResult resource = new ContentSearchResult();
-						resource.setGooruOid((String) item.get(IndexFields.ID));
-						resource.setThumbnail((String) item.get(IndexFields.THUMBNAIL));
-						resource.setTitle((String) item.get(IndexFields.TITLE));
-						resource.setDescription((String) item.get(IndexFields.DESCRIPTION));
-						resource.setCategory(null);
-						String resourceType = (String) item.get(IndexFields.CONTENT_SUB_FORMAT);
-						if (resourceType != null) {
-							Map<String, String> resourceTypeValueAsMap = new HashMap<>(1);
-							resourceTypeValueAsMap.put(SEARCH_NAME, resourceType);
-							resource.setResourceType(resourceTypeValueAsMap);
-						}
-						String resourceFormat = (String) item.get(IndexFields.CONTENT_FORMAT);
-						if (resourceFormat != null) {
-							Map<String, String> resourceFormatValueAsMap = new HashMap<>(1);
-							resourceFormatValueAsMap.put(VALUE, resourceFormat);
-							resource.setResourceFormat(resourceFormatValueAsMap);
-						}
-						resource.setUrl((String) item.get(IndexFields.URL));
-						collectionItems.add(resource);
-						flag = flag + 1;
-					}
-				}
-				output.setCollectionItems(collectionItems);
-			} else {
-				for (Map<String, Object> item : collectionItemList) {
-					ContentSearchResult resource = new ContentSearchResult();
-					resource.setContentId(0L);
-					resource.setCategory(null);
-					resource.setGooruOid((String) item.get(IndexFields.ID));
-					resource.setDescription((String) item.get(IndexFields.DESCRIPTION));
-					resource.setUrl((String) item.get(IndexFields.URL));
-					resource.setThumbnail((String) item.get(IndexFields.THUMBNAIL));
-					resource.setTitle((String) item.get(IndexFields.TITLE));
-					String resourceType = (String) item.get(IndexFields.CONTENT_SUB_FORMAT);
-					if (resourceType != null) {
-						Map<String, String> resourceTypeValueAsMap = new HashMap<>(1);
-						resourceTypeValueAsMap.put(SEARCH_NAME, resourceType);
-						resource.setResourceType(resourceTypeValueAsMap);
-					}
-					String resourceFormat = (String) item.get(IndexFields.CONTENT_FORMAT);
-					if (resourceFormat != null) {
-						Map<String, String> resourceFormatValueAsMap = new HashMap<>(1);
-						resourceFormatValueAsMap.put(VALUE, resourceFormat);
-						resource.setResourceFormat(resourceFormatValueAsMap);
-					}
-					collectionItems.add(resource);
-				}
-			}
-			output.setCollectionItems(collectionItems);
-		}
-*/		
-		output.setNumberOfResources(itemCount);
 		if (model.get(IndexFields.METADATA) != null) {
 			Map<String, List<String>> metadata = (Map<String, List<String>>) model.get(IndexFields.METADATA);
 
@@ -253,6 +193,12 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 			Integer resourceCount = (Integer) statisticsMap.get(IndexFields.RESOURCE_COUNT);
 			output.setResourceCount(String.valueOf(resourceCount != null ? resourceCount : 0));
 		}
+		output.setRemixedInCourseCount(statisticsMap.get(IndexFields.REMIXED_IN_COURSE_COUNT) != null ? ((Number) statisticsMap.get(IndexFields.REMIXED_IN_COURSE_COUNT)).longValue() : 0L);
+		output.setUsedByStudentCount(statisticsMap.get(IndexFields.USED_BY_STUDENT_COUNT) != null ? ((Number) statisticsMap.get(IndexFields.USED_BY_STUDENT_COUNT)).longValue() : 0L);
+        
+		Integer itemCount = (Integer) statisticsMap.get(IndexFields.CONTENT_COUNT);
+		output.setCollectionItemCount(itemCount != null ? itemCount : 0);
+		output.setNumberOfResources(itemCount);
 
 		String type = (String) model.get(IndexFields.CONTENT_FORMAT);
 		output.setType(type);
@@ -314,9 +260,17 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 			taxonomyMap = (Map<String, Object>) model.get(IndexFields.TAXONOMY);
 		}
 		if (taxonomyMap != null) {
+			Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
+			if (searchData.isStandardsSearch() && searchData.isCrosswalk()) {
+				setCrosswalkData(searchData, output, taxonomyMap);
+			} else if (searchData.getUserTaxonomyPreference() != null) {
+				long start = System.currentTimeMillis();
+				taxonomySetAsMap = transformTaxonomy(taxonomyMap, searchData);
+				logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
+			}
+			output.setTaxonomySet(taxonomySetAsMap);		
 			output.setTaxonomyDataSet((String) taxonomyMap.get(IndexFields.TAXONOMY_DATA_SET));
-			output.setTaxonomySet((Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET));
-			output.setTaxonomySkills((String) taxonomyMap.get(IndexFields.SKILLS));
+		
 			List<Code> taxonomySubject = (List<Code>) taxonomyMap.get(IndexFields.SUBJECT);
 			output.setSubject(getTaxonomyMetadataLabel(taxonomySubject));
 		}
@@ -324,8 +278,43 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 		return output;
 	}
 
+	@SuppressWarnings("unchecked")
+	private void setCrosswalkData(SearchData input, CollectionSearchResult collection, Map<String, Object> taxonomyMap) {
+		String fltStandard = null;
+		String fltStandardDisplay = null;
+		if(input.getFilters().containsKey(AMPERSAND_EQ_INTERNAL_CODE)) fltStandard = input.getFilters().get(AMPERSAND_EQ_INTERNAL_CODE).toString();
+		if(input.getFilters().containsKey(AMPERSAND_EQ_DISPLAY_CODE)) fltStandardDisplay = input.getFilters().get(AMPERSAND_EQ_DISPLAY_CODE).toString();
+		Boolean isCrosswalked = false;
+		List<String> leafInternalCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_INTERNAL_CODES);
+		List<String> leafDisplayCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_DISPLAY_CODES);
+		List<Map<String, Object>> equivalentCompetencies = new ArrayList<>();
+		fetchCrosswalks(input, leafInternalCodes, equivalentCompetencies);
+
+		if (!(leafInternalCodes != null && leafInternalCodes.size() > 0 && fltStandard != null && leafInternalCodes.contains(fltStandard.toUpperCase()))
+				&& !(leafDisplayCodes != null && leafDisplayCodes.size() > 0 && fltStandardDisplay != null && leafDisplayCodes.contains(fltStandardDisplay.toUpperCase()))) {
+			isCrosswalked = true;
+		}
+		collection.setIsCrosswalked(isCrosswalked);
+		if (equivalentCompetencies.size() > 0) collection.setTaxonomyEquivalentCompetencies(equivalentCompetencies);
+	}
+	
+	private void fetchCrosswalks(SearchData input, List<String> leafInternalCodes, List<Map<String, Object>> equivalentCompetencies) {
+		List<Map<String, Object>> crosswalkResponses = searchCrosswalk(input, leafInternalCodes);
+		if (crosswalkResponses != null && !crosswalkResponses.isEmpty()) {
+			leafInternalCodes.forEach(leafInternalCode -> {
+				Map<String, Object> crosswalksAsMap = new HashMap<>();
+				crosswalksAsMap.put(IndexFields.ID, leafInternalCode);
+				List<Map<String, String>> crosswalkCodes = null;
+				crosswalkCodes = deserializeCrosswalkResponse(crosswalkResponses, leafInternalCode, crosswalkCodes);
+				crosswalksAsMap.put(IndexFields.CROSSWALK_CODES, crosswalkCodes);
+				if (crosswalkCodes != null && crosswalkCodes.size() > 0) equivalentCompetencies.add(crosswalksAsMap);
+			});
+		}
+	}
+	
 	@Override
 	protected SearchProcessorType getType() {
 		return SearchProcessorType.SCollectionDeserializer;
 	}
+	
 }

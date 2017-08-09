@@ -3,6 +3,7 @@
  */
 package org.ednovo.gooru.search.es.processor.filter.constructor;
 
+import org.ednovo.gooru.search.es.model.CollectionSubFormat;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
@@ -19,14 +20,7 @@ public class SCollectionFilterConstructionProcessor extends ContentFilterConstru
 	public void process(SearchData searchData,
 			SearchResponse<Object> response) {
 		super.process(searchData, response);
-		
-/*		// Include unpublished content in search results or not  
-		
-		String includeUnPublished = SearchSettingService.getByName(SearchSettingConstants.INCLUDE_UNPUBLISHED_COLLECTION);
-		if(includeUnPublished != null && includeUnPublished.equalsIgnoreCase("false")){
-			searchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.PUBLISH_STATUS, PublishedStatus.PUBLISHED.name());
-		}
-*/
+		searchData.putFilter(NOT_SYMBOL + CARET_SYMBOL + CONTENT_SUB_FORMAT, CollectionSubFormat.BENCHMARK.name());
 	}
 
 	@Override

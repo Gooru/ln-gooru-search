@@ -63,7 +63,7 @@ public class BaseController extends SerializerUtil  implements Constants  {
 			sessionToken = Constants.SESSION_TOKEN_20;
 		}
 		if (headerSessionToken != null) {
-			sessionToken = headerSessionToken.substring(6);
+			sessionToken = headerSessionToken.substring(TOKEN.length()).trim();
 		}
 		if (sessionToken == null || (StringUtils.trimToNull(sessionToken)) == null || sessionToken.equalsIgnoreCase("null")) {
 			sessionToken = request.getParameter(SESSION_TOKEN);

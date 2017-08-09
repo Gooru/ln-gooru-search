@@ -37,6 +37,7 @@ public final class ProcessorChain<I extends SearchData, O extends Object> {
 		threadPoolLength *= 3;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void executeProcessorChain(final I searchData, final SearchResponse<O> response, final TransactionTemplate transactionTemplate) {
 
 		final GooruAuthenticationToken authentication = (GooruAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
@@ -64,7 +65,7 @@ public final class ProcessorChain<I extends SearchData, O extends Object> {
 						public SearchResponse<Object> call() throws Exception {
 							try {
 								if (!searchData.isSkipType(processorType)) {
-									final SearchProcessor processsor = SearchProcessor.get(processorType);
+									final SearchProcessor<SearchData, Object> processsor = SearchProcessor.get(processorType);
 									if (authentication != null) {
 										SecurityContextHolder.getContext().setAuthentication(authentication);
 									}
@@ -89,9 +90,7 @@ public final class ProcessorChain<I extends SearchData, O extends Object> {
 					try {
 						doerService.invokeAll(tasks, 60L, TimeUnit.SECONDS);
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
-
 					}
 				}
 			    /* doerService.shutdown();

@@ -13,7 +13,9 @@ import java.util.Properties;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.SearchSettingType;
+import org.ednovo.gooru.search.es.repository.TenantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -41,18 +43,23 @@ public final class SearchSettingService {
 	private static String cachedVersion = "";
 
 	private static String profileName = "default";
-		
-  @Autowired
-  @Resource(name = "configSettings")
-  private Properties searchSettings;
-  
-  protected Properties getSearchSettings() {
-    return this.searchSettings;
-  }
+
+	private static Map<String, Object> discoverableTenants = new HashMap<String, Object>(); 
+			
+	@Autowired
+	@Resource(name = "configSettings")
+	private Properties searchSettings;
+
+	protected Properties getSearchSettings() {
+		return this.searchSettings;
+	}
     
+	@Autowired
+	private TenantRepository tenantRepository;
+
 	public SearchSettingService() {
-		if(instance == null)
-		instance = this;
+		if (instance == null)
+			instance = this;
 	}
 
 	@PostConstruct
@@ -63,9 +70,9 @@ public final class SearchSettingService {
 	private static String getProfileName() {
 		return profileName;
 	}
-	
+
 	private static String getSearchSetting(String key) {
-		if(cache.containsKey(key + getProfileName())) {
+		if (cache.containsKey(key + getProfileName())) {
 			return cache.get(key + getProfileName()).toString();
 		} else {
 			return null;
@@ -99,50 +106,14 @@ public final class SearchSettingService {
 			for (String key : settingsMapKeys) {
 				initMapFilters(key);
 			}
-
+			setDiscoverableTenants();
 		}
 	}
 
-
-	/**
-	 * Copy all the search settings from sourceProfile to destProfile
-	 * 
-	 * @param sourceProfile
-	 *            - the profile from which search settings need to be copied.
-	 * @param destProfile
-	 *            - the profile to which the search settings need to be copied.
-	 * @param rewrite
-	 *            true - to override all settings in destProfile.
-	 */
-	//Disabled while removing cassandra dependency
-/*	public void copyProfile(String sourceProfile, String destProfile, boolean rewrite) {
-		Rows<String, String> rows = instance.searchSettingCassandraService.getAll();
-		if (!rewrite) {
-			for (Row<String, String> row : rows) {
-				String sourceValue = null;
-				boolean write = true;
-				for (Column<String> column : row.getColumns()) {
-					if (column.getName().equals(sourceProfile) && column.hasValue()) {
-						sourceValue = column.getStringValue();
-					} else if (column.getName().equals(destProfile) && column.hasValue()) {
-						write = false;
-					}
-				}
-				if (!write || sourceValue == null) {
-					continue;
-				}
-				instance.searchSettingCassandraService.save(row.getKey(), destProfile, sourceValue);
-			}
-		} else {
-			for (Row<String, String> row : rows) {
-				for (Column<String> column : row.getColumns()) {
-					if (column.getName().equals(sourceProfile) && column.hasValue()) {
-						instance.searchSettingCassandraService.save(row.getKey(), destProfile, column.getStringValue());
-					}
-				}
-			}
-		}
-	}*/
+	private static void setDiscoverableTenants() {
+		discoverableTenants = instance.tenantRepository.getAllDiscoverableTenants();
+		cache.put("discoverableTenantIds" + getProfileName(), ((discoverableTenants != null && !discoverableTenants.isEmpty()) ? discoverableTenants.get("discoverableTenantIds") : null));
+	}
 
 	private static void initListFilters(String key) {
 		String settingData = getSearchSetting(key);
@@ -169,11 +140,13 @@ public final class SearchSettingService {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	protected static List<String> getCacheList(String key) {
 		Object result = cache.get(key + getProfileName());
 		return result instanceof List ? (List<String>) result : null;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected static Map<String, String> getCacheMap(String key) {
 		Object result = cache.get(key + getProfileName());
 		return result instanceof Map ? (Map<String, String>) result : null;
@@ -252,6 +225,24 @@ public final class SearchSettingService {
 	
 	public static boolean isLowercaseForIndex(String name) {
 		return getCacheList(settingsListKeys[10]) != null ? getCacheList(settingsListKeys[10]).contains(name) : false;
+	}
+	
+	public static List<String> getDiscoverableTenantIds(String name) {
+		return getCacheList(name);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static List<String> getDiscoverableTenants() {
+		Map<String, Object> discoverableTenants = instance.tenantRepository.getAllDiscoverableTenants();
+		return (discoverableTenants != null && !discoverableTenants.isEmpty()) ? (List<String>) discoverableTenants.get("discoverableTenantIds") : null;
+	}
+
+	public static void refreshTenants() {
+		setDiscoverableTenants();
+	}
+
+	public static String getCompetencyNodeURI() {
+		return (getCache(Constants.DNS_ENV) != null && getCache(Constants.API_COMPETENCY_NODE) != null) ? (getByName(Constants.DNS_ENV) + getByName(Constants.API_COMPETENCY_NODE)) : null;
 	}
 	
 }

@@ -12,5 +12,7 @@ package org.ednovo.gooru.search.es.service;
 public interface SearchService {
 	
 	SearchFilters getSearchFilters(Integer codeId, String type);
+
+	void refreshGlobalTenantsInCache();
 		
 }

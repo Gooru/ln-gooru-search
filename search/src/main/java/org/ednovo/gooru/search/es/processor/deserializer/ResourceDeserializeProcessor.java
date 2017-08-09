@@ -37,6 +37,7 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 	protected static final String UN_RESTRICTED_SEARCH = "unrestrictedSearch";
 	protected static final String ALLOW_DUPLICATES = "allowDuplicates";
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<ContentSearchResult> deserialize(Map<String, Object> model, SearchData searchData, List<ContentSearchResult> output) {
 		output = new ArrayList<ContentSearchResult>();
@@ -121,6 +122,7 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 		return deserializeToResource(model, input);
 	}
 
+	@SuppressWarnings("unchecked")
 	private ContentSearchResult deserializeToResource(Map<String, Object> dataMap, SearchData input) {
 		String contentFormat = (String) dataMap.get(IndexFields.CONTENT_FORMAT);
 		String contentSubFormat = (String) dataMap.get(IndexFields.CONTENT_SUB_FORMAT);
@@ -189,6 +191,12 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 					}
 				}
 				
+				// 21st century skill
+				List<String> twentyOneCenturySkills = metadata.get(IndexFields.TWENTY_ONE_CENTURY_SKILL);
+				if (twentyOneCenturySkills != null && !twentyOneCenturySkills.isEmpty()) {
+					resource.setTwentyOneCenturySkills(twentyOneCenturySkills);
+				}
+
 				List<String> grade = metadata.get(IndexFields.GRADE);
 				if(grade != null && grade.size() > 0){
 					resource.setGrade(String.join(SEARCH_COMMA_SEPERTOR, grade));
@@ -244,8 +252,6 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 			LOG.debug("Error while parsing date", (String) dataMap.get(IndexFields.CREATED_AT));
 		}
 
-		// resource.setMediaType((String) dataMap.get(SEARCH_MEDIA_TYPE));
-
 		Map<String, Object> statisticsMap = (Map<String, Object>) dataMap.get(IndexFields.STATISTICS);
 		boolean hasFrameBreaker = false;
 		if (statisticsMap != null) {
@@ -270,19 +276,32 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 			if (statisticsMap.get(IndexFields.COLLABORATOR_COUNT) != null) {
 				resource.setCollaboratorCount(0);
 			}
+			resource.setRemixedInCollectionCount((statisticsMap.get(IndexFields.COLLECTION_COUNT) != null) ? ((Number) statisticsMap.get(IndexFields.COLLECTION_COUNT)).longValue() : 0);
+			resource.setRemixedInAssessmentCount((statisticsMap.get(IndexFields.ASSESSMENT_COUNT) != null) ? ((Number) statisticsMap.get(IndexFields.ASSESSMENT_COUNT)).longValue() : 0);
+			resource.setRemixedInExternalAssessmentCount((statisticsMap.get(IndexFields.EXTERNAL_ASSESSMENT_COUNT) != null) ? ((Number) statisticsMap.get(IndexFields.EXTERNAL_ASSESSMENT_COUNT)).longValue() : 0);
 		}
 
 		Map<String, Object> taxonomyMap = (Map<String, Object>) dataMap.get(IndexFields.TAXONOMY);
 		if (taxonomyMap != null) {
+			Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
+			if (input.isCrosswalk()) {
+				if (input.isStandardsSearch()) {
+					setCrosswalkData(input, resource, taxonomyMap);
+				} else if (input.getUserTaxonomyPreference() != null) {
+					long start = System.currentTimeMillis();
+					taxonomySetAsMap = transformTaxonomy(taxonomyMap, input);
+					logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
+				}
+			}
+			resource.setTaxonomySet(taxonomySetAsMap);		
 			resource.setTaxonomyDataSet((String) taxonomyMap.get(IndexFields.TAXONOMY_DATA_SET));
-			resource.setTaxonomySet((Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET));
 		}
 
 		if (dataMap.get(IndexFields.COLLECTION_TITLES) != null) {
-			resource.setScollectionTitles(StringUtils.join((List<String>) dataMap.get(IndexFields.COLLECTION_TITLES), " || "));
+			resource.setScollectionTitles((List<String>) dataMap.get(IndexFields.COLLECTION_TITLES));
 		}
 		if (dataMap.get(IndexFields.COLLECTION_IDS) != null) {
-			resource.setScollectionIds(StringUtils.join((List<String>) dataMap.get(IndexFields.COLLECTION_IDS), " || "));
+			resource.setScollectionIds((List<String>) dataMap.get(IndexFields.COLLECTION_IDS));
 		}
 		
 		Map<String, Object> courseMap = (Map<String, Object>) dataMap.get(IndexFields.COURSE);
@@ -353,7 +372,42 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 
 		return resource;
 	}
+	
+	@SuppressWarnings("unchecked")
+	private void setCrosswalkData(SearchData input, ContentSearchResult resource, Map<String, Object> taxonomyMap) {
+		String fltStandard = null;
+		String fltStandardDisplay = null;
+		if(input.getFilters().containsKey(AMPERSAND_EQ_INTERNAL_CODE)) fltStandard = input.getFilters().get(AMPERSAND_EQ_INTERNAL_CODE).toString();
+		if(input.getFilters().containsKey(AMPERSAND_EQ_DISPLAY_CODE)) fltStandardDisplay = input.getFilters().get(AMPERSAND_EQ_DISPLAY_CODE).toString();
+		Boolean isCrosswalked = false;
+		List<String> leafInternalCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_INTERNAL_CODES);
+		List<String> leafDisplayCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_DISPLAY_CODES);
+		List<Map<String, Object>> equivalentCompetencies = new ArrayList<>();
+		fetchCrosswalks(input, leafInternalCodes, equivalentCompetencies);
+	
+		if (!(leafInternalCodes != null && leafInternalCodes.size() > 0 && fltStandard != null && leafInternalCodes.contains(fltStandard.toUpperCase()))
+				&& !(leafDisplayCodes != null && leafDisplayCodes.size() > 0 && fltStandardDisplay != null && leafDisplayCodes.contains(fltStandardDisplay.toUpperCase()))) {
+			isCrosswalked = true;
+		}
+		resource.setIsCrosswalked(isCrosswalked);
+		if (equivalentCompetencies.size() > 0) resource.setTaxonomyEquivalentCompetencies(equivalentCompetencies);
+	}
 
+	private void fetchCrosswalks(SearchData input, List<String> leafInternalCodes, List<Map<String, Object>> equivalentCompetencies) {
+		List<Map<String, Object>> crosswalkResponses = searchCrosswalk(input, leafInternalCodes);
+		if (crosswalkResponses != null && !crosswalkResponses.isEmpty()) {
+			leafInternalCodes.forEach(leafInternalCode -> {
+				Map<String, Object> crosswalksAsMap = new HashMap<>();
+				crosswalksAsMap.put(IndexFields.ID, leafInternalCode);
+				List<Map<String, String>> crosswalkCodes = null;
+				crosswalkCodes = deserializeCrosswalkResponse(crosswalkResponses, leafInternalCode, crosswalkCodes);
+				crosswalksAsMap.put(IndexFields.CROSSWALK_CODES, crosswalkCodes);
+				if (crosswalkCodes != null && crosswalkCodes.size() > 0) equivalentCompetencies.add(crosswalksAsMap);
+			});
+		}
+	}
+
+	@SuppressWarnings("unchecked")
 	private Question convertToQuestion(Map<String, Object> source) {
 		Question question = new Question();
 		Map<String, Object> questionMap = (Map<String, Object>) (source.get(IndexFields.QUESTION));
@@ -388,5 +442,4 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 		}
 		return question;
 	}
-
 }

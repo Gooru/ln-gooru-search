@@ -13,7 +13,6 @@ import org.ednovo.gooru.search.es.model.SessionContextSupport;
 import org.ednovo.gooru.search.es.processor.util.JsonDeserializer;
 import org.ednovo.gooru.search.es.processor.util.JsonSerializer;
 import org.ednovo.gooru.search.es.service.RedisClient;
-import org.elasticsearch.action.search.SearchType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
@@ -31,11 +30,6 @@ public class LimitValidationProcessor extends SearchProcessor<SearchData, Object
 	private RedisClient redisService;
 	
 	private static final String FLT_COURSE = "flt.courseType";
-	
-/*
-
-	@Autowired
-	private OperationAuthorizer operationAuthorizer;*/
 
 	@Override
 	public void process(SearchData searchData,
@@ -74,12 +68,6 @@ public class LimitValidationProcessor extends SearchProcessor<SearchData, Object
 			getRedisService().set(cacheKeyIP, JsonSerializer.serializeToJson(userCallerInfo, true), 15);
 		}
 	}
-	
-
-	public boolean hasUnrestrictedContentAccess() {
-	  return false;
-		//return getOperationAuthorizer().hasUnrestrictedContentAccess();
-	}
 
 	@Override
 	protected SearchProcessorType getType() {
@@ -93,14 +81,5 @@ public class LimitValidationProcessor extends SearchProcessor<SearchData, Object
 	public RedisClient getRedisService() {
 		return redisService;
 	}
-	
-	/*public OperationAuthorizer getOperationAuthorizer() {
-		return operationAuthorizer;
-	}
-
-	public void setOperationAuthorizer(OperationAuthorizer operationAuthorizer) {
-		this.operationAuthorizer = operationAuthorizer;
-	}
-*/
 
 }
