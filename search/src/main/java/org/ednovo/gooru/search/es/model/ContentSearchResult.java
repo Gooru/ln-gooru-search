@@ -43,9 +43,9 @@ public class ContentSearchResult extends ContentUnusedFields implements Serializ
 
 	private Integer collaboratorCount;
 
-	private String scollectionTitles;
+	private List<String> scollectionTitles;
 
-	private String scollectionIds;
+	private List<String> scollectionIds;
 
 	private Boolean hasFrameBreaker;
 
@@ -86,18 +86,22 @@ public class ContentSearchResult extends ContentUnusedFields implements Serializ
 	
 	private String category;
 
-	public String getMediaType() {
-		return mediaType;
-	}
-
-	public void setMediaType(String mediaType) {
-		this.mediaType = mediaType;
-	}
-
+	private Boolean isCrosswalked = false;
+	
+	private List<Map<String, Object>> taxonomyEquivalentCompetencies;
+	
 	private Map<String, Object> license;
 
 	private Map<String, Object> course;
-
+	
+	private List<String> twentyOneCenturySkills;
+	
+	private Long remixedInCollectionCount;
+	
+	private Long remixedInAssessmentCount;
+	
+	private Long remixedInExternalAssessmentCount;
+	
 	public String getUrl() {
 		return url;
 	}
@@ -226,19 +230,19 @@ public class ContentSearchResult extends ContentUnusedFields implements Serializ
 		this.collaboratorCount = collaboratorCount;
 	}
 
-	public String getScollectionTitles() {
+	public List<String> getScollectionTitles() {
 		return scollectionTitles;
 	}
 
-	public void setScollectionTitles(String scollectionTitles) {
+	public void setScollectionTitles(List<String> scollectionTitles) {
 		this.scollectionTitles = scollectionTitles;
 	}
 
-	public String getScollectionIds() {
+	public List<String> getScollectionIds() {
 		return scollectionIds;
 	}
 
-	public void setScollectionIds(String scollectionIds) {
+	public void setScollectionIds(List<String> scollectionIds) {
 		this.scollectionIds = scollectionIds;
 	}
 
@@ -298,6 +302,14 @@ public class ContentSearchResult extends ContentUnusedFields implements Serializ
 		this.momentsOfLearning = momentsOfLearning;
 	}
 
+	public List<String> getTwentyOneCenturySkills() {
+		return twentyOneCenturySkills;
+	}
+
+	public void setTwentyOneCenturySkills(List<String> twentyOneCenturySkills) {
+		this.twentyOneCenturySkills = twentyOneCenturySkills;
+	}
+	
 	public static String getIndexType() {
 		return INDEX_TYPE;
 	}
@@ -414,6 +426,54 @@ public class ContentSearchResult extends ContentUnusedFields implements Serializ
 
 	public void setCategory(String category) {
 		this.category = category;
+	}
+
+	public Boolean getIsCrosswalked() {
+		return isCrosswalked;
+	}
+
+	public void setIsCrosswalked(Boolean isCrosswalked) {
+		this.isCrosswalked = isCrosswalked;
+	}
+	
+	public List<Map<String, Object>> getTaxonomyEquivalentCompetencies() {
+		return taxonomyEquivalentCompetencies;
+	}
+
+	public void setTaxonomyEquivalentCompetencies(List<Map<String, Object>> taxonomyEquivalentCompetencies) {
+		this.taxonomyEquivalentCompetencies = taxonomyEquivalentCompetencies;
+	}
+	
+	public String getMediaType() {
+		return mediaType;
+	}
+
+	public void setMediaType(String mediaType) {
+		this.mediaType = mediaType;
+	}
+
+	public Long getRemixedInCollectionCount() {
+		return remixedInCollectionCount;
+	}
+
+	public void setRemixedInCollectionCount(Long remixedInCollectionCount) {
+		this.remixedInCollectionCount = remixedInCollectionCount;
+	}
+
+	public Long getRemixedInAssessmentCount() {
+		return remixedInAssessmentCount;
+	}
+
+	public void setRemixedInAssessmentCount(Long remixedInAssessmentCount) {
+		this.remixedInAssessmentCount = remixedInAssessmentCount;
+	}
+
+	public Long getRemixedInExternalAssessmentCount() {
+		return remixedInExternalAssessmentCount;
+	}
+
+	public void setRemixedInExternalAssessmentCount(Long remixedInExternalAssessmentCount) {
+		this.remixedInExternalAssessmentCount = remixedInExternalAssessmentCount;
 	}
 
 }

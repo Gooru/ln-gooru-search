@@ -4,9 +4,7 @@
 package org.ednovo.gooru.search.es.handler;
 
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.BlackListQueryValidation;
-import static org.ednovo.gooru.search.es.processor.SearchProcessorType.ContentUserPreference;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.DictionaryQueryExpansion;
-import static org.ednovo.gooru.search.es.processor.SearchProcessorType.SpellChecker;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.Elasticsearch;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.EsSuggestDslQueryBuild;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.FacetFilterConstruction;
@@ -15,8 +13,8 @@ import static org.ednovo.gooru.search.es.processor.SearchProcessorType.LimitVali
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.ResourceDeserializer;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.ResourceEsDslQueryBuild;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.ResourceFilterConstruction;
-import static org.ednovo.gooru.search.es.processor.SearchProcessorType.TaxonomyQueryExpansion;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.SubjectFacetFilter;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.TaxonomyQueryExpansion;
 
 import java.util.Map;
 

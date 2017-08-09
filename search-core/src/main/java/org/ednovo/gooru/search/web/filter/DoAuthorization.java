@@ -7,6 +7,7 @@ import org.ednovo.gooru.responses.auth.AuthPrefsResponseHolderBuilder;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.exception.UnauthorizedException;
 import org.ednovo.gooru.search.es.model.User;
+import org.ednovo.gooru.search.es.model.UserGroupSupport;
 import org.ednovo.gooru.search.es.service.RedisClient;
 import org.ednovo.gooru.search.model.GooruAuthenticationToken;
 import org.ednovo.gooru.search.model.UserCredential;
@@ -53,8 +54,18 @@ public class DoAuthorization {
 					user.setGooruUId(gooruUId);
 					request.setAttribute(Constants.USER, user);
 					request.setAttribute(Constants.SESSION_TOKEN_SEARCH, sessionToken);
-					request.setAttribute(Constants.CLIENT_ID, responseHolder.getClientId());
+					request.setAttribute(Constants.APP_ID, responseHolder.getAppId());
+					request.setAttribute(Constants.PARTNER_ID, responseHolder.getPartnerId());
 					request.setAttribute(Constants.CONTENT_CDN_URL, responseHolder.getContentCDN());
+					UserGroupSupport userGroup = new UserGroupSupport();
+					JSONObject tenant = responseHolder.getTenant();
+					userGroup.setTenantId(tenant.getString(Constants.TENANT_ID));
+					userGroup.setTenantRoot(tenant.getString(Constants.TENANT_ROOT));
+					request.setAttribute(Constants.TENANT, userGroup);
+					JSONObject stdPref = null;
+					if(responseHolder.getPreferences() != null && responseHolder.getPreferences().has(Constants.STANDARD_PREFERENCE))
+						stdPref  = responseHolder.getPreferences().getJSONObject(Constants.STANDARD_PREFERENCE);
+					request.setAttribute(Constants.USER_PREFERENCES, stdPref);
 				}
 			} catch (Exception e) {
 				logger.error("Error processing authorize request " + e);

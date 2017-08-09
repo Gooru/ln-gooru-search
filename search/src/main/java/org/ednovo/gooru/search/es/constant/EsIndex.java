@@ -19,7 +19,11 @@ public enum EsIndex {
     CONTENT_PROVIDER("content_provider", new String[] {"publisher","aggregator"}),
     SCHOOL_DISTRICT("schooldistrict"),
 	ORGANIZATION("organization"),
-	COURSE("course");
+	COURSE("course"),
+	UNIT("unit"),
+	LESSON("lesson"),
+	CROSSWALK("crosswalk"),
+	RUBRIC("rubric");
 
 	private String name;
 	

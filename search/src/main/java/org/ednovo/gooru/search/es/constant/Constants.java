@@ -2,6 +2,7 @@ package org.ednovo.gooru.search.es.constant;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 public interface Constants {
 
@@ -529,7 +530,7 @@ public interface Constants {
 	public static final String SEARCH_RESOURCE_COUNT = "resourceCount";
 	public static final Short SHORT_ZERO = 0;
 	public static final String API_KEY = "apiKey";
-	public static final String CLIENT_ID = "clientId";
+	public static final String PARTNER_ID = "partnerId";
 	public static final String SESSION_TOKEN_SEARCH = "sessionToken";
 	public static final String SESSION_SEARCH = "session";
 	public static final String GOORU_HEADER_SESSION_TOKEN = "Gooru-Session-Token";
@@ -581,22 +582,74 @@ public interface Constants {
 	String INFO_DOT = "info.";
 	String AMPERSAND = "&";
 	String CARET_SYMBOL = "^";
+	String NOT_SYMBOL = "!";
 	String FLT_COURSE_MISSING = "#^courseMissing";
 	
 	public static final String TYPE_COURSE = "course";
 	public static final String FLT_COURSE_TYPE = "&^courseType";
-	public static final String IS_FEATURED = "&^isFeatured";
+	public static final String FLT_IS_FEATURED = "&^isFeatured";
 	public static final String FLT_PUBLISH_STATUS = "&^publishStatus";
 	public static final String FLT_STATUS_BROKEN = "&^statistics.statusIsBroken";
 	public static final String FLT_CONTENT_FORMAT = "&^contentFormat";
 	public static final String FLT_COURSE_ID = "&^courseId";
+	public static final String FLT_TENANT_ID = "&^tenant.tenantId";
 
 	public static final String CONTENT_CDN_URL = "contentCDN";
+	public static final String USER_PREFERENCES = "userPreferences";
 
 	public static final String THUMBNAIL_URL = "url";
 	public static final String SEARCH_REQ_20 = "2.0";
 	public static  final String SESSION_TOKEN_20 = "special-token-2.0";
 
-	
+	public static final String TENANT_ID = "tenant_id";
+	public static final String TENANT_ROOT = "tenant_root";
 
+	public static final String TENANT = "tenant";
+
+	public static final String DISCOVERABLE_TENANT_IDS = "discoverableTenantIds";
+
+	public static final String APP_ID = "appId";
+	public static final String AMPERSAND_STANDARD = "&^standard";
+	public static final String AMPERSAND_STANDARD_DISPLAY = "&^standardDisplay";
+	public static final String AMPERSAND_EQ_INTERNAL_CODE = "&^taxonomy.allEquivalentInternalCodes";
+	public static final String AMPERSAND_EQ_DISPLAY_CODE = "&^taxonomy.allEquivalentDisplayCodes";
+	public static final String AMPERSAND_EQ_FRAMEWORK_CODE = "&^taxonomy.allEquivalentFrameworkCodes";
+
+	public static final String STANDARD_PREFERENCE = "standard_preference";
+	
+	public static final String LEAF_INTERNAL_CODE = "leafInternalCode";
+	public static final String PARENT_TITLE = "parentTitle";
+
+	public static final String PRE_TEST = "pre-test";
+	public static final String POST_TEST = "post-test";
+	public static final String BENCHMARK = "benchmark";
+	public static final String BACKFILL = "backfill";
+	public static final Pattern POST_TEST_OR_BENCHMARK = Pattern.compile("post-test|benchmark");
+	public static final String STUDY_PLAYER = "study-player";
+	public static final String RESOURCE_STUDY = "resource-study";
+	public static final String COLLECTION_STUDY = "collection-study";
+
+	public static final String SCORE_AVERAGE_MIN = "score.average.min";
+	public static final String SCORE_AVERAGE_MAX = "score.average.max";
+	public static final String TIMESPENT_AVERAGE_MIN = "timespent.average.min";
+	public static final String TIMESPENT_AVERAGE_MAX = "timespent.average.max";
+	public static final String CONTENT_SUB_FORMAT = "contentSubFormat";
+	public static final String INTERNAL = "internal";
+	public static final String EXTERNAL = "external";
+	public static final String CLIENT_SOURCE = "clientSource";
+	public static final String CAMELCASE_SEARCH = "Search";
+	public static final String FRAMEWORK_CODE = "frameworkCode";
+	public static final String TYPE_COMPETENCY_GRAPH = "competency-graph";
+	public static final String KEYWORD_COMPETENCY = "keywordcompetency";
+	public static final String BELOW_AVERAGE = "below-average";
+	public static final String ABOVE_AVERAGE = "above-average";
+	public static final String AVERAGE = "average";
+
+	public static final String TOKEN = "Token";
+	public static final String GUT_COMPETENCY_ID = "gutCompetencyId";
+	public static final String AUTHORIZATION = "Authorization";
+	public static final String TOKEN_SPACE = "Token ";
+	public static final String API_COMPETENCY_NODE = "api.competency.node";
+	public static final String DNS_ENV = "dns.env";
+	public static final String KEYWORDS = "keywords";
 }

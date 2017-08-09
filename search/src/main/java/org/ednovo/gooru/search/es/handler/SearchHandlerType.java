@@ -51,7 +51,17 @@ public enum SearchHandlerType {
 	
 	CONTRIBUTOR(),
 	
-	COURSE();
+	COURSE(),
+	
+	UNIT(),
+	
+	LESSON(),
+	
+	RUBRIC(),
+	
+	CROSSWALK(),
+	
+	KEYWORDCOMPETENCY();
 
 	private SearchHandlerType() {
 	}

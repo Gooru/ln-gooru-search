@@ -22,6 +22,8 @@
 		
 	<context:component-scan base-package="org.ednovo.gooru.search"/>
 	
+	<context:component-scan base-package="org.ednovo.gooru.suggest"/>
+	
 	<context:component-scan base-package="org.ednovo.gooru.domain.service.search"/>
 
 	<context:component-scan base-package="org.ednovo.gooru.controllers"/>

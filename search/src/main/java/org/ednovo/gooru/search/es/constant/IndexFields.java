@@ -76,9 +76,9 @@ public class IndexFields {
 	public static final String MOBILE_FRIENDLINESS = "mobileFriendliness";
 	public static final String IS_COPYRIGHT_OWNER = "isCopyrightOwner";
 	public static final String COPYRIGHT_OWNER_LIST = "copyrightOwnerList";
+	public static final String TWENTY_ONE_CENTURY_SKILL = "21CenturySkills";
 	
 	// course fields 
-	
 	public static final String COURSE_REMIXCOUNT = "courseRemixCount";
 	public static final String UNIT_COUNT = "unitCount";
 	public static final String SEQUENCE = "sequenceId";
@@ -93,5 +93,30 @@ public class IndexFields {
 	public static final String LICENSE_URL = "url";
 	public static final String LICENSE_NAME = "name";
 	
+	public static final String LEAF_INTERNAL_CODES = "leafInternalCodes";
+	public static final String LEAF_DISPLAY_CODES = "leafDisplayCodes";
+	public static final String ALL_EQUIVALENT_DISPLAY_CODES = "allEquivalentDisplayCodes";
+	public static final String EQUIVALENT_COMPETENCIES = "equivalentCompetencies";
+	
+	public static final String CURRICULUM = "curriculum";
+	public static final String CURRICULUM_INFO = "curriculumInfo";
+	public static final String UNIT = "unit";
+	public static final String LESSON = "lesson";
+	public static final String LESSON_IDS = "lessonIds";
+	public static final String UNIT_IDS = "unitIds";
+	
+	public static final String REMIXED_IN_CLASS_COUNT = "remixedInClassCount";
+	public static final String REMIXED_IN_COURSE_COUNT = "remixedInCourseCount";
+	public static final String USED_BY_STUDENT_COUNT = "usedByStudentCount";
+	public static final String COLLECTION_COUNT = "collectionCount";
+	public static final String ASSESSMENT_COUNT = "assessmentCount";
+	public static final String EXTERNAL_ASSESSMENT_COUNT = "externalAssessmentCount";
+	public static final String CONTAINING_COLLECTIONS_COUNT = "containingCollectionsCount";
+	public static final String LESSON_COUNT = "lessonCount";
+	public static final String IS_FEATURED = "isFeatured";
+	public static final Object COLLECTION = "collection";
+	public static final Object CONTENT = "content";
+	public static final String GUT_CODE = "gutCode";
+	public static final String CROSSWALK_CODES = "crosswalkCodes";
 
 }

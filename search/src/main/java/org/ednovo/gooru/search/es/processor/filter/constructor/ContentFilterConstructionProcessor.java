@@ -24,14 +24,27 @@ public class ContentFilterConstructionProcessor extends FilterConstructionProces
 		super.process(searchData, response);
 		
 		// As default search will serve published contents only. If publish filter passed results will be filtered based on filter value.
-		if(searchData != null && searchData.getFilters() != null && !searchData.getFilters().containsKey(FLT_PUBLISH_STATUS)){
+		if(searchData != null && searchData.getFilters() != null) { 
+			if (!searchData.getFilters().containsKey(FLT_PUBLISH_STATUS)) {
+				searchData.putFilter(FLT_PUBLISH_STATUS, PublishedStatus.PUBLISHED.getStatus());
+			}
+			if (searchData.isStandardsSearch() && searchData.isCrosswalk()) {
+				if (searchData.getFilters().containsKey(AMPERSAND_STANDARD) && StringUtils.isNotBlank(searchData.getFilters().get(AMPERSAND_STANDARD).toString())) {
+					searchData.putFilter(AMPERSAND_EQ_INTERNAL_CODE, searchData.getFilters().get(AMPERSAND_STANDARD).toString().toLowerCase());
+					searchData.getFilters().remove(AMPERSAND_STANDARD);
+				}
+				if (searchData.getFilters().containsKey(AMPERSAND_STANDARD_DISPLAY) && StringUtils.isNotBlank(searchData.getFilters().get(AMPERSAND_STANDARD_DISPLAY).toString())) {
+					searchData.putFilter(AMPERSAND_EQ_DISPLAY_CODE, searchData.getFilters().get(AMPERSAND_STANDARD_DISPLAY).toString().toLowerCase());
+					searchData.getFilters().remove(AMPERSAND_STANDARD_DISPLAY);
+				}
+			}
+		} else {
 			searchData.putFilter(FLT_PUBLISH_STATUS, PublishedStatus.PUBLISHED.getStatus());
 		}
         
+		searchData.putFilter(FLT_TENANT_ID, StringUtils.join(searchData.getUserPermits(), ","));
 		
-		//TO be enabled after testing
-		//searchData.putFilter("&^publishStatus", "published");
-/*		//User user = searchData.getUser();
+		/*		//User user = searchData.getUser();
 	//	if(!(searchData.getUser().getUserRoleSetString().contains(SEARCH_SUPER_ADMIN) || searchData.getUser().getUserRoleSetString().contains(SEARCH_CONTENT_ADMIN))) {
 		  if (!searchData.isRestricted() && !searchData.getType().equalsIgnoreCase(LIBRARY)) {
 			if (searchData.getType().equalsIgnoreCase(RESOURCE)) {

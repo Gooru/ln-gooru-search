@@ -8,7 +8,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.ednovo.gooru.kafka.producer.InsightsKafkaHandler;
+import org.ednovo.gooru.kafka.producer.KafkaRegistry;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.exception.MethodFailureException;
 import org.ednovo.gooru.search.es.model.SessionContextSupport;
@@ -33,8 +33,9 @@ public class GooruSearchInterceptor extends HandlerInterceptorAdapter {
 	private static final Logger logger = LoggerFactory.getLogger(GooruSearchInterceptor.class);
 
 	@Autowired
-	private InsightsKafkaHandler kafkaHandler;
+	private KafkaRegistry kafkaHandler;
 
+	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
 		GooruAuthenticationToken authenticationContext = (GooruAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
@@ -64,7 +65,8 @@ public class GooruSearchInterceptor extends HandlerInterceptorAdapter {
 		response.setHeader("X-REQUEST-UUID", eventUUID);
 		SessionContextSupport.putLogParameter("eventId", eventUUID);
 		JSONObject context = new JSONObject();
-		context.put("url", request.getRequestURI());
+		context.put(Constants.SEARCH_URL, request.getRequestURI());
+		context.put(Constants.CLIENT_SOURCE, Constants.CAMELCASE_SEARCH);
 		SessionContextSupport.putLogParameter("context", context);
 
 		request.getHeader("VIA");
@@ -83,7 +85,7 @@ public class GooruSearchInterceptor extends HandlerInterceptorAdapter {
 		SessionContextSupport.putLogParameter("user", user);
 
 		JSONObject version = new JSONObject();
-		version.put("logApi", "0.1");
+		version.put("logApi", "4.0");
 		SessionContextSupport.putLogParameter("version", version);
 		return true;
 	}
@@ -130,7 +132,7 @@ public class GooruSearchInterceptor extends HandlerInterceptorAdapter {
 				try {
 					String logJson = new JSONObject(log).toString();
 					logger.debug("Event Log : " + logJson);
-					kafkaHandler.sendEventLog(SessionContextSupport.getLog().get(EVENT_NAME).toString(), logJson);
+					kafkaHandler.send(SessionContextSupport.getLog().get(EVENT_NAME).toString(), logJson);
 				} catch (Exception e) {
 					logger.error("Error while pushing event log data to kafka : " + e.getMessage());
 				}

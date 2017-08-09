@@ -70,7 +70,7 @@ public class AuthorizationFilter implements Filter {
 		}
 		else {
 			if (headerSessionToken != null) {
-				sessionToken = headerSessionToken.substring(6);
+				sessionToken = headerSessionToken.substring(Constants.TOKEN.length()).trim();
 			}
 			
 			if (sessionToken == null || sessionToken.trim().length() == 0) {

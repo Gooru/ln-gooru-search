@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.ednovo.gooru.search.es.constant.EsIndex;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
+import org.json.JSONObject;
 
 /**
  * @author SearchTeam
@@ -90,7 +91,7 @@ public class SearchData implements Serializable {
 	
 	private boolean isFacetSubjectSearch = false;
 	
-	private String userTaxonomyPreference;
+	private JSONObject userTaxonomyPreference;
 
 	private boolean showSingleSubjectResults;
 	
@@ -106,7 +107,12 @@ public class SearchData implements Serializable {
 	
 	private String contentCdnUrl;
 
-
+	private List<String> userPermits;
+	
+	private boolean isCrosswalk;
+	
+	private String userTenantId;
+	
 	public boolean isShowCanonicalOnly() {
 		return showCanonicalOnly;
 	}
@@ -415,11 +421,11 @@ public class SearchData implements Serializable {
 		this.isBsSearch = isBsSearch;
 	}
 
-	public String getUserTaxonomyPreference() {
+	public JSONObject getUserTaxonomyPreference() {
 		return userTaxonomyPreference;
 	}
 
-	public void setUserTaxonomyPreference(String userTaxonomyPreference) {
+	public void setUserTaxonomyPreference(JSONObject userTaxonomyPreference) {
 		this.userTaxonomyPreference = userTaxonomyPreference;
 	}
 
@@ -485,6 +491,30 @@ public class SearchData implements Serializable {
 
 	public void setContentCdnUrl(String contentCdnUrl) {
 		this.contentCdnUrl = contentCdnUrl;
+	}
+
+	public List<String> getUserPermits() {
+		return userPermits;
+	}
+
+	public void setUserPermits(List<String> userPermits) {
+		this.userPermits = userPermits;
+	}
+
+	public boolean isCrosswalk() {
+		return isCrosswalk;
+	}
+
+	public void setCrosswalk(boolean isCrosswalk) {
+		this.isCrosswalk = isCrosswalk;
+	}
+	
+	public String getUserTenantId() {
+		return userTenantId;
+	}
+
+	public void setUserTenantId(String userTenantId) {
+		this.userTenantId = userTenantId;
 	}
 
 }
