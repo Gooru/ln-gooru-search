@@ -17,7 +17,7 @@ import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.EsIndex;
 import org.ednovo.gooru.search.es.exception.SearchException;
 import org.ednovo.gooru.search.es.model.ContentSearchResult;
-import org.ednovo.gooru.search.es.model.ContentSuggestResult;
+import org.ednovo.gooru.search.es.model.SuggestResult;
 import org.ednovo.gooru.search.es.model.PublishedStatus;
 import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.model.SuggestResponse;
@@ -114,7 +114,7 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 			}
 		}
 
-		final SearchResponse<List<ContentSuggestResult>> suggestResponseResource = new SearchResponse<List<ContentSuggestResult>>();
+		final SearchResponse<List<SuggestResult>> suggestResponseResource = new SearchResponse<List<SuggestResult>>();
 		final SearchResponse<List<ContentSearchResult>> searchResponseResource = new SearchResponse<List<ContentSearchResult>>();
 		final SearchResponse<Object> searchRes = new SearchResponse<Object>();
 		final String contextType = suggestData.getSuggestContextData().getContextType();

@@ -655,5 +655,9 @@ public interface Constants {
 	public static final String SEARCH = "search";
 	public static final String PUBLISHERS = "publishers";
 	public static final String FROM = "from";
+	public static final Pattern STANDARD_MATCH = Pattern.compile("standard_level_1|standard_level_2");
+	public static final String TAXONOMY_RESOURCE = "taxonomy_resource";
+	public static final String TAXONOMY_COLLECTION = "taxonomy_collection";
+	public static final String LEARNING_TARGET_LEVEL_0 = "learning_target_level_0";
 
 }

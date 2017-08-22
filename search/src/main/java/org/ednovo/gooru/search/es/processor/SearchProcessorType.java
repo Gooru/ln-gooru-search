@@ -143,7 +143,9 @@ public enum SearchProcessorType {
 	
 	AutoCompletePublisherDslQueryBuild(),
 	
-	AutoCompletePublisherDeserializeProcessor();
+	AutoCompletePublisherDeserializeProcessor(),
+
+	CollectionSuggestDeserializeProcessor();
 
 	private SearchProcessorType() {
 	}

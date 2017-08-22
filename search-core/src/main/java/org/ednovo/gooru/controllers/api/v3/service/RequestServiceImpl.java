@@ -1,5 +1,7 @@
 package org.ednovo.gooru.controllers.api.v3.service;
 
+import java.util.Arrays;
+
 import org.apache.commons.lang.StringUtils;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.RequestContextFields;
@@ -67,5 +69,31 @@ public class RequestServiceImpl implements RequestService, Constants{
 			throw new BadRequestException("Please refer the document to pass correct parameters");
 		}
 	}
-
+	
+	@Override
+	public void processCodeContextPayload(JSONObject requestContext, SuggestContextData suggestContext, SuggestData suggestData) throws Exception {
+		Boolean isValidRequest = false;
+		if (requestContext.has(RequestContextFields.CONTEXT)) {
+			JSONObject context = requestContext.getJSONObject(RequestContextFields.CONTEXT);
+			if (context != null ) {
+				suggestContext.setUserId(context.getString(RequestContextFields.USER_ID));
+				if (context.has(RequestContextFields.CODES)) { 
+					suggestContext.setCodes(Arrays.asList(context.getString(RequestContextFields.CODES).split(",")));
+					isValidRequest = true;
+				}				
+			}
+		}
+		if (requestContext.has(RequestContextFields.METRICS)) {
+			JSONObject metrics = requestContext.getJSONObject(RequestContextFields.METRICS);
+			if (metrics != null) {
+				if (metrics.has(RequestContextFields.SCORE))
+					suggestContext.setScore(metrics.getInt(RequestContextFields.SCORE));
+				if (metrics.has(RequestContextFields.TIMESPENT))
+					suggestContext.setTimeSpent(metrics.getLong(RequestContextFields.TIMESPENT));
+			}
+		}
+		if (!isValidRequest) {
+			throw new BadRequestException("Please refer the document to pass correct parameters");
+		}
+	}
 }

@@ -10,14 +10,17 @@ import org.ednovo.gooru.suggest.v3.data.provider.model.CollectionDataProviderCri
 import org.ednovo.gooru.suggest.v3.data.provider.model.LessonDataProviderCriteria;
 import org.ednovo.gooru.suggest.v3.data.provider.model.ResourceDataProviderCriteria;
 import org.ednovo.gooru.suggest.v3.data.provider.model.SuggestDataProviderType;
+import org.ednovo.gooru.suggest.v3.data.provider.model.TaxonomyDataProviderCriteria;
 import org.ednovo.gooru.suggest.v3.data.provider.service.ContainerDataProviderService;
 import org.ednovo.gooru.suggest.v3.data.provider.service.ContentDataProviderService;
 import org.ednovo.gooru.suggest.v3.data.provider.service.LessonDataProviderService;
+import org.ednovo.gooru.suggest.v3.data.provider.service.TaxonomyDataProviderService;
 import org.ednovo.gooru.suggest.v3.handler.SuggestHandler;
 import org.ednovo.gooru.suggest.v3.model.CollectionContextData;
 import org.ednovo.gooru.suggest.v3.model.LessonContextData;
 import org.ednovo.gooru.suggest.v3.model.ResourceContextData;
 import org.ednovo.gooru.suggest.v3.model.SuggestData;
+import org.ednovo.gooru.suggest.v3.model.TaxonomyContextData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +40,9 @@ public class SuggestV3ServiceImpl<D> implements SuggestV3Service {
 	@Autowired
 	private LessonDataProviderService lessonDataProviderService;
 	
+	@Autowired
+	private TaxonomyDataProviderService taxonomyDataProviderService;
+	
 	@Override
 	public List<SuggestResponse<Object>> suggest(SuggestData suggestData) throws Exception {
 		
@@ -49,6 +55,10 @@ public class SuggestV3ServiceImpl<D> implements SuggestV3Service {
 		LessonDataProviderCriteria lessonDataProviderCriteria = new LessonDataProviderCriteria();
 		lessonDataProviderCriteria.setLessonId(suggestData.getSuggestContextData().getLessonId());
 		
+		TaxonomyDataProviderCriteria taxonomyDataProviderCriteria = new TaxonomyDataProviderCriteria();
+		taxonomyDataProviderCriteria.setCodeIds(suggestData.getSuggestContextData().getCodes());
+		taxonomyDataProviderCriteria.setIsInternalCode(suggestData.getInputTypeInternalCode());
+
 		Map<SuggestDataProviderType, Object> dataProviderInput = new HashMap<SuggestDataProviderType, Object>();
 		
 		List<SuggestResponse<Object>> suggestResList = new ArrayList<SuggestResponse<Object>>();
@@ -73,6 +83,12 @@ public class SuggestV3ServiceImpl<D> implements SuggestV3Service {
 					LessonContextData lessonData = lessonDataProviderService.getLessonData(lessonDataProviderCriteria);
 					if (lessonData != null) {
 						dataProviderInput.put(SuggestDataProviderType.LESSON, lessonData);
+					}
+				}
+				if (dataProvider.toString().equals(SuggestDataProviderType.TAXONOMY.toString())) {
+					TaxonomyContextData taxonomyData = taxonomyDataProviderService.getTaxonomyData(taxonomyDataProviderCriteria);
+					if (taxonomyData != null) {
+						dataProviderInput.put(SuggestDataProviderType.TAXONOMY, taxonomyData);
 					}
 				}
 			}
