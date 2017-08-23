@@ -9,19 +9,19 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.model.ContentFormat;
-import org.ednovo.gooru.search.es.model.ContentSuggestResult;
+import org.ednovo.gooru.search.es.model.SuggestResult;
 import org.ednovo.gooru.search.es.model.MapWrapper;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ResourceSuggestDeserializeProcessor extends SuggestDeserializeProcessor<List<ContentSuggestResult>, ContentSuggestResult>{
+public class ResourceSuggestDeserializeProcessor extends SuggestDeserializeProcessor<List<SuggestResult>, SuggestResult>{
 
 	@SuppressWarnings("unchecked")
 	@Override
-	List<ContentSuggestResult> deserialize(Map<String, Object> model, SearchData searchData, List<ContentSuggestResult> output) {
-		output = new ArrayList<ContentSuggestResult>();
+	List<SuggestResult> deserialize(Map<String, Object> model, SearchData searchData, List<SuggestResult> output) {
+		output = new ArrayList<SuggestResult>();
 		Set<String> contentUrls = new HashSet<String>();
 		Set<String> contentTitles = new HashSet<String>();
 		if (model != null && model.get(SEARCH_HITS) != null) {
@@ -59,7 +59,7 @@ public class ResourceSuggestDeserializeProcessor extends SuggestDeserializeProce
 					contentUrls.add(url);
 					contentTitles.add(title.toLowerCase());
 				}
-				ContentSuggestResult resource = new ContentSuggestResult();
+				SuggestResult resource = new SuggestResult();
 				resource = collect(fields, searchData, resource);
 				resourceIds.add(resource.getId());
 				output.add(resource);
@@ -71,7 +71,7 @@ public class ResourceSuggestDeserializeProcessor extends SuggestDeserializeProce
 
 	@SuppressWarnings("unchecked")
 	@Override
-	ContentSuggestResult collect(Map<String, Object> dataMap, SearchData input, ContentSuggestResult resource) {
+	SuggestResult collect(Map<String, Object> dataMap, SearchData input, SuggestResult resource) {
 		resource.setId((String) dataMap.get(IndexFields.ID));
 		resource.setFormat((String) dataMap.get(IndexFields.CONTENT_FORMAT));
 		resource.setSubformat((String) dataMap.get(IndexFields.CONTENT_SUB_FORMAT));

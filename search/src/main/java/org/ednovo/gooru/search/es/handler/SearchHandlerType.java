@@ -61,7 +61,9 @@ public enum SearchHandlerType {
 	
 	CROSSWALK(),
 	
-	KEYWORDCOMPETENCY();
+	KEYWORDCOMPETENCY(),
+	
+	AUTOCOMPLETE_KEYWORD();
 
 	private SearchHandlerType() {
 	}

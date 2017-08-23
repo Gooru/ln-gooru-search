@@ -1,9 +1,9 @@
 package org.ednovo.gooru.search.es.handler;
 
-import static org.ednovo.gooru.search.es.processor.SearchProcessorType.AutoCompletePublisherDeserializeProcessor;
-import static org.ednovo.gooru.search.es.processor.SearchProcessorType.AutoCompletePublisherDslQueryBuild;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.BlackListQueryValidation;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.Elasticsearch;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.AutoCompleteKeywordDeserializeProcessor;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.AutoCompleteKeywordDslQueryBuild;
 
 import java.util.Map;
 
@@ -14,18 +14,18 @@ import org.ednovo.gooru.search.es.processor.SearchProcessorType;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PublisherV2SearchHandler extends SearchHandler<SearchData, Map<String, Object>>{
+public class AutoCompleteKeywordV2SearchHandler extends SearchHandler<SearchData, Map<String, Object>> {
 
-	private static final SearchProcessorType[][] searchProcessorTypes = new SearchProcessorType[][] {
-		{ BlackListQueryValidation }, { AutoCompletePublisherDslQueryBuild }, { Elasticsearch }, { AutoCompletePublisherDeserializeProcessor } };
-	
+	private static final SearchProcessorType[][] searchProcessorTypes = new SearchProcessorType[][] { { BlackListQueryValidation },
+			{ AutoCompleteKeywordDslQueryBuild }, { Elasticsearch }, { AutoCompleteKeywordDeserializeProcessor } };
+
 	@Override
 	public SearchResponse<Map<String, Object>> search(SearchData searchData) {
 		searchData.setAllowLeadingWildcard(true);
+		searchData.setDefaultOperator("or");
 		return super.search(searchData);
 	}
 
-	
 	@Override
 	protected SearchProcessorType[][] getProcessorTypeChain() {
 		return searchProcessorTypes;
@@ -33,13 +33,12 @@ public class PublisherV2SearchHandler extends SearchHandler<SearchData, Map<Stri
 
 	@Override
 	protected SearchHandlerType getType() {
-		return SearchHandlerType.PUBLISHER;
+		return SearchHandlerType.AUTOCOMPLETE_KEYWORD;
 	}
 
 	@Override
 	protected EsIndex getIndexType() {
-		return EsIndex.CONTENT_PROVIDER;
-		
+		return EsIndex.QUERY;
 	}
 
 }

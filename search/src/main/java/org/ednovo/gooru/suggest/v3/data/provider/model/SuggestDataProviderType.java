@@ -16,7 +16,9 @@ public enum SuggestDataProviderType {
 	
 	LESSON(),
 	
-	USER_ACTIVITY();
+	USER_ACTIVITY(),
+	
+	TAXONOMY();
 	
 	private SuggestDataProviderType() {
 	}

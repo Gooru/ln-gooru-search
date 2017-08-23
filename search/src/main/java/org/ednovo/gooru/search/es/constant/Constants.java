@@ -100,8 +100,6 @@ public interface Constants {
 
 	public static final String QUERY_STRING = "query_string";
 
-	public static final String TEXT = "text";
-
 	public static final String CHECK_SUGGEST = "check-suggest";
 
 	public static final String FIELD = "field";
@@ -529,10 +527,7 @@ public interface Constants {
 	public static final String SEARCH_QUESTION_COUNT = "questionCount";
 	public static final String SEARCH_RESOURCE_COUNT = "resourceCount";
 	public static final Short SHORT_ZERO = 0;
-	public static final String API_KEY = "apiKey";
-	public static final String PARTNER_ID = "partnerId";
 	public static final String SESSION_TOKEN_SEARCH = "sessionToken";
-	public static final String SESSION_SEARCH = "session";
 	public static final String GOORU_HEADER_SESSION_TOKEN = "Gooru-Session-Token";
 	public static final String GOORU_API_KEY = "Gooru-ApiKey";
 	public static final String SESSION_TOKEN = "SESSION_TOKEN";
@@ -601,14 +596,12 @@ public interface Constants {
 	public static final String SEARCH_REQ_20 = "2.0";
 	public static  final String SESSION_TOKEN_20 = "special-token-2.0";
 
-	public static final String TENANT_ID = "tenant_id";
 	public static final String TENANT_ROOT = "tenant_root";
 
 	public static final String TENANT = "tenant";
 
 	public static final String DISCOVERABLE_TENANT_IDS = "discoverableTenantIds";
 
-	public static final String APP_ID = "appId";
 	public static final String AMPERSAND_STANDARD = "&^standard";
 	public static final String AMPERSAND_STANDARD_DISPLAY = "&^standardDisplay";
 	public static final String AMPERSAND_EQ_INTERNAL_CODE = "&^taxonomy.allEquivalentInternalCodes";
@@ -652,4 +645,19 @@ public interface Constants {
 	public static final String API_COMPETENCY_NODE = "api.competency.node";
 	public static final String DNS_ENV = "dns.env";
 	public static final String KEYWORDS = "keywords";
+	Pattern DEFAULT_FILTERS = Pattern.compile("flt.collectionType|flt.contentFormat|flt.resourceFormat|flt.publishStatus|flt.courseType");
+	public static final String KEYWORD = "keyword";
+	public static final String ANALYZER = "analyzer";
+	public static final String MATCH = "match";
+	public static final String STANDARD = "standard";
+	public static final String AUTOCOMPLETE_KEYWORD = "autocomplete_keyword";
+	public static final String TEXT = "text";
+	public static final String SEARCH = "search";
+	public static final String PUBLISHERS = "publishers";
+	public static final String FROM = "from";
+	public static final Pattern STANDARD_MATCH = Pattern.compile("standard_level_1|standard_level_2");
+	public static final String TAXONOMY_RESOURCE = "taxonomy_resource";
+	public static final String TAXONOMY_COLLECTION = "taxonomy_collection";
+	public static final String LEARNING_TARGET_LEVEL_0 = "learning_target_level_0";
+
 }
