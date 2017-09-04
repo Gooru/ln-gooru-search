@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.controllers.api.BaseController;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.EventConstants;
@@ -104,7 +104,6 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		if (query.matches(SEARCH_SPLCHR)) {
 			throw new BadRequestException("Please enter a valid search term");
 		}
-		// FIXME Duplicate attribute of searchType
 		JSONObject payloadObject = new JSONObject();
 		JSONObject session = new JSONObject();
 		SessionContextSupport.putLogParameter("eventName", "item.search");

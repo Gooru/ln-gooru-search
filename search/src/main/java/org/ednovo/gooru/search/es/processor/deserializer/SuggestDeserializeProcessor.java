@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.EsIndex;
 import org.ednovo.gooru.search.es.constant.IndexFields;
@@ -135,7 +135,7 @@ public abstract class SuggestDeserializeProcessor<O, S> extends SearchProcessor<
 			if (!v.isEmpty()) {
 				String key = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, k);
 				if (!k.equalsIgnoreCase(IndexFields.GRADE)) {
-					txMetadata.put(key, String.join(SEARCH_COMMA_SEPERTOR, ((List<String>) v)));
+					txMetadata.put(key, String.join(SEARCH_COMMA_SEPARATOR, ((List<String>) v)));
 				} else {
 					txMetadata.put(key, v);
 				}

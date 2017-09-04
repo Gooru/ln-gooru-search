@@ -27,7 +27,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.exception.MethodFailureException;
 import org.ednovo.gooru.search.es.model.ContentSearchResult;
@@ -215,7 +215,7 @@ public class SerializerUtil {
 				if (model instanceof ContentSearchResult) {
 					LOGGER.error("Serialization failed for resource : " + ((ContentSearchResult) model).getContentId());
 				} else if (model instanceof List) {
-					List list = (List<?>) model;
+					List<?> list = (List<?>) model;
 					if (list != null && list.size() > 0 && list.get(0) instanceof ContentSearchResult) {
 						LOGGER.error("Serialization failed for list resources of size : " + list.size() + " resource : " + ((ContentSearchResult) list.get(0)).getContentId());
 					}

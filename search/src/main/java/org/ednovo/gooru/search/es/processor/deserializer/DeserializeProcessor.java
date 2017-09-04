@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.EsIndex;
 import org.ednovo.gooru.search.es.constant.IndexFields;
@@ -185,6 +185,7 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 		return avgTimeSpent;
 	}
 	
+	@SuppressWarnings("unchecked")
 	protected String getTaxonomyMetadataLabel(List<Code> taxonomyMetadatas) {
 		if (taxonomyMetadatas != null) {
 			String label = "";
