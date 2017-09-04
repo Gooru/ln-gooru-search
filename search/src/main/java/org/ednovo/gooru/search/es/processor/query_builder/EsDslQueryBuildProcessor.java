@@ -100,7 +100,7 @@ public class EsDslQueryBuildProcessor extends SearchProcessor<SearchData, Object
 				query.put("script_score", scriptScore);
 				scriptScore.put("script", script);
 				script.put("inline", score);
-				script.put("lang", "groovy");
+				script.put("lang", getSearchSetting("search." + searchData.getType().toLowerCase() + ".query.script.lang"));
 			}
 			searchData.getQueryDsl().put("query", customQuery);
 		} else {

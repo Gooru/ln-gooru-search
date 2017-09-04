@@ -5,7 +5,7 @@
 	<groupId>org.ednovo.gooru</groupId>
 	<artifactId>gooru</artifactId>
 	<packaging>pom</packaging>
-	<version>1.0</version>
+	<version>4.0</version>
 	<name>Gooru</name>
 	<url>http://www.gooru.org</url>
 	<prerequisites>
