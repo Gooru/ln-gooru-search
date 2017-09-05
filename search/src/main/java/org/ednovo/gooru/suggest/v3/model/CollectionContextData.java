@@ -25,9 +25,7 @@ public class CollectionContextData {
 	private List<String> taxonomyCourseId;
 	
 	private List<String> taxonomyLeafSLInternalCodes;
-	
-	private List<String> taxonomyConceptNodeNeighbours;
-	
+		
 	private String courseId;
 	
 	private String courseTitle;
@@ -45,6 +43,10 @@ public class CollectionContextData {
 	private List<String> itemTitles;
 
 	private List<String> taxonomyLearningTargets;
+	
+	private List<String> gutStdCodes;
+	
+	private List<String> gutLtCodes;
 
 	public String getId() {
 		return id;
@@ -117,14 +119,6 @@ public class CollectionContextData {
 	public void setTaxonomyLeafSLInternalCodes(List<String> taxonomyLeafSLInternalCodes) {
 		this.taxonomyLeafSLInternalCodes = taxonomyLeafSLInternalCodes;
 	}
-	
-	public List<String> getTaxonomyConceptNodeNeighbours() {
-		return taxonomyConceptNodeNeighbours;
-	}
-
-	public void setTaxonomyConceptNodeNeighbours(List<String> taxonomyConceptNodeNeighbours) {
-		this.taxonomyConceptNodeNeighbours = taxonomyConceptNodeNeighbours;
-	}
 
 	public String getCourseId() {
 		return courseId;
@@ -196,6 +190,22 @@ public class CollectionContextData {
 
 	public void setTaxonomyLearningTargets(List<String> taxonomyLearningTargets) {
 		this.taxonomyLearningTargets = taxonomyLearningTargets;
+	}
+
+	public List<String> getGutStdCodes() {
+		return gutStdCodes;
+	}
+
+	public void setGutStdCodes(List<String> gutStdCodes) {
+		this.gutStdCodes = gutStdCodes;
+	}
+
+	public List<String> getGutLtCodes() {
+		return gutLtCodes;
+	}
+
+	public void setGutLtCodes(List<String> gutLtCodes) {
+		this.gutLtCodes = gutLtCodes;
 	}
 
 }
