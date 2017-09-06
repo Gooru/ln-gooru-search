@@ -1,6 +1,6 @@
 package org.ednovo.gooru.search.es.processor.util;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.json.JSONObject;
 import org.springframework.validation.Errors;
 import org.springframework.web.servlet.ModelAndView;

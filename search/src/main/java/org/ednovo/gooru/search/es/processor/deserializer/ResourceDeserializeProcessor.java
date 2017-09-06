@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.constant.SearchFilterConstants;
 import org.ednovo.gooru.search.es.model.Answer;
@@ -199,7 +199,7 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 
 				List<String> grade = metadata.get(IndexFields.GRADE);
 				if(grade != null && grade.size() > 0){
-					resource.setGrade(String.join(SEARCH_COMMA_SEPERTOR, grade));
+					resource.setGrade(String.join(SEARCH_COMMA_SEPARATOR, grade));
 				}
 			}
 		}

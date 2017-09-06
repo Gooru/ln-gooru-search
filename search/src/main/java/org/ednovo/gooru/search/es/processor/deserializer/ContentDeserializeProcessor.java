@@ -12,6 +12,7 @@ import org.ednovo.gooru.search.es.model.SearchData;
 public abstract class ContentDeserializeProcessor<O extends List<?>, S extends SearchResult>
 		extends DeserializeProcessor<O, S> {
 
+	@SuppressWarnings("unchecked")
 	@Override
 	S collect(Map<String, Object> model, SearchData searchData, S output) {
 		if (output == null) {

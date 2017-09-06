@@ -1,10 +1,7 @@
 package org.ednovo.gooru.suggest.v3.model;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-
-import javax.json.JsonObject;
 
 public class CollectionContextData {
 
@@ -15,10 +12,6 @@ public class CollectionContextData {
 	private String learningObjective;
 
 	private String format;
-			
-	private JsonObject taxonomy;
-	
-	private Map<String, JsonObject> resourcesTaxonomy;
 					
 	private List<String> taxonomySubjectId;
 	
@@ -76,22 +69,6 @@ public class CollectionContextData {
 	
 	public void setFormat(String format) {
 		this.format = format;
-	}
-
-	public JsonObject getTaxonomy() {
-		return taxonomy;
-	}
-
-	public void setTaxonomy(JsonObject taxonomy) {
-		this.taxonomy = taxonomy;
-	}
-
-	public Map<String, JsonObject> getResourcesTaxonomy() {
-		return resourcesTaxonomy;
-	}
-
-	public void setResourcesTaxonomy(Map<String, JsonObject> resourcesTaxonomy) {
-		this.resourcesTaxonomy = resourcesTaxonomy;
 	}
 
 	public List<String> getTaxonomySubjectId() {

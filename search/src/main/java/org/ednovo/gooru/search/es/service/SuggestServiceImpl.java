@@ -38,9 +38,6 @@ public class SuggestServiceImpl<D> implements SuggestService {
 	@Autowired
 	private ActivityStreamDataProviderService userActivityStreamDataProviderService;
 	
-	@Autowired
-	private ClasspagePerformanceDataProviderService userPerformanceResourceDataProviderService;
-	
 	@Override
 	public List<SuggestResponse<Object>> suggest(SuggestData suggestData) throws Exception {
 		
@@ -90,12 +87,6 @@ public class SuggestServiceImpl<D> implements SuggestService {
 					List<CollectionContextData> collectionData = scollectionDataProviderService.getCollectionList(collectionDataProviderCriteria);
 					if (collectionData.size() > 0) {
 						dataProviderInput.put(SuggestDataProviderType.SCOLLECTION, collectionData.get(0));
-					}
-				}
-				if (dataProvider.name().equals(SuggestDataProviderType.USER_RESOURCE_PERFORMANCE.name())) {
-					Map<String, ResourceUsageData> userResourcePerformanceData = userPerformanceResourceDataProviderService.getUserResourcePerformanceDataMap(classpageDataProviderCriteria);
-					if (userResourcePerformanceData != null) {
-						dataProviderInput.put(SuggestDataProviderType.USER_RESOURCE_PERFORMANCE, userResourcePerformanceData);
 					}
 				}
 				if (suggestData.getSuggestContext().getEvent() != null && !suggestData.getSuggestContext().getEvent().equalsIgnoreCase("collection-edit") && dataProvider.name().equals(SuggestDataProviderType.RESOURCE.name())) {

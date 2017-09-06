@@ -2,7 +2,7 @@ package org.ednovo.gooru.search.es.model;
 
 import java.io.Serializable;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class UserV2 implements Serializable{
 

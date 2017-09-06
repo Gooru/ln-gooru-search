@@ -2,7 +2,7 @@ package org.ednovo.gooru.controllers.api.v3.service;
 
 import java.util.Arrays;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.RequestContextFields;
 import org.ednovo.gooru.search.es.exception.BadRequestException;
