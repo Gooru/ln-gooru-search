@@ -99,7 +99,7 @@ public class EsDslQueryBuildProcessor extends SearchProcessor<SearchData, Object
 			if (searchDataType.equalsIgnoreCase(SearchType.SIMPLE_COLLECTION.getType()) && lang != null && !(lang.equalsIgnoreCase("native"))) {
 				query.put("script_score", scriptScore);
 				scriptScore.put("script", script);
-				script.put("inline", score);
+				script.put("source", score);
 				script.put("lang", getSearchSetting("search." + searchData.getType().toLowerCase() + ".query.script.lang"));
 			}
 			searchData.getQueryDsl().put("query", customQuery);
@@ -138,7 +138,7 @@ public class EsDslQueryBuildProcessor extends SearchProcessor<SearchData, Object
 			customScoreQuery.put("function_score", query);
 			query.put("script_score", scriptScore);
 			scriptScore.put("script", script);
-			script.put("inline", getSearchSetting(RESCORE_SCRIPT, DEFAULT_RESCORE_SCRIPT));
+			script.put("source", getSearchSetting(RESCORE_SCRIPT, DEFAULT_RESCORE_SCRIPT));
 			script.put("lang", getSearchSetting(RESCORE_SCRIPT_LANG, DEFAULT_RESCORE_LANG));
 			rescoreQuery.put("rescore_query", customScoreQuery);
 			rescoreQuery.put("score_mode", getSearchSetting(RESCORE_MODE, DEFAULT_RESCORE_MODE));

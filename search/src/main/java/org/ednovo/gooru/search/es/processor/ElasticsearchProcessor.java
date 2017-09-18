@@ -17,6 +17,7 @@ import javax.annotation.PreDestroy;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.entity.ContentType;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.nio.entity.NStringEntity;
 import org.apache.http.util.EntityUtils;
 import org.ednovo.gooru.search.es.exception.BadRequestException;
@@ -97,15 +98,14 @@ public class ElasticsearchProcessor extends SearchProcessor<SearchData, Object> 
 			long start = System.currentTimeMillis();
 
 			HttpEntity entity = new NStringEntity(searchQuery, ContentType.APPLICATION_JSON);
-			Response indexResponse = getClient().performRequest(GET_METHOD,
+			Response searchResponse = getClient().performRequest(GET_METHOD,
 					SLASH_SEPARATOR + getSetting(S_ES_INDEX_PREFIX) + indexName + getSetting(S_ES_INDEX_SUFFIX) + SLASH_SEPARATOR + indexType + SLASH_SEPARATOR + UNDERSCORE_SEARCH,
-					Collections.<String, String>emptyMap(), entity);
-			if (indexResponse.getEntity() != null) {
-				if (indexResponse.getStatusLine().getStatusCode() == 400 || indexResponse.getStatusLine().getStatusCode() == 503) {
-					throw new BadRequestException("Please check request param input values");
-				}
+					Collections.<String, String>emptyMap(), entity, new BasicHeader("Content-Type", "application/json"));
+			if (searchResponse.getStatusLine().getStatusCode() == 400 || searchResponse.getStatusLine().getStatusCode() == 503) {
+				throw new BadRequestException("Please check request param input values");
 			}
-			searchData.setSearchResultText(EntityUtils.toString(indexResponse.getEntity()));
+
+			searchData.setSearchResultText(EntityUtils.toString(searchResponse.getEntity()));
 			if (LOG.isDebugEnabled()) {
 				LOG.debug("Elapsed Time for " + indexType + " : " + (System.currentTimeMillis() - start) + " ms");
 			}
