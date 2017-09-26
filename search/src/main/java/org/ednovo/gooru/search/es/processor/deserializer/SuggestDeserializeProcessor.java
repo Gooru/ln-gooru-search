@@ -55,13 +55,13 @@ public abstract class SuggestDeserializeProcessor<O, S> extends SearchProcessor<
 			Map<String, Object> curriculumAsMap = (Map<String, Object>) taxonomySetAsMap.get(IndexFields.CURRICULUM);
 			List<Map<String, String>> curriculumInfoAsList = (List<Map<String, String>>) curriculumAsMap.get(IndexFields.CURRICULUM_INFO);
 			if (curriculumInfoAsList != null && !curriculumInfoAsList.isEmpty()) {
-				curriculumInfoAsList.parallelStream().forEach(codeAsMap -> {
+				curriculumInfoAsList.forEach(codeAsMap -> {
 					if (standardPrefs == null) {
 						convertKeysToSnakeCase(finalConvertedMap, codeAsMap);
 					} else {
-						Map<String, Map<String, String>> crosswalkResult = null;
-						crosswalkResult = deserializeCrosswalkResponse(crosswalkResponse, codeAsMap.get(IndexFields.ID), crosswalkResult);
-						transformToPreferredCode(finalConvertedMap, standardPrefs, codeAsMap, crosswalkResult);
+						List<Map<String, String>> crosswalkCodes = null;
+						crosswalkCodes = deserializeCrosswalkResponse(crosswalkResponse, codeAsMap.get(IndexFields.ID), crosswalkCodes);
+						transformToPreferredCode(finalConvertedMap, standardPrefs, codeAsMap, crosswalkCodes);
 					}
 				});
 			}
@@ -70,22 +70,25 @@ public abstract class SuggestDeserializeProcessor<O, S> extends SearchProcessor<
 	}
 
 	@SuppressWarnings("unchecked")
-	private Map<String, Map<String, String>> deserializeCrosswalkResponse(List<Map<String, Object>> crosswalkSearchResponse, String id, Map<String, Map<String, String>> crosswalkedResult) {
-		if (crosswalkSearchResponse != null && !crosswalkSearchResponse.isEmpty()) {
-			for (Map<String, Object> response : crosswalkSearchResponse) {
+	protected List<Map<String, String>> deserializeCrosswalkResponse(List<Map<String, Object>> crosswalkResponses, String id, List<Map<String, String>> crosswalkResult) {
+		if (crosswalkResponses != null && !crosswalkResponses.isEmpty()) {
+			for (Map<String, Object> response : crosswalkResponses) {
 				Map<String, Object> source = (Map<String, Object>) response.get(SEARCH_SOURCE);
-				String crosswalkId = (String) source.get(IndexFields.ID);
-				if (!crosswalkId.equalsIgnoreCase(id)) {
-					continue;
-				} else {
-					crosswalkedResult = (Map<String, Map<String, String>>) source.get(IndexFields.EQUIVALENT_COMPETENCIES);
+				List<Map<String, String>> crosswalkCodes = (List<Map<String, String>>) source.get(IndexFields.CROSSWALK_CODES);
+				for (Map<String, String> code : crosswalkCodes) {
+					String crosswalkId = (String) code.get(IndexFields.ID);
+					if (!crosswalkId.equalsIgnoreCase(id)) {
+						continue;
+					} else {
+						return crosswalkCodes;
+					}
 				}
 			}
 		}
-		return crosswalkedResult;
+		return crosswalkResult;
 	}
 
-	private void transformToPreferredCode(Map<String, Object> finalConvertedMap, JSONObject standardPrefs, Map<String, String> codeAsMap, Map<String, Map<String, String>> crosswalkResult) {
+	private void transformToPreferredCode(Map<String, Object> finalConvertedMap, JSONObject standardPrefs, Map<String, String> codeAsMap, List<Map<String, String>> crosswalkCodes) {
 		String internalCode = codeAsMap.get(IndexFields.ID);
 		final String subject = internalCode.substring((internalCode.indexOf(DOT) + 1), internalCode.indexOf(HYPHEN));
 		String framework = null;
@@ -93,10 +96,13 @@ public abstract class SuggestDeserializeProcessor<O, S> extends SearchProcessor<
 		try {
 			if (standardPrefs != null && standardPrefs.has(subject)) {
 				framework = standardPrefs.getString(subject);
-				if (framework != null && !internalCode.startsWith(framework + DOT) && crosswalkResult != null) {
-					Map<String, String> txCodes = crosswalkResult.get(framework);
-					if (txCodes != null) {
-						convertKeysToSnakeCase(finalConvertedMap, codeAsMap);
+				if (framework != null && !internalCode.startsWith(framework + DOT) && crosswalkCodes != null) {
+					for (Map<String, String> crosswalk : crosswalkCodes) {
+						if (!crosswalk.get(FRAMEWORK_CODE).equalsIgnoreCase(framework)) {
+							continue;
+						}
+						crosswalk.put(PARENT_TITLE, codeAsMap.get(PARENT_TITLE));
+						convertKeysToSnakeCase(finalConvertedMap, crosswalk);
 						isTransformed = true;
 					}
 				}
@@ -123,7 +129,7 @@ public abstract class SuggestDeserializeProcessor<O, S> extends SearchProcessor<
 		SearchData crosswalkRequest = new SearchData();
 		crosswalkRequest.setPretty(input.getPretty());
 		crosswalkRequest.setIndexType(EsIndex.CROSSWALK);
-		crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.ID, (StringUtils.join(leafInternalCodes, ",")));
+		crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CROSSWALK_CODES + DOT + IndexFields.ID, (StringUtils.join(leafInternalCodes,",")));
 		crosswalkRequest.setQueryString(STAR);
 		List<Map<String, Object>> searchResponse = (List<Map<String, Object>>) SearchHandler.getSearcher(SearchHandlerType.CROSSWALK.name()).search(crosswalkRequest).getSearchResults();
 		return searchResponse;
