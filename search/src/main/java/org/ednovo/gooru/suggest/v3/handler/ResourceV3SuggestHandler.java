@@ -26,6 +26,7 @@ import org.ednovo.gooru.search.es.processor.deserializer.ResourceDeserializeProc
 import org.ednovo.gooru.search.es.processor.deserializer.ResourceSuggestDeserializeProcessor;
 import org.ednovo.gooru.search.es.processor.query_builder.ResourceEsDslQueryBuildProcessor;
 import org.ednovo.gooru.search.es.repository.ConceptBasedResourceSuggestRepository;
+import org.ednovo.gooru.search.es.repository.GutBasedResourceSuggestRepository;
 import org.ednovo.gooru.search.es.service.SearchSettingService;
 import org.ednovo.gooru.search.model.ActivityStreamRawData;
 import org.ednovo.gooru.suggest.v3.data.provider.model.SuggestDataProviderType;
@@ -71,6 +72,9 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 	@Autowired
 	private ConceptBasedResourceSuggestRepository conceptSuggestionRepository;
 	
+//	@Autowired
+//	private GutBasedResourceSuggestRepository gutSuggestionRepository;
+
 	private SuggestDataProviderType[] suggestDataProviders = { SuggestDataProviderType.RESOURCE,SuggestDataProviderType.COLLECTION };
 
 	@Override
@@ -202,6 +206,14 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 							if (ids == null && collectionData.getStandards() != null && collectionData.getStandards().size() > 0) {
 								ids = conceptSuggestionRepository.getSuggestionByCompetency(collectionData.getStandards(), contextType, range, SuggestHandlerType.RESOURCE.name().toLowerCase());
 							}
+							//To be enabled when Gut table is ready with NU suggestion
+/*							if (collectionData.getGutLtCodes() != null && collectionData.getGutLtCodes().size() > 0) {
+								ids = gutSuggestionRepository.getSuggestionByMicroCompetency(collectionData.getGutLtCodes(), range);
+							}
+
+							if (ids == null && collectionData.getGutStdCodes() != null && collectionData.getGutStdCodes().size() > 0) {
+								ids = gutSuggestionRepository.getSuggestionByCompetency(collectionData.getGutStdCodes(), range);
+							}*/
 						}
 						if (ids != null && !ids.isEmpty()) {
 							suggestData.putFilter("&id", StringUtils.join(ids, ","));

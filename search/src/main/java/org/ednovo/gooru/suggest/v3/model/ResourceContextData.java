@@ -40,8 +40,6 @@ public class ResourceContextData {
 
 	private ArrayList<String> standards;
 
-	private ArrayList<String> conceptNodeNeighbours;
-
 	public String getId() {
 		return id;
 	}
@@ -168,14 +166,6 @@ public class ResourceContextData {
 
 	public void setStandards(ArrayList<String> standards) {
 		this.standards = standards;
-	}
-
-	public ArrayList<String> getConceptNodeNeighbours() {
-		return conceptNodeNeighbours;
-	}
-
-	public void setConceptNodeNeighbours(ArrayList<String> conceptNodeNeighbours) {
-		this.conceptNodeNeighbours = conceptNodeNeighbours;
 	}
 
 }
