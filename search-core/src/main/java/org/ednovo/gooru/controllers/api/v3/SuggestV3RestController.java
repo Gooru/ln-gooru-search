@@ -118,6 +118,7 @@ public class SuggestV3RestController extends BaseController {
 		}
 		User apiCaller = (User) request.getAttribute(Constants.USER);
 		suggestData.setType(type);
+		suggestData.setUserTaxonomyPreference((JSONObject) request.getAttribute(Constants.USER_PREFERENCES));
 
 		@SuppressWarnings("unchecked")
 		MapWrapper<Object> suggestParamMap = new MapWrapper<Object>(request.getParameterMap());
