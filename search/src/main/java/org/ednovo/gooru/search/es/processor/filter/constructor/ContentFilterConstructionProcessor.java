@@ -3,7 +3,7 @@
  */
 package org.ednovo.gooru.search.es.processor.filter.constructor;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.model.PublishedStatus;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.SearchResponse;

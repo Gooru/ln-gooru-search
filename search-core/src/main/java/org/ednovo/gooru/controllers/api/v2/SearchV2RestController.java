@@ -9,10 +9,11 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.controllers.api.BaseController;
 import org.ednovo.gooru.search.es.constant.Constants;
+import org.ednovo.gooru.search.es.constant.EventConstants;
 import org.ednovo.gooru.search.es.constant.SearchInputType;
 import org.ednovo.gooru.search.es.exception.BadRequestException;
 import org.ednovo.gooru.search.es.exception.SearchException;
@@ -27,6 +28,7 @@ import org.ednovo.gooru.search.es.model.UserGroupSupport;
 import org.ednovo.gooru.search.es.processor.util.SerializerUtil;
 import org.ednovo.gooru.search.es.service.SearchService;
 import org.ednovo.gooru.search.es.service.SearchSettingService;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,13 +102,12 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		}
 
 		if (query.matches(SEARCH_SPLCHR)) {
-			throw new BadRequestException("Please Enter the Valid Query for search Resources");
+			throw new BadRequestException("Please enter a valid search term");
 		}
-		// FIXME Duplicate attribute of searchType
 		JSONObject payloadObject = new JSONObject();
 		JSONObject session = new JSONObject();
 		SessionContextSupport.putLogParameter("eventName", "item.search");
-		payloadObject.put("text", query);
+		payloadObject.put(TEXT, query);
 		long start = System.currentTimeMillis();
 		User apiCaller = (User) request.getAttribute(USER);
 		
@@ -130,15 +131,15 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		}
 
 		if (sessionToken != null) {
-			session.put(SESSION_TOKEN_SEARCH, sessionToken);
-			session.put(PARTNER_ID, request.getAttribute(PARTNER_ID));
-			session.put(APP_ID, request.getAttribute(APP_ID));
-			session.put(TENANT_ID, userTenantId);
-			session.put(API_KEY, "");
-			session.put(Constants.SEARCH_ORGANIZATION_UID, "");
+			session.put(EventConstants.SESSION_TOKEN, sessionToken);
+			session.put(EventConstants.PARTNER_ID, request.getAttribute(EventConstants.PARTNER_ID));
+			session.put(EventConstants.APP_ID, request.getAttribute(EventConstants.APP_ID));
+			session.put(EventConstants.TENANT_ID, userTenantId);
+			session.put(EventConstants.API_KEY, EMPTY_STRING);
+			session.put(SEARCH_ORGANIZATION_UID, EMPTY_STRING);
 		}
 
-		SessionContextSupport.putLogParameter(SESSION_SEARCH, session);
+		SessionContextSupport.putLogParameter(EventConstants.SESSION, session);
 
 		/*Set<UserRoleAssoc> userRoleAssocs = (Set<UserRoleAssoc>) apiCaller.getUserRoleSet();
 		for (UserRoleAssoc set : userRoleAssocs) {
@@ -161,7 +162,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		searchData.setParameters(searchDataMap);
 
 		if (query.contains("!")) {
-			query = query.replace("!", "");
+			query = query.replace("!", EMPTY_STRING);
 		}
 		searchData.setOriginalQuery(query);
 		searchData.setQueryString(query);
@@ -211,11 +212,11 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		} else if (type.equalsIgnoreCase(COLLECTION_QUIZ)) {
 			type = TYPE_LIBRARY;
 		} else if (type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(AUTO_COMPLETE)) {
-			String expandedQuery = searchData.getQueryString().replace("\"", "").replace(" ", "_").replaceAll("([^a-z0-9A-Z_])", "\\\\$1");
-			if (expandedQuery == "") {
-				expandedQuery = "*";
+			String expandedQuery = searchData.getQueryString().replace("\"", EMPTY_STRING).replace(" ", "_").replaceAll("([^a-z0-9A-Z_])", "\\\\$1");
+			if (expandedQuery == EMPTY_STRING) {
+				expandedQuery = STAR;
 			}
-			String queryString = "querysuggestion: " + expandedQuery + " OR querysuggestion: " + expandedQuery + "*";
+			String queryString = "querysuggestion: " + expandedQuery + " OR querysuggestion: " + expandedQuery + STAR;
 			searchData.setQueryString(queryString);
 			if (type.equalsIgnoreCase(AUTO_COMPLETE)) {
 				type = SearchHandlerType.AUTOCOMPLETE.name();
@@ -338,6 +339,116 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 	public void refreshGlobalTenantsInCache(HttpServletRequest request,@RequestParam(required = false) String sessionToken, HttpServletResponse response,
 			final ModelMap model) throws Exception {
 		searchService.refreshGlobalTenantsInCache();
+	}
+	
+	@RequestMapping(method = {RequestMethod.GET}, value = "/autocomplete/{type}")
+	public ModelAndView searchAutoComplete(HttpServletRequest request, HttpServletResponse response, 
+			@RequestParam(required = false) String sessionToken,
+			@RequestParam(defaultValue = "8", value="length") Integer pageSize, 
+			@RequestParam(defaultValue = "0") String pretty, 
+			@RequestParam(defaultValue = "0") Integer startAt,
+			@RequestParam(defaultValue = "1", value="start") Integer pageNum, 
+			@RequestParam(value="q") String query, 
+			@PathVariable String type) throws Exception {
+		SearchData searchData = new SearchData();
+
+		// original query string from user
+		searchData.setUserQueryString(query);
+
+		if (query.matches(SEARCH_SPLCHR)) {
+			throw new BadRequestException("Please enter a valid search term");
+		}
+
+		long start = System.currentTimeMillis();
+
+		if (sessionToken == null) {
+			sessionToken = BaseController.getSessionToken(request);
+		}
+
+		if (query.contains("!")) {
+			query = query.replace("!", EMPTY_STRING);
+		}
+		searchData.setOriginalQuery(query);
+		searchData.setQueryString(query);
+		searchData.setPretty(pretty);
+		searchData.setQueryType(SINGLE);
+		searchData.setSessionToken(sessionToken);
+		searchData.setUserTenantId(((UserGroupSupport) request.getAttribute(TENANT)).getTenantId());
+
+		if (type.equalsIgnoreCase(TYPE_AGGREGATOR)) {
+			searchData.setType(type);
+			searchData.setQueryString(searchData.getQueryString() + STAR);
+		} else if (type.equalsIgnoreCase(TYPE_PUBLISHER) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(KEYWORD)) {
+			String expandedQuery = searchData.getQueryString().replace("\"", EMPTY_STRING).replace(" ", "_").replaceAll("([^a-z0-9A-Z_])", "\\\\$1");
+			if (expandedQuery == EMPTY_STRING) {
+				expandedQuery = STAR;
+			}
+			if (type.equalsIgnoreCase(KEYWORD)) {
+				searchData.setQueryString(expandedQuery);
+				type = SearchHandlerType.AUTOCOMPLETE_KEYWORD.name();
+			} else if (type.equalsIgnoreCase(PUBLISHER)) {
+				expandedQuery = expandedQuery.replaceAll(FIND_SPECIAL_CHARACTERS_REGEX, EMPTY_STRING);
+				searchData.setQueryString(expandedQuery);
+			} else if (type.equalsIgnoreCase(SEARCH_QUERY)) {
+				String queryString = "querysuggestion: " + expandedQuery + " OR querysuggestion: " + expandedQuery + STAR;
+				searchData.setQueryString(queryString);
+			}
+		} else {
+			throw new BadRequestException("Invalid Autocomplete Type!");
+		}
+
+		searchData.setType(type);
+		searchData.setFrom(startAt);
+		searchData.setPageNum(pageNum);
+		searchData.setSize(pageSize);
+		if (searchData.getFrom() < 1) {
+			searchData.setFrom((pageNum - 1) * searchData.getSize());
+		}
+		searchData.setRemoteAddress(request.getRemoteAddr());
+		User apiCaller = (User) request.getAttribute(USER);
+		searchData.setUser(apiCaller);
+		if (!(type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(KEYWORD))) {
+			searchData.setRestricted(false);
+		}
+
+		String excludeAttributeArray[] = {};
+		try {
+			SearchResponse<Object> searchResponse = SearchHandler.getSearcher(type.toUpperCase()).search(searchData);
+			logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
+			searchResponse.setExecutionTime(System.currentTimeMillis() - start);
+
+			setEventLogObject(request, searchData, searchResponse);
+
+			if (type.equalsIgnoreCase(SearchHandlerType.AUTOCOMPLETE_KEYWORD.name()) || type.equalsIgnoreCase(TYPE_ATTRIBUTION) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(TYPE_PUBLISHER) || type.equalsIgnoreCase(TYPE_AGGREGATOR)) {
+				return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
+			}
+			return toModelAndView(serialize(searchResponse, JSON, excludeAttributeArray, true, false));
+		} catch (SearchException searchException) {
+			response.setStatus(searchException.getStatus().value());
+			return toModelAndView(searchException.getMessage());
+		}
+	}
+
+	private void setEventLogObject(HttpServletRequest request, SearchData searchData, SearchResponse<Object> searchResponse) throws JSONException {
+		JSONObject payloadObject = new JSONObject();
+		JSONObject session = new JSONObject();
+		SessionContextSupport.putLogParameter(EventConstants.EVENT_NAME, EventConstants.ITEM_DOT_SEARCH);
+		payloadObject.put(EventConstants.TEXT, searchData.getOriginalQuery());
+		if (searchData.getSessionToken() != null) {
+			session.put(EventConstants.SESSION_TOKEN, searchData.getSessionToken());
+			session.put(EventConstants.PARTNER_ID, request.getAttribute(EventConstants.PARTNER_ID));
+			session.put(EventConstants.APP_ID, request.getAttribute(EventConstants.APP_ID));
+			session.put(EventConstants.TENANT_ID, searchData.getUserTenantId());
+		}
+		SessionContextSupport.putLogParameter(EventConstants.SESSION, session);
+		payloadObject.put(EventConstants.PAGE_SIZE, searchData.getSize());
+		payloadObject.put(EventConstants.PAGE_NUM, searchData.getPageNum());
+		payloadObject.put(EventConstants.START_AT, searchData.getFrom());
+		payloadObject.put(EventConstants.RESULT_SIZE, searchResponse.getResultCount());
+		payloadObject.put(EventConstants.HIT_COUNT, searchResponse.getTotalHitCount());
+		payloadObject.put(EventConstants.SEARCH_EXECUTION_TIME, searchResponse.getExecutionTime());
+		SessionContextSupport.putLogParameter(EventConstants.PAYLOAD_OBJECT, payloadObject);
+		request.setAttribute(EventConstants.ACTION, SEARCH);
 	}
 	
 }

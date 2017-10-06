@@ -1,10 +1,7 @@
 package org.ednovo.gooru.suggest.v3.model;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-
-import javax.json.JsonObject;
 
 public class CollectionContextData {
 
@@ -15,19 +12,13 @@ public class CollectionContextData {
 	private String learningObjective;
 
 	private String format;
-			
-	private JsonObject taxonomy;
-	
-	private Map<String, JsonObject> resourcesTaxonomy;
 					
 	private List<String> taxonomySubjectId;
 	
 	private List<String> taxonomyCourseId;
 	
 	private List<String> taxonomyLeafSLInternalCodes;
-	
-	private List<String> taxonomyConceptNodeNeighbours;
-	
+		
 	private String courseId;
 	
 	private String courseTitle;
@@ -45,6 +36,10 @@ public class CollectionContextData {
 	private List<String> itemTitles;
 
 	private List<String> taxonomyLearningTargets;
+	
+	private List<String> gutStdCodes;
+	
+	private List<String> gutLtCodes;
 
 	public String getId() {
 		return id;
@@ -78,22 +73,6 @@ public class CollectionContextData {
 		this.format = format;
 	}
 
-	public JsonObject getTaxonomy() {
-		return taxonomy;
-	}
-
-	public void setTaxonomy(JsonObject taxonomy) {
-		this.taxonomy = taxonomy;
-	}
-
-	public Map<String, JsonObject> getResourcesTaxonomy() {
-		return resourcesTaxonomy;
-	}
-
-	public void setResourcesTaxonomy(Map<String, JsonObject> resourcesTaxonomy) {
-		this.resourcesTaxonomy = resourcesTaxonomy;
-	}
-
 	public List<String> getTaxonomySubjectId() {
 		return taxonomySubjectId;
 	}
@@ -116,14 +95,6 @@ public class CollectionContextData {
 
 	public void setTaxonomyLeafSLInternalCodes(List<String> taxonomyLeafSLInternalCodes) {
 		this.taxonomyLeafSLInternalCodes = taxonomyLeafSLInternalCodes;
-	}
-	
-	public List<String> getTaxonomyConceptNodeNeighbours() {
-		return taxonomyConceptNodeNeighbours;
-	}
-
-	public void setTaxonomyConceptNodeNeighbours(List<String> taxonomyConceptNodeNeighbours) {
-		this.taxonomyConceptNodeNeighbours = taxonomyConceptNodeNeighbours;
 	}
 
 	public String getCourseId() {
@@ -196,6 +167,22 @@ public class CollectionContextData {
 
 	public void setTaxonomyLearningTargets(List<String> taxonomyLearningTargets) {
 		this.taxonomyLearningTargets = taxonomyLearningTargets;
+	}
+
+	public List<String> getGutStdCodes() {
+		return gutStdCodes;
+	}
+
+	public void setGutStdCodes(List<String> gutStdCodes) {
+		this.gutStdCodes = gutStdCodes;
+	}
+
+	public List<String> getGutLtCodes() {
+		return gutLtCodes;
+	}
+
+	public void setGutLtCodes(List<String> gutLtCodes) {
+		this.gutLtCodes = gutLtCodes;
 	}
 
 }

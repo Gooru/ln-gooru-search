@@ -135,7 +135,17 @@ public enum SearchProcessorType {
 	
 	KeywordCompetencyFilterConstruction(),
 	
-	KeywordCompetencyDeserializer();
+	KeywordCompetencyDeserializer(),
+	
+	AutoCompleteKeywordDslQueryBuild(),
+	
+	AutoCompleteKeywordDeserializeProcessor(),
+	
+	AutoCompletePublisherDslQueryBuild(),
+	
+	AutoCompletePublisherDeserializeProcessor(),
+
+	CollectionSuggestDeserializeProcessor();
 
 	private SearchProcessorType() {
 	}

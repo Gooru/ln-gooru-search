@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.ednovo.gooru.search.es.constant.SearchSettingType;
-import org.ednovo.gooru.search.es.filter.AndFilter;
 import org.ednovo.gooru.search.es.filter.TermsFilter;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.SearchResponse;

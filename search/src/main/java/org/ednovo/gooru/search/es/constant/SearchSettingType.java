@@ -13,7 +13,7 @@ public enum SearchSettingType {
 	//TODO move these to a property file
 	S_VERSION("setting.version", "2463573737435353"),
 	S_PROFILE("search.profile", "default"),
-	S_ES_POINT("search.elasticsearch.point", "http://localhost:9200"),
+	S_ES_POINT("search.elasticsearch.point", "localhost:9200"),
 	S_ES_POINT_USERNAME("search.elasticsearch.point.username", ""),
 	S_ES_POINT_PASSWORD("search.elasticsearch.point.password", ""),
 	S_ES_INDEX_PREFIX("search.elasticsearch.index.prefix", "gooru_local_"),

@@ -8,4 +8,6 @@ public interface RequestService {
 
 	void processContextPayload(JSONObject requestContext, SuggestContextData suggestContext, SuggestData suggestData) throws Exception;
 
+	void processCodeContextPayload(JSONObject requestContext, SuggestContextData suggestContext, SuggestData suggestData) throws Exception;
+
 }

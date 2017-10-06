@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.SearchSettingType;
 import org.ednovo.gooru.search.es.model.SearchData;
@@ -291,7 +291,7 @@ public abstract class SearchProcessor<I extends SearchData, O extends Object> im
 		
 		if(((dotsCount > 2 && !(dotsCount == queryString.length())) || (hyphenCount > 2 && !(hyphenCount == queryString.length()))) && !searchData.getParameters().containsKey(SEARCH_FLT_STANDARD)){
 			if (getSearchSetting(SEARCH_TAXONOMY_ROOT_CODE) != null) {
-				String[] rootCodes = getSearchSetting(SEARCH_TAXONOMY_ROOT_CODE).split(SEARCH_COMMA_SEPERTOR);
+				String[] rootCodes = getSearchSetting(SEARCH_TAXONOMY_ROOT_CODE).split(SEARCH_COMMA_SEPARATOR);
 				if (rootCodes != null && rootCodes.length > 0) {
 					for (String rootCode : rootCodes) {
 						if (queryString.startsWith(rootCode)) {
