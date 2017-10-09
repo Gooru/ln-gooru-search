@@ -50,7 +50,7 @@ public class ElasticsearchProcessor extends SearchProcessor<SearchData, Object> 
 	@PostConstruct
 	public void onStartUp() {
 		// Configuration
-		LOG.info("Creating Elasticsearh Rest client...");
+		LOG.info("Creating Elasticsearch Rest client...");
 		HttpHost[] httpHosts = buildHosts(getSetting(S_ES_POINT));
 		SniffOnFailureListener sniffOnFailureListener = new SniffOnFailureListener();
 		RestClient restClient = RestClient.builder(httpHosts).setFailureListener(sniffOnFailureListener).build();

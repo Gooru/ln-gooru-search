@@ -51,7 +51,8 @@ public class SuggestV3RestController extends BaseController {
 	@RequestMapping(method = RequestMethod.POST , value = "/{type}", headers = "Content-Type=application/json")
 	public ModelAndView suggest(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) String sessionToken,
 			@RequestParam(defaultValue = "10", value = "limit") Integer pageSize, @RequestParam(defaultValue = "0") String pretty, 
-			@RequestParam(required = false, defaultValue = "false") Boolean isInternalSuggest, @PathVariable String type, @RequestBody String contextPayload)
+			@RequestParam(required = false, defaultValue = "false") Boolean isInternalSuggest, @PathVariable String type, @RequestBody String contextPayload,
+			@RequestParam(required = false, defaultValue= "true") boolean isCrosswalk)
 			throws Exception {
 		long start = System.currentTimeMillis();
 		JSONObject requestContext = null;
@@ -61,6 +62,7 @@ public class SuggestV3RestController extends BaseController {
 			throw new BadRequestException("Request Payload missing!");
 		}
 		SuggestData suggestData = new SuggestData();
+		suggestData.setCrosswalk(isCrosswalk);
 		suggestData = suggestRequest(suggestData, request, type, pageSize, requestContext, pretty, sessionToken);
 		try {
 			if (!(type.equalsIgnoreCase(RESOURCE) || type.equalsIgnoreCase(COLLECTION))) {
@@ -79,7 +81,8 @@ public class SuggestV3RestController extends BaseController {
 	
 	@RequestMapping(method = RequestMethod.POST , value = "taxonomy/{type}", headers = "Content-Type=application/json")
 	public ModelAndView suggestForCode(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) String sessionToken,
-			@RequestParam(defaultValue = "10", value = "limit") Integer pageSize, @RequestParam(defaultValue = "0") String pretty, @RequestParam(required = false, defaultValue = "false") Boolean inputTypeInternalCode, @RequestParam(required = false, defaultValue = "false") Boolean isInternalSuggest, @PathVariable String type, @RequestBody String contextPayload)
+			@RequestParam(defaultValue = "10", value = "limit") Integer pageSize, @RequestParam(defaultValue = "0") String pretty, @RequestParam(required = false, defaultValue = "false") Boolean inputTypeInternalCode, @RequestParam(required = false, defaultValue = "false") Boolean isInternalSuggest, @PathVariable String type, @RequestBody String contextPayload,
+			@RequestParam(required = false, defaultValue= "true") boolean isCrosswalk)
 			throws Exception {
 		long start = System.currentTimeMillis();
 		JSONObject requestContext = null;
@@ -102,6 +105,7 @@ public class SuggestV3RestController extends BaseController {
 			}
 			suggestData.setType(type);
 			suggestData.setIsInternalSuggest(isInternalSuggest);
+			suggestData.setCrosswalk(isCrosswalk);
 			SuggestResponse<Object> suggestResults = suggestService.suggest(suggestData).get(0);
 			String result = serialize(suggestResults, JSON, SINGLE_EXCLUDES, true);
 			LOG.info("Total latency of suggest " + (System.currentTimeMillis() - start));
