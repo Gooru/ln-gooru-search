@@ -75,7 +75,7 @@ public class TaxonomyDataProviderServiceImpl implements TaxonomyDataProviderServ
 		fetchGutCodesForInternalCodes(standardInternalCodes, gutStdCodes);
 		Set<String> gutLtParentCodes = new HashSet<>(parentStandardInternalCodes.size());
 		fetchGutCodesForInternalCodes(parentStandardInternalCodes, gutLtParentCodes);
-		gutStdCodes.addAll(gutLtParentCodes);
+		if (!gutLtParentCodes.isEmpty()) gutStdCodes.addAll(gutLtParentCodes);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -85,10 +85,12 @@ public class TaxonomyDataProviderServiceImpl implements TaxonomyDataProviderServ
 		crosswalkRequest.putFilter(Constants.AMPERSAND + Constants.CARET_SYMBOL + IndexFields.CROSSWALK_CODES + Constants.DOT + IndexFields.ID, (StringUtils.join(codes, Constants.COMMA)));
 		crosswalkRequest.setQueryString(Constants.STAR);
 		List<Map<String, Object>> searchResponse = (List<Map<String, Object>>) SearchHandler.getSearcher(SearchHandlerType.CROSSWALK.name()).search(crosswalkRequest).getSearchResults();
-		searchResponse.forEach(map -> {
-			Map<String, Object> source = (Map<String, Object>) map.get(Constants.SEARCH_SOURCE);
-			gutCodes.add((String) source.get(IndexFields.ID));
-		});
+		if (searchResponse != null) {
+			searchResponse.forEach(map -> {
+				Map<String, Object> source = (Map<String, Object>) map.get(Constants.SEARCH_SOURCE);
+				gutCodes.add((String) source.get(IndexFields.ID));
+			});
+		}
 	}
 
 }

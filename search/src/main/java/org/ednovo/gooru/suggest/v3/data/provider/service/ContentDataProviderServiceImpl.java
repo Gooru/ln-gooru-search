@@ -5,12 +5,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.repository.ContentRepository;
-import org.ednovo.gooru.search.es.repository.TaxonomyRepository;
 import org.ednovo.gooru.suggest.v3.data.provider.model.ResourceDataProviderCriteria;
 import org.ednovo.gooru.suggest.v3.model.ResourceContextData;
 import org.json.JSONException;
@@ -27,9 +25,6 @@ public class ContentDataProviderServiceImpl implements ContentDataProviderServic
 
 	@Autowired
 	private ContentRepository contentRepository;
-
-	@Autowired
-	private TaxonomyRepository taxonomyRepository;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -54,7 +49,6 @@ public class ContentDataProviderServiceImpl implements ContentDataProviderServic
 				resourceContextDo.setStandards((ArrayList<String>) conceptNodeJson.get("standards"));
 				resourceContextDo.setTaxonomyLearningTargets((ArrayList<String>) conceptNodeJson.get("learningTargets"));
 				resourceContextDo.setTaxonomyLeafSLInternalCodes((ArrayList<String>) conceptNodeJson.get("leafSLInternalCodes"));
-				resourceContextDo.setConceptNodeNeighbours((ArrayList<String>) conceptNodeJson.get("conceptNodeNeighbours"));
 			} catch(Exception e) {
 				LOG.error("Unable to fetch from DB : Resource ID may be a copied resource", e.getMessage());
 			}
@@ -70,7 +64,6 @@ public class ContentDataProviderServiceImpl implements ContentDataProviderServic
 		List<String> standardArray = new ArrayList<>();
 		List<String> learningTargetArray = new ArrayList<>();
 		List<String> leafSLInternalCodes = new ArrayList<>();
-		List<String> conceptNodeNeighbours = new ArrayList<>();
 		Map<String, Object> conceptNodeJson = new HashMap<>();
 
 		if (taxonomyObject != null && (taxonomyObject.length() > 0)) {
@@ -112,19 +105,12 @@ public class ContentDataProviderServiceImpl implements ContentDataProviderServic
 				courseArray.add(courseCode != null ? courseCode.toLowerCase() : null);
 				domainArray.add(domainCode != null ? domainCode.toLowerCase() : null);
 			}
-			for (String leafSLInternalCode : leafSLInternalCodes) {
-				String parentCode = taxonomyRepository.getParentTaxonomyCode(leafSLInternalCode);
-				List<String> conceptNodes = taxonomyRepository.getConceptNeighbours(leafSLInternalCode, parentCode);
-				if (conceptNodes != null && conceptNodes.size() > 0)
-					conceptNodeNeighbours.addAll(conceptNodes);
-			}
 			conceptNodeJson.put("standards", standardArray);
 			conceptNodeJson.put("subjects", subjectArray);
 			conceptNodeJson.put("courses", courseArray);
 			conceptNodeJson.put("domains", domainArray);
 			conceptNodeJson.put("learningTargets", learningTargetArray);
 			conceptNodeJson.put("leafSLInternalCodes", leafSLInternalCodes);
-			conceptNodeJson.put("conceptNodeNeighbours", conceptNodeNeighbours.stream().map(String::toLowerCase).collect(Collectors.toList()));
 		}
 		return conceptNodeJson;
 	}
