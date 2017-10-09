@@ -51,15 +51,15 @@ public abstract class SuggestDeserializeProcessor<O, S> extends SearchProcessor<
 		JSONObject standardPrefs = input.getUserTaxonomyPreference();
 		List<String> leafInternalCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_INTERNAL_CODES);
 		if (leafInternalCodes != null) {
-			List<Map<String, Object>> crosswalkResponse = searchCrosswalk(input, leafInternalCodes);
 			Map<String, Object> curriculumAsMap = (Map<String, Object>) taxonomySetAsMap.get(IndexFields.CURRICULUM);
 			List<Map<String, String>> curriculumInfoAsList = (List<Map<String, String>>) curriculumAsMap.get(IndexFields.CURRICULUM_INFO);
 			if (curriculumInfoAsList != null && !curriculumInfoAsList.isEmpty()) {
 				curriculumInfoAsList.forEach(codeAsMap -> {
-					if (standardPrefs == null) {
+					if (standardPrefs == null || !input.isCrosswalk()) {
 						convertKeysToSnakeCase(finalConvertedMap, codeAsMap);
 					} else {
 						List<Map<String, String>> crosswalkCodes = null;
+						List<Map<String, Object>> crosswalkResponse = searchCrosswalk(input, leafInternalCodes);
 						crosswalkCodes = deserializeCrosswalkResponse(crosswalkResponse, codeAsMap.get(IndexFields.ID), crosswalkCodes);
 						transformToPreferredCode(finalConvertedMap, standardPrefs, codeAsMap, crosswalkCodes);
 					}
