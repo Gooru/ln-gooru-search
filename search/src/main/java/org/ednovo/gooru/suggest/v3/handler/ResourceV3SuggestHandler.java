@@ -72,8 +72,8 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 	@Autowired
 	private ConceptBasedResourceSuggestRepository conceptSuggestionRepository;
 	
-//	@Autowired
-//	private GutBasedResourceSuggestRepository gutSuggestionRepository;
+	@Autowired
+	private GutBasedResourceSuggestRepository gutSuggestionRepository;
 
 	private SuggestDataProviderType[] suggestDataProviders = { SuggestDataProviderType.RESOURCE,SuggestDataProviderType.COLLECTION };
 
@@ -198,28 +198,48 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 						}
 						List<String> ids = null;
 						if (collectionData != null) {
-							if (collectionData.getTaxonomyLearningTargets() != null && collectionData.getTaxonomyLearningTargets().size() > 0) {
+							/*if (collectionData.getTaxonomyLearningTargets() != null && collectionData.getTaxonomyLearningTargets().size() > 0) {
 								ids = conceptSuggestionRepository.getSuggestionByMicroCompetency(collectionData.getTaxonomyLearningTargets(), contextType, range,
 										SuggestHandlerType.RESOURCE.name().toLowerCase());
 							} 
 							
 							if (ids == null && collectionData.getStandards() != null && collectionData.getStandards().size() > 0) {
 								ids = conceptSuggestionRepository.getSuggestionByCompetency(collectionData.getStandards(), contextType, range, SuggestHandlerType.RESOURCE.name().toLowerCase());
-							}
+							}*/
 							//To be enabled when Gut table is ready with NU suggestion
-/*							if (collectionData.getGutLtCodes() != null && collectionData.getGutLtCodes().size() > 0) {
+							if (collectionData.getGutLtCodes() != null && collectionData.getGutLtCodes().size() > 0) {
 								ids = gutSuggestionRepository.getSuggestionByMicroCompetency(collectionData.getGutLtCodes(), range);
 							}
 
 							if (ids == null && collectionData.getGutStdCodes() != null && collectionData.getGutStdCodes().size() > 0) {
 								ids = gutSuggestionRepository.getSuggestionByCompetency(collectionData.getGutStdCodes(), range);
-							}*/
+							}
 						}
 						if (ids != null && !ids.isEmpty()) {
 							suggestData.putFilter("&id", StringUtils.join(ids, ","));
 						} else {
 							LOG.info("Suggestions unavailable for concept nodes : " + collectionData.getTaxonomyLeafSLInternalCodes());
-							suggestData.setSize(0);
+
+							LOG.info("Checking other published resources as quality suggestions are unavailable for gut codes : " + collectionData.getGutStdCodes());
+							suggestData.putFilter(FLT_PUBLISH_STATUS, PublishedStatus.PUBLISHED.getStatus());
+							
+							if (StringUtils.isNotBlank(collectionData.getTitle())) {
+								if (suggestQuery.length() > 0) {
+									suggestQuery.append(OR_DELIMETER);
+								}
+								suggestQuery.append(collectionData.getTitle().trim());
+							}
+							if (StringUtils.isNotBlank(collectionData.getLearningObjective())) {
+								if (suggestQuery.length() > 0) {
+									suggestQuery.append(OR_DELIMETER);
+								}
+								suggestQuery.append(collectionData.getLearningObjective().trim());
+							}
+							if (collectionData.getTaxonomyLeafSLInternalCodes() != null && collectionData.getTaxonomyLeafSLInternalCodes().size() > 0) {
+								suggestData.putFilter("&^taxonomy.leafInternalCodes", StringUtils.join(collectionData.getTaxonomyLeafSLInternalCodes(), ","));
+							} else if (collectionData.getTaxonomyDomains() != null && collectionData.getTaxonomyDomains().size() > 0) {
+								suggestData.putFilter("&^domain", StringUtils.join(collectionData.getTaxonomyDomains(), ","));
+							} 
 						}
 					}
 					
