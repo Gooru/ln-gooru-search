@@ -198,14 +198,6 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 						}
 						List<String> ids = null;
 						if (collectionData != null) {
-							/*if (collectionData.getTaxonomyLearningTargets() != null && collectionData.getTaxonomyLearningTargets().size() > 0) {
-								ids = conceptSuggestionRepository.getSuggestionByMicroCompetency(collectionData.getTaxonomyLearningTargets(), contextType, range,
-										SuggestHandlerType.RESOURCE.name().toLowerCase());
-							} 
-							
-							if (ids == null && collectionData.getStandards() != null && collectionData.getStandards().size() > 0) {
-								ids = conceptSuggestionRepository.getSuggestionByCompetency(collectionData.getStandards(), contextType, range, SuggestHandlerType.RESOURCE.name().toLowerCase());
-							}*/
 							//To be enabled when Gut table is ready with NU suggestion
 							if (collectionData.getGutLtCodes() != null && collectionData.getGutLtCodes().size() > 0) {
 								ids = gutSuggestionRepository.getSuggestionByMicroCompetency(collectionData.getGutLtCodes(), range);
@@ -213,6 +205,14 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 
 							if (ids == null && collectionData.getGutStdCodes() != null && collectionData.getGutStdCodes().size() > 0) {
 								ids = gutSuggestionRepository.getSuggestionByCompetency(collectionData.getGutStdCodes(), range);
+							}
+							
+							if (ids == null && collectionData.getTaxonomyLearningTargets() != null && collectionData.getTaxonomyLearningTargets().size() > 0) {
+								ids = gutSuggestionRepository.getSuggestionByMicroCompetency(collectionData.getTaxonomyLearningTargets(), range);
+							}
+							
+							if (ids == null && collectionData.getStandards() != null && collectionData.getStandards().size() > 0) {
+								ids = gutSuggestionRepository.getSuggestionByCompetency(collectionData.getStandards(), range);
 							}
 						}
 						if (ids != null && !ids.isEmpty()) {
