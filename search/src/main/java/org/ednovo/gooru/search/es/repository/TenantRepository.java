@@ -6,4 +6,6 @@ public interface TenantRepository {
 
 	Map<String, Object> getAllDiscoverableTenants();
 
+	String getTenantSetting(String tenant, String key);
+
 }

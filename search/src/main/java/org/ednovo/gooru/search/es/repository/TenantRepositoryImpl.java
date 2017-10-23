@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.Query;
 import org.hibernate.type.PostgresUUIDType;
+import org.hibernate.type.StringType;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,8 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class TenantRepositoryImpl extends BaseRepository implements TenantRepository {
 
-	public static final String QUERY_FETCH_TENANT = "select id, content_visibility, user_visibility, class_visibility, parent_tenant from tenant where status = "
-			            + "'active'";
 	@Override
 	public Map<String, Object> getAllDiscoverableTenants() {
 		Map<String, Object> discoverableTenants = null;
@@ -44,5 +43,19 @@ public class TenantRepositoryImpl extends BaseRepository implements TenantReposi
 		}
 		return discoverableTenants;
 	}	
+	
+	@Override
+	public String getTenantSetting(String tenant, String key) {
+		String sql = "select value from tenant_setting where id =:ID and key =:KEY";
+		Query query = getSessionFactory().getCurrentSession().createSQLQuery(sql)
+				.addScalar("value", StringType.INSTANCE)
+				.setParameter("ID", tenant, StringType.INSTANCE)
+				.setParameter("KEY", key, StringType.INSTANCE);
+		String value = null;
+		if (query != null && list(query).size() > 0 && list(query).get(0) != null) {
+			value = list(query).get(0).toString();
+		}
+		return value;
+	}
 	
 }

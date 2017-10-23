@@ -232,9 +232,14 @@ public final class SearchSettingService {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static List<String> getDiscoverableTenants() {
+	public static List<String> getDiscoverableTenantIds() {
 		Map<String, Object> discoverableTenants = instance.tenantRepository.getAllDiscoverableTenants();
 		return (discoverableTenants != null && !discoverableTenants.isEmpty()) ? (List<String>) discoverableTenants.get("discoverableTenantIds") : null;
+	}
+	
+	public static Boolean getOpenTenantVisibility(String tenant) {
+		String value = instance.tenantRepository.getTenantSetting(tenant, "open-tenant-course-visibility");
+		return (value != null) ? Boolean.valueOf(value) : false;
 	}
 
 	public static void refreshTenants() {
