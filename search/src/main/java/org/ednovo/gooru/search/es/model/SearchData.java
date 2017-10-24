@@ -112,47 +112,17 @@ public class SearchData implements Serializable {
 	private boolean isCrosswalk;
 	
 	private String userTenantId;
-	
+		
+	private boolean isFeaturedCourseSearch = false;
+
+	private List<String> featuredCourseTenantPreferences;
+
 	public boolean isShowCanonicalOnly() {
 		return showCanonicalOnly;
 	}
 	
 	public void setShowCanonicalOnly(boolean showCanonicalOnly) {
 		this.showCanonicalOnly = showCanonicalOnly;
-	}
-	
-	
-	public static enum DetailType {
-		SIMPLE("simple"),
-		FULL("full"),
-		FULL_WITH_TAXONOMY("fullWithTaxonomy"),
-		SIMPLE_WITH_TAXONOMY("simpleWithTaxonomy");
-
-		String type;
-
-		DetailType(String type) {
-			this.type = type;
-		}
-
-		public String getType() {
-			return this.type;
-		}
-	}
-
-	public static enum QueryType {
-		SINGLE("single"),
-		MULTI_QUERY("multiQuery"),
-		MULTI_CATEGORY("multiCategory");
-
-		String type;
-
-		QueryType(String type) {
-			this.type = type;
-		}
-
-		public String getType() {
-			return this.type;
-		}
 	}
 
 	public String getQueryString() {
@@ -500,7 +470,7 @@ public class SearchData implements Serializable {
 	public void setUserPermits(List<String> userPermits) {
 		this.userPermits = userPermits;
 	}
-
+	
 	public boolean isCrosswalk() {
 		return isCrosswalk;
 	}
@@ -515,6 +485,22 @@ public class SearchData implements Serializable {
 
 	public void setUserTenantId(String userTenantId) {
 		this.userTenantId = userTenantId;
+	}
+
+	public boolean isFeaturedCourseSearch() {
+		return isFeaturedCourseSearch;
+	}
+
+	public void setFeaturedCourseSearch(boolean isFeaturedCourseSearch) {
+		this.isFeaturedCourseSearch = isFeaturedCourseSearch;
+	}
+	
+	public List<String> getFeaturedCourseTenantPreferences() {
+		return featuredCourseTenantPreferences;
+	}
+
+	public void setFeaturedCourseTenantPreferences(List<String> featuredCourseTenantPreferences) {
+		this.featuredCourseTenantPreferences = featuredCourseTenantPreferences;
 	}
 
 }

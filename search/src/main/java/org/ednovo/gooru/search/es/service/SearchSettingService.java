@@ -44,7 +44,7 @@ public final class SearchSettingService {
 
 	private static String profileName = "default";
 
-	private static Map<String, Object> discoverableTenants = new HashMap<String, Object>(); 
+	private static Map<String, Object> allDiscoverableTenants = new HashMap<String, Object>(); 
 			
 	@Autowired
 	@Resource(name = "configSettings")
@@ -111,8 +111,10 @@ public final class SearchSettingService {
 	}
 
 	private static void setDiscoverableTenants() {
-		discoverableTenants = instance.tenantRepository.getAllDiscoverableTenants();
-		cache.put("discoverableTenantIds" + getProfileName(), ((discoverableTenants != null && !discoverableTenants.isEmpty()) ? discoverableTenants.get("discoverableTenantIds") : null));
+		allDiscoverableTenants = instance.tenantRepository.getAllDiscoverableTenants();
+		cache.put("allDiscoverableTenantIds" + getProfileName(), ((allDiscoverableTenants != null && !allDiscoverableTenants.isEmpty()) ? allDiscoverableTenants.get("discoverableTenantIds") : null));
+		cache.put("globalTenantIds" + getProfileName(), (instance.tenantRepository.getGlobalTenantIds()));
+		cache.put("discoverableTenantIds" + getProfileName(), instance.tenantRepository.getDiscoverableTenantIds());
 	}
 
 	private static void initListFilters(String key) {
@@ -227,14 +229,19 @@ public final class SearchSettingService {
 		return getCacheList(settingsListKeys[10]) != null ? getCacheList(settingsListKeys[10]).contains(name) : false;
 	}
 	
-	public static List<String> getDiscoverableTenantIds(String name) {
+	public static List<String> getAllDiscoverableTenantIds(String name) {
 		return getCacheList(name);
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static List<String> getDiscoverableTenants() {
+	public static List<String> getDiscoverableTenantIds() {
 		Map<String, Object> discoverableTenants = instance.tenantRepository.getAllDiscoverableTenants();
 		return (discoverableTenants != null && !discoverableTenants.isEmpty()) ? (List<String>) discoverableTenants.get("discoverableTenantIds") : null;
+	}
+	
+	public static List<String> getFeaturedCourseTenantPreference(String tenant) {
+		String value = instance.tenantRepository.getTenantSetting(tenant, "featured-course-tenant-preferences");
+		return value != null ? Arrays.asList(value.split(Constants.COMMA)) : null;
 	}
 
 	public static void refreshTenants() {

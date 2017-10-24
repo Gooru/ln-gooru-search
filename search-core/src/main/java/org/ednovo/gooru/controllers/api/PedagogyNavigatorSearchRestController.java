@@ -62,7 +62,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		String userTenantId = userGroup.getTenantId();
 		searchData.setUserTenantId(userTenantId);
 		userPermits.add(userTenantId);
-		List<String> discoverableTenantIds = SearchSettingService.getDiscoverableTenantIds(Constants.DISCOVERABLE_TENANT_IDS);
+		List<String> discoverableTenantIds = SearchSettingService.getAllDiscoverableTenantIds(Constants.ALL_DISCOVERABLE_TENANT_IDS);
 		if (discoverableTenantIds != null && !discoverableTenantIds.isEmpty())
 			userPermits.addAll(discoverableTenantIds);
 		searchData.setUserPermits(userPermits.stream().distinct().collect(Collectors.toList()));

@@ -239,7 +239,10 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 								suggestData.putFilter("&^taxonomy.leafInternalCodes", StringUtils.join(collectionData.getTaxonomyLeafSLInternalCodes(), ","));
 							} else if (collectionData.getTaxonomyDomains() != null && collectionData.getTaxonomyDomains().size() > 0) {
 								suggestData.putFilter("&^domain", StringUtils.join(collectionData.getTaxonomyDomains(), ","));
-							} 
+							} else {
+								LOG.info("There are no matching published resources!");
+								suggestData.setSize(0);
+							}
 						}
 					}
 					

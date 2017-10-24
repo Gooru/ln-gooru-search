@@ -600,7 +600,7 @@ public interface Constants {
 
 	public static final String TENANT = "tenant";
 
-	public static final String DISCOVERABLE_TENANT_IDS = "discoverableTenantIds";
+	public static final String ALL_DISCOVERABLE_TENANT_IDS = "allDiscoverableTenantIds";
 
 	public static final String AMPERSAND_STANDARD = "&^standard";
 	public static final String AMPERSAND_STANDARD_DISPLAY = "&^standardDisplay";
@@ -664,5 +664,9 @@ public interface Constants {
 	public static final String UNDERSCORE_SEARCH = "_search";
 	public static final String COLON = ":";
 	public static final String HTTP = "http";
+	public static final String GLOBAL = "global";
+	public static final String DISCOVERABLE = "discoverable";
+	public static final String GLOBAL_TENANT_IDS = "globalTenantIds";
+	public static final String DISCOVERABLE_TENANT_IDS = "discoverableTenantIds";
 
 }

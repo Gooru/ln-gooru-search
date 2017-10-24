@@ -115,17 +115,30 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		String contentCdnUrl = (String) request.getAttribute(Constants.CONTENT_CDN_URL);
 		searchData.setContentCdnUrl(contentCdnUrl);
 		
+		MapWrapper<Object> searchDataMap = new MapWrapper<Object>(request.getParameterMap());
+
+		searchDataMap.put("allowDuplicates", true);
+		searchDataMap.put("includeCollectionItem", includeCollectionItem);
+		searchDataMap.put("includeCIMin", includeCIMetaData);
+		if (searchDataMap.containsKey("flt.standard") || searchDataMap.containsKey("flt.standardDisplay")) {
+			searchData.setStandardsSearch(true);
+		}
+		// client controlled value to enable / disable spell check.
+		searchDataMap.put("disableSpellCheck", disableSpellCheck);
+		searchData.setParameters(searchDataMap);
+
 		// Set user permits
 		UserGroupSupport userGroup = (UserGroupSupport) request.getAttribute(Constants.TENANT);
 		List<String> userPermits = new ArrayList<>();
 		String userTenantId = userGroup.getTenantId();
-		searchData.setUserTenantId(userTenantId);
 		userPermits.add(userTenantId);
-		List<String> discoverableTenantIds = SearchSettingService.getDiscoverableTenantIds(Constants.DISCOVERABLE_TENANT_IDS);
-		if (discoverableTenantIds != null && !discoverableTenantIds.isEmpty())
-			userPermits.addAll(discoverableTenantIds);
+		searchData.setUserTenantId(userTenantId);
+		List<String> allDiscoverableTenantIds = SearchSettingService.getAllDiscoverableTenantIds(Constants.ALL_DISCOVERABLE_TENANT_IDS);
+		if (allDiscoverableTenantIds != null && !allDiscoverableTenantIds.isEmpty()) {
+			userPermits.addAll(allDiscoverableTenantIds);
+		}
 		searchData.setUserPermits(userPermits.stream().distinct().collect(Collectors.toList()));
-
+		searchData.setFeaturedCourseTenantPreferences(SearchSettingService.getFeaturedCourseTenantPreference(userTenantId));
 		if (sessionToken == null) {
 			sessionToken = BaseController.getSessionToken(request);
 		}
@@ -141,25 +154,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 
 		SessionContextSupport.putLogParameter(EventConstants.SESSION, session);
 
-		/*Set<UserRoleAssoc> userRoleAssocs = (Set<UserRoleAssoc>) apiCaller.getUserRoleSet();
-		for (UserRoleAssoc set : userRoleAssocs) {
-			if (set.getRole().getName().toString().equalsIgnoreCase(UserRole.UserRoleType.SUPER_ADMIN.getType().toString())) {
-				searchData.skipType(SearchProcessorType.BlackListQueryValidation);
-			}
-		}*/
 		searchData.setUserTaxonomyPreference((JSONObject) request.getAttribute(Constants.USER_PREFERENCES));
-		MapWrapper<Object> searchDataMap = new MapWrapper<Object>(request.getParameterMap());
-
-		searchDataMap.put("allowDuplicates", true);
-		searchDataMap.put("includeCollectionItem", includeCollectionItem);
-		searchDataMap.put("includeCIMin", includeCIMetaData);
-		if (searchDataMap.containsKey("flt.standard") || searchDataMap.containsKey("flt.standardDisplay")) {
-			searchData.setStandardsSearch(true);
-		}
-
-		// client controlled value to enable / disable spell check.
-		searchDataMap.put("disableSpellCheck", disableSpellCheck);
-		searchData.setParameters(searchDataMap);
 
 		if (query.contains("!")) {
 			query = query.replace("!", EMPTY_STRING);
