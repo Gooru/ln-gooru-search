@@ -133,12 +133,12 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		String userTenantId = userGroup.getTenantId();
 		userPermits.add(userTenantId);
 		searchData.setUserTenantId(userTenantId);
-		List<String> discoverableTenantIds = SearchSettingService.getDiscoverableTenantIds(Constants.DISCOVERABLE_TENANT_IDS);
-		if (discoverableTenantIds != null && !discoverableTenantIds.isEmpty()) {
-			userPermits.addAll(discoverableTenantIds);
+		List<String> allDiscoverableTenantIds = SearchSettingService.getAllDiscoverableTenantIds(Constants.ALL_DISCOVERABLE_TENANT_IDS);
+		if (allDiscoverableTenantIds != null && !allDiscoverableTenantIds.isEmpty()) {
+			userPermits.addAll(allDiscoverableTenantIds);
 		}
 		searchData.setUserPermits(userPermits.stream().distinct().collect(Collectors.toList()));
-		searchData.setOpenTenantFeaturedCourseVisibility(SearchSettingService.getOpenTenantVisibility(userTenantId));
+		searchData.setFeaturedCourseTenantPreferences(SearchSettingService.getFeaturedCourseTenantPreference(userTenantId));
 		if (sessionToken == null) {
 			sessionToken = BaseController.getSessionToken(request);
 		}

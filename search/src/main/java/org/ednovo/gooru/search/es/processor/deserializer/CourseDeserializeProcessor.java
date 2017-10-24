@@ -34,7 +34,7 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
 		List<Map<String, Object>> hits = (List<Map<String, Object>>) (hitsMap).get(SEARCH_HITS);
 		output = new ArrayList<CourseSearchResult>();
 		long start = System.currentTimeMillis();
-		if (input.isFeaturedCourseSearch() && input.isOpenTenantFeaturedCourseVisibility()) {
+		if (input.isFeaturedCourseSearch()) {
 			generateFeaturedCourseResponse(hits, input, output);
 			logger.debug("Proccessing time for featured courses of both tenants : {} ms", System.currentTimeMillis() - start);
 		} else {
@@ -162,57 +162,58 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
 	private List<CourseSearchResult> generateFeaturedCourseResponse(List<Map<String, Object>> hits, SearchData input, List<CourseSearchResult> courseResult) {
 		Map<String, Object> featured = new HashMap<>();
 		featured = aggregateByTenant(hits, input, featured);
-		
-		List<Map<String, Object>> userTenant = (List<Map<String, Object>>) featured.get(input.getUserTenantId());
-		Map<String, Object> tenantFeaturedSorted = aggregateBySubjectAndSort(userTenant);
-		
-		for (String key : featured.keySet()) {
-			if(key.equalsIgnoreCase(input.getUserTenantId())) {
-				continue;
+		if (!featured.isEmpty()) {
+			List<Map<String, Object>> userTenant = (List<Map<String, Object>>) featured.get(input.getUserTenantId());
+			Map<String, Object> tenantFeaturedSorted = aggregateBySubjectAndSort(userTenant);
+
+			for (String key : featured.keySet()) {
+				if (key.equalsIgnoreCase(input.getUserTenantId())) {
+					continue;
+				}
+				List<Map<String, Object>> openTenant = (List<Map<String, Object>>) featured.get(key);
+				Map<String, Object> gooruFeaturedSorted = aggregateBySubjectAndSort(openTenant);
+				mergeDiscoverableTenantCourses(tenantFeaturedSorted, gooruFeaturedSorted);
 			}
-			List<Map<String, Object>> openTenant = (List<Map<String, Object>>) featured.get(key);
-			Map<String, Object> gooruFeaturedSorted = aggregateBySubjectAndSort(openTenant);
-			mergeDiscoverableTenantCourses(tenantFeaturedSorted, gooruFeaturedSorted);
-		}
-		
-		tenantFeaturedSorted.entrySet().forEach(mergedFeaturedMap -> {
-			((List<Map<String, Object>>) mergedFeaturedMap.getValue()).forEach(hit -> {
-				courseResult.add(collect(hit, input, null));
+
+			tenantFeaturedSorted.entrySet().forEach(mergedFeaturedMap -> {
+				((List<Map<String, Object>>) mergedFeaturedMap.getValue()).forEach(hit -> {
+					courseResult.add(collect(hit, input, null));
+				});
 			});
-		});
+		}
 		return courseResult;
 	}
 
 	@SuppressWarnings("unchecked")
-	private void mergeDiscoverableTenantCourses(Map<String, Object> tenantFeaturedSorted, Map<String, Object> gooruFeaturedSorted) {
-		Set<String> extraSubjectsOfGooru = new HashSet<>();
-		gooruFeaturedSorted.keySet().forEach(key -> {
+	private void mergeDiscoverableTenantCourses(Map<String, Object> tenantFeaturedSorted, Map<String, Object> openTenantFeaturedSorted) {
+		Set<String> extraSubjectsOfOpenTenant = new HashSet<>();
+		openTenantFeaturedSorted.keySet().forEach(key -> {
 			if (tenantFeaturedSorted.containsKey(key)) {
 				List<Map<String, Object>> tenantFeaturedList = (List<Map<String, Object>>) (tenantFeaturedSorted.get(key));
 				int numOfCourses = tenantFeaturedList.size();
-				List<Map<String, Object>> gooruFeaturedSortedList = (List<Map<String, Object>>) (gooruFeaturedSorted.get(key));
-				int numOfOpenCourses = gooruFeaturedSortedList.size();
+				List<Map<String, Object>> openTenantFeaturedSortedList = (List<Map<String, Object>>) (openTenantFeaturedSorted.get(key));
+				int numOfOpenCourses = openTenantFeaturedSortedList.size();
 				for (int index = 0; index < numOfOpenCourses; index++) {
-					Map<String, Object> gooruFeaturedCourseMap = gooruFeaturedSortedList.get(index);
-					gooruFeaturedCourseMap.put(IndexFields.SEQUENCE, numOfCourses + 1);
-					gooruFeaturedCourseMap.put(IndexFields.SUBJECT_SEQUENCE, tenantFeaturedList.get(index).get(IndexFields.SUBJECT_SEQUENCE));
-					tenantFeaturedList.add(gooruFeaturedCourseMap);
+					Map<String, Object> openTenantFeaturedCourseMap = openTenantFeaturedSortedList.get(index);
+					openTenantFeaturedCourseMap.put(IndexFields.SEQUENCE, numOfCourses + 1);
+					openTenantFeaturedCourseMap.put(IndexFields.SUBJECT_SEQUENCE, tenantFeaturedList.get(index).get(IndexFields.SUBJECT_SEQUENCE));
+					tenantFeaturedList.add(openTenantFeaturedCourseMap);
 					numOfCourses++;
 				}
 				tenantFeaturedSorted.put(key, tenantFeaturedList);
 			} else {
-				extraSubjectsOfGooru.add(key);
+				extraSubjectsOfOpenTenant.add(key);
 			}
 		});
 
-		extraSubjectsOfGooru.forEach(key -> {
+		extraSubjectsOfOpenTenant.forEach(key -> {
 			int tenantFeaturedListSize = tenantFeaturedSorted.size();
-			List<Map<String, Object>> gooruFeaturedSortedList = (List<Map<String, Object>>) (gooruFeaturedSorted.get(key));
-			List<Map<String, Object>> finalList = new ArrayList<>(gooruFeaturedSortedList.size());
-			for (Map<String, Object> gooruFeaturedCourseMap : gooruFeaturedSortedList) {
-				gooruFeaturedCourseMap.put(IndexFields.SUBJECT_SEQUENCE, tenantFeaturedListSize + 1);
+			List<Map<String, Object>> openTenantFeaturedSortedList = (List<Map<String, Object>>) (openTenantFeaturedSorted.get(key));
+			List<Map<String, Object>> finalList = new ArrayList<>(openTenantFeaturedSortedList.size());
+			for (Map<String, Object> openTenantFeaturedCourseMap : openTenantFeaturedSortedList) {
+				openTenantFeaturedCourseMap.put(IndexFields.SUBJECT_SEQUENCE, tenantFeaturedListSize + 1);
 				tenantFeaturedListSize++;
-				finalList.add(gooruFeaturedCourseMap);
+				finalList.add(openTenantFeaturedCourseMap);
 			}
 			tenantFeaturedSorted.put(key, finalList);
 		});
@@ -224,14 +225,15 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
 			Map<String, Object> fields = (Map<String, Object>) hit.get(SEARCH_SOURCE);
 			Map<String, String> tenant = (Map<String, String>) fields.get(IndexFields.TENANT);
 			if (fields.containsKey(IndexFields.SUBJECT_BUCKET)) {
-				if (featuredByTenantAsMap.containsKey(tenant.get(IndexFields.TENANT_ID))) {
-					List<Map<String, Object>> courses = (List<Map<String, Object>>) featuredByTenantAsMap.get(tenant.get(IndexFields.TENANT_ID));
+				String tenantId = tenant.get(IndexFields.TENANT_ID);
+				if (featuredByTenantAsMap.containsKey(tenantId)) {
+					List<Map<String, Object>> courses = (List<Map<String, Object>>) featuredByTenantAsMap.get(tenantId);
 					courses.add(fields);
-					featuredByTenantAsMap.put(tenant.get(IndexFields.TENANT_ID), courses);
+					featuredByTenantAsMap.put(tenantId, courses);
 				} else {
 					List<Map<String, Object>> courses = new ArrayList<>(1);
 					courses.add(fields);
-					featuredByTenantAsMap.put(tenant.get(IndexFields.TENANT_ID), courses);
+					featuredByTenantAsMap.put(tenantId, courses);
 				}
 			}
 		});

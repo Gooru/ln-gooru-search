@@ -142,7 +142,7 @@ public class SuggestV3RestController extends BaseController {
 		List<String> userPermits = new ArrayList<>();
 		String userTenantId = userGroup.getTenantId();
 		userPermits.add(userTenantId);
-		List<String> discoverableTenantIds = SearchSettingService.getDiscoverableTenantIds(DISCOVERABLE_TENANT_IDS);
+		List<String> discoverableTenantIds = SearchSettingService.getAllDiscoverableTenantIds(ALL_DISCOVERABLE_TENANT_IDS);
 		if (discoverableTenantIds != null && !discoverableTenantIds.isEmpty())
 			userPermits.addAll(discoverableTenantIds);
 		suggestData.setUserPermits(userPermits);

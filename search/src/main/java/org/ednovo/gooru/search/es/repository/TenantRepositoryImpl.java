@@ -45,6 +45,28 @@ public class TenantRepositoryImpl extends BaseRepository implements TenantReposi
 	}	
 	
 	@Override
+	public List<String> getGlobalTenantIds() {
+		List<String> gobalTenantIds = new ArrayList<>();
+		String sql = "select id from tenant where content_visibility = 'global' and status = 'active'";
+		Query query = getSessionFactory().getCurrentSession().createSQLQuery(sql).addScalar("id", PostgresUUIDType.INSTANCE);
+		if (query != null && list(query).size() > 0) {
+			return list(query).stream().map(Object::toString).collect(Collectors.toList());
+		}
+		return gobalTenantIds;
+	}
+	
+	@Override
+	public List<String> getDiscoverableTenantIds() {
+		List<String> discoverableTenantIds = null;
+		String sql = "select id from tenant where content_visibility = 'discoverable' and status = 'active'";
+		Query query = getSessionFactory().getCurrentSession().createSQLQuery(sql).addScalar("id", PostgresUUIDType.INSTANCE);
+		if (query != null && list(query).size() > 0) {
+			return list(query).stream().map(Object::toString).collect(Collectors.toList());
+		}
+		return discoverableTenantIds;
+	}
+	
+	@Override
 	public String getTenantSetting(String tenant, String key) {
 		String sql = "select value from tenant_setting where id =:ID and key =:KEY";
 		Query query = getSessionFactory().getCurrentSession().createSQLQuery(sql)

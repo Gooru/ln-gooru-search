@@ -115,7 +115,7 @@ public class SearchData implements Serializable {
 		
 	private boolean isFeaturedCourseSearch = false;
 
-	private boolean isOpenTenantFeaturedCourseVisibility = false;
+	private List<String> featuredCourseTenantPreferences;
 
 	public boolean isShowCanonicalOnly() {
 		return showCanonicalOnly;
@@ -495,12 +495,12 @@ public class SearchData implements Serializable {
 		this.isFeaturedCourseSearch = isFeaturedCourseSearch;
 	}
 	
-	public boolean isOpenTenantFeaturedCourseVisibility() {
-		return isOpenTenantFeaturedCourseVisibility;
+	public List<String> getFeaturedCourseTenantPreferences() {
+		return featuredCourseTenantPreferences;
 	}
 
-	public void setOpenTenantFeaturedCourseVisibility(boolean isOpenTenantFeaturedCourseVisibility) {
-		this.isOpenTenantFeaturedCourseVisibility = isOpenTenantFeaturedCourseVisibility;
+	public void setFeaturedCourseTenantPreferences(List<String> featuredCourseTenantPreferences) {
+		this.featuredCourseTenantPreferences = featuredCourseTenantPreferences;
 	}
 
 }
