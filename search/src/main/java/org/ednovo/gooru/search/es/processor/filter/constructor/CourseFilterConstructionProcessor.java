@@ -27,7 +27,7 @@ public class CourseFilterConstructionProcessor extends FilterConstructionProcess
 				searchData.putFilter(FLT_TENANT_ID, searchData.getUserTenantId());
 				if (searchData.getFeaturedCourseTenantPreferences() != null) {
 					List<String> tenantPermits = new ArrayList<>();
-					processTenantPreferenceSetting(searchData, tenantPermits);
+					tenantPermits = processTenantPreferenceSetting(searchData, tenantPermits);
 					if (!tenantPermits.isEmpty()) searchData.putFilter(FLT_TENANT_ID, StringUtils.join(tenantPermits, ","));
 				}
 			}
@@ -37,7 +37,7 @@ public class CourseFilterConstructionProcessor extends FilterConstructionProcess
 		if(!searchData.getFilters().containsKey(FLT_TENANT_ID)) searchData.putFilter(FLT_TENANT_ID, StringUtils.join(searchData.getUserPermits(), ","));
 	}
 
-	private void processTenantPreferenceSetting(SearchData searchData, List<String> tenantPermits) {
+	private List<String> processTenantPreferenceSetting(SearchData searchData, List<String> tenantPermits) {
 		for (String preference : searchData.getFeaturedCourseTenantPreferences()) {
 			switch (preference) {
 			case TENANT:
@@ -47,10 +47,11 @@ public class CourseFilterConstructionProcessor extends FilterConstructionProcess
 				tenantPermits.addAll(SearchSettingService.getListByName(GLOBAL_TENANT_IDS));
 				break;
 			case DISCOVERABLE:
-				tenantPermits.addAll(SearchSettingService.getListByName(ALL_DISCOVERABLE_TENANT_IDS));
+				tenantPermits.addAll(SearchSettingService.getListByName(DISCOVERABLE_TENANT_IDS));
 				break;
 			}
 		}
+		return tenantPermits;
 	}
 	
 	@Override

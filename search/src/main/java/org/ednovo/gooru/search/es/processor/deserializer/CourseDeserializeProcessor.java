@@ -164,15 +164,19 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
 		featured = aggregateByTenant(hits, input, featured);
 		if (!featured.isEmpty()) {
 			List<Map<String, Object>> userTenant = (List<Map<String, Object>>) featured.get(input.getUserTenantId());
-			Map<String, Object> tenantFeaturedSorted = aggregateBySubjectAndSort(userTenant);
+			Map<String, Object> tenantFeaturedSorted = aggregateBySubjectAndSortByCourse(userTenant);
 
 			for (String key : featured.keySet()) {
 				if (key.equalsIgnoreCase(input.getUserTenantId())) {
 					continue;
 				}
 				List<Map<String, Object>> openTenant = (List<Map<String, Object>>) featured.get(key);
-				Map<String, Object> gooruFeaturedSorted = aggregateBySubjectAndSort(openTenant);
-				mergeDiscoverableTenantCourses(tenantFeaturedSorted, gooruFeaturedSorted);
+				Map<String, Object> openTenantFeaturedSorted = aggregateBySubjectAndSortByCourse(openTenant);
+				if (tenantFeaturedSorted.isEmpty()) {
+					tenantFeaturedSorted = openTenantFeaturedSorted;
+				} else {
+					tenantFeaturedSorted = mergeDiscoverableTenantCourses(tenantFeaturedSorted, openTenantFeaturedSorted);
+				}
 			}
 
 			tenantFeaturedSorted.entrySet().forEach(mergedFeaturedMap -> {
@@ -185,7 +189,7 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
 	}
 
 	@SuppressWarnings("unchecked")
-	private void mergeDiscoverableTenantCourses(Map<String, Object> tenantFeaturedSorted, Map<String, Object> openTenantFeaturedSorted) {
+	private Map<String, Object> mergeDiscoverableTenantCourses(Map<String, Object> tenantFeaturedSorted, Map<String, Object> openTenantFeaturedSorted) {
 		Set<String> extraSubjectsOfOpenTenant = new HashSet<>();
 		openTenantFeaturedSorted.keySet().forEach(key -> {
 			if (tenantFeaturedSorted.containsKey(key)) {
@@ -205,18 +209,19 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
 				extraSubjectsOfOpenTenant.add(key);
 			}
 		});
-
 		extraSubjectsOfOpenTenant.forEach(key -> {
 			int tenantFeaturedListSize = tenantFeaturedSorted.size();
 			List<Map<String, Object>> openTenantFeaturedSortedList = (List<Map<String, Object>>) (openTenantFeaturedSorted.get(key));
 			List<Map<String, Object>> finalList = new ArrayList<>(openTenantFeaturedSortedList.size());
+			int subjectSequence = tenantFeaturedListSize + 1;
 			for (Map<String, Object> openTenantFeaturedCourseMap : openTenantFeaturedSortedList) {
-				openTenantFeaturedCourseMap.put(IndexFields.SUBJECT_SEQUENCE, tenantFeaturedListSize + 1);
-				tenantFeaturedListSize++;
+				openTenantFeaturedCourseMap.put(IndexFields.SUBJECT_SEQUENCE, subjectSequence);
 				finalList.add(openTenantFeaturedCourseMap);
 			}
+			tenantFeaturedListSize++;
 			tenantFeaturedSorted.put(key, finalList);
 		});
+		return tenantFeaturedSorted;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -241,7 +246,7 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
 	}
 
 	@SuppressWarnings("unchecked")
-	private static Map<String, Object> aggregateBySubjectAndSort(List<Map<String, Object>> tenantFeaturedList) {
+	private static Map<String, Object> aggregateBySubjectAndSortByCourse(List<Map<String, Object>> tenantFeaturedList) {
 		Map<String, Object> featuredSubjectBucketSortedList = new HashMap<>();
 		if (tenantFeaturedList != null && tenantFeaturedList.size() > 0) {
 			Map<String, Object> featuredBySubjectBucketAsMap = new HashMap<>();
