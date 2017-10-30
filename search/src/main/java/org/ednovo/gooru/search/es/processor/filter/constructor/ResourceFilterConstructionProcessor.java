@@ -21,11 +21,6 @@ public class ResourceFilterConstructionProcessor extends ContentFilterConstructi
 			SearchResponse<Object> response) {
 		super.process(searchData, response);
 		
-		//searchData.putFilter("&^statistics.invalidResource", "0");
-/*		if(!(searchData.getUser().getUserRoleSetString().contains(SEARCH_SUPER_ADMIN) || searchData.getUser().getUserRoleSetString().contains(SEARCH_CONTENT_ADMIN))) {
-			searchData.putFilter("&^statistics.statusIsBroken", "0");
-		}*/	
-		
 		if(searchData.getFilters()!= null && searchData.getFilters().containsKey("&^type") && searchData.getFilters().get("&^type").equals(SEARCH_QUESTION)) {
 			searchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_FORMAT, SEARCH_QUESTION);
 			searchData.getFilters().remove("&^type");

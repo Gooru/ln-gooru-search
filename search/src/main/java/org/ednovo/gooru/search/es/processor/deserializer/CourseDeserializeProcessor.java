@@ -165,20 +165,18 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
 		if (!featured.isEmpty()) {
 			List<Map<String, Object>> userTenant = (List<Map<String, Object>>) featured.get(input.getUserTenantId());
 			Map<String, Object> tenantFeaturedSorted = aggregateBySubjectAndSortByCourse(userTenant);
-
-			for (String key : featured.keySet()) {
-				if (key.equalsIgnoreCase(input.getUserTenantId())) {
-					continue;
-				}
-				List<Map<String, Object>> openTenant = (List<Map<String, Object>>) featured.get(key);
-				Map<String, Object> openTenantFeaturedSorted = aggregateBySubjectAndSortByCourse(openTenant);
-				if (tenantFeaturedSorted.isEmpty()) {
-					tenantFeaturedSorted = openTenantFeaturedSorted;
-				} else {
-					tenantFeaturedSorted = mergeDiscoverableTenantCourses(tenantFeaturedSorted, openTenantFeaturedSorted);
+			featured.remove(input.getUserTenantId());
+			if (input.getUserTenantParentIds() != null && input.getUserTenantParentIds().size() > 0) {
+				for (String parentTenantId : input.getUserTenantParentIds()) {
+					tenantFeaturedSorted = sequenceAndMergeTenantCourses(featured, tenantFeaturedSorted, parentTenantId);
+					featured.remove(parentTenantId);
 				}
 			}
-
+			if (featured != null && !featured.isEmpty()) {
+				for (String key : featured.keySet()) {
+					tenantFeaturedSorted = sequenceAndMergeTenantCourses(featured, tenantFeaturedSorted, key);
+				}
+			}
 			tenantFeaturedSorted.entrySet().forEach(mergedFeaturedMap -> {
 				((List<Map<String, Object>>) mergedFeaturedMap.getValue()).forEach(hit -> {
 					courseResult.add(collect(hit, input, null));
@@ -186,6 +184,18 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
 			});
 		}
 		return courseResult;
+	}
+
+	@SuppressWarnings("unchecked")
+	private Map<String, Object> sequenceAndMergeTenantCourses(Map<String, Object> featured, Map<String, Object> tenantFeaturedSorted, String parentTenantId) {
+		List<Map<String, Object>> parentTenant = (List<Map<String, Object>>) featured.get(parentTenantId);
+		Map<String, Object> parentTenantFeaturedSorted = aggregateBySubjectAndSortByCourse(parentTenant);
+		if (tenantFeaturedSorted.isEmpty()) {
+			tenantFeaturedSorted = parentTenantFeaturedSorted;
+		} else {
+			tenantFeaturedSorted = mergeDiscoverableTenantCourses(tenantFeaturedSorted, parentTenantFeaturedSorted);
+		}
+		return tenantFeaturedSorted;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -276,5 +286,4 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
 		}
 		return featuredSubjectBucketSortedList;
 	}
-
 }

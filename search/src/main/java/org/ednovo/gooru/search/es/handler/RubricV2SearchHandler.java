@@ -6,6 +6,7 @@ import static org.ednovo.gooru.search.es.processor.SearchProcessorType.EsDslQuer
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.LimitValidation;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.RubricDeserializeProcessor;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.RubricFilterConstruction;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.TenantFilterConstruction;
 
 import java.util.Map;
 
@@ -20,8 +21,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class RubricV2SearchHandler extends SearchHandler<SearchData, Map<String, Object>> {
 
-	private static final SearchProcessorType[][] searchProcessorTypes = new SearchProcessorType[][] { { BlackListQueryValidation }, { LimitValidation }, { RubricFilterConstruction },
-			{ EsDslQueryBuild }, { Elasticsearch }, { RubricDeserializeProcessor } };
+	private static final SearchProcessorType[][] searchProcessorTypes = new SearchProcessorType[][] { { BlackListQueryValidation }, { LimitValidation }, { TenantFilterConstruction },
+			{ RubricFilterConstruction }, { EsDslQueryBuild }, { Elasticsearch }, { RubricDeserializeProcessor } };
 
 	@Override
 	protected SearchProcessorType[][] getProcessorTypeChain() {

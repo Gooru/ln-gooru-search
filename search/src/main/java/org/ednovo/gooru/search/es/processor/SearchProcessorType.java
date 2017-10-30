@@ -145,7 +145,9 @@ public enum SearchProcessorType {
 	
 	AutoCompletePublisherDeserializeProcessor(),
 
-	CollectionSuggestDeserializeProcessor();
+	CollectionSuggestDeserializeProcessor(),
+	
+	TenantFilterConstruction();
 
 	private SearchProcessorType() {
 	}

@@ -20,7 +20,7 @@ import static org.ednovo.gooru.search.es.processor.SearchProcessorType.*;
 public class SCollectionV2SearchHandler extends SearchHandler<SearchData, Map<String, Object>> {
 
 	private static final SearchProcessorType[][] searchProcessorTypes = new SearchProcessorType[][] {{ BlackListQueryValidation }, { FilterDetection },
-			{ LimitValidation }, { TaxonomyQueryExpansion }, { DictionaryQueryExpansion },
+			{ LimitValidation }, { TaxonomyQueryExpansion }, { DictionaryQueryExpansion }, { TenantFilterConstruction },
 			{ SCollectionFilterConstruction }, { EsDslQueryBuild }, { EsSuggestDslQueryBuild },{ FacetFilterConstruction }, { Elasticsearch }, { SCollectionDeserializer } };
 
 	@Override
