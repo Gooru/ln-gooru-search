@@ -41,9 +41,7 @@ public class ContentFilterConstructionProcessor extends FilterConstructionProces
 		} else {
 			searchData.putFilter(FLT_PUBLISH_STATUS, PublishedStatus.PUBLISHED.getStatus());
 		}
-        
-		searchData.putFilter(FLT_TENANT_ID, StringUtils.join(searchData.getUserPermits(), ","));
-		
+        		
 		/*		//User user = searchData.getUser();
 	//	if(!(searchData.getUser().getUserRoleSetString().contains(SEARCH_SUPER_ADMIN) || searchData.getUser().getUserRoleSetString().contains(SEARCH_CONTENT_ADMIN))) {
 		  if (!searchData.isRestricted() && !searchData.getType().equalsIgnoreCase(LIBRARY)) {

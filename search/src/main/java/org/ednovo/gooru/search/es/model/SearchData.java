@@ -117,6 +117,8 @@ public class SearchData implements Serializable {
 
 	private List<String> featuredCourseTenantPreferences;
 
+	private List<String> userTenantParentIds;
+
 	public boolean isShowCanonicalOnly() {
 		return showCanonicalOnly;
 	}
@@ -501,6 +503,14 @@ public class SearchData implements Serializable {
 
 	public void setFeaturedCourseTenantPreferences(List<String> featuredCourseTenantPreferences) {
 		this.featuredCourseTenantPreferences = featuredCourseTenantPreferences;
+	}
+
+	public List<String> getUserTenantParentIds() {
+		return userTenantParentIds;
+	}
+
+	public void setUserTenantParentIds(List<String> userTenantParentIds) {
+		this.userTenantParentIds = userTenantParentIds;
 	}
 
 }

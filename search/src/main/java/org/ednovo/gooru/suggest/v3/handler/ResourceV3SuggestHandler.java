@@ -24,6 +24,7 @@ import org.ednovo.gooru.search.es.model.SuggestResponse;
 import org.ednovo.gooru.search.es.processor.ElasticsearchProcessor;
 import org.ednovo.gooru.search.es.processor.deserializer.ResourceDeserializeProcessor;
 import org.ednovo.gooru.search.es.processor.deserializer.ResourceSuggestDeserializeProcessor;
+import org.ednovo.gooru.search.es.processor.filter.constructor.TenantFilterConstructionProcessor;
 import org.ednovo.gooru.search.es.processor.query_builder.ResourceEsDslQueryBuildProcessor;
 import org.ednovo.gooru.search.es.repository.ConceptBasedResourceSuggestRepository;
 import org.ednovo.gooru.search.es.repository.GutBasedResourceSuggestRepository;
@@ -75,6 +76,9 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 	@Autowired
 	private GutBasedResourceSuggestRepository gutSuggestionRepository;
 
+	@Autowired
+	private TenantFilterConstructionProcessor tenantFilterConstructionProcessor;
+	
 	private SuggestDataProviderType[] suggestDataProviders = { SuggestDataProviderType.RESOURCE,SuggestDataProviderType.COLLECTION };
 
 	@Override
@@ -133,7 +137,6 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 				try {
 					String queryString = "*";
 					suggestData.putFilter("&^statistics.statusIsBroken", 0);
-					suggestData.putFilter(FLT_TENANT_ID, StringUtils.join(suggestData.getUserPermits(), ","));
 
 					if (contextType.equalsIgnoreCase(RESOURCE_STUDY) && resourceData != null) {
 
@@ -278,6 +281,7 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 					}
 					suggestData.setQueryString(queryString);
 
+					tenantFilterConstructionProcessor.process(suggestData, searchRes);
 					resourceEsDslQueryProcessor.process(suggestData, searchRes);
 					elasticSearchProcessor.process(suggestData, searchRes);
 					if (suggestData.getIsIntenralSuggest()) {

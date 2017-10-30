@@ -63,7 +63,9 @@ public enum SearchHandlerType {
 	
 	KEYWORDCOMPETENCY(),
 	
-	AUTOCOMPLETE_KEYWORD();
+	AUTOCOMPLETE_KEYWORD(),
+	
+	TENANT();
 
 	private SearchHandlerType() {
 	}

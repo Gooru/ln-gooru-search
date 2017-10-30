@@ -20,6 +20,7 @@ import org.ednovo.gooru.search.es.model.SuggestResult;
 import org.ednovo.gooru.search.es.processor.ElasticsearchProcessor;
 import org.ednovo.gooru.search.es.processor.deserializer.CollectionSuggestDeserializeProcessor;
 import org.ednovo.gooru.search.es.processor.deserializer.SCollectionDeserializeProcessor;
+import org.ednovo.gooru.search.es.processor.filter.constructor.TenantFilterConstructionProcessor;
 import org.ednovo.gooru.search.es.processor.query_builder.EsDslQueryBuildProcessor;
 import org.ednovo.gooru.search.es.repository.GutBasedCollectionSuggestRepository;
 import org.ednovo.gooru.search.es.service.SearchSettingService;
@@ -51,6 +52,9 @@ public class CollectionV3SuggestHandlerForTaxonomy extends SuggestHandler<Map<St
 	@Autowired
 	private GutBasedCollectionSuggestRepository gutSuggestionRepository;
 
+	@Autowired
+	private TenantFilterConstructionProcessor tenantFilterConstructionProcessor;
+	
 	private SuggestDataProviderType[] suggestDataProviders = { SuggestDataProviderType.TAXONOMY };
 
 	@Override
@@ -84,7 +88,6 @@ public class CollectionV3SuggestHandlerForTaxonomy extends SuggestHandler<Map<St
 		final Long timespent = suggestData.getSuggestContextData().getTimeSpent();
 		try {
 			String queryString = "*";
-			suggestData.putFilter(FLT_TENANT_ID, StringUtils.join(suggestData.getUserPermits(), ","));
 
 			if (taxonomyData != null) {
 
@@ -116,6 +119,7 @@ public class CollectionV3SuggestHandlerForTaxonomy extends SuggestHandler<Map<St
 			}
 
 			suggestData.setQueryString(queryString);
+			tenantFilterConstructionProcessor.process(suggestData, searchRes);
 			esDslQueryBuildProcessor.process(suggestData, searchRes);
 			elasticSearchProcessor.process(suggestData, searchRes);
 			if (suggestData.getIsIntenralSuggest()) {

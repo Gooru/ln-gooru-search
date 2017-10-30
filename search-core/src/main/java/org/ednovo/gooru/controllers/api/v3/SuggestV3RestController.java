@@ -139,13 +139,8 @@ public class SuggestV3RestController extends BaseController {
 
 		// Set user permits
 		UserGroupSupport userGroup = (UserGroupSupport) request.getAttribute(TENANT);
-		List<String> userPermits = new ArrayList<>();
 		String userTenantId = userGroup.getTenantId();
-		userPermits.add(userTenantId);
-		List<String> discoverableTenantIds = SearchSettingService.getAllDiscoverableTenantIds(ALL_DISCOVERABLE_TENANT_IDS);
-		if (discoverableTenantIds != null && !discoverableTenantIds.isEmpty())
-			userPermits.addAll(discoverableTenantIds);
-		suggestData.setUserPermits(userPermits);
+		suggestData.setUserTenantId(userTenantId);
 
 		suggestData.setFrom(0);
 		suggestData.setSize(pageSize);
