@@ -7,26 +7,31 @@ import static org.ednovo.gooru.search.es.constant.SearchSettingType.S_ES_INDEX_P
 import static org.ednovo.gooru.search.es.constant.SearchSettingType.S_ES_INDEX_SUFFIX;
 import static org.ednovo.gooru.search.es.constant.SearchSettingType.S_ES_POINT;
 
-import java.util.Arrays;
+import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jettison.json.JSONObject;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.nio.entity.NStringEntity;
+import org.apache.http.util.EntityUtils;
 import org.ednovo.gooru.search.es.exception.BadRequestException;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.SearchResponse;
+import org.elasticsearch.client.Response;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.sniff.SniffOnFailureListener;
+import org.elasticsearch.client.sniff.Sniffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import io.searchbox.client.JestClient;
-import io.searchbox.client.JestClientFactory;
-import io.searchbox.client.JestResult;
-import io.searchbox.client.config.HttpClientConfig;
-import io.searchbox.core.Search;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
@@ -38,28 +43,36 @@ public class ElasticsearchProcessor extends SearchProcessor<SearchData, Object> 
 
 	protected static final Logger LOG = LoggerFactory.getLogger(ElasticsearchProcessor.class);
 
-	private static JestClient client = null;
+	private static RestClient client = null;
+	
+	private static Sniffer sniffer = null;
 
 	@PostConstruct
 	public void onStartUp() {
 		// Configuration
+		LOG.info("Creating Elasticsearch Rest client...");
+		HttpHost[] httpHosts = buildHosts(getSetting(S_ES_POINT));
+		SniffOnFailureListener sniffOnFailureListener = new SniffOnFailureListener();
+		RestClient restClient = RestClient.builder(httpHosts).setFailureListener(sniffOnFailureListener).build();
+		Sniffer sniffer = Sniffer.builder(restClient).setSniffAfterFailureDelayMillis(30000).build();
+		sniffOnFailureListener.setSniffer(sniffer);
 
-		HttpClientConfig clientConfig = new HttpClientConfig.Builder(Arrays.asList(getSetting(S_ES_POINT).split(","))).multiThreaded(true)
-				.maxTotalConnection(500).defaultMaxTotalConnectionPerRoute(100).readTimeout(30000).build();
-
-		// Construct a new Jest client according to configuration via factory
-		JestClientFactory factory = new JestClientFactory();
-		factory.setHttpClientConfig(clientConfig);
-		setClient(factory.getObject());
-		LOG.info("IP included to jest client: " + getSetting(S_ES_POINT));
-		LOG.info("Creating Jest client...");
+		setClient(restClient);
+		setSniffer(sniffer);
+		LOG.info("IP included to rest client: {} ", getSetting(S_ES_POINT));
 
 	}
 
 	@PreDestroy
 	public void onStop() {
-		getClient().shutdownClient();
-		LOG.info("Jest client shutdown");
+		try {
+			getClient().close();
+			getSniffer().close();
+			LOG.info("Rest client shutdown");
+		} catch (IOException e) {
+			LOG.info("Rest Client is not shutdown : {}", e.getMessage());
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -70,6 +83,8 @@ public class ElasticsearchProcessor extends SearchProcessor<SearchData, Object> 
 			indexType = TYPE_COLLECTION;
 		} else if (indexType.equalsIgnoreCase(KEYWORD_COMPETENCY)) {
 			indexType = TYPE_TAXONOMY;
+		} else if (indexType.equalsIgnoreCase(AUTOCOMPLETE_KEYWORD)) {
+			indexType = KEYWORD;
 		}
 
 		try {
@@ -77,21 +92,20 @@ public class ElasticsearchProcessor extends SearchProcessor<SearchData, Object> 
 			if (searchData.getPretty().equals("1")) {
 				ObjectMapper mapper = new ObjectMapper();
 				Object json = mapper.readValue(searchQuery, Map.class);
-				LOG.info("IndexName:" + getSetting(S_ES_INDEX_PREFIX) + indexName + getSetting(S_ES_INDEX_SUFFIX) + "/" + indexType);
+				LOG.info("IndexName:" + getSetting(S_ES_INDEX_PREFIX) + indexName + getSetting(S_ES_INDEX_SUFFIX) + SLASH_SEPARATOR + indexType);
 				LOG.info(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json));
 			}
-
-			Search search = new Search.Builder(searchQuery).addIndex(getSetting(S_ES_INDEX_PREFIX) + indexName + getSetting(S_ES_INDEX_SUFFIX)).addType(indexType).build();
-
 			long start = System.currentTimeMillis();
-			JestResult jestResult = getClient().execute(search);
-			if (jestResult.getErrorMessage() != null) {
-				JSONObject responseStatus = new JSONObject(jestResult.getJsonString());
-				if ((Integer) responseStatus.get(SEARCH_STATUS) == 400 || (Integer) responseStatus.get(SEARCH_STATUS) == 503) {
-					throw new BadRequestException("Please check request param input values");
-				}
+
+			HttpEntity entity = new NStringEntity(searchQuery, ContentType.APPLICATION_JSON);
+			Response searchResponse = getClient().performRequest(GET_METHOD,
+					SLASH_SEPARATOR + getSetting(S_ES_INDEX_PREFIX) + indexName + getSetting(S_ES_INDEX_SUFFIX) + SLASH_SEPARATOR + indexType + SLASH_SEPARATOR + UNDERSCORE_SEARCH,
+					Collections.<String, String>emptyMap(), entity, new BasicHeader("Content-Type", "application/json"));
+			if (searchResponse.getStatusLine().getStatusCode() == 400 || searchResponse.getStatusLine().getStatusCode() == 503) {
+				throw new BadRequestException("Please check request param input values");
 			}
-			searchData.setSearchResultText(jestResult.getJsonString());
+
+			searchData.setSearchResultText(EntityUtils.toString(searchResponse.getEntity()));
 			if (LOG.isDebugEnabled()) {
 				LOG.debug("Elapsed Time for " + indexType + " : " + (System.currentTimeMillis() - start) + " ms");
 			}
@@ -107,11 +121,42 @@ public class ElasticsearchProcessor extends SearchProcessor<SearchData, Object> 
 		return SearchProcessorType.Elasticsearch;
 	}
 
-	public static JestClient getClient() {
+	public static RestClient getClient() {
 		return client;
 	}
 
-	public static void setClient(JestClient client) {
+	public static void setClient(RestClient client) {
 		ElasticsearchProcessor.client = client;
 	}
+	
+	public static Sniffer getSniffer() {
+		return sniffer;
+	}
+
+	public static void setSniffer(Sniffer sniffer) {
+		ElasticsearchProcessor.sniffer = sniffer;
+	}
+	
+	private HttpHost[] buildHosts(String endpoints) {
+		String[] hosts = endpoints.split(COMMA);
+		HttpHost[] httpHosts = new HttpHost[0];
+		for (String host : hosts) {
+			String[] hostParams = host.split(COLON);
+			if (hostParams.length == 2) {
+				httpHosts = appendToArray(httpHosts , new HttpHost(hostParams[0], Integer.valueOf(hostParams[1]), HTTP));
+			} else {
+				LOG.debug("Oops! Could't initialize rest client with host : {}", host);
+			}
+		}
+		return httpHosts;
+	}
+	
+	private HttpHost[] appendToArray(HttpHost[] array, HttpHost x){
+		HttpHost[] result = new HttpHost[array.length + 1];
+	    for(int i = 0; i < array.length; i++)
+	        result[i] = array[i];
+	    result[result.length - 1] = x;
+	    return result;
+	}
+
 }

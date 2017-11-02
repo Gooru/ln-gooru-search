@@ -12,20 +12,22 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.EsIndex;
 import org.ednovo.gooru.search.es.exception.SearchException;
 import org.ednovo.gooru.search.es.model.ContentSearchResult;
-import org.ednovo.gooru.search.es.model.ContentSuggestResult;
+import org.ednovo.gooru.search.es.model.SuggestResult;
 import org.ednovo.gooru.search.es.model.PublishedStatus;
 import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.model.SuggestResponse;
 import org.ednovo.gooru.search.es.processor.ElasticsearchProcessor;
 import org.ednovo.gooru.search.es.processor.deserializer.ResourceDeserializeProcessor;
 import org.ednovo.gooru.search.es.processor.deserializer.ResourceSuggestDeserializeProcessor;
+import org.ednovo.gooru.search.es.processor.filter.constructor.TenantFilterConstructionProcessor;
 import org.ednovo.gooru.search.es.processor.query_builder.ResourceEsDslQueryBuildProcessor;
 import org.ednovo.gooru.search.es.repository.ConceptBasedResourceSuggestRepository;
+import org.ednovo.gooru.search.es.repository.GutBasedResourceSuggestRepository;
 import org.ednovo.gooru.search.es.service.SearchSettingService;
 import org.ednovo.gooru.search.model.ActivityStreamRawData;
 import org.ednovo.gooru.suggest.v3.data.provider.model.SuggestDataProviderType;
@@ -71,6 +73,12 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 	@Autowired
 	private ConceptBasedResourceSuggestRepository conceptSuggestionRepository;
 	
+	@Autowired
+	private GutBasedResourceSuggestRepository gutSuggestionRepository;
+
+	@Autowired
+	private TenantFilterConstructionProcessor tenantFilterConstructionProcessor;
+	
 	private SuggestDataProviderType[] suggestDataProviders = { SuggestDataProviderType.RESOURCE,SuggestDataProviderType.COLLECTION };
 
 	@Override
@@ -114,7 +122,7 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 			}
 		}
 
-		final SearchResponse<List<ContentSuggestResult>> suggestResponseResource = new SearchResponse<List<ContentSuggestResult>>();
+		final SearchResponse<List<SuggestResult>> suggestResponseResource = new SearchResponse<List<SuggestResult>>();
 		final SearchResponse<List<ContentSearchResult>> searchResponseResource = new SearchResponse<List<ContentSearchResult>>();
 		final SearchResponse<Object> searchRes = new SearchResponse<Object>();
 		final String contextType = suggestData.getSuggestContextData().getContextType();
@@ -129,7 +137,6 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 				try {
 					String queryString = "*";
 					suggestData.putFilter("&^statistics.statusIsBroken", 0);
-					suggestData.putFilter(FLT_TENANT_ID, StringUtils.join(suggestData.getUserPermits(), ","));
 
 					if (contextType.equalsIgnoreCase(RESOURCE_STUDY) && resourceData != null) {
 
@@ -194,20 +201,51 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 						}
 						List<String> ids = null;
 						if (collectionData != null) {
-							if (collectionData.getTaxonomyLearningTargets() != null && collectionData.getTaxonomyLearningTargets().size() > 0) {
-								ids = conceptSuggestionRepository.getSuggestionByMicroCompetency(collectionData.getTaxonomyLearningTargets(), contextType, range,
-										SuggestHandlerType.RESOURCE.name().toLowerCase());
-							} 
+							//To be enabled when Gut table is ready with NU suggestion
+							if (collectionData.getGutLtCodes() != null && collectionData.getGutLtCodes().size() > 0) {
+								ids = gutSuggestionRepository.getSuggestionByMicroCompetency(collectionData.getGutLtCodes(), range);
+							}
+
+							if (ids == null && collectionData.getGutStdCodes() != null && collectionData.getGutStdCodes().size() > 0) {
+								ids = gutSuggestionRepository.getSuggestionByCompetency(collectionData.getGutStdCodes(), range);
+							}
+							
+							if (ids == null && collectionData.getTaxonomyLearningTargets() != null && collectionData.getTaxonomyLearningTargets().size() > 0) {
+								ids = gutSuggestionRepository.getSuggestionByMicroCompetency(collectionData.getTaxonomyLearningTargets(), range);
+							}
 							
 							if (ids == null && collectionData.getStandards() != null && collectionData.getStandards().size() > 0) {
-								ids = conceptSuggestionRepository.getSuggestionByCompetency(collectionData.getStandards(), contextType, range, SuggestHandlerType.RESOURCE.name().toLowerCase());
+								ids = gutSuggestionRepository.getSuggestionByCompetency(collectionData.getStandards(), range);
 							}
 						}
 						if (ids != null && !ids.isEmpty()) {
 							suggestData.putFilter("&id", StringUtils.join(ids, ","));
 						} else {
 							LOG.info("Suggestions unavailable for concept nodes : " + collectionData.getTaxonomyLeafSLInternalCodes());
-							suggestData.setSize(0);
+
+							LOG.info("Checking other published resources as quality suggestions are unavailable for gut codes : " + collectionData.getGutStdCodes());
+							suggestData.putFilter(FLT_PUBLISH_STATUS, PublishedStatus.PUBLISHED.getStatus());
+							
+							if (StringUtils.isNotBlank(collectionData.getTitle())) {
+								if (suggestQuery.length() > 0) {
+									suggestQuery.append(OR_DELIMETER);
+								}
+								suggestQuery.append(collectionData.getTitle().trim());
+							}
+							if (StringUtils.isNotBlank(collectionData.getLearningObjective())) {
+								if (suggestQuery.length() > 0) {
+									suggestQuery.append(OR_DELIMETER);
+								}
+								suggestQuery.append(collectionData.getLearningObjective().trim());
+							}
+							if (collectionData.getTaxonomyLeafSLInternalCodes() != null && collectionData.getTaxonomyLeafSLInternalCodes().size() > 0) {
+								suggestData.putFilter("&^taxonomy.leafInternalCodes", StringUtils.join(collectionData.getTaxonomyLeafSLInternalCodes(), ","));
+							} else if (collectionData.getTaxonomyDomains() != null && collectionData.getTaxonomyDomains().size() > 0) {
+								suggestData.putFilter("&^domain", StringUtils.join(collectionData.getTaxonomyDomains(), ","));
+							} else {
+								LOG.info("There are no matching published resources!");
+								suggestData.setSize(0);
+							}
 						}
 					}
 					
@@ -243,6 +281,7 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 					}
 					suggestData.setQueryString(queryString);
 
+					tenantFilterConstructionProcessor.process(suggestData, searchRes);
 					resourceEsDslQueryProcessor.process(suggestData, searchRes);
 					elasticSearchProcessor.process(suggestData, searchRes);
 					if (suggestData.getIsIntenralSuggest()) {

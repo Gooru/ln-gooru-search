@@ -1,10 +1,9 @@
 package org.ednovo.gooru.search.es.handler;
 
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.AutoCompletePublisherDeserializeProcessor;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.AutoCompletePublisherDslQueryBuild;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.BlackListQueryValidation;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.Elasticsearch;
-import static org.ednovo.gooru.search.es.processor.SearchProcessorType.EsDslQueryBuild;
-import static org.ednovo.gooru.search.es.processor.SearchProcessorType.LimitValidation;
-import static org.ednovo.gooru.search.es.processor.SearchProcessorType.PublisherDeserializer;
 
 import java.util.Map;
 
@@ -17,7 +16,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class PublisherV2SearchHandler extends SearchHandler<SearchData, Map<String, Object>>{
 
-	private static final SearchProcessorType[][] searchProcessorTypes = new SearchProcessorType[][] { { BlackListQueryValidation }, { LimitValidation }, { EsDslQueryBuild }, { Elasticsearch }, { PublisherDeserializer } };
+	private static final SearchProcessorType[][] searchProcessorTypes = new SearchProcessorType[][] {
+		{ BlackListQueryValidation }, { AutoCompletePublisherDslQueryBuild }, { Elasticsearch }, { AutoCompletePublisherDeserializeProcessor } };
 	
 	@Override
 	public SearchResponse<Map<String, Object>> search(SearchData searchData) {

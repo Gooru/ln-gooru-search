@@ -21,18 +21,6 @@ public class ResourceFilterConstructionProcessor extends ContentFilterConstructi
 			SearchResponse<Object> response) {
 		super.process(searchData, response);
 		
-		//searchData.putFilter("&^statistics.invalidResource", "0");
-/*		if(!(searchData.getUser().getUserRoleSetString().contains(SEARCH_SUPER_ADMIN) || searchData.getUser().getUserRoleSetString().contains(SEARCH_CONTENT_ADMIN))) {
-			searchData.putFilter("&^statistics.statusIsBroken", "0");
-		}*/	
-		
-/*		// Include unpublished content in search results or not  
-		
-		String includeUnPublished = SearchSettingService.getByName(SearchSettingConstants.INCLUDE_UNPUBLISHED_CONTENT);
-		if(includeUnPublished != null && includeUnPublished.equalsIgnoreCase("false")){
-			searchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.PUBLISH_STATUS, PublishedStatus.PUBLISHED.name());
-		}
-*/		
 		if(searchData.getFilters()!= null && searchData.getFilters().containsKey("&^type") && searchData.getFilters().get("&^type").equals(SEARCH_QUESTION)) {
 			searchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_FORMAT, SEARCH_QUESTION);
 			searchData.getFilters().remove("&^type");
@@ -40,10 +28,6 @@ public class ResourceFilterConstructionProcessor extends ContentFilterConstructi
 		
 		// Default filter to get non-broken content 
 		searchData.putFilter(FLT_STATUS_BROKEN, 0);
-
-		// Default filter to only get resources that is not mapped to user created course
-		searchData.putFilter(FLT_COURSE_MISSING, "");
-		
 		
 		if(searchData != null && searchData.getFilters() != null){
 			String contentFormat = null;

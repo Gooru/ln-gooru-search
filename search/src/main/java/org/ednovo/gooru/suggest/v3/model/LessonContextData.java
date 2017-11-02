@@ -2,8 +2,6 @@ package org.ednovo.gooru.suggest.v3.model;
 
 import java.util.List;
 
-import javax.json.JsonObject;
-
 public class LessonContextData {
 
 	private String id;
@@ -13,9 +11,7 @@ public class LessonContextData {
 	private String format;
 
 	private String creatorId;
-	
-	private JsonObject taxonomy;
-	
+		
 	private List<String> taxonomyLeafSLInternalCodes;
 	
 	private List<String> standards;
@@ -52,14 +48,6 @@ public class LessonContextData {
 
 	public void setCreatorId(String creatorId) {
 		this.creatorId = creatorId;
-	}
-
-	public JsonObject getTaxonomy() {
-		return taxonomy;
-	}
-
-	public void setTaxonomy(JsonObject taxonomy) {
-		this.taxonomy = taxonomy;
 	}
 
 	public List<String> getTaxonomyLeafSLInternalCodes() {

@@ -5,9 +5,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException;
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 import org.ednovo.gooru.search.es.constant.Constants;
+import org.ednovo.gooru.search.es.constant.EventConstants;
 import org.ednovo.gooru.search.es.exception.BadRequestException;
 import org.ednovo.gooru.search.es.exception.MethodFailureException;
 import org.ednovo.gooru.search.es.exception.NotAllowedException;
@@ -45,9 +45,6 @@ public class GooruExceptionResolver extends SimpleMappingExceptionResolver {
 		} else if (ex instanceof UnauthorizedException) {
 			errorObject = new ErrorObject(401, ((UnauthorizedException) ex).getErrorCode() != null ? "401-" + ((UnauthorizedException) ex).getErrorCode() : "401", ex.getMessage());
 			response.setStatus(401);
-		} else if (ex instanceof SizeLimitExceededException) {
-			response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
-			errorObject = new ErrorObject(413, ex.getMessage());
 		} else if (ex instanceof NotFoundException) {
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			isLogError = true;
@@ -87,7 +84,7 @@ public class GooruExceptionResolver extends SimpleMappingExceptionResolver {
 			try {
 				inputParams.put("parameters", new JSONObject(map));
 				inputParams.put(Constants.SESSION_TOKEN, request.getHeader(Constants.GOORU_SESSION_TOKEN));
-				inputParams.put(Constants.API_KEY, request.getHeader(Constants.GOORU_API_KEY));
+				inputParams.put(EventConstants.API_KEY, request.getHeader(Constants.GOORU_API_KEY));
 			} catch (JSONException e) {
 			}
 		}

@@ -1,6 +1,7 @@
 package org.ednovo.gooru.suggest.v3.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -40,6 +41,8 @@ public class SuggestContextData implements Serializable {
 	private Integer score;
 	
 	private Long timeSpent;
+
+	private List<String> codes;
 
 	public String getUserId() {
 		return userId;
@@ -163,6 +166,12 @@ public class SuggestContextData implements Serializable {
 	public void setCurrentItemType(String currentItemType) {
 		this.currentItemType = currentItemType;
 	}
-	
 
+	public List<String> getCodes() {
+		return codes;
+	}
+
+	public void setCodes(List<String> codes) {
+		this.codes = codes;
+	}
 }

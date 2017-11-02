@@ -36,7 +36,7 @@ public class LimitValidationProcessor extends SearchProcessor<SearchData, Object
 			SearchResponse<Object> response) {
 		int maxResultSize = 20;
 		if(searchData.getType().equalsIgnoreCase(TYPE_COURSE) && searchData.getParameters() != null && searchData.getParameters().containsKey(FLT_COURSE)){
-			maxResultSize = 50;
+			maxResultSize = 70;
 		}
 		Integer apikeySearchLimit = SessionContextSupport.getUserCredential().getApiKeySearchLimit();
 		if (apikeySearchLimit != null && apikeySearchLimit != -1 && searchData.getSize() > apikeySearchLimit) {

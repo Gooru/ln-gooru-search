@@ -3,7 +3,7 @@ package org.ednovo.gooru.search.es.model;
 import java.io.Serializable;
 import java.util.Map;
 
-public class ContentSuggestResult implements Serializable {
+public class SuggestResult implements Serializable {
 
 	private static final long serialVersionUID = 658669415425318456L;
 

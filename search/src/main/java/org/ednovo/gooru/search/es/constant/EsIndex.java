@@ -23,7 +23,9 @@ public enum EsIndex {
 	UNIT("unit"),
 	LESSON("lesson"),
 	CROSSWALK("crosswalk"),
-	RUBRIC("rubric");
+	RUBRIC("rubric"),
+	QUERY("query", new String[] { "keyword" }),
+	TENANT("tenant");
 
 	private String name;
 	

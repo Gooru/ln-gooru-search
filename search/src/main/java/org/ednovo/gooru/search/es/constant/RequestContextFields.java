@@ -19,5 +19,6 @@ public class RequestContextFields {
 	public static final String METRICS = "metrics";
 	public static final String SCORE = "score";
 	public static final String TIMESPENT = "timespent";
+	public static final String CODES = "codes";
 
 }

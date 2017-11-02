@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.processor.SearchProcessor;
@@ -76,7 +76,7 @@ public class FilterDetectionProcessor extends SearchProcessor<SearchData, Object
 			if(!skipColonFilter){
 				String filterDetectionKey = filterName;
 				if(filterDetectionKey.equalsIgnoreCase("grade")){
-					filterDetectionKey = filterDetectionKey+COLON;
+					filterDetectionKey = filterDetectionKey+UNDERSCORE_COLON;
 				}
 				Map<String, String> patternMap = SearchSettingService.getFilterDetection(filterDetectionKey);
 				
