@@ -1,8 +1,5 @@
 package org.ednovo.gooru.controllers.api.v3;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -15,7 +12,6 @@ import org.ednovo.gooru.search.es.model.MapWrapper;
 import org.ednovo.gooru.search.es.model.SuggestResponse;
 import org.ednovo.gooru.search.es.model.User;
 import org.ednovo.gooru.search.es.model.UserGroupSupport;
-import org.ednovo.gooru.search.es.service.SearchSettingService;
 import org.ednovo.gooru.suggest.v3.model.SuggestContextData;
 import org.ednovo.gooru.suggest.v3.model.SuggestData;
 import org.ednovo.gooru.suggest.v3.service.SuggestV3Service;

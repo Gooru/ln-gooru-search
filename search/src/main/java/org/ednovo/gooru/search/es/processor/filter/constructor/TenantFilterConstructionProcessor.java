@@ -53,11 +53,10 @@ public class TenantFilterConstructionProcessor extends FilterConstructionProcess
 		}
 		searchData.setUserPermits(userPermits.stream().distinct().collect(Collectors.toList()));
 
-		searchData.putFilter(FLT_TENANT_ID, StringUtils.join(searchData.getUserPermits(), ","));
-
-		searchData.setFeaturedCourseTenantPreferences(SearchSettingService.getFeaturedCourseTenantPreference(searchData.getUserTenantId()));
-		
-		if (searchData.getFilters().containsKey(FLT_COURSE_TYPE)) {
+		if (searchData.getFilters() != null && !searchData.getFilters().containsKey(FLT_COURSE_TYPE)) {
+			searchData.putFilter(FLT_TENANT_ID, StringUtils.join(searchData.getUserPermits(), ","));
+		} else {
+			searchData.setFeaturedCourseTenantPreferences(SearchSettingService.getFeaturedCourseTenantPreference(searchData.getUserTenantId()));
 			List<String> userTenantPermits = new ArrayList<>();
 			userTenantPermits.add(searchData.getUserTenantId());
 			userTenantPermits.addAll(searchData.getUserTenantParentIds());
