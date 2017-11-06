@@ -59,7 +59,7 @@ public class TenantFilterConstructionProcessor extends FilterConstructionProcess
 			searchData.setFeaturedCourseTenantPreferences(SearchSettingService.getFeaturedCourseTenantPreference(searchData.getUserTenantId()));
 			List<String> userTenantPermits = new ArrayList<>();
 			userTenantPermits.add(searchData.getUserTenantId());
-			userTenantPermits.addAll(searchData.getUserTenantParentIds());
+			if (searchData.getUserTenantParentIds() != null) userTenantPermits.addAll(searchData.getUserTenantParentIds());
 			searchData.putFilter(FLT_TENANT_ID, StringUtils.join(userTenantPermits, ","));
 			if (searchData.getFeaturedCourseTenantPreferences() != null) {
 				List<String> tenantPreferences = new ArrayList<>();
