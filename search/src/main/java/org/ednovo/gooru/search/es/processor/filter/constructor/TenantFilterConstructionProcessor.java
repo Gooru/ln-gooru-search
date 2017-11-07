@@ -24,6 +24,7 @@ public class TenantFilterConstructionProcessor extends FilterConstructionProcess
 	@SuppressWarnings("unchecked")
 	@Override
 	public void process(SearchData searchData, SearchResponse<Object> response) {
+		super.process(searchData, response);
 
 		// add user tenant
 		Set<String> userPermits = new HashSet<>();
@@ -53,9 +54,7 @@ public class TenantFilterConstructionProcessor extends FilterConstructionProcess
 		}
 		searchData.setUserPermits(userPermits.stream().distinct().collect(Collectors.toList()));
 
-		if (searchData.getFilters() != null && !searchData.getFilters().containsKey(FLT_COURSE_TYPE)) {
-			searchData.putFilter(FLT_TENANT_ID, StringUtils.join(searchData.getUserPermits(), ","));
-		} else {
+		if (searchData.getFilters() != null && searchData.getFilters().containsKey(FLT_COURSE_TYPE)) {
 			searchData.setFeaturedCourseTenantPreferences(SearchSettingService.getFeaturedCourseTenantPreference(searchData.getUserTenantId()));
 			List<String> userTenantPermits = new ArrayList<>();
 			userTenantPermits.add(searchData.getUserTenantId());
@@ -67,6 +66,8 @@ public class TenantFilterConstructionProcessor extends FilterConstructionProcess
 				if (!tenantPreferences.isEmpty())
 					searchData.putFilter(FLT_TENANT_ID, StringUtils.join(tenantPreferences, ","));
 			}
+		} else {
+			searchData.putFilter(FLT_TENANT_ID, StringUtils.join(searchData.getUserPermits(), ","));
 		}
 	}
 
