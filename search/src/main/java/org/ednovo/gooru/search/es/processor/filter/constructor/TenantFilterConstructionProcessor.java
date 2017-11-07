@@ -75,7 +75,7 @@ public class TenantFilterConstructionProcessor extends FilterConstructionProcess
 			switch (preference) {
 			case TENANT:
 				tenantPermits.add(searchData.getUserTenantId());
-				tenantPermits.addAll(searchData.getUserTenantParentIds());
+				if (searchData.getUserTenantParentIds() != null) tenantPermits.addAll(searchData.getUserTenantParentIds());
 				break;
 			case GLOBAL:
 				tenantPermits.addAll(SearchSettingService.getListByName(GLOBAL_TENANT_IDS));
