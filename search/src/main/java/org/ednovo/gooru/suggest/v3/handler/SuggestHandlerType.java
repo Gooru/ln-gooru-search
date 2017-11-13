@@ -21,7 +21,9 @@ public enum SuggestHandlerType {
 
 	SEARCHQUERY(),
 
-	TAXONOMY(),
+	TAXONOMY_RESOURCE(),
+
+	TAXONOMY_COLLECTION(),
 
 	COURSE();
 

@@ -100,8 +100,6 @@ public interface Constants {
 
 	public static final String QUERY_STRING = "query_string";
 
-	public static final String TEXT = "text";
-
 	public static final String CHECK_SUGGEST = "check-suggest";
 
 	public static final String FIELD = "field";
@@ -118,7 +116,7 @@ public interface Constants {
 
 	public static final String REPLACE_CHARACTERS = "\\\\$1";
 
-	public static final String COLON = "_colon";
+	public static final String UNDERSCORE_COLON = "_colon";
 
 	public static final String SEARCH_FILTER_NAME = "filter-name";
 
@@ -499,8 +497,8 @@ public interface Constants {
 	public static final String SEARCH_ACTIVE = "active";
 	public static final String SEARCH_PARENT_ACCOUNT_USER_NAME = "parentAccountUserName";
 	public static final String SEARCH_CHILD_ACCOUNT_COUNT = "childAccountCount";
-	public static final String DEFAULT_RESCORE_SCRIPT = "esScore = esScore=_score.score(); pcw = doc['statistics.preComputedWeight'].value; cenPrecent = esScore/60*100; fourtyPrecent = cenPrecent - esScore; return fourtyPrecent * pcw;";
-	public static final String DEFAULT_RESCORE_LANG = "groovy";
+	public static final String DEFAULT_RESCORE_SCRIPT = "((_score/60*100) - _score) * doc['statistics.preComputedWeight'].value";
+	public static final String DEFAULT_RESCORE_LANG = "painless";
 	public static final String DEFAULT_RESCORE_MODE = "multiply";
 	public static final int DEFAULT_RESCORE_WINDOW_SIZE = 300;
 	public static final String RESCORE_SCRIPT = "search.resource.rescore.script";
@@ -522,17 +520,14 @@ public interface Constants {
 	public static final String SEARCH_VALUE_NOTEMPTY = "NotEmpty";
 	public static final String SEARCH_SUPER_ADMIN = "superadmin";
 	public static final String SEARCH_CONTENT_ADMIN = "Content_Admin";
-	public static final String SEARCH_COMMA_SEPERTOR = ",";
+	public static final String SEARCH_COMMA_SEPARATOR = ",";
 	public static final String SEARCH_FLT_STANDARD = "flt.standard";
 	public static final String SEARCH_DOT_SEPERTOR = ".";
 	public static final String SEARCH_HYPHEN_SEPERTOR = "-";
 	public static final String SEARCH_QUESTION_COUNT = "questionCount";
 	public static final String SEARCH_RESOURCE_COUNT = "resourceCount";
 	public static final Short SHORT_ZERO = 0;
-	public static final String API_KEY = "apiKey";
-	public static final String PARTNER_ID = "partnerId";
 	public static final String SESSION_TOKEN_SEARCH = "sessionToken";
-	public static final String SESSION_SEARCH = "session";
 	public static final String GOORU_HEADER_SESSION_TOKEN = "Gooru-Session-Token";
 	public static final String GOORU_API_KEY = "Gooru-ApiKey";
 	public static final String SESSION_TOKEN = "SESSION_TOKEN";
@@ -601,14 +596,12 @@ public interface Constants {
 	public static final String SEARCH_REQ_20 = "2.0";
 	public static  final String SESSION_TOKEN_20 = "special-token-2.0";
 
-	public static final String TENANT_ID = "tenant_id";
 	public static final String TENANT_ROOT = "tenant_root";
 
 	public static final String TENANT = "tenant";
 
-	public static final String DISCOVERABLE_TENANT_IDS = "discoverableTenantIds";
+	public static final String ALL_DISCOVERABLE_TENANT_IDS = "allDiscoverableTenantIds";
 
-	public static final String APP_ID = "appId";
 	public static final String AMPERSAND_STANDARD = "&^standard";
 	public static final String AMPERSAND_STANDARD_DISPLAY = "&^standardDisplay";
 	public static final String AMPERSAND_EQ_INTERNAL_CODE = "&^taxonomy.allEquivalentInternalCodes";
@@ -652,4 +645,28 @@ public interface Constants {
 	public static final String API_COMPETENCY_NODE = "api.competency.node";
 	public static final String DNS_ENV = "dns.env";
 	public static final String KEYWORDS = "keywords";
+	Pattern DEFAULT_FILTERS = Pattern.compile("flt.collectionType|flt.contentFormat|flt.resourceFormat|flt.publishStatus|flt.courseType");
+	public static final String KEYWORD = "keyword";
+	public static final String ANALYZER = "analyzer";
+	public static final String MATCH = "match";
+	public static final String STANDARD = "standard";
+	public static final String AUTOCOMPLETE_KEYWORD = "autocomplete_keyword";
+	public static final String TEXT = "text";
+	public static final String SEARCH = "search";
+	public static final String PUBLISHERS = "publishers";
+	public static final String FROM = "from";
+	public static final Pattern STANDARD_MATCH = Pattern.compile("standard_level_1|standard_level_2");
+	public static final String TAXONOMY_RESOURCE = "taxonomy_resource";
+	public static final String TAXONOMY_COLLECTION = "taxonomy_collection";
+	public static final String LEARNING_TARGET_LEVEL_0 = "learning_target_level_0";
+	public static final String GET_METHOD = "GET";
+	public static final String SLASH_SEPARATOR = "/";
+	public static final String UNDERSCORE_SEARCH = "_search";
+	public static final String COLON = ":";
+	public static final String HTTP = "http";
+	public static final String GLOBAL = "global";
+	public static final String DISCOVERABLE = "discoverable";
+	public static final String GLOBAL_TENANT_IDS = "globalTenantIds";
+	public static final String DISCOVERABLE_TENANT_IDS = "discoverableTenantIds";
+
 }

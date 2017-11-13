@@ -1,8 +1,5 @@
 package org.ednovo.gooru.controllers.api.v3;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -15,7 +12,6 @@ import org.ednovo.gooru.search.es.model.MapWrapper;
 import org.ednovo.gooru.search.es.model.SuggestResponse;
 import org.ednovo.gooru.search.es.model.User;
 import org.ednovo.gooru.search.es.model.UserGroupSupport;
-import org.ednovo.gooru.search.es.service.SearchSettingService;
 import org.ednovo.gooru.suggest.v3.model.SuggestContextData;
 import org.ednovo.gooru.suggest.v3.model.SuggestData;
 import org.ednovo.gooru.suggest.v3.service.SuggestV3Service;
@@ -47,11 +43,12 @@ public class SuggestV3RestController extends BaseController {
 
 	@Autowired
 	private RequestService requestService;
-	
+
 	@RequestMapping(method = RequestMethod.POST , value = "/{type}", headers = "Content-Type=application/json")
 	public ModelAndView suggest(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) String sessionToken,
 			@RequestParam(defaultValue = "10", value = "limit") Integer pageSize, @RequestParam(defaultValue = "0") String pretty, 
-			@RequestParam(required = false, defaultValue = "false") Boolean isInternalSuggest, @PathVariable String type, @RequestBody String contextPayload)
+			@RequestParam(required = false, defaultValue = "false") Boolean isInternalSuggest, @PathVariable String type, @RequestBody String contextPayload,
+			@RequestParam(required = false, defaultValue= "true") boolean isCrosswalk)
 			throws Exception {
 		long start = System.currentTimeMillis();
 		JSONObject requestContext = null;
@@ -60,7 +57,9 @@ public class SuggestV3RestController extends BaseController {
 		if (requestContext == null || requestContext.keys() == null) {
 			throw new BadRequestException("Request Payload missing!");
 		}
-		SuggestData suggestData = suggestRequest(request, type, pageSize, requestContext, pretty, sessionToken);
+		SuggestData suggestData = new SuggestData();
+		suggestData.setCrosswalk(isCrosswalk);
+		suggestData = suggestRequest(suggestData, request, type, pageSize, requestContext, pretty, sessionToken);
 		try {
 			if (!(type.equalsIgnoreCase(RESOURCE) || type.equalsIgnoreCase(COLLECTION))) {
 				throw new BadRequestException("Invalid Type is passed. For now, the support types are resource and collection.");
@@ -75,19 +74,58 @@ public class SuggestV3RestController extends BaseController {
 			return toModelAndView(searchException.getMessage());
 		}
 	}
+	
+	@RequestMapping(method = RequestMethod.POST , value = "taxonomy/{type}", headers = "Content-Type=application/json")
+	public ModelAndView suggestForCode(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) String sessionToken,
+			@RequestParam(defaultValue = "10", value = "limit") Integer pageSize, @RequestParam(defaultValue = "0") String pretty, @RequestParam(required = false, defaultValue = "false") Boolean inputTypeInternalCode, @RequestParam(required = false, defaultValue = "false") Boolean isInternalSuggest, @PathVariable String type, @RequestBody String contextPayload,
+			@RequestParam(required = false, defaultValue= "true") boolean isCrosswalk)
+			throws Exception {
+		long start = System.currentTimeMillis();
+		JSONObject requestContext = null;
+		if (!contextPayload.isEmpty())
+			requestContext = new JSONObject(contextPayload);
+		if (requestContext == null || requestContext.keys() == null) {
+			throw new BadRequestException("Request Payload missing!");
+		}
+		SuggestData suggestData = new SuggestData();
+		suggestData.setSuggestInputType("code");
+		suggestRequest(suggestData, request, type, pageSize, requestContext, pretty, sessionToken);
+		try {
+			if (!(type.equalsIgnoreCase(RESOURCE) || type.equalsIgnoreCase(COLLECTION))) {
+				throw new BadRequestException("Invalid Type is passed. For now, the support types are resource and collection.");
+			}
+			if (type.equalsIgnoreCase(RESOURCE)) {
+				type = TAXONOMY_RESOURCE;
+			} else if (type.equalsIgnoreCase(COLLECTION)) {
+				type = TAXONOMY_COLLECTION;
+			}
+			suggestData.setType(type);
+			suggestData.setIsInternalSuggest(isInternalSuggest);
+			suggestData.setCrosswalk(isCrosswalk);
+			SuggestResponse<Object> suggestResults = suggestService.suggest(suggestData).get(0);
+			String result = serialize(suggestResults, JSON, SINGLE_EXCLUDES, true);
+			LOG.info("Total latency of suggest " + (System.currentTimeMillis() - start));
+			return toModelAndView(result);
+		} catch (SearchException searchException) {
+			response.setStatus(searchException.getStatus().value());
+			return toModelAndView(searchException.getMessage());
+		}
+	}
 
-	private SuggestData suggestRequest(HttpServletRequest request, String type, Integer pageSize, JSONObject requestContext, String pretty, String sessionToken) throws Exception {
+	private SuggestData suggestRequest(SuggestData suggestData, HttpServletRequest request, String type, Integer pageSize, JSONObject requestContext, String pretty, String sessionToken) throws Exception {
 		if (sessionToken == null) {
 			sessionToken = getSessionToken(request);
 		}
 		User apiCaller = (User) request.getAttribute(Constants.USER);
-		SuggestData suggestData = new SuggestData();
 		suggestData.setType(type);
+		suggestData.setUserTaxonomyPreference((JSONObject) request.getAttribute(Constants.USER_PREFERENCES));
 
 		@SuppressWarnings("unchecked")
 		MapWrapper<Object> suggestParamMap = new MapWrapper<Object>(request.getParameterMap());
 		suggestData.setParameters(suggestParamMap);
 		if (suggestParamMap != null) {
+			if (suggestParamMap.containsKey("inputTypeInternalCode")) suggestData.setInputTypeInternalCode(suggestParamMap.getBoolean("inputTypeInternalCode"));
+
 			SuggestContextData suggestContext = getStudyPlayerContextData(suggestParamMap, requestContext, suggestData);
 			if (apiCaller != null) {
 				suggestContext.setUserId(apiCaller.getGooruUId());
@@ -97,13 +135,8 @@ public class SuggestV3RestController extends BaseController {
 
 		// Set user permits
 		UserGroupSupport userGroup = (UserGroupSupport) request.getAttribute(TENANT);
-		List<String> userPermits = new ArrayList<>();
 		String userTenantId = userGroup.getTenantId();
-		userPermits.add(userTenantId);
-		List<String> discoverableTenantIds = SearchSettingService.getDiscoverableTenantIds(DISCOVERABLE_TENANT_IDS);
-		if (discoverableTenantIds != null && !discoverableTenantIds.isEmpty())
-			userPermits.addAll(discoverableTenantIds);
-		suggestData.setUserPermits(userPermits);
+		suggestData.setUserTenantId(userTenantId);
 
 		suggestData.setFrom(0);
 		suggestData.setSize(pageSize);
@@ -117,7 +150,11 @@ public class SuggestV3RestController extends BaseController {
 	private SuggestContextData getStudyPlayerContextData(MapWrapper<Object> suggestParamMap, JSONObject requestContext, SuggestData suggestData) throws Exception {
 		SuggestContextData suggestContext = new SuggestContextData();
 		if (requestContext != null) {
-			getRequestService().processContextPayload(requestContext, suggestContext, suggestData);
+			if (suggestData.getSuggestInputType() != null && suggestData.getSuggestInputType().equalsIgnoreCase("code")) {
+				getRequestService().processCodeContextPayload(requestContext, suggestContext, suggestData);
+			} else {
+				getRequestService().processContextPayload(requestContext, suggestContext, suggestData);
+			}
 		} else {
 			throw new BadRequestException("Please refer the document to pass correct parameters");
 		}

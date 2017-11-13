@@ -61,7 +61,7 @@ public class CompetencyNodeDataProviderServiceImpl implements CompetencyNodeData
 		RestTemplate restTemplate = new RestTemplate();
 		HttpEntity<String> entity = new HttpEntity<String>(headers);
 		ResponseEntity<CompetencyNodesDTO> result = restTemplate.exchange(uri, HttpMethod.GET, entity, CompetencyNodesDTO.class, params);
-		if (result.getStatusCode().equals(HttpStatus.SC_NOT_FOUND)) {
+		if (result.getStatusCode().value() == (HttpStatus.SC_NOT_FOUND)) {
 			return null;
 		}
 		return result.getBody();

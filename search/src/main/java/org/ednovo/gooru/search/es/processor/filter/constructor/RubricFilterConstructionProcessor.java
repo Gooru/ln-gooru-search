@@ -1,6 +1,5 @@
 package org.ednovo.gooru.search.es.processor.filter.constructor;
 
-import org.apache.commons.lang.StringUtils;
 import org.ednovo.gooru.search.es.model.PublishedStatus;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.SearchResponse;
@@ -16,7 +15,6 @@ public class RubricFilterConstructionProcessor extends FilterConstructionProcess
 		if (((searchData != null && searchData.getFilters() != null) && (!searchData.getFilters().containsKey(FLT_PUBLISH_STATUS))) || (searchData == null || searchData.getFilters() == null)) {
 			searchData.putFilter(FLT_PUBLISH_STATUS, PublishedStatus.PUBLISHED.getStatus());
 		}
-		searchData.putFilter(FLT_TENANT_ID, StringUtils.join(searchData.getUserPermits(), ","));
 	}
 
 	@Override

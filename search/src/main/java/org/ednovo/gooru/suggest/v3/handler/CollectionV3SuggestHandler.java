@@ -9,7 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.domain.service.CollectionSearchResult;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.EsIndex;
@@ -18,6 +18,7 @@ import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.model.SuggestResponse;
 import org.ednovo.gooru.search.es.processor.ElasticsearchProcessor;
 import org.ednovo.gooru.search.es.processor.deserializer.SCollectionDeserializeProcessor;
+import org.ednovo.gooru.search.es.processor.filter.constructor.TenantFilterConstructionProcessor;
 import org.ednovo.gooru.search.es.processor.query_builder.EsDslQueryBuildProcessor;
 import org.ednovo.gooru.search.es.repository.ConceptBasedCollectionSuggestRepository;
 import org.ednovo.gooru.search.es.service.SearchSettingService;
@@ -51,6 +52,9 @@ public class CollectionV3SuggestHandler extends SuggestHandler<Map<String, Objec
 	
 	@Autowired
 	private ConceptBasedCollectionSuggestRepository conceptSuggestionRepository;
+
+	@Autowired
+	private TenantFilterConstructionProcessor tenantFilterConstructionProcessor;
 	
 	private static final String COLLECTION_STUDY = "collection-study";	
 
@@ -157,6 +161,7 @@ public class CollectionV3SuggestHandler extends SuggestHandler<Map<String, Objec
 				}
 				suggestData.setIndexType(getIndexType());
 				suggestData.setType(getName());
+				tenantFilterConstructionProcessor.process(suggestData, searchResponse);
 				esDslQueryBuildProcessor.process(suggestData, searchResponse);
 				elasticSearchProcessor.process(suggestData, searchResponse);
 				scollectionDeserializeProcessor.process(suggestData, searchCollectionResult);

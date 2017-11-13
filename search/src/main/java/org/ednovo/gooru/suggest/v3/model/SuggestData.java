@@ -21,6 +21,10 @@ public class SuggestData extends SearchData {
 	
 	private Boolean isInternalSuggest;
 
+	private String suggestInputType;
+	
+	private Boolean inputTypeInternalCode = false;
+	
 	public SuggestContextData getSuggestContextData() {
 		return suggestContextData;
 	}
@@ -35,6 +39,22 @@ public class SuggestData extends SearchData {
 
 	public void setIsInternalSuggest(Boolean isInternalSuggest) {
 		this.isInternalSuggest = isInternalSuggest;
+	}
+
+	public String getSuggestInputType() {
+		return suggestInputType;
+	}
+
+	public void setSuggestInputType(String suggestInputType) {
+		this.suggestInputType = suggestInputType;
+	}
+	
+	public Boolean getInputTypeInternalCode() {
+		return inputTypeInternalCode;
+	}
+
+	public void setInputTypeInternalCode(Boolean inputTypeInternalCode) {
+		this.inputTypeInternalCode = inputTypeInternalCode;
 	}
 
 }

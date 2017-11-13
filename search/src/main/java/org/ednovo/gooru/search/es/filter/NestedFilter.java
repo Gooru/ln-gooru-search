@@ -3,7 +3,9 @@
  */
 package org.ednovo.gooru.search.es.filter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,7 +19,12 @@ public class NestedFilter {
 	public NestedFilter(String path,
 			Object filter) {
 		nested.put("path", path);
-		nested.put("filter", filter);
+		List<Object> filters = new ArrayList<Object>(1);
+		filters.add(filter);
+		FilterQuery filterQuery = new FilterQuery(filters);
+		BoolQuery boolQuery = new BoolQuery();
+		boolQuery.setBool(filterQuery);
+		nested.put("query", boolQuery);
 	}
 
 	public Map<String, Object> getNested() {

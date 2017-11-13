@@ -11,6 +11,11 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.constant.Constants;
+import org.ednovo.gooru.search.es.constant.EsIndex;
+import org.ednovo.gooru.search.es.constant.IndexFields;
+import org.ednovo.gooru.search.es.handler.SearchHandler;
+import org.ednovo.gooru.search.es.handler.SearchHandlerType;
+import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.repository.CollectionRepository;
 import org.ednovo.gooru.search.es.repository.ContentRepository;
 import org.ednovo.gooru.search.es.repository.CourseRepository;
@@ -61,7 +66,11 @@ public class ContainerDataProviderServiceImpl implements ContainerDataProviderSe
 						collectionContextDo.setStandards((ArrayList<String>) conceptNodeJson.get("standards"));
 						collectionContextDo.setTaxonomyLearningTargets((ArrayList<String>) conceptNodeJson.get("learningTargets"));
 						collectionContextDo.setTaxonomyLeafSLInternalCodes((ArrayList<String>) conceptNodeJson.get("leafSLInternalCodes"));
-						collectionContextDo.setTaxonomyConceptNodeNeighbours((ArrayList<String>) conceptNodeJson.get("conceptNodeNeighbours"));
+						Set<String> gutStdCodes = new HashSet<>();
+						Set<String> gutLtCodes = new HashSet<>();
+						addGutCodes(collectionContextDo.getStandards(), collectionContextDo.getTaxonomyLearningTargets(), ((ArrayList<String>) conceptNodeJson.get("parentStandardInternalCodes")), gutStdCodes, gutLtCodes);
+						collectionContextDo.setGutLtCodes(gutLtCodes.stream().distinct().collect(Collectors.toList()));
+						collectionContextDo.setGutStdCodes(gutStdCodes.stream().distinct().collect(Collectors.toList()));
 					}
 					if (collectionSrc.get("course_id") != null) {
 						String courseId = collectionSrc.get("course_id").toString();
@@ -94,8 +103,8 @@ public class ContainerDataProviderServiceImpl implements ContainerDataProviderSe
 		List<String> standardArray = new ArrayList<>();
 		List<String> learningTargetArray = new ArrayList<>();
 		List<String> leafSLInternalCodes = new ArrayList<>();
-		List<String> conceptNodeNeighbours = new ArrayList<>(); 
 		Map<String, Object> conceptNodeJson = new HashMap<>();
+		List<String> parentStandardInternalCodes = new ArrayList<>();
 
 		if (taxonomyObject != null && (taxonomyObject.length() > 0)) {
 			Iterator<String> keys = taxonomyObject.keys();
@@ -135,24 +144,46 @@ public class ContainerDataProviderServiceImpl implements ContainerDataProviderSe
 				courseArray.add(courseCode != null ? courseCode.toLowerCase() : null);
 				domainArray.add(domainCode != null ? domainCode.toLowerCase() : null);
 			}
-			for (String leafSLInternalCode : leafSLInternalCodes) {
-				String parentCode = taxonomyRepository.getParentTaxonomyCode(leafSLInternalCode);
+			learningTargetArray.stream().forEach(learningTarget -> {
+				String parentCode = taxonomyRepository.getParentTaxonomyCode(learningTarget);
 				if (parentCode != null) {
-					List<String> conceptNodes = taxonomyRepository.getConceptNeighbours(leafSLInternalCode, parentCode);
-					if (conceptNodes != null && conceptNodes.size() > 0)
-						conceptNodeNeighbours.addAll(conceptNodes);
+					parentStandardInternalCodes.add(parentCode);
 				}
-			}
+			});
 			conceptNodeJson.put("standards", standardArray);
 			conceptNodeJson.put("subjects", subjectArray);
 			conceptNodeJson.put("courses", courseArray);
 			conceptNodeJson.put("domains", domainArray);
 			conceptNodeJson.put("learningTargets", learningTargetArray);
 			conceptNodeJson.put("leafSLInternalCodes", leafSLInternalCodes);
-			conceptNodeJson.put("conceptNodeNeighbours", conceptNodeNeighbours.stream().map(String::toLowerCase).collect(Collectors.toList()));
+			conceptNodeJson.put("parentStandardInternalCodes", parentStandardInternalCodes);
 		}
 		return conceptNodeJson;
 	}
+	
+	private void addGutCodes(List<String> standardInternalCodes, List<String> ltInternalCodes, List<String> parentStandardInternalCodes, Set<String> gutStdCodes, Set<String> gutLtCodes) {
+		fetchGutCodesForInternalCodes(ltInternalCodes, gutLtCodes);
+		fetchGutCodesForInternalCodes(standardInternalCodes, gutStdCodes);
+		Set<String> gutLtParentCodes = new HashSet<>(parentStandardInternalCodes.size());
+		fetchGutCodesForInternalCodes(parentStandardInternalCodes, gutLtParentCodes);
+		if (!gutLtParentCodes.isEmpty()) gutStdCodes.addAll(gutLtParentCodes);
+	}
+
+	@SuppressWarnings("unchecked")
+	private void fetchGutCodesForInternalCodes(List<String> codes, Set<String> gutCodes) {
+		SearchData crosswalkRequest = new SearchData();
+		crosswalkRequest.setIndexType(EsIndex.CROSSWALK);
+		crosswalkRequest.putFilter(Constants.AMPERSAND + Constants.CARET_SYMBOL + IndexFields.CROSSWALK_CODES + Constants.DOT + IndexFields.ID, (StringUtils.join(codes, Constants.COMMA)));
+		crosswalkRequest.setQueryString(Constants.STAR);
+		List<Map<String, Object>> searchResponse = (List<Map<String, Object>>) SearchHandler.getSearcher(SearchHandlerType.CROSSWALK.name()).search(crosswalkRequest).getSearchResults();
+		if (searchResponse != null) {
+			searchResponse.forEach(map -> {
+				Map<String, Object> source = (Map<String, Object>) map.get(Constants.SEARCH_SOURCE);
+				gutCodes.add((String) source.get(IndexFields.ID));
+			});
+		}
+	}
+
 
 }
 

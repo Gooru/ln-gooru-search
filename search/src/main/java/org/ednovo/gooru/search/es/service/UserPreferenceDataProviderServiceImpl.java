@@ -2,7 +2,7 @@ package org.ednovo.gooru.search.es.service;
 
 import java.util.ArrayList;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.model.UserDataProviderCriteria;
 import org.ednovo.gooru.search.model.UserPreferenceData;
 import org.springframework.stereotype.Service;

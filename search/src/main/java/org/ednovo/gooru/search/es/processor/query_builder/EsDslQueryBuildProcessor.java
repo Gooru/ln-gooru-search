@@ -37,28 +37,30 @@ public class EsDslQueryBuildProcessor extends SearchProcessor<SearchData, Object
 		Map<String, Object> queryString = new HashMap<String, Object>(1);
 		searchData.getQueryDsl().put("from", searchData.isPaginated() ? searchData.getFrom() * searchData.getSize() : searchData.getFrom()).put("size", searchData.getSize());
 		String fields = "";
-		
+
 		MapWrapper<Object> searchParameters = searchData.getParameters();
-		if(searchDataType.equalsIgnoreCase(TYPE_SCOLLECTION) && (searchParameters != null && searchParameters.containsKey(INCLUDE_COLLECTION_ITEM) && searchParameters.getBoolean(INCLUDE_COLLECTION_ITEM))){
+		if (searchDataType.equalsIgnoreCase(TYPE_SCOLLECTION)
+				&& (searchParameters != null && searchParameters.containsKey(INCLUDE_COLLECTION_ITEM) && searchParameters.getBoolean(INCLUDE_COLLECTION_ITEM))) {
 			fields = getSetting("S_" + searchDataType + "_ITEM_FIELDS");
-		}else if(searchDataType.equalsIgnoreCase(TYPE_SCOLLECTION) && (searchParameters != null && searchParameters.containsKey(INCLUDE_CIMIN) && searchParameters.getBoolean(INCLUDE_CIMIN))){
+		} else if (searchDataType.equalsIgnoreCase(TYPE_SCOLLECTION) && (searchParameters != null && searchParameters.containsKey(INCLUDE_CIMIN) && searchParameters.getBoolean(INCLUDE_CIMIN))) {
 			fields = getSetting("S_" + searchDataType + "_ITEM_SPECIFIC_FIELDS");
-		}else{
+		} else {
 			fields = getSearchSetting("search." + typeLower + ".fields");
 		}
-		
+
 		if (fields != null && fields.trim().length() > 0) {
 			searchData.getQueryDsl().put("_source", fields.split(","));
 		}
 		String queryField = "";
-		if(!searchData.isFacetSubjectSearch()){
-			if(searchDataType.equalsIgnoreCase(SEARCH_TAXONOMY) && searchData.getParameters().containsKey("searchBy") && searchData.getParameters().getString("searchBy").equalsIgnoreCase("standard")){
+		if (!searchData.isFacetSubjectSearch()) {
+			if (searchDataType.equalsIgnoreCase(SEARCH_TAXONOMY) && searchData.getParameters().containsKey("searchBy")
+					&& searchData.getParameters().getString("searchBy").equalsIgnoreCase("standard")) {
 				queryField = getSetting("S_STANDARD_QUERY_FIELDS");
 			} else {
 				queryField = getSearchSetting("search." + typeLower + ".query.fields");
 			}
 		}
-		
+
 		String[] queryFields = null;
 		if (queryField != null && !queryField.isEmpty()) {
 			queryFields = queryField.split(",");
@@ -69,33 +71,36 @@ public class EsDslQueryBuildProcessor extends SearchProcessor<SearchData, Object
 				}
 			}
 		}
-		
+
 		String analyzer = getSearchSetting("search." + typeLower + ".query.analyzer");
-		if(emailValidate(searchData.getQueryString().toLowerCase()) || uuidValidate(searchData.getQueryString().toLowerCase())){
-			if(getSearchSetting("search." + typeLower + ".query.email.uuid.analyzer") != null){
+		if (emailValidate(searchData.getQueryString().toLowerCase()) || uuidValidate(searchData.getQueryString().toLowerCase())) {
+			if (getSearchSetting("search." + typeLower + ".query.email.uuid.analyzer") != null) {
 				analyzer = getSearchSetting("search." + typeLower + ".query.email.uuid.analyzer");
 			}
 		}
-		
-		Query mainQuery = new Query(searchData.getQueryString(), queryFields, true, searchData.getDefaultOperator(), searchData.isAllowLeadingWildcard(), analyzer, getCassandraSettingAsFloat("search." + typeLower + ".query.user_query.boost"));
+
+		Query mainQuery = new Query(searchData.getQueryString(), queryFields, true, searchData.getDefaultOperator(), searchData.isAllowLeadingWildcard(), analyzer,
+				getCassandraSettingAsFloat("search." + typeLower + ".query.user_query.boost"));
 		queryString.put("query_string", mainQuery);
 		String lang = getSearchSetting("search." + searchData.getType().toLowerCase() + ".query.nativescore.lang");
 		String score = getSearchSetting("search." + searchData.getType().toLowerCase() + ".query.score");
-		//FIXME:temporary fix because of IllegalArgumentException issue with calculating score in lucene when use match all docs.
+		// FIXME:temporary fix because of IllegalArgumentException issue with calculating score in lucene when use match all docs.
 		if (searchData.getQueryString().equalsIgnoreCase("*") && !searchData.getType().equalsIgnoreCase(TYPE_USER)) {
 			score = "1.0";
 		}
-		
+
 		Map<String, Object> customQuery = new HashMap<String, Object>(1);
 		if (score != null && searchDataType.equalsIgnoreCase(SearchType.SIMPLE_COLLECTION.getType())) {
 			Map<String, Object> query = new HashMap<String, Object>(3);
 			Map<String, Object> scriptScore = new HashMap<String, Object>(1);
+			Map<String, Object> script = new HashMap<String, Object>(2);
 			customQuery.put("function_score", query);
 			query.put("query", queryString);
 			if (searchDataType.equalsIgnoreCase(SearchType.SIMPLE_COLLECTION.getType()) && lang != null && !(lang.equalsIgnoreCase("native"))) {
 				query.put("script_score", scriptScore);
-				scriptScore.put("script", score);
-				scriptScore.put("lang", "groovy");
+				scriptScore.put("script", script);
+				script.put("source", score);
+				script.put("lang", getSearchSetting("search." + searchData.getType().toLowerCase() + ".query.script.lang"));
 			}
 			searchData.getQueryDsl().put("query", customQuery);
 		} else {
@@ -123,21 +128,23 @@ public class EsDslQueryBuildProcessor extends SearchProcessor<SearchData, Object
 				searchData.getQueryDsl().put("query", customFiltersScore);
 			}
 		}
-		if(searchDataType.equalsIgnoreCase(SearchType.RESOURCE.getType())){
-            Map<String , Object> rescoreQuery = new HashMap<String, Object>();
-            Map<String , Object> queryObj = new HashMap<String, Object>();
-            Map<String, Object> customScoreQuery = new HashMap<String, Object>(1);
-            Map<String, Object> query = new HashMap<String, Object>(3);
-            Map<String,Object> scriptScore = new HashMap<String, Object>(2);
-            customScoreQuery.put("function_score", query);
-            query.put("script_score", scriptScore);
-            scriptScore.put("script", getSearchSetting(RESCORE_SCRIPT, DEFAULT_RESCORE_SCRIPT));
-            scriptScore.put("lang", getSearchSetting(RESCORE_SCRIPT_LANG, DEFAULT_RESCORE_LANG));
-		    rescoreQuery.put("rescore_query", customScoreQuery);
-		    rescoreQuery.put("score_mode", getSearchSetting(RESCORE_MODE, DEFAULT_RESCORE_MODE));
-		    queryObj.put("query", rescoreQuery);
-		    queryObj.put("window_size", getCassandraSettingAsInt(RESCORE_SCRIPT_LIMIT, DEFAULT_RESCORE_WINDOW_SIZE));
-		    searchData.getQueryDsl().put("rescore", queryObj);
+		if (searchDataType.equalsIgnoreCase(SearchType.RESOURCE.getType())) {
+			Map<String, Object> rescoreQuery = new HashMap<String, Object>(2);
+			Map<String, Object> queryObj = new HashMap<String, Object>(2);
+			Map<String, Object> customScoreQuery = new HashMap<String, Object>(1);
+			Map<String, Object> query = new HashMap<String, Object>(1);
+			Map<String, Object> scriptScore = new HashMap<String, Object>(1);
+			Map<String, Object> script = new HashMap<String, Object>(2);
+			customScoreQuery.put("function_score", query);
+			query.put("script_score", scriptScore);
+			scriptScore.put("script", script);
+			script.put("source", getSearchSetting(RESCORE_SCRIPT, DEFAULT_RESCORE_SCRIPT));
+			script.put("lang", getSearchSetting(RESCORE_SCRIPT_LANG, DEFAULT_RESCORE_LANG));
+			rescoreQuery.put("rescore_query", customScoreQuery);
+			rescoreQuery.put("score_mode", getSearchSetting(RESCORE_MODE, DEFAULT_RESCORE_MODE));
+			queryObj.put("query", rescoreQuery);
+			queryObj.put("window_size", getCassandraSettingAsInt(RESCORE_SCRIPT_LIMIT, DEFAULT_RESCORE_WINDOW_SIZE));
+			searchData.getQueryDsl().put("rescore", queryObj);
 		}
 	}
 
@@ -148,7 +155,7 @@ public class EsDslQueryBuildProcessor extends SearchProcessor<SearchData, Object
 		if (searchData.getFilters() != null && searchData.getFilters().size() > 0) {
 			Object boolQuery = FilterBuilderUtils.buildFilters(searchData.getFilters());
 			if (boolQuery != null) {
-				searchData.getQueryDsl().put("filter", boolQuery);
+				searchData.getQueryDsl().put("post_filter", boolQuery);
 			}
 		}
 	}
