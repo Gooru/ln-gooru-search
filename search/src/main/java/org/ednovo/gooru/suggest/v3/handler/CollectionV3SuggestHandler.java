@@ -20,7 +20,7 @@ import org.ednovo.gooru.search.es.processor.ElasticsearchProcessor;
 import org.ednovo.gooru.search.es.processor.deserializer.SCollectionDeserializeProcessor;
 import org.ednovo.gooru.search.es.processor.filter.constructor.TenantFilterConstructionProcessor;
 import org.ednovo.gooru.search.es.processor.query_builder.EsDslQueryBuildProcessor;
-import org.ednovo.gooru.search.es.repository.ConceptBasedCollectionSuggestRepository;
+import org.ednovo.gooru.search.es.repository.GutBasedCollectionSuggestRepository;
 import org.ednovo.gooru.search.es.service.SearchSettingService;
 import org.ednovo.gooru.suggest.v3.data.provider.model.SuggestDataProviderType;
 import org.ednovo.gooru.suggest.v3.model.CollectionContextData;
@@ -51,7 +51,7 @@ public class CollectionV3SuggestHandler extends SuggestHandler<Map<String, Objec
 	private SCollectionDeserializeProcessor scollectionDeserializeProcessor;
 	
 	@Autowired
-	private ConceptBasedCollectionSuggestRepository conceptSuggestionRepository;
+	private GutBasedCollectionSuggestRepository gutSuggestionRepository;
 
 	@Autowired
 	private TenantFilterConstructionProcessor tenantFilterConstructionProcessor;
@@ -194,21 +194,18 @@ public class CollectionV3SuggestHandler extends SuggestHandler<Map<String, Objec
 		switch (suggestData.getSuggestContextData().getRequestedSubType()) {
 		case Constants.PRE_TEST:
 			if (lessonData != null && lessonData.getStandards() != null && lessonData.getStandards().size() > 0) {
-				ids = conceptSuggestionRepository.getSuggestionByCompetency(lessonData.getStandards(), contextType, range,
-						suggestData.getSuggestContextData().getRequestedSubType());
+				ids = gutSuggestionRepository.getSuggestionByCompetency(lessonData.getStandards(), range);
 			}
 			break;
 		case Constants.POST_TEST:
 		case Constants.BACKFILL:
 			if (collectionData != null && collectionData.getStandards() != null && collectionData.getStandards().size() > 0) {
-				ids = conceptSuggestionRepository.getSuggestionByCompetency(collectionData.getStandards(), contextType, range,
-						suggestData.getSuggestContextData().getRequestedSubType());
+				ids = gutSuggestionRepository.getSuggestionByCompetency(collectionData.getStandards(), range);
 			}
 			break;
 		case Constants.BENCHMARK:
 			if (collectionData != null && collectionData.getTaxonomyLearningTargets() != null && collectionData.getTaxonomyLearningTargets().size() > 0) {
-				ids = conceptSuggestionRepository.getSuggestionByMicroCompetency(collectionData.getTaxonomyLearningTargets(), contextType, range,
-						suggestData.getSuggestContextData().getRequestedSubType());
+				ids = gutSuggestionRepository.getSuggestionByMicroCompetency(collectionData.getTaxonomyLearningTargets(), range);
 			}
 			break;
 		default:

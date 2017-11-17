@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import org.hibernate.Query;
 import org.hibernate.type.PostgresUUIDType;
 import org.hibernate.type.StringType;
-import org.hibernate.type.TextType;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,18 +67,17 @@ public class TenantRepositoryImpl extends BaseRepository implements TenantReposi
 	}
 	
 	@Override
-	public String getTenantSetting(String tenant, String key) {
+	public String getFCVisibility(String tenant) {
 		UUID uuid = UUID.fromString(tenant);
-		String sql = "select value from tenant_setting where id =:ID and key =:KEY";
+		String sql = "select fc_visibility from tenant where id =:ID";
 		Query query = getSessionFactory().getCurrentSession().createSQLQuery(sql)
-				.addScalar("value", TextType.INSTANCE)
-				.setParameter("ID", uuid, PostgresUUIDType.INSTANCE)
-				.setParameter("KEY", key, StringType.INSTANCE);
-		String value = null;
+				.addScalar("fc_visibility", StringType.INSTANCE)
+				.setParameter("ID", uuid, PostgresUUIDType.INSTANCE);
+		String fcVisibility = null;
 		if (query != null && list(query).size() > 0 && list(query).get(0) != null) {
-			value = list(query).get(0).toString();
+			fcVisibility = list(query).get(0).toString();
 		}
-		return value;
+		return fcVisibility;
 	}
 	
 }

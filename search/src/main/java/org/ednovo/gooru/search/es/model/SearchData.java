@@ -113,11 +113,11 @@ public class SearchData implements Serializable {
 	
 	private String userTenantId;
 		
+	private String userTenantRootId;
+
 	private boolean isFeaturedCourseSearch = false;
 
-	private List<String> featuredCourseTenantPreferences;
-
-	private List<String> userTenantParentIds;
+	private String featuredCourseTenantPreferences;
 
 	public boolean isShowCanonicalOnly() {
 		return showCanonicalOnly;
@@ -489,6 +489,14 @@ public class SearchData implements Serializable {
 		this.userTenantId = userTenantId;
 	}
 
+	public String getUserTenantRootId() {
+		return userTenantRootId;
+	}
+
+	public void setUserTenantRootId(String userTenantRootId) {
+		this.userTenantRootId = userTenantRootId;
+	}
+
 	public boolean isFeaturedCourseSearch() {
 		return isFeaturedCourseSearch;
 	}
@@ -497,20 +505,12 @@ public class SearchData implements Serializable {
 		this.isFeaturedCourseSearch = isFeaturedCourseSearch;
 	}
 	
-	public List<String> getFeaturedCourseTenantPreferences() {
+	public String getFeaturedCourseTenantPreference() {
 		return featuredCourseTenantPreferences;
 	}
 
-	public void setFeaturedCourseTenantPreferences(List<String> featuredCourseTenantPreferences) {
+	public void setFeaturedCourseTenantPreference(String featuredCourseTenantPreferences) {
 		this.featuredCourseTenantPreferences = featuredCourseTenantPreferences;
-	}
-
-	public List<String> getUserTenantParentIds() {
-		return userTenantParentIds;
-	}
-
-	public void setUserTenantParentIds(List<String> userTenantParentIds) {
-		this.userTenantParentIds = userTenantParentIds;
 	}
 
 }
