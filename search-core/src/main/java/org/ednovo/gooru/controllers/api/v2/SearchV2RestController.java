@@ -127,10 +127,8 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		// Set user permits
 		UserGroupSupport userGroup = (UserGroupSupport) request.getAttribute(Constants.TENANT);
 		String userTenantId = userGroup.getTenantId();
-		String userTenantRootId = userGroup.getTenantRoot();
 		searchData.setUserTenantId(userTenantId);
-		searchData.setUserTenantRootId(userTenantRootId);
-
+		
 		if (sessionToken == null) {
 			sessionToken = BaseController.getSessionToken(request);
 		}
@@ -140,7 +138,6 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			session.put(EventConstants.PARTNER_ID, request.getAttribute(EventConstants.PARTNER_ID));
 			session.put(EventConstants.APP_ID, request.getAttribute(EventConstants.APP_ID));
 			session.put(EventConstants.TENANT_ID, userTenantId);
-			session.put(EventConstants.TENANT_ROOT, userTenantRootId);
 			session.put(EventConstants.API_KEY, EMPTY_STRING);
 			session.put(SEARCH_ORGANIZATION_UID, EMPTY_STRING);
 		}
@@ -362,7 +359,6 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		searchData.setQueryType(SINGLE);
 		searchData.setSessionToken(sessionToken);
 		searchData.setUserTenantId(((UserGroupSupport) request.getAttribute(TENANT)).getTenantId());
-		searchData.setUserTenantRootId(((UserGroupSupport) request.getAttribute(TENANT)).getTenantRoot());
 
 		if (type.equalsIgnoreCase(TYPE_AGGREGATOR)) {
 			searchData.setType(type);
@@ -428,7 +424,6 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			session.put(EventConstants.PARTNER_ID, request.getAttribute(EventConstants.PARTNER_ID));
 			session.put(EventConstants.APP_ID, request.getAttribute(EventConstants.APP_ID));
 			session.put(EventConstants.TENANT_ID, searchData.getUserTenantId());
-			session.put(EventConstants.TENANT_ROOT, searchData.getUserTenantRootId());
 		}
 		SessionContextSupport.putLogParameter(EventConstants.SESSION, session);
 		payloadObject.put(EventConstants.PAGE_SIZE, searchData.getSize());

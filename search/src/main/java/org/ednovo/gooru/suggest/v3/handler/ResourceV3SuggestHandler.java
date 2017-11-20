@@ -26,6 +26,7 @@ import org.ednovo.gooru.search.es.processor.deserializer.ResourceDeserializeProc
 import org.ednovo.gooru.search.es.processor.deserializer.ResourceSuggestDeserializeProcessor;
 import org.ednovo.gooru.search.es.processor.filter.constructor.TenantFilterConstructionProcessor;
 import org.ednovo.gooru.search.es.processor.query_builder.ResourceEsDslQueryBuildProcessor;
+import org.ednovo.gooru.search.es.repository.ConceptBasedResourceSuggestRepository;
 import org.ednovo.gooru.search.es.repository.GutBasedResourceSuggestRepository;
 import org.ednovo.gooru.search.es.service.SearchSettingService;
 import org.ednovo.gooru.search.model.ActivityStreamRawData;
@@ -68,6 +69,9 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 	
 	@Autowired
 	private ResourceSuggestDeserializeProcessor resourceSuggestDeserializeProcessor;
+	
+	@Autowired
+	private ConceptBasedResourceSuggestRepository conceptSuggestionRepository;
 	
 	@Autowired
 	private GutBasedResourceSuggestRepository gutSuggestionRepository;
@@ -146,11 +150,12 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 						}
 						List<String> ids = null;
 						if (resourceData.getTaxonomyLearningTargets() != null && resourceData.getTaxonomyLearningTargets().size() > 0) {
-							ids = gutSuggestionRepository.getSuggestionByMicroCompetency(resourceData.getTaxonomyLearningTargets(), range);
+							ids = conceptSuggestionRepository.getSuggestionByMicroCompetency(resourceData.getTaxonomyLearningTargets(), COLLECTION_STUDY, range,
+									SuggestHandlerType.RESOURCE.name().toLowerCase());
 						}
 
 						if (ids == null && resourceData.getStandards() != null && resourceData.getStandards().size() > 0) {
-							ids = gutSuggestionRepository.getSuggestionByCompetency(resourceData.getStandards(), range);
+							ids = conceptSuggestionRepository.getSuggestionByCompetency(resourceData.getStandards(), COLLECTION_STUDY, range, SuggestHandlerType.RESOURCE.name().toLowerCase());
 						}
 						if (ids != null && !ids.isEmpty()) {
 							suggestData.putFilter("&id", StringUtils.join(ids, ","));

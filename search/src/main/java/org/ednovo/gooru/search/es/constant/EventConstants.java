@@ -17,7 +17,6 @@ public class EventConstants {
 	public static final String PARTNER_ID = "partnerId";
 	public static final String APP_ID = "appId";
 	public static final String TENANT_ID = "tenant_id";
-	public static final String TENANT_ROOT = "tenant_root";
 	public static final String SESSION = "session";
 	public static final String SESSION_TOKEN = "sessionToken";
 	

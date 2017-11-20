@@ -16,21 +16,23 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional
-public class GutBasedResourceSuggestRepositoryImpl extends BaseRepository implements GutBasedResourceSuggestRepository {
+public class ConceptBasedResourceSuggestRepositoryImpl extends BaseRepository implements ConceptBasedResourceSuggestRepository {
 	
-	private static final Logger LOG = LoggerFactory.getLogger(GutBasedResourceSuggestRepositoryImpl.class);
+	private static final Logger LOG = LoggerFactory.getLogger(CollectionRepositoryImpl.class);
 
 	@Override
-	public List<String> getSuggestionByCompetency(List<String> idsToFilter, String performanceRange) {
+	public List<String> getSuggestionByCompetency(List<String> idsToFilter, String ctxType, String performanceRange, String suggestType) {
 		List<String> ids = null;
 		try {
 			Type textArrayType = new TypeLocatorImpl(new TypeResolver()).custom(StringArrayType.class);
-			String sql = "select ids_to_suggest from gut_based_resource_suggest where competency_internal_code in (:IDS) ";
+			String sql = "select ids_to_suggest from concept_based_resource_suggest where ctx_type = :CTX_TYPE and competency_internal_code in (:IDS) and suggest_type = :SUGGEST_TYPE";
 			if (performanceRange != null) {
 				sql += " and performance_range = '"+performanceRange+"'";
 			}
 			Query query = getSessionFactory().getCurrentSession().createSQLQuery(sql)
 					.addScalar("ids_to_suggest", textArrayType)
+					.setParameter("CTX_TYPE", ctxType)
+					.setParameter("SUGGEST_TYPE", suggestType)
 					.setParameterList("IDS", idsToFilter);
 			Map<String, Object> resultMap = null;
 			if (query != null && list(query).size() > 0) {
@@ -52,16 +54,18 @@ public class GutBasedResourceSuggestRepositoryImpl extends BaseRepository implem
 	}
 	
 	@Override
-	public List<String> getSuggestionByMicroCompetency(List<String> idsToFilter, String performanceRange) {
+	public List<String> getSuggestionByMicroCompetency(List<String> idsToFilter, String ctxType, String performanceRange, String suggestType) {
 		List<String> ids = null;
 		try {
 			Type textArrayType = new TypeLocatorImpl(new TypeResolver()).custom(StringArrayType.class);
-			String sql = "select ids_to_suggest from gut_based_resource_suggest where micro_competency_internal_code in (:IDS) ";
+			String sql = "select ids_to_suggest from concept_based_resource_suggest where ctx_type = :CTX_TYPE and micro_competency_internal_code in (:IDS) and suggest_type = :SUGGEST_TYPE";
 			if (performanceRange != null) {
 				sql += " and performance_range = '"+performanceRange+"'";
 			}
 			Query query = getSessionFactory().getCurrentSession().createSQLQuery(sql)
 					.addScalar("ids_to_suggest", textArrayType)
+					.setParameter("CTX_TYPE", ctxType)
+					.setParameter("SUGGEST_TYPE", suggestType)
 					.setParameterList("IDS", idsToFilter);
 			Map<String, Object> resultMap = null;
 			if (query != null && list(query).size() > 0) {

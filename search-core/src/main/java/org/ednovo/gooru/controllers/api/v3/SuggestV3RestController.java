@@ -136,10 +136,8 @@ public class SuggestV3RestController extends BaseController {
 		// Set user permits
 		UserGroupSupport userGroup = (UserGroupSupport) request.getAttribute(TENANT);
 		String userTenantId = userGroup.getTenantId();
-		String userTenantRootId = userGroup.getTenantRoot();
 		suggestData.setUserTenantId(userTenantId);
-		suggestData.setUserTenantRootId(userTenantRootId);
-		
+
 		suggestData.setFrom(0);
 		suggestData.setSize(pageSize);
 		suggestData.setPretty(pretty);

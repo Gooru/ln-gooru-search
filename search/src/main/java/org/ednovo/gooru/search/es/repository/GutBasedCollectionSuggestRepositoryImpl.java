@@ -1,7 +1,9 @@
 package org.ednovo.gooru.search.es.repository;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.Query;
 import org.hibernate.internal.TypeLocatorImpl;
@@ -30,13 +32,16 @@ public class GutBasedCollectionSuggestRepositoryImpl extends BaseRepository impl
 			Query query = getSessionFactory().getCurrentSession().createSQLQuery(sql)
 					.addScalar("ids_to_suggest", textArrayType)
 					.setParameterList("IDS", idsToFilter);
+			Map<String, Object> resultMap = null;
 			if (query != null && list(query).size() > 0) {
+				resultMap = new HashMap<>();
 				ids = new ArrayList<>();
 				for (Object[] object : arrayList(query)) {
 					for (int i = 0; i < object.length; i++) {
 						ids.add(object[i].toString());
 					}
 				}
+				resultMap.put("suggestion_ids", ids);
 			} else {
 				LOG.info("There are no suggestions for c_internal_code" + idsToFilter);
 			}
@@ -58,13 +63,16 @@ public class GutBasedCollectionSuggestRepositoryImpl extends BaseRepository impl
 			Query query = getSessionFactory().getCurrentSession().createSQLQuery(sql)
 					.addScalar("ids_to_suggest", textArrayType)
 					.setParameterList("IDS", idsToFilter);
+			Map<String, Object> resultMap = null;
 			if (query != null && list(query).size() > 0) {
+				resultMap = new HashMap<>();
 				ids = new ArrayList<>();
 				for (Object[] object : arrayList(query)) {
 					for (int i = 0; i < object.length; i++) {
 						ids.add(object[i].toString());
 					}
 				}
+				resultMap.put("suggestion_ids", ids);
 			} else {
 				LOG.info("There are no suggestions for mc_internal_code" + idsToFilter);
 			}

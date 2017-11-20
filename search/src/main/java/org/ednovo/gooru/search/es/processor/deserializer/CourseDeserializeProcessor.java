@@ -17,7 +17,6 @@ import org.ednovo.gooru.search.es.model.License;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.UserV2;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
-import org.ednovo.gooru.search.es.service.SearchSettingService;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -167,19 +166,10 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
 			List<Map<String, Object>> userTenant = (List<Map<String, Object>>) featured.get(input.getUserTenantId());
 			Map<String, Object> tenantFeaturedSorted = aggregateBySubjectAndSortByCourse(userTenant);
 			featured.remove(input.getUserTenantId());
-			if (featured != null && !featured.isEmpty()) {
-				List<String> globalTenantIds = SearchSettingService.getListByName(ALL_DISCOVERABLE_TENANT_IDS);
-				Map<String, Object> subTenantFcs = new HashMap<>();
-				featured.forEach((k, v) -> {
-					if (!globalTenantIds.contains(k)) {
-						subTenantFcs.put(k, v);
-					}
-				});
-				if (!subTenantFcs.isEmpty()) {
-					for (String subTenantId : subTenantFcs.keySet()) {
-						tenantFeaturedSorted = sequenceAndMergeTenantCourses(subTenantFcs, tenantFeaturedSorted, subTenantId);
-						featured.remove(subTenantId);
-					}
+			if (input.getUserTenantParentIds() != null && input.getUserTenantParentIds().size() > 0) {
+				for (String parentTenantId : input.getUserTenantParentIds()) {
+					tenantFeaturedSorted = sequenceAndMergeTenantCourses(featured, tenantFeaturedSorted, parentTenantId);
+					featured.remove(parentTenantId);
 				}
 			}
 			if (featured != null && !featured.isEmpty()) {
@@ -197,46 +187,46 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
 	}
 
 	@SuppressWarnings("unchecked")
-	private Map<String, Object> sequenceAndMergeTenantCourses(Map<String, Object> featured, Map<String, Object> tenantFeaturedSorted, String tenantId) {
-		List<Map<String, Object>> tenant = (List<Map<String, Object>>) featured.get(tenantId);
-		Map<String, Object> tenantFcAggAndSortedByC = aggregateBySubjectAndSortByCourse(tenant);
+	private Map<String, Object> sequenceAndMergeTenantCourses(Map<String, Object> featured, Map<String, Object> tenantFeaturedSorted, String parentTenantId) {
+		List<Map<String, Object>> parentTenant = (List<Map<String, Object>>) featured.get(parentTenantId);
+		Map<String, Object> parentTenantFeaturedSorted = aggregateBySubjectAndSortByCourse(parentTenant);
 		if (tenantFeaturedSorted.isEmpty()) {
-			tenantFeaturedSorted = tenantFcAggAndSortedByC;
+			tenantFeaturedSorted = parentTenantFeaturedSorted;
 		} else {
-			tenantFeaturedSorted = mergeNextToTenantCourses(tenantFeaturedSorted, tenantFcAggAndSortedByC);
+			tenantFeaturedSorted = mergeDiscoverableTenantCourses(tenantFeaturedSorted, parentTenantFeaturedSorted);
 		}
 		return tenantFeaturedSorted;
 	}
 
 	@SuppressWarnings("unchecked")
-	private Map<String, Object> mergeNextToTenantCourses(Map<String, Object> tenantFeaturedSorted, Map<String, Object> otherTenantFcSorted) {
-		Set<String> extraSubjectsOfOtherTenant = new HashSet<>();
-		otherTenantFcSorted.keySet().forEach(key -> {
+	private Map<String, Object> mergeDiscoverableTenantCourses(Map<String, Object> tenantFeaturedSorted, Map<String, Object> openTenantFeaturedSorted) {
+		Set<String> extraSubjectsOfOpenTenant = new HashSet<>();
+		openTenantFeaturedSorted.keySet().forEach(key -> {
 			if (tenantFeaturedSorted.containsKey(key)) {
 				List<Map<String, Object>> tenantFeaturedList = (List<Map<String, Object>>) (tenantFeaturedSorted.get(key));
 				int numOfCourses = tenantFeaturedList.size();
-				List<Map<String, Object>> otherTenantFCSortedList = (List<Map<String, Object>>) (otherTenantFcSorted.get(key));
-				int numOfOpenCourses = otherTenantFCSortedList.size();
+				List<Map<String, Object>> openTenantFeaturedSortedList = (List<Map<String, Object>>) (openTenantFeaturedSorted.get(key));
+				int numOfOpenCourses = openTenantFeaturedSortedList.size();
 				for (int index = 0; index < numOfOpenCourses; index++) {
-					Map<String, Object> otherTenantFCMap = otherTenantFCSortedList.get(index);
-					otherTenantFCMap.put(IndexFields.SEQUENCE, numOfCourses + 1);
-					otherTenantFCMap.put(IndexFields.SUBJECT_SEQUENCE, tenantFeaturedList.get(index).get(IndexFields.SUBJECT_SEQUENCE));
-					tenantFeaturedList.add(otherTenantFCMap);
+					Map<String, Object> openTenantFeaturedCourseMap = openTenantFeaturedSortedList.get(index);
+					openTenantFeaturedCourseMap.put(IndexFields.SEQUENCE, numOfCourses + 1);
+					openTenantFeaturedCourseMap.put(IndexFields.SUBJECT_SEQUENCE, tenantFeaturedList.get(index).get(IndexFields.SUBJECT_SEQUENCE));
+					tenantFeaturedList.add(openTenantFeaturedCourseMap);
 					numOfCourses++;
 				}
 				tenantFeaturedSorted.put(key, tenantFeaturedList);
 			} else {
-				extraSubjectsOfOtherTenant.add(key);
+				extraSubjectsOfOpenTenant.add(key);
 			}
 		});
-		extraSubjectsOfOtherTenant.forEach(key -> {
+		extraSubjectsOfOpenTenant.forEach(key -> {
 			int tenantFeaturedListSize = tenantFeaturedSorted.size();
-			List<Map<String, Object>> otherTenantFCSortedList = (List<Map<String, Object>>) (otherTenantFcSorted.get(key));
-			List<Map<String, Object>> finalList = new ArrayList<>(otherTenantFCSortedList.size());
+			List<Map<String, Object>> openTenantFeaturedSortedList = (List<Map<String, Object>>) (openTenantFeaturedSorted.get(key));
+			List<Map<String, Object>> finalList = new ArrayList<>(openTenantFeaturedSortedList.size());
 			int subjectSequence = tenantFeaturedListSize + 1;
-			for (Map<String, Object> openTenantFCMap : otherTenantFCSortedList) {
-				openTenantFCMap.put(IndexFields.SUBJECT_SEQUENCE, subjectSequence);
-				finalList.add(openTenantFCMap);
+			for (Map<String, Object> openTenantFeaturedCourseMap : openTenantFeaturedSortedList) {
+				openTenantFeaturedCourseMap.put(IndexFields.SUBJECT_SEQUENCE, subjectSequence);
+				finalList.add(openTenantFeaturedCourseMap);
 			}
 			tenantFeaturedListSize++;
 			tenantFeaturedSorted.put(key, finalList);

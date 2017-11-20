@@ -239,8 +239,9 @@ public final class SearchSettingService {
 		return (discoverableTenants != null && !discoverableTenants.isEmpty()) ? (List<String>) discoverableTenants.get("discoverableTenantIds") : null;
 	}
 	
-	public static String getFeaturedCourseTenantPreference(String tenant) {
-		return instance.tenantRepository.getFCVisibility(tenant);
+	public static List<String> getFeaturedCourseTenantPreference(String tenant) {
+		String value = instance.tenantRepository.getTenantSetting(tenant, "featured-course-tenant-preferences");
+		return value != null ? Arrays.asList(value.split(Constants.COMMA)) : null;
 	}
 
 	public static void refreshTenants() {

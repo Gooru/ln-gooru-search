@@ -668,7 +668,5 @@ public interface Constants {
 	public static final String DISCOVERABLE = "discoverable";
 	public static final String GLOBAL_TENANT_IDS = "globalTenantIds";
 	public static final String DISCOVERABLE_TENANT_IDS = "discoverableTenantIds";
-	public static final String OR_SYMBOL = "|";
-	public static final String TENANT_TREE = "tenant_tree";
 
 }
