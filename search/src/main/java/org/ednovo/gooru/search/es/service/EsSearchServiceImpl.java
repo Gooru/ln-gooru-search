@@ -8,8 +8,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.SearchType;
+import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.processor.SearchProcessor;
 import org.springframework.stereotype.Service;
 
@@ -91,6 +93,33 @@ public class EsSearchServiceImpl implements SearchService, Constants {
 
 		searchFilters.setGradeLevels(GRADE_LEVELS);
 		return searchFilters;
+	}
+	
+	@Override
+	public void trimInvalidExpression(SearchData searchData) {
+		String query = searchData.getQueryString();
+		String[] start = new String[] { "AND NOT ", "OR NOT ", "NOT AND ", "NOT OR ", "OR ", "AND " };
+		String[] end = new String[] { " AND NOT", " OR NOT", " NOT AND", " NOT OR", " OR", " AND" };
+		query = cutOffStart(query, start);
+		query = cutOffEnd(query, end);
+		searchData.setQueryString(query);
+		if ((StringUtils.startsWithAny(query, start)) || (StringUtils.endsWithAny(query, end))) {
+			trimInvalidExpression(searchData);
+		}
+	}
+
+	private String cutOffStart(String query, String[] termsToTrim) {
+		for (String termToTrim : termsToTrim) {
+			query = StringUtils.removeStart(query, termToTrim);
+		}
+		return query;
+	}
+	
+	private String cutOffEnd(String query, String[] termsToTrim) {
+		for (String termToTrim : termsToTrim) {
+			query = StringUtils.removeEnd(query, termToTrim);
+		}
+		return query;
 	}
 	
 	@Override
