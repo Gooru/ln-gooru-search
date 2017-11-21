@@ -73,8 +73,8 @@ public class TenantRepositoryImpl extends BaseRepository implements TenantReposi
 		String sql = "select value from tenant_setting where id =:ID and key =:KEY";
 		Query query = getSessionFactory().getCurrentSession().createSQLQuery(sql)
 				.addScalar("value", TextType.INSTANCE)
-				.setParameter("ID", uuid, PostgresUUIDType.INSTANCE)
-				.setParameter("KEY", key, StringType.INSTANCE);
+				 				.setParameter("ID", uuid, PostgresUUIDType.INSTANCE)
+				 				.setParameter("KEY", key, StringType.INSTANCE);
 		String value = null;
 		if (query != null && list(query).size() > 0 && list(query).get(0) != null) {
 			value = list(query).get(0).toString();

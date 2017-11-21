@@ -100,8 +100,8 @@ public class EsSearchServiceImpl implements SearchService, Constants {
 		String query = searchData.getQueryString();
 		String[] start = new String[] { "AND NOT ", "OR NOT ", "NOT AND ", "NOT OR ", "OR ", "AND " };
 		String[] end = new String[] { " AND NOT", " OR NOT", " NOT AND", " NOT OR", " OR", " AND" };
-		query = cutOffStart(query, start);
-		query = cutOffEnd(query, end);
+		if (StringUtils.startsWithAny(query, start)) query = cutOffStart(query, start);
+		if (StringUtils.endsWithAny(query, end)) query = cutOffEnd(query, end);
 		searchData.setQueryString(query);
 		if ((StringUtils.startsWithAny(query, start)) || (StringUtils.endsWithAny(query, end))) {
 			trimInvalidExpression(searchData);
