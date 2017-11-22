@@ -238,10 +238,6 @@ public final class SearchSettingService {
 		Map<String, Object> discoverableTenants = instance.tenantRepository.getAllDiscoverableTenants();
 		return (discoverableTenants != null && !discoverableTenants.isEmpty()) ? (List<String>) discoverableTenants.get("discoverableTenantIds") : null;
 	}
-	
-	public static String getFeaturedCourseTenantPreference(String tenant) {
-		return instance.tenantRepository.getTenantSetting(tenant, "featured-course-tenant-preferences");
-	}
 
 	public static void refreshTenants() {
 		setDiscoverableTenants();

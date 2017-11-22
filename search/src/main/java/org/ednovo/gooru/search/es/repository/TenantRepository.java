@@ -11,6 +11,4 @@ public interface TenantRepository {
 
 	List<String> getGlobalTenantIds();
 
-	String getTenantSetting(String tenant, String key);
-
 }

@@ -122,5 +122,9 @@ public class IndexFields {
 	public static final String TENANT = "tenant";
 	public static final String TENANT_ID = "tenantId";
 	public static final String TENANT_ROOT_ID = "tenantRootId";
+	public static final String PARENT_TENANT_ID = "parentTenantId";
+	public static final String PARENT_TENANT_IDS = "parentTenantIds";
+	public static final String FC_VISIBILITY = "fcVisibility";
+	public static final String PARENT_TENANT_FC_VISIBILITY = "parentTenantFCVisibility";
 
 }
