@@ -216,6 +216,10 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			type = KEYWORD_COMPETENCY;
 		}
 
+		if (searchData.getQueryString() != null && ((StringUtils.startsWithAny(searchData.getQueryString(), new String[] { "AND NOT ", "OR NOT ", "NOT AND ", "NOT OR ", "OR ", "AND " })) || (StringUtils.endsWithAny(searchData.getQueryString(), new String[] { " AND NOT", " OR NOT", " NOT AND", " NOT OR", " OR", " AND" })))) {
+			searchService.trimInvalidExpression(searchData);
+		}
+		
 		searchData.setType(type);
 		searchData.setFrom(startAt);
 		searchData.setPageNum(pageNum);
