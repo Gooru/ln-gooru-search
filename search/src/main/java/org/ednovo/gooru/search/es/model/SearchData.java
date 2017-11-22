@@ -113,12 +113,18 @@ public class SearchData implements Serializable {
 	
 	private String userTenantId;
 		
-	private boolean isFeaturedCourseSearch = false;
-
-	private List<String> featuredCourseTenantPreferences;
+	private String userTenantRootId;
+	
+	private String userTenantParentId;
 
 	private List<String> userTenantParentIds;
 
+	private boolean isFeaturedCourseSearch = false;
+
+	private String featuredCourseTenantPreferences;
+
+	private String parentTenantFCVisibility;
+	
 	public boolean isShowCanonicalOnly() {
 		return showCanonicalOnly;
 	}
@@ -489,20 +495,20 @@ public class SearchData implements Serializable {
 		this.userTenantId = userTenantId;
 	}
 
-	public boolean isFeaturedCourseSearch() {
-		return isFeaturedCourseSearch;
+	public String getUserTenantRootId() {
+		return userTenantRootId;
 	}
 
-	public void setFeaturedCourseSearch(boolean isFeaturedCourseSearch) {
-		this.isFeaturedCourseSearch = isFeaturedCourseSearch;
-	}
-	
-	public List<String> getFeaturedCourseTenantPreferences() {
-		return featuredCourseTenantPreferences;
+	public void setUserTenantRootId(String userTenantRootId) {
+		this.userTenantRootId = userTenantRootId;
 	}
 
-	public void setFeaturedCourseTenantPreferences(List<String> featuredCourseTenantPreferences) {
-		this.featuredCourseTenantPreferences = featuredCourseTenantPreferences;
+	public String getUserTenantParentId() {
+		return userTenantParentId;
+	}
+
+	public void setUserTenantParentId(String userTenantParentId) {
+		this.userTenantParentId = userTenantParentId;
 	}
 
 	public List<String> getUserTenantParentIds() {
@@ -511,6 +517,30 @@ public class SearchData implements Serializable {
 
 	public void setUserTenantParentIds(List<String> userTenantParentIds) {
 		this.userTenantParentIds = userTenantParentIds;
+	}
+
+	public boolean isFeaturedCourseSearch() {
+		return isFeaturedCourseSearch;
+	}
+
+	public void setFeaturedCourseSearch(boolean isFeaturedCourseSearch) {
+		this.isFeaturedCourseSearch = isFeaturedCourseSearch;
+	}
+	
+	public String getFeaturedCourseTenantPreference() {
+		return featuredCourseTenantPreferences;
+	}
+
+	public void setFeaturedCourseTenantPreference(String featuredCourseTenantPreferences) {
+		this.featuredCourseTenantPreferences = featuredCourseTenantPreferences;
+	}
+
+	public String getParentTenantFCVisibility() {
+		return parentTenantFCVisibility;
+	}
+
+	public void setParentTenantFCVisibility(String parentTenantFCVisibility) {
+		this.parentTenantFCVisibility = parentTenantFCVisibility;
 	}
 
 }

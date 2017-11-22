@@ -6,15 +6,19 @@ import javax.servlet.http.HttpServletResponse;
 import org.ednovo.gooru.controllers.api.BaseController;
 import org.ednovo.gooru.controllers.api.v3.service.RequestService;
 import org.ednovo.gooru.search.es.constant.Constants;
+import org.ednovo.gooru.search.es.constant.EventConstants;
 import org.ednovo.gooru.search.es.exception.BadRequestException;
 import org.ednovo.gooru.search.es.exception.SearchException;
 import org.ednovo.gooru.search.es.model.MapWrapper;
+import org.ednovo.gooru.search.es.model.SearchResponse;
+import org.ednovo.gooru.search.es.model.SessionContextSupport;
 import org.ednovo.gooru.search.es.model.SuggestResponse;
 import org.ednovo.gooru.search.es.model.User;
 import org.ednovo.gooru.search.es.model.UserGroupSupport;
 import org.ednovo.gooru.suggest.v3.model.SuggestContextData;
 import org.ednovo.gooru.suggest.v3.model.SuggestData;
 import org.ednovo.gooru.suggest.v3.service.SuggestV3Service;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,8 +140,10 @@ public class SuggestV3RestController extends BaseController {
 		// Set user permits
 		UserGroupSupport userGroup = (UserGroupSupport) request.getAttribute(TENANT);
 		String userTenantId = userGroup.getTenantId();
+		String userTenantRootId = userGroup.getTenantRoot();
 		suggestData.setUserTenantId(userTenantId);
-
+		suggestData.setUserTenantRootId(userTenantRootId);
+		
 		suggestData.setFrom(0);
 		suggestData.setSize(pageSize);
 		suggestData.setPretty(pretty);
@@ -163,5 +169,33 @@ public class SuggestV3RestController extends BaseController {
 	
 	private RequestService getRequestService() {
 		return requestService;
+	}
+	
+	private void setEventLogObject(HttpServletRequest request, SuggestData suggestData, SearchResponse<Object> searchResponse) throws JSONException {
+		if (suggestData.getType() != null && suggestData.getType().equalsIgnoreCase(TYPE_SCOLLECTION)) {
+			request.setAttribute(SEARCH_TYPE, COLLECTION);
+		} else {
+			request.setAttribute(SEARCH_TYPE, suggestData.getType());
+		}
+		JSONObject payloadObject = new JSONObject();
+		JSONObject session = new JSONObject();
+		SessionContextSupport.putLogParameter(EventConstants.EVENT_NAME, EventConstants.ITEM_DOT_SUGGEST);
+		payloadObject.put(EventConstants.TEXT, suggestData.getOriginalQuery());
+		if (suggestData.getSessionToken() != null) {
+			session.put(EventConstants.SESSION_TOKEN, suggestData.getSessionToken());
+			session.put(EventConstants.PARTNER_ID, request.getAttribute(EventConstants.PARTNER_ID));
+			session.put(EventConstants.APP_ID, request.getAttribute(EventConstants.APP_ID));
+			session.put(EventConstants.TENANT_ID, suggestData.getUserTenantId());
+			session.put(EventConstants.TENANT_ROOT, suggestData.getUserTenantRootId());
+		}
+		SessionContextSupport.putLogParameter(EventConstants.SESSION, session);
+		payloadObject.put(EventConstants.PAGE_SIZE, suggestData.getSize());
+		payloadObject.put(EventConstants.PAGE_NUM, suggestData.getPageNum());
+		payloadObject.put(EventConstants.START_AT, suggestData.getFrom());
+		payloadObject.put(EventConstants.RESULT_SIZE, searchResponse.getResultCount());
+		payloadObject.put(EventConstants.HIT_COUNT, searchResponse.getTotalHitCount());
+		payloadObject.put(EventConstants.SEARCH_EXECUTION_TIME, searchResponse.getExecutionTime());
+		SessionContextSupport.putLogParameter(EventConstants.PAYLOAD_OBJECT, payloadObject);
+		request.setAttribute(EventConstants.ACTION, SUGGEST);
 	}
 }
