@@ -59,21 +59,15 @@ public class UnitDeserializeProcessor extends DeserializeProcessor<List<UnitSear
         	unitResult.setAssessmentCount(statistics.get("assessmentCount") != null ? (Integer) statistics.get("assessmentCount") : 0);
         	unitResult.setExternalAssessmentCount(statistics.get("externalAssessmentCount") != null ? (Integer) statistics.get("externalAssessmentCount") : 0);
         	unitResult.setIsFeatured(statistics.get("isFeatured") != null ? (Boolean) statistics.get("isFeatured") : false);
-
+        	unitResult.setEfficacy((statistics.get(IndexFields.EFFICACY) != null) ? ((Number) statistics.get(IndexFields.EFFICACY)).doubleValue() : 0.5);
+        	unitResult.setEngagement((statistics.get(IndexFields.ENGAGEMENT) != null) ? ((Number) statistics.get(IndexFields.ENGAGEMENT)).doubleValue() : 0.5);
+        	unitResult.setRelevance((statistics.get(IndexFields.RELEVANCE) != null) ? ((Number) statistics.get(IndexFields.RELEVANCE)).doubleValue() : 0.5);
+    	
 			long viewsCount = 0L;
 			if (statistics.get(IndexFields.VIEWS_COUNT) != null) {
 				viewsCount = ((Number) statistics.get(IndexFields.VIEWS_COUNT)).longValue();
 				unitResult.setViewCount(viewsCount);
 			}
-		}
-		// set lessonIds
-		if (model.get(IndexFields.LESSON_IDS) != null) {
-			unitResult.setLessonIds((List<String>) model.get(IndexFields.LESSON_IDS));
-		}
-
-		// set collectionIds
-		if (model.get(IndexFields.COLLECTION_IDS) != null) {
-			unitResult.setCollectionIds((List<String>) model.get(IndexFields.COLLECTION_IDS));
 		}
 
 		// set course
@@ -99,7 +93,10 @@ public class UnitDeserializeProcessor extends DeserializeProcessor<List<UnitSear
 		// set taxonomy
 		if(model.get(IndexFields.TAXONOMY) != null){
 			Map<String, Object> tax = (Map<String, Object>) model.get(IndexFields.TAXONOMY); 
-			unitResult.setTaxonomy((Map<String, Object>) tax.get(IndexFields.TAXONOMY_SET));
+			Map<String, Object> taxonomyMap =(Map<String, Object>) tax.get(IndexFields.TAXONOMY_SET);
+			if (taxonomyMap.containsKey(IndexFields.SUBJECT) && ((List<String>) taxonomyMap.get(IndexFields.SUBJECT)).size() > 0) {
+				unitResult.setTaxonomy((Map<String, Object>) tax.get(IndexFields.TAXONOMY_SET));
+			}
 		}
 		
  		return unitResult;

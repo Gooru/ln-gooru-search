@@ -276,6 +276,9 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 			if (statisticsMap.get(IndexFields.COLLABORATOR_COUNT) != null) {
 				resource.setCollaboratorCount(0);
 			}
+			resource.setEfficacy((statisticsMap.get(IndexFields.EFFICACY) != null) ? ((Number) statisticsMap.get(IndexFields.EFFICACY)).doubleValue() : 0.5);
+			resource.setEngagement((statisticsMap.get(IndexFields.ENGAGEMENT) != null) ? ((Number) statisticsMap.get(IndexFields.ENGAGEMENT)).doubleValue() : 0.5);
+			resource.setRelevance((statisticsMap.get(IndexFields.RELEVANCE) != null) ? ((Number) statisticsMap.get(IndexFields.RELEVANCE)).doubleValue() : 0.5);
 			resource.setRemixedInCollectionCount((statisticsMap.get(IndexFields.COLLECTION_COUNT) != null) ? ((Number) statisticsMap.get(IndexFields.COLLECTION_COUNT)).longValue() : 0);
 			resource.setRemixedInAssessmentCount((statisticsMap.get(IndexFields.ASSESSMENT_COUNT) != null) ? ((Number) statisticsMap.get(IndexFields.ASSESSMENT_COUNT)).longValue() : 0);
 			resource.setRemixedInExternalAssessmentCount((statisticsMap.get(IndexFields.EXTERNAL_ASSESSMENT_COUNT) != null) ? ((Number) statisticsMap.get(IndexFields.EXTERNAL_ASSESSMENT_COUNT)).longValue() : 0);

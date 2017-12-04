@@ -58,19 +58,17 @@ public class LessonDeserializeProcessor extends DeserializeProcessor<List<Lesson
         	lessonResult.setAssessmentCount(statistics.get("assessmentCount") != null ? (Integer) statistics.get("assessmentCount") : 0);
         	lessonResult.setExternalAssessmentCount(statistics.get("externalAssessmentCount") != null ? (Integer) statistics.get("externalAssessmentCount") : 0);
         	lessonResult.setIsFeatured(statistics.get("isFeatured") != null ? (Boolean) statistics.get("isFeatured") : false);
-
+        	lessonResult.setEfficacy((statistics.get(IndexFields.EFFICACY) != null) ? ((Number) statistics.get(IndexFields.EFFICACY)).doubleValue() : 0.5);
+        	lessonResult.setEngagement((statistics.get(IndexFields.ENGAGEMENT) != null) ? ((Number) statistics.get(IndexFields.ENGAGEMENT)).doubleValue() : 0.5);
+        	lessonResult.setRelevance((statistics.get(IndexFields.RELEVANCE) != null) ? ((Number) statistics.get(IndexFields.RELEVANCE)).doubleValue() : 0.5);
+    	
 			long viewsCount = 0L;
 			if (statistics.get(IndexFields.VIEWS_COUNT) != null) {
 				viewsCount = ((Number) statistics.get(IndexFields.VIEWS_COUNT)).longValue();
 				lessonResult.setViewCount(viewsCount);
 			}
 		}
-        
-		// set collectionIds
-		if (model.get(IndexFields.COLLECTION_IDS) != null) {
-			lessonResult.setCollectionIds((List<String>) model.get(IndexFields.COLLECTION_IDS));
-		}
-		
+
 		// set unit
 		if (model.get(IndexFields.UNIT) != null) {
 			lessonResult.setUnit((Map<String, Object>) model.get(IndexFields.UNIT));
