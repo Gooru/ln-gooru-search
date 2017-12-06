@@ -151,9 +151,9 @@ public class SerializerUtil {
 	}
 	public static JSONSerializer appendTransformers(final JSONSerializer serializer, final boolean excludeNullObject) {
 		//serializer.transform(new UserTransformer(false), User.class).transform(new OrganizationTransformer(), Organization.class).transform(new ContentPermissionTransformer(), ContentPermission.class);
-		/*if (excludeNullObject) {
+		if (excludeNullObject) {
 			serializer.transform(new ExcludeNullTransformer(), void.class);
-		}*/
+		}
 		return serializer;
 
 	}

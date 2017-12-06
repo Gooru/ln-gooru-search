@@ -79,6 +79,9 @@ public class ElasticsearchProcessor extends SearchProcessor<SearchData, Object> 
 	public void process(SearchData searchData, SearchResponse<Object> response)  {
 		String indexName = searchData.getIndexType().getName();
 		String indexType = searchData.getType().toLowerCase();
+		if (indexType.startsWith(PEDAGOGY_UNDERSCORE)) {
+			indexType = indexType.replaceFirst(PEDAGOGY_UNDERSCORE, "");
+		}
 		if (indexType.equalsIgnoreCase(TYPE_SCOLLECTION)) {
 			indexType = TYPE_COLLECTION;
 		} else if (indexType.equalsIgnoreCase(KEYWORD_COMPETENCY)) {

@@ -9,9 +9,7 @@ import java.util.Map;
 import org.ednovo.gooru.search.domain.service.CollectionSearchResult;
 import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.model.Code;
-import org.ednovo.gooru.search.es.model.ContentFormat;
 import org.ednovo.gooru.search.es.model.License;
-import org.ednovo.gooru.search.es.model.PublishedStatus;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
 import org.slf4j.Logger;
@@ -199,7 +197,10 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 		Integer itemCount = (Integer) statisticsMap.get(IndexFields.CONTENT_COUNT);
 		output.setCollectionItemCount(itemCount != null ? itemCount : 0);
 		output.setNumberOfResources(itemCount);
-
+		output.setEfficacy((statisticsMap.get(IndexFields.EFFICACY) != null) ? ((Number) statisticsMap.get(IndexFields.EFFICACY)).doubleValue() : 0.5);
+		output.setEngagement((statisticsMap.get(IndexFields.ENGAGEMENT) != null) ? ((Number) statisticsMap.get(IndexFields.ENGAGEMENT)).doubleValue() : 0.5);
+		output.setRelevance((statisticsMap.get(IndexFields.RELEVANCE) != null) ? ((Number) statisticsMap.get(IndexFields.RELEVANCE)).doubleValue() : 0.5);
+		
 		String type = (String) model.get(IndexFields.CONTENT_FORMAT);
 		output.setType(type);
 		if (type != null) {

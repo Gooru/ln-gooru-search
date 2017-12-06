@@ -147,7 +147,17 @@ public enum SearchProcessorType {
 
 	CollectionSuggestDeserializeProcessor(),
 	
-	TenantFilterConstruction();
+	TenantFilterConstruction(),
+	
+	PedagogyResourceDeserializer(),
+	
+	PedagogySCollectionDeserializer(),
+	
+	PedagogyUnitDeserializer(),
+	
+	PedagogyLessonDeserializer(),
+	
+	PedagogyCourseDeserializer();
 
 	private SearchProcessorType() {
 	}

@@ -88,27 +88,15 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
 			courseResult.setIsFeatured(statistics.get(IndexFields.IS_FEATURED) != null ? (Boolean) statistics.get(IndexFields.IS_FEATURED) : false);
 			courseResult.setRemixedInClassCount(statistics.get(IndexFields.REMIXED_IN_CLASS_COUNT) != null ? ((Number) statistics.get(IndexFields.REMIXED_IN_CLASS_COUNT)).longValue() : 0L);
 			courseResult.setUsedByStudentCount(statistics.get(IndexFields.USED_BY_STUDENT_COUNT) != null ? ((Number) statistics.get(IndexFields.USED_BY_STUDENT_COUNT)).longValue() : 0L);
-
+			courseResult.setEfficacy((statistics.get(IndexFields.EFFICACY) != null) ? ((Number) statistics.get(IndexFields.EFFICACY)).doubleValue() : 0.5);
+			courseResult.setEngagement((statistics.get(IndexFields.ENGAGEMENT) != null) ? ((Number) statistics.get(IndexFields.ENGAGEMENT)).doubleValue() : 0.5);
+			courseResult.setRelevance((statistics.get(IndexFields.RELEVANCE) != null) ? ((Number) statistics.get(IndexFields.RELEVANCE)).doubleValue() : 0.5);
+    	
 			long viewsCount = 0L;
 			if (statistics.get(IndexFields.VIEWS_COUNT) != null) {
 				viewsCount = ((Number) statistics.get(IndexFields.VIEWS_COUNT)).longValue();
 				courseResult.setViewCount(viewsCount);
 			}
-		}
-
-		// set unitIds
-		if (model.get(IndexFields.UNIT_IDS) != null) {
-			courseResult.setUnitIds((List<String>) model.get(IndexFields.UNIT_IDS));
-		}
-
-		// set lessonIds
-		if (model.get(IndexFields.LESSON_IDS) != null) {
-			courseResult.setLessonIds((List<String>) model.get(IndexFields.LESSON_IDS));
-		}
-
-		// set collectionIds
-		if (model.get(IndexFields.COLLECTION_IDS) != null) {
-			courseResult.setCollectionIds((List<String>) model.get(IndexFields.COLLECTION_IDS));
 		}
 
 		// set license
