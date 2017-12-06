@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.constant.SearchFilterConstants;
 import org.ednovo.gooru.search.es.model.Answer;
-import org.ednovo.gooru.search.es.model.ContentFormat;
 import org.ednovo.gooru.search.es.model.ContentSearchResult;
 import org.ednovo.gooru.search.es.model.Hint;
 import org.ednovo.gooru.search.es.model.MapWrapper;

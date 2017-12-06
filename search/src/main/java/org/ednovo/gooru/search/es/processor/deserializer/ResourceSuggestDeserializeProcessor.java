@@ -8,10 +8,9 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.constant.IndexFields;
-import org.ednovo.gooru.search.es.model.ContentFormat;
-import org.ednovo.gooru.search.es.model.SuggestResult;
 import org.ednovo.gooru.search.es.model.MapWrapper;
 import org.ednovo.gooru.search.es.model.SearchData;
+import org.ednovo.gooru.search.es.model.SuggestResult;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
 import org.springframework.stereotype.Component;
 
