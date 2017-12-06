@@ -93,10 +93,7 @@ public class UnitDeserializeProcessor extends DeserializeProcessor<List<UnitSear
 		// set taxonomy
 		if(model.get(IndexFields.TAXONOMY) != null){
 			Map<String, Object> tax = (Map<String, Object>) model.get(IndexFields.TAXONOMY); 
-			Map<String, Object> taxonomyMap =(Map<String, Object>) tax.get(IndexFields.TAXONOMY_SET);
-			if (taxonomyMap.containsKey(IndexFields.SUBJECT) && ((List<String>) taxonomyMap.get(IndexFields.SUBJECT)).size() > 0) {
-				unitResult.setTaxonomy((Map<String, Object>) tax.get(IndexFields.TAXONOMY_SET));
-			}
+			unitResult.setTaxonomy((Map<String, Object>) tax.get(IndexFields.TAXONOMY_SET));
 		}
 		
  		return unitResult;

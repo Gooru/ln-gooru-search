@@ -80,6 +80,12 @@ public class CourseSearchResult implements Serializable {
 
 	private Long usedByStudentCount;
 
+	private Double efficacy;
+	
+	private Double engagement;
+	
+	private Double relevance;
+	
 	public String getLastModified() {
 		return lastModified;
 	}
@@ -344,4 +350,27 @@ public class CourseSearchResult implements Serializable {
 		this.usedByStudentCount = usedByStudentCount;
 	}
 
+	public Double getEfficacy() {
+		return efficacy;
+	}
+
+	public void setEfficacy(Double efficacy) {
+		this.efficacy = efficacy;
+	}
+
+	public Double getEngagement() {
+		return engagement;
+	}
+
+	public void setEngagement(Double engagement) {
+		this.engagement = engagement;
+	}
+
+	public Double getRelevance() {
+		return relevance;
+	}
+
+	public void setRelevance(Double relevance) {
+		this.relevance = relevance;
+	}
 }

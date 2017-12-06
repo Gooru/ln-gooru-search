@@ -32,6 +32,8 @@ public interface Constants {
 
 	public static final String TYPE_COLLECTION = "collection";
 
+	public static final String TYPE_ASSESSMENT = "assessment";
+
 	public static final String TYPE_QUIZ = "quiz";
 
 	public static final String TYPE_PUBLISHER = "publisher";
@@ -258,6 +260,8 @@ public interface Constants {
 	public static final String SEARCH_TAXONOMY_ROOT_CODE = "search.taxonomy.root.code";
 
 	public static final String FLT_STANDARD = "flt.standard";
+
+	public static final String FLT_STANDARD_DISPLAY = "flt.standardDisplay";
 
 	public static final String SEARCH_HITS = "hits";
 
@@ -579,7 +583,7 @@ public interface Constants {
 	String CARET_SYMBOL = "^";
 	String NOT_SYMBOL = "!";
 	String FLT_COURSE_MISSING = "#^courseMissing";
-	
+
 	public static final String TYPE_COURSE = "course";
 	public static final String FLT_COURSE_TYPE = "&^courseType";
 	public static final String FLT_IS_FEATURED = "&^isFeatured";
@@ -594,7 +598,7 @@ public interface Constants {
 
 	public static final String THUMBNAIL_URL = "url";
 	public static final String SEARCH_REQ_20 = "2.0";
-	public static  final String SESSION_TOKEN_20 = "special-token-2.0";
+	public static final String SESSION_TOKEN_20 = "special-token-2.0";
 
 	public static final String TENANT_ROOT = "tenant_root";
 
@@ -609,7 +613,7 @@ public interface Constants {
 	public static final String AMPERSAND_EQ_FRAMEWORK_CODE = "&^taxonomy.allEquivalentFrameworkCodes";
 
 	public static final String STANDARD_PREFERENCE = "standard_preference";
-	
+
 	public static final String LEAF_INTERNAL_CODE = "leafInternalCode";
 	public static final String PARENT_TITLE = "parentTitle";
 
@@ -671,5 +675,62 @@ public interface Constants {
 	public static final String OR_SYMBOL = "|";
 	public static final String TENANT_TREE = "tenant_tree";
 	public static final String DEFAULT_FC_VISIBILITY = "default.fc_visibility";
+	public static final String TYPE_UNIT = "unit";
+	public static final String TYPE_LESSON = "lesson";
+	public static final String LEARNING_MAPS = "learning-maps";
+	public static final String CROSSWALK_ID = "crosswalkId";
+
+	public enum PublishedStatus {
+
+		PUBLISHED("published"), UNPUBLISHED("unpublished"), FEATURED("featured");
+
+		private String status;
+
+		PublishedStatus(String status) {
+			this.status = status;
+		}
+
+		public String getStatus() {
+			return status;
+		}
+
+	}
+	
+	public enum CollectionSubFormat {
+		
+		PRE_TEST("pre-test"), POST_TEST("post-test"), BENCHMARK("benchmark"), BACKFILL("backfill");
+
+		private String subFormat;
+
+		CollectionSubFormat(String subFormat) {
+			this.subFormat = subFormat;
+		}
+
+		public String getStatus() {
+			return subFormat;
+		}
+	}
+
+	public enum ContentFormat {
+
+		RESOURCE("resource"), 
+		QUESTION("question"), 
+		COLLECTION("collection"), 
+		ASSESSMENT("assessment"),
+		;
+
+		private String contentFormat;
+
+		ContentFormat(String contentFormat) {
+			this.contentFormat = contentFormat;
+		}
+
+		public String getContentFormat() {
+			return this.contentFormat;
+		}
+
+	}
+	public static final String CONTENTS = "contents";
+	Pattern CUL_MATCH = Pattern.compile("course|unit|lesson");
 
 }
