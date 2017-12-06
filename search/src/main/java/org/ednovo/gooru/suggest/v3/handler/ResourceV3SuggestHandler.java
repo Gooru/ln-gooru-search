@@ -18,8 +18,8 @@ import org.ednovo.gooru.search.es.constant.EsIndex;
 import org.ednovo.gooru.search.es.exception.SearchException;
 import org.ednovo.gooru.search.es.model.ContentSearchResult;
 import org.ednovo.gooru.search.es.model.SearchResponse;
+import org.ednovo.gooru.search.es.model.SimpleSuggestResponse;
 import org.ednovo.gooru.search.es.model.SuggestResponse;
-import org.ednovo.gooru.search.es.model.SuggestResult;
 import org.ednovo.gooru.search.es.processor.ElasticsearchProcessor;
 import org.ednovo.gooru.search.es.processor.deserializer.ResourceDeserializeProcessor;
 import org.ednovo.gooru.search.es.processor.deserializer.ResourceSuggestDeserializeProcessor;
@@ -27,7 +27,6 @@ import org.ednovo.gooru.search.es.processor.filter.constructor.TenantFilterConst
 import org.ednovo.gooru.search.es.processor.query_builder.ResourceEsDslQueryBuildProcessor;
 import org.ednovo.gooru.search.es.repository.GutBasedResourceSuggestRepository;
 import org.ednovo.gooru.search.es.service.SearchSettingService;
-import org.ednovo.gooru.search.model.ActivityStreamRawData;
 import org.ednovo.gooru.suggest.v3.data.provider.model.SuggestDataProviderType;
 import org.ednovo.gooru.suggest.v3.model.CollectionContextData;
 import org.ednovo.gooru.suggest.v3.model.ResourceContextData;
@@ -49,10 +48,6 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 	private static final String RESOURCE_STUDY = "resource-study";
 
 	private static final String COLLECTION_STUDY = "collection-study";
-
-	private static final String RESOURCE_PLAY_ACTIVITY = "resource.play";
-
-	private static final String COLLECTION_ITEM_PLAY_ACTIVITY = "collection.resource.play";
 
 	private static final String OR_DELIMETER = "~~@@";
 
@@ -91,7 +86,6 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 		return new ArrayList<SuggestDataProviderType>(Arrays.asList(this.suggestDataProviders));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public SuggestResponse<Object> suggest(final SuggestData suggestData, Map<SuggestDataProviderType, Object> dataProviderInput) {
 		final SuggestResponse<Object> suggestResponse = new SuggestResponse<Object>();
@@ -103,21 +97,10 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 		}
 
 		List<Callable<SuggestResponse<Object>>> tasks = new ArrayList<Callable<SuggestResponse<Object>>>();
-		final List<String> recentlyPlayedResIds = new ArrayList<String>();
 		final ResourceContextData resourceData = (ResourceContextData) dataProviderInput.get(SuggestDataProviderType.RESOURCE);
 		final CollectionContextData collectionData = (CollectionContextData) dataProviderInput.get(SuggestDataProviderType.COLLECTION);
-		final List<ActivityStreamRawData> activityList = (List<ActivityStreamRawData>) dataProviderInput.get(SuggestDataProviderType.USER_ACTIVITY);
-
-		if ((activityList != null && activityList.size() > 0)) {
-			for (ActivityStreamRawData activityData : activityList) {
-				if (resourceData != null && (activityData.getEventName().equalsIgnoreCase(COLLECTION_ITEM_PLAY_ACTIVITY) || activityData.getEventName().equalsIgnoreCase(RESOURCE_PLAY_ACTIVITY))
-						&& activityData.getResourceGooruOid() != null) {
-					recentlyPlayedResIds.add(activityData.getResourceGooruOid());
-				}
-			}
-		}
-
-		final SearchResponse<List<SuggestResult>> suggestResponseResource = new SearchResponse<List<SuggestResult>>();
+		
+		final SearchResponse<List<SimpleSuggestResponse>> suggestResponseResource = new SearchResponse<List<SimpleSuggestResponse>>();
 		final SearchResponse<List<ContentSearchResult>> searchResponseResource = new SearchResponse<List<ContentSearchResult>>();
 		final SearchResponse<Object> searchRes = new SearchResponse<Object>();
 		final String contextType = suggestData.getSuggestContextData().getContextType();

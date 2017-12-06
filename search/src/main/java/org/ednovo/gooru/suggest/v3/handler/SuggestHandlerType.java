@@ -23,9 +23,7 @@ public enum SuggestHandlerType {
 
 	TAXONOMY_RESOURCE(),
 
-	TAXONOMY_COLLECTION(),
-
-	COURSE();
+	TAXONOMY_COLLECTION();
 
 	private SuggestHandlerType() {
 	}

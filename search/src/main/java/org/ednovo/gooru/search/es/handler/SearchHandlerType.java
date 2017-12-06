@@ -13,8 +13,6 @@ public enum SearchHandlerType {
 
 	SCOLLECTION(),
 
-	QUIZ(),
-
 	DICTIONARY(),
 
     SPELLCHECKER(),
@@ -23,33 +21,17 @@ public enum SearchHandlerType {
 	
 	USER(),
 	
-	QUESTION(),
-
-	LIBRARY(),
-	
 	SEARCHQUERY(),
 	
 	TAXONOMY(),
 	
-	ATTRIBUTION(),
-	
 	SOURCE(),
 	
-	AUTOCOMPLETE(), 
-	
-	MULTI_FORMAT(),
+	AUTOCOMPLETE(),
 	
 	PUBLISHER(),
 	
-	AGGREGATOR(),
-	
 	SUBJECT_FACET_FILTER(),
-	
-	SCHOOLDISTRICT(),
-	
-	SKILLS(),
-	
-	CONTRIBUTOR(),
 	
 	COURSE(),
 	
