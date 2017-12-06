@@ -65,7 +65,17 @@ public enum SearchHandlerType {
 	
 	AUTOCOMPLETE_KEYWORD(),
 	
-	TENANT();
+	TENANT(),
+	
+	PEDAGOGY_RESOURCE(),
+
+	PEDAGOGY_SCOLLECTION(),
+	
+	PEDAGOGY_UNIT(),
+
+	PEDAGOGY_LESSON(),
+
+	PEDAGOGY_COURSE();
 
 	private SearchHandlerType() {
 	}

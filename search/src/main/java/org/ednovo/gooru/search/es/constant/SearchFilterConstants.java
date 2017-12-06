@@ -14,8 +14,6 @@ public class SearchFilterConstants {
 
 	private static Map<String, String> contentSubFormatResponseMap;
 
-	private static Map<String, String> resourceTypeResponseMap;
-
 	@PostConstruct
 	private void init() {
 		putContentSubFormatFilterMap();
