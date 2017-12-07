@@ -2,7 +2,6 @@
 package org.ednovo.gooru.search.es.processor.deserializer;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -139,58 +138,10 @@ public class PedagogySCollectionDeserializeProcessor extends PedagogyDeserialize
 		Map<String, Object> taxonomyMap = (Map<String, Object>) model.get(IndexFields.TAXONOMY);
 		if (taxonomyMap != null) {
 			long start = System.currentTimeMillis();
-			Map<String, Object> taxonomy = transformTaxonomy(taxonomyMap, searchData);
+			setTaxonomy(taxonomyMap, searchData, output);
 			logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
-			if(!taxonomy.isEmpty()) output.setTaxonomy(taxonomy);
 		}
 		return output;
-	}
-	
-	@SuppressWarnings("unchecked")
-	protected Map<String, Object> transformTaxonomy(Map<String, Object> taxonomyMap, SearchData input, PedagogyCollectionSearchResult output) {
-		Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
-		if (taxonomySetAsMap == null) {
-			return taxonomyMap;
-		}
-		Map<String, Object> finalConvertedMap = new HashMap<>();
-		Map<String, Object> finalCrosswalkMap = new HashMap<>();
-		List<String> leafInternalCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_INTERNAL_CODES);
-		if (leafInternalCodes != null) {
-			Map<String, Object> curriculumAsMap = (Map<String, Object>) taxonomySetAsMap.get(IndexFields.CURRICULUM);
-			List<Map<String, String>> curriculumInfoAsList = (List<Map<String, String>>) curriculumAsMap.get(IndexFields.CURRICULUM_INFO);
-			if (curriculumInfoAsList != null && !curriculumInfoAsList.isEmpty()) {
-				List<Map<String, Object>> crosswalkResponse = searchCrosswalk(input, leafInternalCodes);
-				curriculumInfoAsList.forEach(codeAsMap -> {
-					convertKeysToSnakeCase(finalConvertedMap, codeAsMap);
-					List<Map<String, String>> crosswalkCodes = null;
-					crosswalkCodes = deserializeCrosswalkResponse(crosswalkResponse, codeAsMap.get(IndexFields.ID), crosswalkCodes);
-					if (crosswalkCodes != null) {
-						for (Map<String, String> crosswalk : crosswalkCodes) {
-							if (!((String) crosswalk.get(IndexFields.ID)).equalsIgnoreCase((String) codeAsMap.get(IndexFields.ID))) {
-								crosswalk.put(PARENT_TITLE, codeAsMap.get(PARENT_TITLE));
-								crosswalk.put(CROSSWALK_ID, crosswalk.get(IndexFields.ID));
-								crosswalk.put(IndexFields.ID, codeAsMap.get(IndexFields.ID));
-								convertKeysToSnakeCase(finalCrosswalkMap, crosswalk);
-							}
-						}
-					}
-				});
-				String fltStandard = null;
-				String fltStandardDisplay = null;
-				if(input.getFilters().containsKey(AMPERSAND_EQ_INTERNAL_CODE)) fltStandard = input.getFilters().get(AMPERSAND_EQ_INTERNAL_CODE).toString();
-				if(input.getFilters().containsKey(AMPERSAND_EQ_DISPLAY_CODE)) fltStandardDisplay = input.getFilters().get(AMPERSAND_EQ_DISPLAY_CODE).toString();
-				Boolean isCrosswalked = false;
-				leafInternalCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_INTERNAL_CODES);
-				List<String> leafDisplayCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_DISPLAY_CODES);
-				if (!(leafInternalCodes != null && leafInternalCodes.size() > 0 && fltStandard != null && leafInternalCodes.contains(fltStandard.toUpperCase()))
-						&& !(leafDisplayCodes != null && leafDisplayCodes.size() > 0 && fltStandardDisplay != null && leafDisplayCodes.contains(fltStandardDisplay.toUpperCase()))) {
-					isCrosswalked = true;
-				}
-				output.setIsCrosswalked(isCrosswalked);
-			}
-		}
-		if(!finalCrosswalkMap.isEmpty()) output.setTaxonomyEquivalentCompetencies(finalCrosswalkMap);
-		return finalConvertedMap;
 	}
 
 	@Override

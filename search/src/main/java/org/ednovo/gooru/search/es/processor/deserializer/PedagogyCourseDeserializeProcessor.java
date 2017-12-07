@@ -1,7 +1,6 @@
 package org.ednovo.gooru.search.es.processor.deserializer;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -88,46 +87,14 @@ public class PedagogyCourseDeserializeProcessor extends PedagogyDeserializeProce
 		}
 
 		// set taxonomy
-		if(model.get(IndexFields.TAXONOMY) != null){
-			Map<String, Object> tax = (Map<String, Object>) model.get(IndexFields.TAXONOMY);
-			if (tax != null) {
-				transformTaxonomy(tax, input, courseResult);
-			}
+		Map<String, Object> taxonomyMap = (Map<String, Object>) model.get(IndexFields.TAXONOMY);
+		if (taxonomyMap != null) {
+			long start = System.currentTimeMillis();
+			setTaxonomy(taxonomyMap, input, courseResult);
+			logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
 		}
 
 		return courseResult;
-	}	
-
-	@SuppressWarnings("unchecked")
-	protected void transformTaxonomy(Map<String, Object> taxonomyMap, SearchData input, PedagogyCourseSearchResult output) {
-		Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
-		Map<String, Object> finalConvertedMap = new HashMap<>();
-		Map<String, Object> finalCrosswalkMap = new HashMap<>();
-		List<String> leafInternalCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_INTERNAL_CODES);
-		if (taxonomySetAsMap != null && leafInternalCodes != null) {
-			Map<String, Object> curriculumAsMap = (Map<String, Object>) taxonomySetAsMap.get(IndexFields.CURRICULUM);
-			List<Map<String, String>> curriculumInfoAsList = (List<Map<String, String>>) curriculumAsMap.get(IndexFields.CURRICULUM_INFO);
-			if (curriculumInfoAsList != null && !curriculumInfoAsList.isEmpty()) {
-				List<Map<String, Object>> crosswalkResponse = searchCrosswalk(input, leafInternalCodes);
-				curriculumInfoAsList.forEach(codeAsMap -> {
-					convertKeysToSnakeCase(finalConvertedMap, codeAsMap);
-					List<Map<String, String>> crosswalkCodes = null;
-					crosswalkCodes = deserializeCrosswalkResponse(crosswalkResponse, codeAsMap.get(IndexFields.ID), crosswalkCodes);
-					if (crosswalkCodes != null) {
-						for (Map<String, String> crosswalk : crosswalkCodes) {
-							if (!((String) crosswalk.get(IndexFields.ID)).equalsIgnoreCase((String) codeAsMap.get(IndexFields.ID))) {
-								crosswalk.put(PARENT_TITLE, codeAsMap.get(PARENT_TITLE));
-								crosswalk.put(CROSSWALK_ID, crosswalk.get(IndexFields.ID));
-								crosswalk.put(IndexFields.ID, codeAsMap.get(IndexFields.ID));
-								convertKeysToSnakeCase(finalCrosswalkMap, crosswalk);
-							}
-						}
-					}
-				});
-			}
-		}
-		if(!finalCrosswalkMap.isEmpty()) output.setTaxonomyEquivalentCompetencies(finalCrosswalkMap);
-		if(!finalConvertedMap.isEmpty()) output.setTaxonomy(finalConvertedMap);
 	}
 
 }

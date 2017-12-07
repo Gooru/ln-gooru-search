@@ -8,22 +8,18 @@ import org.ednovo.gooru.search.es.model.UserV2;
  * @author Renuka
  * 
  */
-public class PedagogyCourseSearchResult implements Serializable {
+public class PedagogyCourseSearchResult extends PedagogySearchResult implements Serializable {
 
 	/**
 	* 
 	*/
 	private static final long serialVersionUID = 6280104303486215659L;
 
-	private String id;
-
 	private UserV2 creator;
 
 	private UserV2 owner;
 
 	private UserV2 originalCreator;
-
-	private String publishStatus;
 
 	private Integer unitCount;
 
@@ -36,8 +32,6 @@ public class PedagogyCourseSearchResult implements Serializable {
 	private Integer collaboratorCount;
 
 	private String thumbnail;
-
-	private String title;
 
 	private String description;
 
@@ -89,14 +83,6 @@ public class PedagogyCourseSearchResult implements Serializable {
 		this.originalCreator = originalCreator;
 	}
 
-	public String getPublishStatus() {
-		return publishStatus;
-	}
-
-	public void setPublishStatus(String publishStatus) {
-		this.publishStatus = publishStatus;
-	}
-
 	public Integer getUnitCount() {
 		return unitCount;
 	}
@@ -144,29 +130,13 @@ public class PedagogyCourseSearchResult implements Serializable {
 	public void setThumbnail(String thumbnail) {
 		this.thumbnail = thumbnail;
 	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
+	
 	public String getDescription() {
 		return description;
 	}
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
 	}
 
 	public String getFormat() {

@@ -12,6 +12,6 @@ public interface PedagogySearchService {
 	
 	SearchResponse<Object> searchPedagogy(SearchData searchData);
 	
-	Map<String, Object> search(SearchData searchData, String type, String searchHandlerType, Map<String, Object> resultAsMap);
+	Map<String, Object> search(SearchData searchData, String type, Map<String, Object> resultAsMap);
 	
 }
