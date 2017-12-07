@@ -3,11 +3,13 @@
  */
 package org.ednovo.gooru.search.es.processor.deserializer;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ednovo.gooru.search.domain.service.PedagogySearchResult;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.EsIndex;
 import org.ednovo.gooru.search.es.constant.IndexFields;
@@ -18,7 +20,6 @@ import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.model.UserV2;
 import org.ednovo.gooru.search.es.processor.SearchProcessor;
-import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -67,36 +68,46 @@ public abstract class PedagogyDeserializeProcessor<O, S> extends SearchProcessor
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Map<String, Object> transformTaxonomy(Map<String, Object> taxonomyMap, SearchData input) {
+	protected void setTaxonomy(Map<String, Object> taxonomyMap, SearchData input, PedagogySearchResult output) {
 		Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
-		if (taxonomySetAsMap == null) {
-			return taxonomyMap;
-		}
 		Map<String, Object> finalConvertedMap = new HashMap<>();
 		Map<String, Object> finalCrosswalkMap = new HashMap<>();
-		JSONObject standardPrefs = input.getUserTaxonomyPreference();
 		List<String> leafInternalCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_INTERNAL_CODES);
-		if (leafInternalCodes != null) {
+		if (taxonomySetAsMap != null && leafInternalCodes != null) {
 			Map<String, Object> curriculumAsMap = (Map<String, Object>) taxonomySetAsMap.get(IndexFields.CURRICULUM);
 			List<Map<String, String>> curriculumInfoAsList = (List<Map<String, String>>) curriculumAsMap.get(IndexFields.CURRICULUM_INFO);
 			if (curriculumInfoAsList != null && !curriculumInfoAsList.isEmpty()) {
+				List<Map<String, Object>> crosswalkResponse = searchCrosswalk(input, leafInternalCodes);
 				curriculumInfoAsList.forEach(codeAsMap -> {
-					if (standardPrefs == null || !input.isCrosswalk()) {
-						convertKeysToSnakeCase(finalConvertedMap, codeAsMap);
-					} else {
-						List<Map<String, String>> crosswalkCodes = null;
-						List<Map<String, Object>> crosswalkResponse = searchCrosswalk(input, leafInternalCodes);
-						crosswalkCodes = deserializeCrosswalkResponse(crosswalkResponse, codeAsMap.get(IndexFields.ID), crosswalkCodes);
-						convertKeysToSnakeCase(finalConvertedMap, codeAsMap);
+					convertKeysToSnakeCase(finalConvertedMap, codeAsMap);
+					List<Map<String, String>> crosswalkCodes = null;
+					crosswalkCodes = deserializeCrosswalkResponse(crosswalkResponse, codeAsMap.get(IndexFields.ID), crosswalkCodes);
+					if (crosswalkCodes != null) {
 						for (Map<String, String> crosswalk : crosswalkCodes) {
-							crosswalk.put(PARENT_TITLE, codeAsMap.get(PARENT_TITLE));
-							convertKeysToSnakeCase(finalCrosswalkMap, crosswalk);
+							if (!((String) crosswalk.get(IndexFields.ID)).equalsIgnoreCase((String) codeAsMap.get(IndexFields.ID))) {
+								crosswalk.put(PARENT_TITLE, codeAsMap.get(PARENT_TITLE));
+								crosswalk.put(CROSSWALK_ID, crosswalk.get(IndexFields.ID));
+								crosswalk.put(IndexFields.ID, codeAsMap.get(IndexFields.ID));
+								convertKeysToSnakeCase(finalCrosswalkMap, crosswalk);
+							}
 						}
+						String fltStandard = null;
+						String fltStandardDisplay = null;
+						if(input.getFilters().containsKey(AMPERSAND_EQ_INTERNAL_CODE)) fltStandard = input.getFilters().get(AMPERSAND_EQ_INTERNAL_CODE).toString();
+						if(input.getFilters().containsKey(AMPERSAND_EQ_DISPLAY_CODE)) fltStandardDisplay = input.getFilters().get(AMPERSAND_EQ_DISPLAY_CODE).toString();
+						Boolean isCrosswalked = false;
+						List<String> leafDisplayCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_DISPLAY_CODES);
+						if (!(leafInternalCodes != null && leafInternalCodes.size() > 0 && fltStandard != null && leafInternalCodes.contains(fltStandard.toUpperCase()))
+								&& !(leafDisplayCodes != null && leafDisplayCodes.size() > 0 && fltStandardDisplay != null && leafDisplayCodes.contains(fltStandardDisplay.toUpperCase()))) {
+							isCrosswalked = true;
+						}
+						output.setIsCrosswalked(isCrosswalked);
 					}
 				});
 			}
 		}
-		return finalConvertedMap;
+		if(!finalConvertedMap.isEmpty()) output.setTaxonomy(finalConvertedMap);
+		if(!finalCrosswalkMap.isEmpty()) output.setTaxonomyEquivalentCompetencies(finalCrosswalkMap);
 	}
 
 	@SuppressWarnings("unchecked")

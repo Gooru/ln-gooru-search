@@ -4,46 +4,58 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.ednovo.gooru.search.es.model.UserV2;
+
 /**
  * @author Renuka
  * 
  */
-public class PedagogyCollectionSearchResult implements Serializable {
+public class PedagogyCollectionSearchResult extends PedagogySearchResult implements Serializable {
 
 	/**
 	* 
 	*/
 	private static final long serialVersionUID = 5673214015280665109L;
 
-	private String id;
-	private String title;
 	private String format;
+
 	private Integer viewCount;
+
 	private String grade;
+
 	private String learningObjective;
+
 	private Integer isFeatured;
+
 	private Integer collectionItemCount;
+
 	private String questionCount;
+
 	private String resourceCount;
 
 	private Integer collectionRemixCount;
+
 	private Integer collaboratorCount;
+
 	private String thumbnail;
+
 	private UserV2 creator;
+
 	private UserV2 user;
-	private String publishStatus;
+
 	private Map<String, Object> taxonomy;
-	private Boolean isCrosswalked = false;
+
 	private Long remixedInCourseCount;
+
 	private Long usedByStudentCount;
+
 	private Map<String, Object> taxonomyEquivalentCompetencies;
 
 	private Double efficacy;
-	
+
 	private Double engagement;
-	
+
 	private Double relevance;
-	
+
 	public PedagogyCollectionSearchResult() {
 	}
 
@@ -163,44 +175,12 @@ public class PedagogyCollectionSearchResult implements Serializable {
 		this.thumbnail = thumbnail;
 	}
 
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
 	public Integer getViewCount() {
 		return viewCount;
 	}
 
 	public void setViewCount(Integer viewCount) {
 		this.viewCount = viewCount;
-	}
-
-	public String getPublishStatus() {
-		return publishStatus;
-	}
-
-	public void setPublishStatus(String publishStatus) {
-		this.publishStatus = publishStatus;
-	}
-
-	public Boolean getIsCrosswalked() {
-		return isCrosswalked;
-	}
-
-	public void setIsCrosswalked(Boolean isCrosswalked) {
-		this.isCrosswalked = isCrosswalked;
 	}
 
 	public Long getRemixedInCourseCount() {

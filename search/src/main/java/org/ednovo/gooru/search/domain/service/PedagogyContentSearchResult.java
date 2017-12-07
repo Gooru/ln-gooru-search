@@ -9,7 +9,7 @@ import org.ednovo.gooru.search.es.model.UserV2;
  * @author Renuka
  * 
  */
-public class PedagogyContentSearchResult implements Serializable {
+public class PedagogyContentSearchResult extends PedagogySearchResult implements Serializable {
 
 	private static final long serialVersionUID = 6586694154253184566L;
 
@@ -17,13 +17,9 @@ public class PedagogyContentSearchResult implements Serializable {
 
 	private String url;
 
-	private String title;
-
 	private String thumbnail;
 
 	private String description;
-
-	private String id;
 
 	private UserV2 user;
 
@@ -37,14 +33,10 @@ public class PedagogyContentSearchResult implements Serializable {
 
 	private List<String> publisher;
 
-	private String publishStatus;
-
 	private String contentFormat;
 
 	private String contentSubFormat;
-	
-	private Boolean isCrosswalked = false;
-	
+		
 	private Map<String, Object> taxonomyEquivalentCompetencies;
 		
 	private Long remixedInCollectionCount;
@@ -69,14 +61,6 @@ public class PedagogyContentSearchResult implements Serializable {
 		this.url = url;
 	}
 
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
 	public String getThumbnail() {
 		return thumbnail;
 	}
@@ -91,14 +75,6 @@ public class PedagogyContentSearchResult implements Serializable {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
 	}
 
 	public UserV2 getUser() {
@@ -145,14 +121,6 @@ public class PedagogyContentSearchResult implements Serializable {
 		return INDEX_TYPE;
 	}
 
-	public String getPublishStatus() {
-		return publishStatus;
-	}
-
-	public void setPublishStatus(String publishStatus) {
-		this.publishStatus = publishStatus;
-	}
-
 	public List<String> getPublisher() {
 		return publisher;
 	}
@@ -175,14 +143,6 @@ public class PedagogyContentSearchResult implements Serializable {
 
 	public void setContentSubFormat(String contentSubFormat) {
 		this.contentSubFormat = contentSubFormat;
-	}
-
-	public Boolean getIsCrosswalked() {
-		return isCrosswalked;
-	}
-
-	public void setIsCrosswalked(Boolean isCrosswalked) {
-		this.isCrosswalked = isCrosswalked;
 	}
 	
 	public Map<String, Object> getTaxonomyEquivalentCompetencies() {

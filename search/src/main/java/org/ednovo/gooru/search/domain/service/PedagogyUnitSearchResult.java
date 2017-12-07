@@ -8,14 +8,12 @@ import org.ednovo.gooru.search.es.model.UserV2;
  * @author Renuka
  * 
  */
-public class PedagogyUnitSearchResult implements Serializable {
+public class PedagogyUnitSearchResult extends PedagogySearchResult implements Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 6280104303486215679L;
-
-	private String id;
 
 	private UserV2 creator;
 
@@ -23,11 +21,7 @@ public class PedagogyUnitSearchResult implements Serializable {
 
 	private UserV2 originalCreator;
 
-	private String publishStatus;
-
 	private Map<String, Object> taxonomy;
-
-	private String title;
 	
 	private String format;
 
@@ -52,14 +46,6 @@ public class PedagogyUnitSearchResult implements Serializable {
 	private Double engagement;
 	
 	private Double relevance;
-	
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
 
 	public UserV2 getCreator() {
 		return creator;
@@ -85,28 +71,12 @@ public class PedagogyUnitSearchResult implements Serializable {
 		this.originalCreator = originalCreator;
 	}
 
-	public String getPublishStatus() {
-		return publishStatus;
-	}
-
-	public void setPublishStatus(String publishStatus) {
-		this.publishStatus = publishStatus;
-	}
-
 	public Map<String, Object> getTaxonomy() {
 		return taxonomy;
 	}
 
 	public void setTaxonomy(Map<String, Object> taxonomy) {
 		this.taxonomy = taxonomy;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
 	}
 
 	public Map<String, Object> getCourse() {

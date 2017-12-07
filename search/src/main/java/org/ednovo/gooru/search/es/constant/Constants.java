@@ -732,9 +732,12 @@ public interface Constants {
 	}
 	public static final String CONTENTS = "contents";
 	Pattern CUL_MATCH = Pattern.compile("course|unit|lesson");
+	Pattern RQC_MATCH = Pattern.compile("resource|question|collection");
 	public static final String PEDAGOGY_UNDERSCORE = "pedagogy_";
 	public static final String TOTAL_HIT_COUNT = "totalHitCount";
 	public static final String RESULT_COUNT = "resultCount";
 	public static final String SEARCH_RESULTS = "searchResults";
+	public static final String FLT_FWCODE = "flt.fwCode";
+	public static final String PREREQUISITES = "prerequisites";
 
 }
