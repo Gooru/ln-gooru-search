@@ -90,21 +90,23 @@ public class PedagogySearchServiceImpl implements PedagogySearchService, Constan
 		inputSearchData.setUserTenantId(searchData.getUserTenantId());
 		inputSearchData.setUserTenantRootId(searchData.getUserTenantRootId());
 		inputSearchData.setUserPermits(searchData.getUserPermits());
-		if(RQC_MATCH.matcher(type).matches()) {
-			inputSearchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_FORMAT, type);
-		} else if(type.equalsIgnoreCase(TYPE_ASSESSMENT)) {
+		inputSearchData.setType(type);
+		if (RQC_MATCH.matcher(type).matches()) {
+			inputSearchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_FORMAT, type.equalsIgnoreCase(TYPE_SCOLLECTION) ? TYPE_COLLECTION : type);
+			if (type.equalsIgnoreCase(TYPE_QUESTION)) inputSearchData.setType(TYPE_RESOURCE);
+		} else if (type.equalsIgnoreCase(TYPE_ASSESSMENT)) {
 			inputSearchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_FORMAT, "assessment,assessment-external");
 			inputSearchData.setType(TYPE_SCOLLECTION);
 		}
 		if (CUL_MATCH.matcher(type).matches() && !searchData.getDefaultQuery().equalsIgnoreCase(STAR))
 			inputSearchData.setParameters(new MapWrapper<>());
-		SearchResponse<Object> searchResponse = (SearchResponse<Object>) SearchHandler.getSearcher((PEDAGOGY_UNDERSCORE + type).toUpperCase()).search(inputSearchData);
+		SearchResponse<Object> searchResponse = (SearchResponse<Object>) SearchHandler.getSearcher((PEDAGOGY_UNDERSCORE + inputSearchData.getType()).toUpperCase()).search(inputSearchData);
 		Map<String, Object> searchMap = new HashMap<>();
 		searchMap.put(TOTAL_HIT_COUNT, searchResponse.getStats().get(TOTAL_HIT_COUNT));
 		searchMap.put(RESULT_COUNT, searchResponse.getStats().get(RESULT_COUNT));
 		searchMap.put(SEARCH_RESULTS, searchResponse.getSearchResults());
 		resultAsMap.put(type, searchMap);
-		logger.info("Elapsed time to complete unit search process :" + (System.currentTimeMillis() - uStart) + " ms");
+		logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - uStart) + " ms");
 		return resultAsMap;
 	}
 
