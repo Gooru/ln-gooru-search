@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.ednovo.gooru</groupId>
 		<artifactId>gooru</artifactId>
-		<version>1.0</version>
+		<version>4.0</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>gooru-search-core</artifactId>
