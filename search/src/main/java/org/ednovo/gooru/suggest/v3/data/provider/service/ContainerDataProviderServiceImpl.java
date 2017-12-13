@@ -81,16 +81,18 @@ public class ContainerDataProviderServiceImpl implements ContainerDataProviderSe
 						}
 					}
 					List<Map<String, Object>> itemList = contentRepository.getItems(collectionId);
-					Set<String> itemIds = new HashSet<>();
-					itemList.forEach(item -> {
-						itemIds.add(item.get("id").toString());
-					});
-					collectionContextDo.setItemIds(itemIds);
-					collectionContextDo.setItemCount(itemList.size());
+					if (itemList != null && itemList.size() > 0) {
+						Set<String> itemIds = new HashSet<>();
+						itemList.forEach(item -> {
+							itemIds.add(item.get("id").toString());
+						});
+						collectionContextDo.setItemIds(itemIds);
+						collectionContextDo.setItemCount(itemList.size());
+					}
 				}
 			}
 		} catch (Exception e) {
-			LOG.error("Unable to fetch from DB : {} :: {}", collectionDataProviderCriteria.getCollectionId(), e.getMessage());
+			LOG.error("Unable to fetch from DB : {} :: {}", collectionDataProviderCriteria.getCollectionId(), e);
 		}
 		return collectionContextDo;
 	}
@@ -183,7 +185,5 @@ public class ContainerDataProviderServiceImpl implements ContainerDataProviderSe
 			});
 		}
 	}
-
-
 }
 

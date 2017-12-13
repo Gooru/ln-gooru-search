@@ -50,13 +50,13 @@ public class ContentRepositoryImpl extends BaseRepository implements ContentRepo
 				.addScalar("taxonomy", StringType.INSTANCE)
 				.setParameter("ID", uuid, PostgresUUIDType.INSTANCE);
 		List<Map<String, Object>> resultMapAsList = null;
-		resultMapAsList = new ArrayList<>();
-		if(query!= null && arrayList(query).size() > 0) {
-			for(Object[] object : arrayList(query)) {
+		if (query != null && arrayList(query).size() > 0) {
+			resultMapAsList = new ArrayList<>();
+			for (Object[] object : arrayList(query)) {
 				Map<String, Object> resultMap = new HashMap<>();
-				resultMap.put("id", ((UUID)object[0]).toString());
+				resultMap.put("id", ((UUID) object[0]).toString());
 				resultMap.put("title", object[1] != null ? object[1].toString() : null);
-				resultMap.put("course_id", object[2] != null ? ((UUID)object[2]).toString(): null);
+				resultMap.put("course_id", object[2] != null ? ((UUID) object[2]).toString() : null);
 				resultMap.put("taxonomy", object[3] != null ? object[3].toString() : null);
 				resultMapAsList.add(resultMap);
 			}

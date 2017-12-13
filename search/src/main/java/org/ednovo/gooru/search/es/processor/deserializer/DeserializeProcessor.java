@@ -156,12 +156,17 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 
 	@SuppressWarnings("unchecked")
 	protected List<Map<String, Object>> searchCrosswalk(SearchData input, List<String> leafInternalCodes) {
+		List<Map<String, Object>> searchResponse = null;
 		SearchData crosswalkRequest = new SearchData();
 		crosswalkRequest.setPretty(input.getPretty());
 		crosswalkRequest.setIndexType(EsIndex.CROSSWALK);
 		crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CROSSWALK_CODES + DOT + IndexFields.ID, (StringUtils.join(leafInternalCodes,",")));
 		crosswalkRequest.setQueryString(STAR);
-		List<Map<String, Object>> searchResponse = (List<Map<String, Object>>) SearchHandler.getSearcher(SearchHandlerType.CROSSWALK.name()).search(crosswalkRequest).getSearchResults();
+		try {
+			searchResponse = (List<Map<String, Object>>) SearchHandler.getSearcher(SearchHandlerType.CROSSWALK.name()).search(crosswalkRequest).getSearchResults();
+		} catch (Exception e) { 
+			logger.error("No matching crosswalk for codes : {} : Exception : {}", leafInternalCodes, e.getMessage());
+		}
 		return searchResponse;
 	}
 

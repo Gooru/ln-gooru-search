@@ -17,7 +17,7 @@
 		<httpAsyncClient.version>4.1.2</httpAsyncClient.version>
 	</properties>
 	<packaging>jar</packaging>
-	<name>Gooru Search </name>
+	<name>Gooru Search</name>
 	<build>
 		<plugins>
 			<plugin>

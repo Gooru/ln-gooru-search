@@ -22,7 +22,6 @@ class AuthPrefsMessageBusJsonResponseHolder implements AuthPrefsResponseHolder {
 	private static final String MSG_PARTNER_ID = "partner_id";
 
 	public AuthPrefsMessageBusJsonResponseHolder(JSONObject message) {
-		System.out.println("json on auth pref class : " + message.toString());
 		this.message = message;
 		String userId;
 		try {
