@@ -41,7 +41,7 @@ public class GutBasedResourceSuggestRepositoryImpl extends BaseRepository implem
 				LOG.info("There are no suggestions for c_internal_code" + idsToFilter);
 			}
 		} catch (Exception e) {
-			LOG.error("Unable to fetch suggestions from DB for Concept Node : {} : Exception :: {}"+ idsToFilter.toString()+ e.getMessage());
+			LOG.error("Unable to fetch suggestions from DB for Concept Node : {} : Exception :: {}", idsToFilter.toString(), e.getMessage());
 		}
 		return ids;
 	}
@@ -69,7 +69,7 @@ public class GutBasedResourceSuggestRepositoryImpl extends BaseRepository implem
 				LOG.info("There are no suggestions for mc_internal_code" + idsToFilter);
 			}
 		} catch (Exception e) {
-			LOG.error("Unable to fetch suggestions from DB for Micro Concept Node : {} : Exception :: {}"+ idsToFilter.toString()+ e.getMessage());
+			LOG.error("Unable to fetch suggestions from DB for Micro Concept Node : {} : Exception :: {}", idsToFilter.toString(), e.getMessage());
 		}
 		return ids;
 	}

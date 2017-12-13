@@ -76,7 +76,7 @@ public class ElasticsearchProcessor extends SearchProcessor<SearchData, Object> 
 	}
 
 	@Override
-	public void process(SearchData searchData, SearchResponse<Object> response)  {
+	public void process(SearchData searchData, SearchResponse<Object> response) {
 		String indexName = searchData.getIndexType().getName();
 		String indexType = searchData.getType().toLowerCase();
 		if (indexType.startsWith(PEDAGOGY_UNDERSCORE)) {
@@ -108,14 +108,16 @@ public class ElasticsearchProcessor extends SearchProcessor<SearchData, Object> 
 				throw new BadRequestException("Please check request param input values");
 			}
 
-			searchData.setSearchResultText(EntityUtils.toString(searchResponse.getEntity()));
+			if (searchResponse.getEntity() != null) searchData.setSearchResultText(EntityUtils.toString(searchResponse.getEntity()));
 			if (LOG.isDebugEnabled()) {
 				LOG.debug("Elapsed Time for " + indexType + " : " + (System.currentTimeMillis() - start) + " ms");
 			}
 		} catch (BadRequestException e) {
 			throw new BadRequestException("Please check request input param values" + e);		
+		} catch (IOException ioe) {
+			LOG.error("IO Exception : {}" , ioe);		
 		} catch (Exception e) {
-			LOG.error("Search Error"+ e); 
+			LOG.error("Search Error : {}", e); 
 		}
 	}
 

@@ -16,12 +16,16 @@ import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.processor.SearchProcessor;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.CaseFormat;
 
 public abstract class SuggestDeserializeProcessor<O, S> extends SearchProcessor<SearchData, O> implements Constants {
+
+	protected static final Logger LOG = LoggerFactory.getLogger(SuggestDeserializeProcessor.class);
 
 	abstract O deserialize(Map<String, Object> model, SearchData input, O output);
 
@@ -111,7 +115,7 @@ public abstract class SuggestDeserializeProcessor<O, S> extends SearchProcessor<
 				convertKeysToSnakeCase(finalConvertedMap, codeAsMap);
 			}
 		} catch (JSONException e) {
-			logger.error("JsonException during taxonomy tranformation!", e.getMessage());
+			LOG.error("JsonException during taxonomy tranformation!", e.getMessage());
 		}
 	}
 
@@ -131,7 +135,12 @@ public abstract class SuggestDeserializeProcessor<O, S> extends SearchProcessor<
 		crosswalkRequest.setIndexType(EsIndex.CROSSWALK);
 		crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CROSSWALK_CODES + DOT + IndexFields.ID, (StringUtils.join(leafInternalCodes,",")));
 		crosswalkRequest.setQueryString(STAR);
-		List<Map<String, Object>> searchResponse = (List<Map<String, Object>>) SearchHandler.getSearcher(SearchHandlerType.CROSSWALK.name()).search(crosswalkRequest).getSearchResults();
+		List<Map<String, Object>> searchResponse = null;
+		try {
+			searchResponse = (List<Map<String, Object>>) SearchHandler.getSearcher(SearchHandlerType.CROSSWALK.name()).search(crosswalkRequest).getSearchResults();
+		} catch (Exception e) {
+			LOG.error("No matching crosswalk for codes : {} : Exception : {}", leafInternalCodes, e.getMessage());
+		}
 		return searchResponse;
 	}
 
