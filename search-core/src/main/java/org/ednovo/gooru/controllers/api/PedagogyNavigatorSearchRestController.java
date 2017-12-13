@@ -21,23 +21,31 @@ import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.model.User;
 import org.ednovo.gooru.search.es.model.UserGroupSupport;
 import org.ednovo.gooru.search.es.processor.util.SerializerUtil;
+import org.ednovo.gooru.search.es.service.PedagogySearchService;
 import org.ednovo.gooru.search.es.service.SearchSettingService;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-
+/**
+ * @author Renuka
+ * 
+ */
 @Controller
 @RequestMapping(value = { "/v1/pedagogy-search" })
 public class PedagogyNavigatorSearchRestController extends SerializerUtil implements Constants {
 
 	protected static final Logger logger = LoggerFactory.getLogger(PedagogyNavigatorSearchRestController.class);
-
+	
+	@Autowired
+	private PedagogySearchService pedagogySearchService;
+		
 	@SuppressWarnings("unchecked")
 	@RequestMapping(method = { RequestMethod.GET }, value = "/{type}")
 	public ModelAndView search(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) String sessionToken,
@@ -52,15 +60,17 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		/**
 		 * Here, when no filter is chosen, * search and keyword request with length less than 3 without * are skipped.
 		 **/
-		if (type.equalsIgnoreCase(TYPE_COMPETENCY_GRAPH)) {
+		if (type.equalsIgnoreCase(TYPE_COMPETENCY_GRAPH) || type.equalsIgnoreCase(LEARNING_MAPS)) {
 			query = checkQueryValidity(query, (Map<String, Object>) request.getParameterMap());
 		}
-		
+
 		// Set user permits
 		UserGroupSupport userGroup = (UserGroupSupport) request.getAttribute(Constants.TENANT);
 		List<String> userPermits = new ArrayList<>();
 		String userTenantId = userGroup.getTenantId();
+		String userTenantRootId = userGroup.getTenantRoot();
 		searchData.setUserTenantId(userTenantId);
+		searchData.setUserTenantRootId(userTenantRootId);
 		userPermits.add(userTenantId);
 		List<String> discoverableTenantIds = SearchSettingService.getAllDiscoverableTenantIds(Constants.ALL_DISCOVERABLE_TENANT_IDS);
 		if (discoverableTenantIds != null && !discoverableTenantIds.isEmpty())
@@ -70,7 +80,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		searchData.setUserTaxonomyPreference((JSONObject) request.getAttribute(Constants.USER_PREFERENCES));
 		MapWrapper<Object> searchDataMap = new MapWrapper<Object>(request.getParameterMap());
 
-		if (searchDataMap.containsKey("flt.standard") || searchDataMap.containsKey("flt.standardDisplay")) {
+		if (searchDataMap.containsKey(FLT_STANDARD) || searchDataMap.containsKey(FLT_STANDARD_DISPLAY)) {
 			searchData.setStandardsSearch(true);
 		}
 		searchData.setParameters(searchDataMap);
@@ -107,12 +117,16 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 
 		String excludeAttributeArray[] = {};
 		try {
-			SearchResponse<Object> searchResponse = SearchHandler.getSearcher(type.toUpperCase()).search(searchData);
+			SearchResponse<Object> searchResponse = new SearchResponse<>();
+			if (type.equalsIgnoreCase(LEARNING_MAPS)) {
+				searchResponse = pedagogySearchService.searchPedagogy(searchData);
+			} else {
+				searchResponse = SearchHandler.getSearcher(type.toUpperCase()).search(searchData);
+			}
 			logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
-			searchResponse.setExecutionTime(System.currentTimeMillis() - start);
-
-			if (type.equalsIgnoreCase(KEYWORD_COMPETENCY)) {
-				return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
+			if (type.equalsIgnoreCase(KEYWORD_COMPETENCY)) searchResponse.setExecutionTime(System.currentTimeMillis() - start);
+			if (type.equalsIgnoreCase(KEYWORD_COMPETENCY) || type.equalsIgnoreCase(LEARNING_MAPS)) {
+				return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, true));
 			}
 			return toModelAndView(serialize(searchResponse, JSON, excludeAttributeArray, true, false));
 		} catch (SearchException searchException) {

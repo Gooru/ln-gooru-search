@@ -53,8 +53,8 @@ public class EsDslQueryBuildProcessor extends SearchProcessor<SearchData, Object
 		}
 		String queryField = "";
 		if (!searchData.isFacetSubjectSearch()) {
-			if (searchDataType.equalsIgnoreCase(SEARCH_TAXONOMY) && searchData.getParameters().containsKey("searchBy")
-					&& searchData.getParameters().getString("searchBy").equalsIgnoreCase("standard")) {
+			if (searchDataType.equalsIgnoreCase(SEARCH_TAXONOMY) && (searchData.getParameters() != null && searchData.getParameters().containsKey("searchBy")
+					&& searchData.getParameters().getString("searchBy").equalsIgnoreCase("standard"))) {
 				queryField = getSetting("S_STANDARD_QUERY_FIELDS");
 			} else {
 				queryField = getSearchSetting("search." + typeLower + ".query.fields");

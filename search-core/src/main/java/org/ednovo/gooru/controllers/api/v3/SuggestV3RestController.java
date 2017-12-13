@@ -56,6 +56,7 @@ public class SuggestV3RestController extends BaseController {
 			throws Exception {
 		long start = System.currentTimeMillis();
 		JSONObject requestContext = null;
+		LOG.info("Suggest Request Payload : {}", contextPayload);
 		if (!contextPayload.isEmpty())
 			requestContext = new JSONObject(contextPayload);
 		if (requestContext == null || requestContext.keys() == null) {

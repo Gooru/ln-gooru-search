@@ -80,13 +80,6 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 
 		SearchData searchData = new SearchData();
 		searchData.setShowSingleSubjectResults(showSingleSubjectResults);
-		if (type.contains(TYPE_SCOLLECTION) || type.contains(RESOURCE)) {
-			if (type.equalsIgnoreCase(TYPE_SCOLLECTION)) {
-				request.setAttribute(SEARCH_TYPE, COLLECTION);
-			} else {
-				request.setAttribute(SEARCH_TYPE, type);
-			}
-		}
 
 		// original query string from user
 		searchData.setUserQueryString(query);
@@ -95,6 +88,11 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		 * Here, when no filter is chosen, * search and keyword request with length less than 3 without * are skipped.
 		 **/
 		if (type.equalsIgnoreCase(TYPE_SCOLLECTION) || type.equalsIgnoreCase(RESOURCE)) {
+			if (type.equalsIgnoreCase(TYPE_SCOLLECTION)) {
+				request.setAttribute(SEARCH_TYPE, COLLECTION);
+			} else {
+				request.setAttribute(SEARCH_TYPE, type);
+			}
 			query = checkQueryValidity(query, (Map<String, Object>) request.getParameterMap());
 		}
 
@@ -297,6 +295,8 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 				return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
 			} else if (type.equalsIgnoreCase(KEYWORD_COMPETENCY)) {
 				return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
+			} else if (CUL_MATCH.matcher(type).matches()) {
+				return toModelAndView(serialize(searchResponse, JSON, excludeAttributeArray, true, true));
 			}
 			return toModelAndView(serialize(searchResponse, JSON, excludeAttributeArray, true, false));
 		} catch (SearchException searchException) {

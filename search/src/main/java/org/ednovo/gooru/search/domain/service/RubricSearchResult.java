@@ -1,11 +1,9 @@
 package org.ednovo.gooru.search.domain.service;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.ednovo.gooru.search.es.model.User;
 import org.ednovo.gooru.search.es.model.UserV2;
 
 public class RubricSearchResult implements Serializable {

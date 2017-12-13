@@ -125,6 +125,8 @@ public class SearchData implements Serializable {
 
 	private String parentTenantFCVisibility;
 	
+	private String defaultQuery = "*";
+
 	public boolean isShowCanonicalOnly() {
 		return showCanonicalOnly;
 	}
@@ -308,6 +310,13 @@ public class SearchData implements Serializable {
 			this.filters = new HashMap<String, Object>(1);
 		}
 		this.filters.put(key, value);
+	}
+
+	public void putFilters(Map<String, Object> filters) {
+		if (this.filters == null) {
+			this.filters = new HashMap<String, Object>(1);
+		}
+		this.filters = filters;
 	}
 
 	public synchronized String getQueryType() {
@@ -541,6 +550,14 @@ public class SearchData implements Serializable {
 
 	public void setParentTenantFCVisibility(String parentTenantFCVisibility) {
 		this.parentTenantFCVisibility = parentTenantFCVisibility;
+	}
+
+	public String getDefaultQuery() {
+		return defaultQuery;
+	}
+
+	public void setDefaultQuery(String defaultQuery) {
+		this.defaultQuery = defaultQuery;
 	}
 
 }

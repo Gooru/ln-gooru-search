@@ -13,10 +13,9 @@ import org.ednovo.gooru.search.domain.service.CollectionSearchResult;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.EsIndex;
 import org.ednovo.gooru.search.es.exception.SearchException;
-import org.ednovo.gooru.search.es.model.PublishedStatus;
 import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.model.SuggestResponse;
-import org.ednovo.gooru.search.es.model.SuggestResult;
+import org.ednovo.gooru.search.es.model.SimpleSuggestResponse;
 import org.ednovo.gooru.search.es.processor.ElasticsearchProcessor;
 import org.ednovo.gooru.search.es.processor.deserializer.CollectionSuggestDeserializeProcessor;
 import org.ednovo.gooru.search.es.processor.deserializer.SCollectionDeserializeProcessor;
@@ -81,7 +80,7 @@ public class CollectionV3SuggestHandlerForTaxonomy extends SuggestHandler<Map<St
 
 		final TaxonomyContextData taxonomyData = (TaxonomyContextData) dataProviderInput.get(SuggestDataProviderType.TAXONOMY);
 
-		final SearchResponse<List<SuggestResult>> suggestResponseResource = new SearchResponse<List<SuggestResult>>();
+		final SearchResponse<List<SimpleSuggestResponse>> suggestResponseResource = new SearchResponse<List<SimpleSuggestResponse>>();
 		final SearchResponse<List<CollectionSearchResult>> searchResponseResource = new SearchResponse<List<CollectionSearchResult>>();
 		final SearchResponse<Object> searchRes = new SearchResponse<Object>();
 		final Integer score = suggestData.getSuggestContextData().getScore();

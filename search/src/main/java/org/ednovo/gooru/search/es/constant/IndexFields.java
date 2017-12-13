@@ -126,5 +126,14 @@ public class IndexFields {
 	public static final String PARENT_TENANT_IDS = "parentTenantIds";
 	public static final String FC_VISIBILITY = "fcVisibility";
 	public static final String PARENT_TENANT_FC_VISIBILITY = "parentTenantFCVisibility";
+	
+	public static final String FRAMEWORK_CODE = "frameworkCode";
+	public static final String CODE_TYPE = "codeType";
+	public static final String KEYWORDS = "keywords";
+	public static final String EFFICACY = "efficacy";
+	public static final String ENGAGEMENT = "engagement";
+	public static final String RELEVANCE = "relevance";
+	public static final String GUT_PREREQUISITES = "gutPrerequisites";
+	public static final String DISPLAY_CODE = "displayCode";
 
 }

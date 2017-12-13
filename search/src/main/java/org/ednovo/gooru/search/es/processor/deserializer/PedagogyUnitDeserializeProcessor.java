@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.ednovo.gooru.search.domain.service.UnitSearchResult;
+import org.ednovo.gooru.search.domain.service.PedagogyUnitSearchResult;
 import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.model.SearchData;
-import org.ednovo.gooru.search.es.model.UserV2;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
 import org.springframework.stereotype.Component;
 /**
@@ -15,19 +14,19 @@ import org.springframework.stereotype.Component;
  * 
  */
 @Component
-public class UnitDeserializeProcessor extends DeserializeProcessor<List<UnitSearchResult>, UnitSearchResult> {
+public class PedagogyUnitDeserializeProcessor extends PedagogyDeserializeProcessor<List<PedagogyUnitSearchResult>, PedagogyUnitSearchResult> {
 
 	@Override
 	protected SearchProcessorType getType() {
-		return SearchProcessorType.UnitDeserializeProcessor;
+		return SearchProcessorType.PedagogyUnitDeserializer;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	List<UnitSearchResult> deserialize(Map<String, Object> model, SearchData input, List<UnitSearchResult> output) {
+	List<PedagogyUnitSearchResult> deserialize(Map<String, Object> model, SearchData input, List<PedagogyUnitSearchResult> output) {
 		Map<String, Object> hitsMap = (Map<String, Object>) model.get(SEARCH_HITS);
 		List<Map<String, Object>> hits = (List<Map<String, Object>>) (hitsMap).get(SEARCH_HITS);
-		output = new ArrayList<UnitSearchResult>();
+		output = new ArrayList<PedagogyUnitSearchResult>();
 		for (Map<String, Object> hit : hits) {
 			Map<String, Object> fields = (Map<String, Object>) hit.get(SEARCH_SOURCE);
 			output.add(collect(fields, input, null));
@@ -38,23 +37,19 @@ public class UnitDeserializeProcessor extends DeserializeProcessor<List<UnitSear
 
 	@SuppressWarnings("unchecked")
 	@Override
-	UnitSearchResult collect(Map<String, Object> model, SearchData input, UnitSearchResult unitResult) {
+	PedagogyUnitSearchResult collect(Map<String, Object> model, SearchData input, PedagogyUnitSearchResult unitResult) {
 		if(unitResult == null){
-			unitResult = new UnitSearchResult();
+			unitResult = new PedagogyUnitSearchResult();
 		}
 		unitResult.setId((String) model.get(IndexFields.ID));
 		unitResult.setTitle((String) model.get(IndexFields.TITLE));
 		unitResult.setPublishStatus((String) model.get(IndexFields.PUBLISH_STATUS));
-		unitResult.setLastModified((String) model.get(IndexFields.UPDATED_AT));
-		unitResult.setAddDate((String) model.get(IndexFields.CREATED_AT));
-        unitResult.setLastModifiedBy((String) model.get(IndexFields.MODIFIER_ID));
         unitResult.setFormat((String) model.get(IndexFields.CONTENT_FORMAT));
 
         // set counts
         if(model.get(IndexFields.STATISTICS) != null){
         	Map<String, Object> statistics = (Map<String, Object>) model.get(IndexFields.STATISTICS);
             unitResult.setLessonCount(statistics.get("lessonCount") != null ? (Integer) statistics.get("lessonCount") : 0);
-            unitResult.setContainingCollectionCount(statistics.get("containingCollectionsCount") != null ? (Integer) statistics.get("containingCollectionsCount") : 0);
         	unitResult.setCollectionCount(statistics.get("collectionCount") != null ? (Integer) statistics.get("collectionCount") : 0);
         	unitResult.setAssessmentCount(statistics.get("assessmentCount") != null ? (Integer) statistics.get("assessmentCount") : 0);
         	unitResult.setExternalAssessmentCount(statistics.get("externalAssessmentCount") != null ? (Integer) statistics.get("externalAssessmentCount") : 0);
@@ -62,7 +57,7 @@ public class UnitDeserializeProcessor extends DeserializeProcessor<List<UnitSear
         	unitResult.setEfficacy((statistics.get(IndexFields.EFFICACY) != null) ? ((Number) statistics.get(IndexFields.EFFICACY)).doubleValue() : 0.5);
         	unitResult.setEngagement((statistics.get(IndexFields.ENGAGEMENT) != null) ? ((Number) statistics.get(IndexFields.ENGAGEMENT)).doubleValue() : 0.5);
         	unitResult.setRelevance((statistics.get(IndexFields.RELEVANCE) != null) ? ((Number) statistics.get(IndexFields.RELEVANCE)).doubleValue() : 0.5);
-    	
+		
 			long viewsCount = 0L;
 			if (statistics.get(IndexFields.VIEWS_COUNT) != null) {
 				viewsCount = ((Number) statistics.get(IndexFields.VIEWS_COUNT)).longValue();
@@ -87,26 +82,17 @@ public class UnitDeserializeProcessor extends DeserializeProcessor<List<UnitSear
 
 		// set original creator 
 		if(model.get(IndexFields.ORIGINAL_CREATOR) != null){
-			unitResult.setOrginalCreator(setUser((Map<String, Object>) model.get(IndexFields.ORIGINAL_CREATOR)));
+			unitResult.setOriginalCreator(setUser((Map<String, Object>) model.get(IndexFields.ORIGINAL_CREATOR)));
 		}
 
 		// set taxonomy
-		if(model.get(IndexFields.TAXONOMY) != null){
-			Map<String, Object> tax = (Map<String, Object>) model.get(IndexFields.TAXONOMY); 
-			unitResult.setTaxonomy((Map<String, Object>) tax.get(IndexFields.TAXONOMY_SET));
+		Map<String, Object> taxonomyMap = (Map<String, Object>) model.get(IndexFields.TAXONOMY);
+		if (taxonomyMap != null) {
+			long start = System.currentTimeMillis();
+			setTaxonomy(taxonomyMap, input, unitResult);
+			logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
 		}
-		
  		return unitResult;
-	}
-	
-	private UserV2 setUser(Map<String, Object> userData){
-		UserV2 user = new UserV2();
-		user.setFirstname((String) userData.get(IndexFields.FIRST_NAME));
-		user.setLastname((String) userData.get(IndexFields.LAST_NAME));
-		user.setUsernameDisplay((String) userData.get(IndexFields.USERNAME));
-		user.setId((String) userData.get(IndexFields.USER_ID));
-		user.setProfileImage((String) userData.get(IndexFields.PROFILE_IMAGE));
-		return user;
 	}
 
 }

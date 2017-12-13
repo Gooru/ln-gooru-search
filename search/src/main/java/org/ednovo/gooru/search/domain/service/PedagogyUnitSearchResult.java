@@ -1,49 +1,33 @@
 package org.ednovo.gooru.search.domain.service;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
 import org.ednovo.gooru.search.es.model.UserV2;
-
-public class UnitSearchResult implements Serializable {
+/**
+ * @author Renuka
+ * 
+ */
+public class PedagogyUnitSearchResult extends PedagogySearchResult implements Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 6280104303486215679L;
 
-	private String id;
-
-	private String lastModified;
-
-	private String addDate;
-
-	private String lastModifiedBy;
-
 	private UserV2 creator;
 
 	private UserV2 owner;
 
-	private UserV2 orginalCreator;
-
-	private String publishStatus;
+	private UserV2 originalCreator;
 
 	private Map<String, Object> taxonomy;
-
-	private String title;
 	
 	private String format;
 
 	private Map<String, Object> course;
 	
-	private List<String> lessonIds;
-
-	private List<String> collectionIds;
-
 	private Integer lessonCount;
-
-	private Integer containingCollectionCount;
 	
 	private Boolean isFeatured;
 
@@ -54,44 +38,14 @@ public class UnitSearchResult implements Serializable {
 	private Integer externalAssessmentCount;
 
 	private Long viewCount;
+	
+	private Map<String, Object> taxonomyEquivalentCompetencies;
 
 	private Double efficacy;
 	
 	private Double engagement;
 	
 	private Double relevance;
-	
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getLastModified() {
-		return lastModified;
-	}
-
-	public void setLastModified(String lastModified) {
-		this.lastModified = lastModified;
-	}
-
-	public String getAddDate() {
-		return addDate;
-	}
-
-	public void setAddDate(String addDate) {
-		this.addDate = addDate;
-	}
-
-	public String getLastModifiedBy() {
-		return lastModifiedBy;
-	}
-
-	public void setLastModifiedBy(String lastModifiedBy) {
-		this.lastModifiedBy = lastModifiedBy;
-	}
 
 	public UserV2 getCreator() {
 		return creator;
@@ -109,20 +63,12 @@ public class UnitSearchResult implements Serializable {
 		this.owner = owner;
 	}
 
-	public UserV2 getOrginalCreator() {
-		return orginalCreator;
+	public UserV2 getOriginalCreator() {
+		return originalCreator;
 	}
 
-	public void setOrginalCreator(UserV2 orginalCreator) {
-		this.orginalCreator = orginalCreator;
-	}
-
-	public String getPublishStatus() {
-		return publishStatus;
-	}
-
-	public void setPublishStatus(String publishStatus) {
-		this.publishStatus = publishStatus;
+	public void setOriginalCreator(UserV2 originalCreator) {
+		this.originalCreator = originalCreator;
 	}
 
 	public Map<String, Object> getTaxonomy() {
@@ -131,14 +77,6 @@ public class UnitSearchResult implements Serializable {
 
 	public void setTaxonomy(Map<String, Object> taxonomy) {
 		this.taxonomy = taxonomy;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
 	}
 
 	public Map<String, Object> getCourse() {
@@ -157,36 +95,12 @@ public class UnitSearchResult implements Serializable {
 		this.format = format;
 	}
 
-	public List<String> getLessonIds() {
-		return lessonIds;
-	}
-
-	public void setLessonIds(List<String> lessonIds) {
-		this.lessonIds = lessonIds;
-	}
-
-	public List<String> getCollectionIds() {
-		return collectionIds;
-	}
-
-	public void setCollectionIds(List<String> collectionIds) {
-		this.collectionIds = collectionIds;
-	}
-
 	public Integer getLessonCount() {
 		return lessonCount;
 	}
 
 	public void setLessonCount(Integer lessonCount) {
 		this.lessonCount = lessonCount;
-	}
-
-	public Integer getContainingCollectionCount() {
-		return containingCollectionCount;
-	}
-
-	public void setContainingCollectionCount(Integer containingCollectionCount) {
-		this.containingCollectionCount = containingCollectionCount;
 	}
 
 	public Boolean getIsFeatured() {
@@ -227,6 +141,14 @@ public class UnitSearchResult implements Serializable {
 
 	public void setViewCount(Long viewCount) {
 		this.viewCount = viewCount;
+	}
+
+	public Map<String, Object> getTaxonomyEquivalentCompetencies() {
+		return taxonomyEquivalentCompetencies;
+	}
+
+	public void setTaxonomyEquivalentCompetencies(Map<String, Object> taxonomyEquivalentCompetencies) {
+		this.taxonomyEquivalentCompetencies = taxonomyEquivalentCompetencies;
 	}
 
 	public Double getEfficacy() {

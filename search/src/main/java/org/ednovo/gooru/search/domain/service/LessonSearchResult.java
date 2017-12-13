@@ -53,6 +53,12 @@ public class LessonSearchResult implements Serializable {
 
 	private Long viewCount;
 
+	private Double efficacy;
+	
+	private Double engagement;
+	
+	private Double relevance;
+	
 	public String getId() {
 		return id;
 	}
@@ -213,4 +219,27 @@ public class LessonSearchResult implements Serializable {
 		this.viewCount = viewCount;
 	}
 
+	public Double getEfficacy() {
+		return efficacy;
+	}
+
+	public void setEfficacy(Double efficacy) {
+		this.efficacy = efficacy;
+	}
+
+	public Double getEngagement() {
+		return engagement;
+	}
+
+	public void setEngagement(Double engagement) {
+		this.engagement = engagement;
+	}
+
+	public Double getRelevance() {
+		return relevance;
+	}
+
+	public void setRelevance(Double relevance) {
+		this.relevance = relevance;
+	}
 }
