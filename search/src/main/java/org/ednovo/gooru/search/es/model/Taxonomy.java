@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.ednovo.gooru.search.model.GutPrerequisites;
+
 public class Taxonomy implements Serializable {
 
 	private static final long serialVersionUID = 6586694154253184566L;
@@ -16,7 +18,8 @@ public class Taxonomy implements Serializable {
 	private String gutCode;
 	private String grade;
 	private List<String> keywords;
-	private List<Map<String, String>> gutPrerequisites;
+	private List<GutPrerequisites> gutPrerequisites;
+	private Map<String, Object> signatureContents;
 	
 	public String getId() {
 		return id;
@@ -82,12 +85,20 @@ public class Taxonomy implements Serializable {
 		this.keywords = keywords;
 	}
 
-	public List<Map<String, String>> getGutPrerequisites() {
+	public List<GutPrerequisites> getGutPrerequisites() {
 		return gutPrerequisites;
 	}
 
-	public void setGutPrerequisites(List<Map<String, String>> gutPrerequisites) {
+	public void setGutPrerequisites(List<GutPrerequisites> gutPrerequisites) {
 		this.gutPrerequisites = gutPrerequisites;
+	}
+
+	public Map<String, Object> getSignatureContents() {
+		return signatureContents;
+	}
+
+	public void setSignatureContents(Map<String, Object> signatureContents) {
+		this.signatureContents = signatureContents;
 	}
 
 }

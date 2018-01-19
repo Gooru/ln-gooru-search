@@ -29,8 +29,6 @@ public class PedagogyContentSearchResult extends PedagogySearchResult implements
 
 	private Boolean hasFrameBreaker;
 
-	private Map<String, Object> taxonomySet;
-
 	private List<String> publisher;
 
 	private String contentFormat;
@@ -108,15 +106,7 @@ public class PedagogyContentSearchResult extends PedagogySearchResult implements
 	public void setHasFrameBreaker(Boolean hasFrameBreaker) {
 		this.hasFrameBreaker = hasFrameBreaker;
 	}
-	
-	public Map<String, Object> getTaxonomySet() {
-		return taxonomySet;
-	}
 
-	public void setTaxonomySet(Map<String, Object> taxonomySet) {
-		this.taxonomySet = taxonomySet;
-	}
-	
 	public static String getIndexType() {
 		return INDEX_TYPE;
 	}

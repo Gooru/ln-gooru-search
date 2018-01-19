@@ -4,13 +4,18 @@
 package org.ednovo.gooru.search.es.processor.deserializer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.Taxonomy;
+import org.ednovo.gooru.search.es.model.UserV2;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
+import org.ednovo.gooru.search.model.GutPrerequisites;
+import org.ednovo.gooru.search.model.SignatureItems;
+import org.ednovo.gooru.search.model.SignatureResources;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,14 +46,72 @@ public class TaxonomyDeserializeProcessor extends DeserializeProcessor<List<Taxo
 		}
 		//TODO disabled while removing coreAPI jar. Need to re-enable
 		code.setId((String) model.get(IndexFields.ID));
+		code.setDisplayCode((String) model.get(IndexFields.CODE));
 		code.setTitle((String) model.get(IndexFields.TITLE));
 		code.setDescription((String) model.get(IndexFields.DESCRIPTION));
 		code.setGutCode((String) model.get(IndexFields.GUT_CODE));
 		code.setCodeType((String) model.get(IndexFields.CODE_TYPE));
 		code.setKeywords((List<String>) model.get(IndexFields.KEYWORDS));
-		code.setGutPrerequisites((List<Map<String, String>>) model.get(IndexFields.GUT_PREREQUISITES));
+		
+		List<GutPrerequisites> gutPrerequisites = new ArrayList<>(); 
+		List<Map<String, String>> prerequisites = (List<Map<String, String>>) model.get(IndexFields.GUT_PREREQUISITES);
+		prerequisites.forEach(p -> {
+			GutPrerequisites gutPrerequisite = new GutPrerequisites();
+			gutPrerequisite.setId(p.get(IndexFields.ID));
+			gutPrerequisite.setCode(p.get(IndexFields.CODE));
+			gutPrerequisite.setTitle(p.get(IndexFields.TITLE));
+			gutPrerequisites.add(gutPrerequisite);
+		});
+		code.setGutPrerequisites(gutPrerequisites);
+
+		Map<String, Object> signatureContents = new HashMap<>();
+		List<SignatureItems> signatureCollections = generateSignatureCollections(model, (List<Map<String, Object>>) model.get(IndexFields.SIGNATURE_COLLECTIONS));
+		List<SignatureItems> signatureAssessments = generateSignatureCollections(model, (List<Map<String, Object>>) model.get(IndexFields.SIGNATURE_ASSESSMENTS));
+		List<SignatureResources> signatureResources = generateSignatureResources(model, (List<Map<String, Object>>) model.get(IndexFields.SIGNATURE_RESOURCES));
+
+		signatureContents.put("collections", signatureCollections);
+		signatureContents.put("assessments", signatureAssessments);
+		signatureContents.put("resources", signatureResources);
+		code.setSignatureContents(signatureContents);
 		return code;
 
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<SignatureItems> generateSignatureCollections(Map<String, Object> model, List<Map<String, Object>> items) {
+		List<SignatureItems> signatureItems = new ArrayList<>(); 
+		items.forEach(item -> {
+			SignatureItems signatureItem = new SignatureItems();
+			signatureItem.setId((String) item.get(IndexFields.ID));
+			signatureItem.setTitle((String) item.get(IndexFields.TITLE));
+			signatureItem.setThumbnail((String) item.get(IndexFields.THUMBNAIL));
+			signatureItem.setEfficacy((item.get(IndexFields.EFFICACY) != null) ? ((Number) item.get(IndexFields.EFFICACY)).doubleValue() : 0.5);
+			signatureItem.setEngagement((item.get(IndexFields.ENGAGEMENT) != null) ? ((Number) item.get(IndexFields.ENGAGEMENT)).doubleValue() : 0.5);
+			signatureItem.setRelevance((item.get(IndexFields.RELEVANCE) != null) ? ((Number) item.get(IndexFields.RELEVANCE)).doubleValue() : 0.5);
+			signatureItem.setOwner(setUser((Map<String, Object>) item.get(IndexFields.OWNER)));
+			signatureItem.setCreator(setUser((Map<String, Object>) item.get(IndexFields.CREATOR)));
+			signatureItems.add(signatureItem);
+		});
+		return signatureItems;
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<SignatureResources> generateSignatureResources(Map<String, Object> model, List<Map<String, Object>> resources) {
+		List<SignatureResources> signatureResources = new ArrayList<>(); 
+		resources.forEach(resource -> {
+			SignatureResources signatureResource = new SignatureResources();
+			signatureResource.setId((String) resource.get(IndexFields.ID));
+			signatureResource.setTitle((String) resource.get(IndexFields.TITLE));
+			signatureResource.setUrl((String) resource.get(IndexFields.URL));
+			signatureResource.setContentSubFormat((String) resource.get(IndexFields.CONTENT_SUB_FORMAT));
+			signatureResource.setThumbnail((String) resource.get(IndexFields.THUMBNAIL));
+			signatureResource.setEfficacy((resource.get(IndexFields.EFFICACY) != null) ? ((Number) resource.get(IndexFields.EFFICACY)).doubleValue() : 0.5);
+			signatureResource.setEngagement((resource.get(IndexFields.ENGAGEMENT) != null) ? ((Number) resource.get(IndexFields.ENGAGEMENT)).doubleValue() : 0.5);
+			signatureResource.setRelevance((resource.get(IndexFields.RELEVANCE) != null) ? ((Number) resource.get(IndexFields.RELEVANCE)).doubleValue() : 0.5);
+			signatureResource.setCreator(setUser((Map<String, Object>) resource.get(IndexFields.CREATOR)));
+			signatureResources.add(signatureResource);
+		});
+		return signatureResources;
 	}
 
 	@Override
@@ -56,4 +119,12 @@ public class TaxonomyDeserializeProcessor extends DeserializeProcessor<List<Taxo
 		return SearchProcessorType.TaxonomyDeserializer;
 	}
 
+	protected UserV2 setUser(Map<String, Object> userData) {
+		UserV2 user = new UserV2();
+		user.setFirstname((String) userData.get(IndexFields.FIRST_NAME));
+		user.setLastname((String) userData.get(IndexFields.LAST_NAME));
+		user.setUsernameDisplay((String) userData.get(IndexFields.USERNAME));
+		user.setId((String) userData.get(IndexFields.USER_ID));
+		return user;
+	}
 }
