@@ -8,7 +8,7 @@ import org.ednovo.gooru.search.es.model.SearchResponse;
  * @author Renuka
  * 
  */
-public interface PedagogySearchService {
+public interface LearningMapsService {
 	
 	SearchResponse<Object> searchPedagogy(SearchData searchData);
 	

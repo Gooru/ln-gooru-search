@@ -135,5 +135,8 @@ public class IndexFields {
 	public static final String RELEVANCE = "relevance";
 	public static final String GUT_PREREQUISITES = "gutPrerequisites";
 	public static final String DISPLAY_CODE = "displayCode";
+	public static final String SIGNATURE_COLLECTIONS = "signatureCollections";
+	public static final String SIGNATURE_ASSESSMENTS = "signatureAssessments";
+	public static final String SIGNATURE_RESOURCES = "signatureResources";
 
 }

@@ -12,7 +12,7 @@ public class CompetencyNodeDTO {
 	private String display_code;
 	private String competency_level;
 	private List<Competency> prerequisites;
-	private List<SignatureCollectionDTO> signature_collections;
+	private List<SignatureItems> signature_collections;
 
 	public String getId() {
 		return id;
@@ -78,11 +78,11 @@ public class CompetencyNodeDTO {
 		this.prerequisites = prerequisites;
 	}
 	
-	public List<SignatureCollectionDTO> getSignature_collections() {
+	public List<SignatureItems> getSignature_collections() {
 		return signature_collections;
 	}
 
-	public void setSignature_collections(List<SignatureCollectionDTO> signature_collections) {
+	public void setSignature_collections(List<SignatureItems> signature_collections) {
 		this.signature_collections = signature_collections;
 	}
 }
