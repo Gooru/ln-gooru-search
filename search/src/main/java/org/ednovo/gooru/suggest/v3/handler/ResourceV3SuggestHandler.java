@@ -239,12 +239,14 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 						for (int index = 0; index < queryArr.length; index++) {
 							StringBuilder queryBuilder = new StringBuilder();
 							buildQuery(queryArr[index], queryBuilder);
-							if (index > 0) {
+							if (index > 0 && searchQuery.length() > 0) {
 								searchQuery.append(" OR ");
 							}
-							searchQuery.append("(");
-							searchQuery.append(queryBuilder.toString());
-							searchQuery.append(")");
+							if (queryBuilder.length() > 0) {
+								searchQuery.append("(");
+								searchQuery.append(queryBuilder.toString());
+								searchQuery.append(")");
+							}
 						}
 						if (StringUtils.trimToNull(searchQuery.toString()) != null) {
 							queryString = searchQuery.toString();

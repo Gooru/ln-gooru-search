@@ -146,6 +146,8 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 					parameters.remove(FLT_STANDARD_DISPLAY);
 					parameters.remove(FLT_FWCODE);
 					searchData.getParameters().put(FLT_STANDARD, StringUtils.join(filterCodes, COMMA));
+				} else {
+					searchData.getParameters().put(FLT_STANDARD, StringUtils.join(codes, COMMA));
 				}
 			}
 		}
@@ -165,34 +167,36 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 			List<GutPrerequisites> gutPrerequisites = response.getGutPrerequisites();
 			if (!key.equalsIgnoreCase(TAXONOMY_GUT_CODE)) {
 				Set<Map<String, String>> progressions = new HashSet<>();
-				gutPrerequisites.forEach(a -> {
-					GutPrerequisites gutPrerequisite = (GutPrerequisites) a;
-					SearchData crosswalkRequest = new SearchData();
-					crosswalkRequest.setPretty(searchData.getPretty());
-					crosswalkRequest.setIndexType(EsIndex.CROSSWALK);
-					crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.ID, gutPrerequisite.getId());
-					crosswalkRequest.setQueryString(STAR);
-					List<Map<String, Object>> crosswalkResponses = (List<Map<String, Object>>) SearchHandler.getSearcher(SearchHandlerType.CROSSWALK.name()).search(crosswalkRequest)
-							.getSearchResults();
-					if (crosswalkResponses != null && !crosswalkResponses.isEmpty()) {
-						crosswalkResponses.forEach(cwResponse -> {
-							Map<String, Object> source = (Map<String, Object>) cwResponse.get(SEARCH_SOURCE);
-							List<Map<String, String>> crosswalkCodes = (List<Map<String, String>>) source.get(IndexFields.CROSSWALK_CODES);
-							crosswalkCodes.forEach(code -> {
-								String cwFw = (String) code.get(IndexFields.FRAMEWORK_CODE);
-								if (cwFw.equalsIgnoreCase(requestedFwCode)) {
-									Map<String, String> cwCode = new HashMap<>();
-									cwCode.put(IndexFields.CODE, (String) code.get(IndexFields.CODE));
-									cwCode.put(IndexFields.TITLE, (String) code.get(IndexFields.TITLE));
-									progressions.add(cwCode);
-								}
+				if (gutPrerequisites != null && gutPrerequisites.size() > 0) {
+					gutPrerequisites.forEach(a -> {
+						GutPrerequisites gutPrerequisite = (GutPrerequisites) a;
+						SearchData crosswalkRequest = new SearchData();
+						crosswalkRequest.setPretty(searchData.getPretty());
+						crosswalkRequest.setIndexType(EsIndex.CROSSWALK);
+						crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.ID, gutPrerequisite.getId());
+						crosswalkRequest.setQueryString(STAR);
+						List<Map<String, Object>> crosswalkResponses = (List<Map<String, Object>>) SearchHandler.getSearcher(SearchHandlerType.CROSSWALK.name()).search(crosswalkRequest)
+								.getSearchResults();
+						if (crosswalkResponses != null && !crosswalkResponses.isEmpty()) {
+							crosswalkResponses.forEach(cwResponse -> {
+								Map<String, Object> source = (Map<String, Object>) cwResponse.get(SEARCH_SOURCE);
+								List<Map<String, String>> crosswalkCodes = (List<Map<String, String>>) source.get(IndexFields.CROSSWALK_CODES);
+								crosswalkCodes.forEach(code -> {
+									String cwFw = (String) code.get(IndexFields.FRAMEWORK_CODE);
+									if (cwFw.equalsIgnoreCase(requestedFwCode)) {
+										Map<String, String> cwCode = new HashMap<>();
+										cwCode.put(IndexFields.CODE, (String) code.get(IndexFields.CODE));
+										cwCode.put(IndexFields.TITLE, (String) code.get(IndexFields.TITLE));
+										progressions.add(cwCode);
+									}
+								});
 							});
-						});
-					}
-				});
+						}
+					});
+				}
 				searchResult.put(PREREQUISITES, progressions);
 			}
-			if (key.equalsIgnoreCase(TAXONOMY_GUT_CODE)) searchResult.put(PREREQUISITES, response.getGutPrerequisites());
+			if (key.equalsIgnoreCase(TAXONOMY_GUT_CODE)) searchResult.put(PREREQUISITES, gutPrerequisites);
 			searchResult.put(SIGNATURE_CONTENTS, response.getSignatureContents());
 			searchResult.put(IndexFields.GUT_CODE, response.getGutCode());
 			searchResult.put(IndexFields.CODE, response.getDisplayCode());

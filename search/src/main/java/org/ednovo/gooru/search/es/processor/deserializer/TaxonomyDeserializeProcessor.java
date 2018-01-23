@@ -55,13 +55,15 @@ public class TaxonomyDeserializeProcessor extends DeserializeProcessor<List<Taxo
 		
 		List<GutPrerequisites> gutPrerequisites = new ArrayList<>(); 
 		List<Map<String, String>> prerequisites = (List<Map<String, String>>) model.get(IndexFields.GUT_PREREQUISITES);
-		prerequisites.forEach(p -> {
-			GutPrerequisites gutPrerequisite = new GutPrerequisites();
-			gutPrerequisite.setId(p.get(IndexFields.ID));
-			gutPrerequisite.setCode(p.get(IndexFields.CODE));
-			gutPrerequisite.setTitle(p.get(IndexFields.TITLE));
-			gutPrerequisites.add(gutPrerequisite);
-		});
+		if (prerequisites != null) {
+			prerequisites.forEach(p -> {
+				GutPrerequisites gutPrerequisite = new GutPrerequisites();
+				gutPrerequisite.setId(p.get(IndexFields.ID));
+				gutPrerequisite.setCode(p.get(IndexFields.CODE));
+				gutPrerequisite.setTitle(p.get(IndexFields.TITLE));
+				gutPrerequisites.add(gutPrerequisite);
+			});
+		}
 		code.setGutPrerequisites(gutPrerequisites);
 
 		Map<String, Object> signatureContents = new HashMap<>();
@@ -80,37 +82,41 @@ public class TaxonomyDeserializeProcessor extends DeserializeProcessor<List<Taxo
 	@SuppressWarnings("unchecked")
 	private List<SignatureItems> generateSignatureCollections(Map<String, Object> model, List<Map<String, Object>> items) {
 		List<SignatureItems> signatureItems = new ArrayList<>(); 
-		items.forEach(item -> {
-			SignatureItems signatureItem = new SignatureItems();
-			signatureItem.setId((String) item.get(IndexFields.ID));
-			signatureItem.setTitle((String) item.get(IndexFields.TITLE));
-			signatureItem.setThumbnail((String) item.get(IndexFields.THUMBNAIL));
-			signatureItem.setEfficacy((item.get(IndexFields.EFFICACY) != null) ? ((Number) item.get(IndexFields.EFFICACY)).doubleValue() : 0.5);
-			signatureItem.setEngagement((item.get(IndexFields.ENGAGEMENT) != null) ? ((Number) item.get(IndexFields.ENGAGEMENT)).doubleValue() : 0.5);
-			signatureItem.setRelevance((item.get(IndexFields.RELEVANCE) != null) ? ((Number) item.get(IndexFields.RELEVANCE)).doubleValue() : 0.5);
-			signatureItem.setOwner(setUser((Map<String, Object>) item.get(IndexFields.OWNER)));
-			signatureItem.setCreator(setUser((Map<String, Object>) item.get(IndexFields.CREATOR)));
-			signatureItems.add(signatureItem);
-		});
+		if (items != null && items.size() > 0) {
+			items.forEach(item -> {
+				SignatureItems signatureItem = new SignatureItems();
+				signatureItem.setId((String) item.get(IndexFields.ID));
+				signatureItem.setTitle((String) item.get(IndexFields.TITLE));
+				signatureItem.setThumbnail((String) item.get(IndexFields.THUMBNAIL));
+				signatureItem.setEfficacy((item.get(IndexFields.EFFICACY) != null) ? ((Number) item.get(IndexFields.EFFICACY)).doubleValue() : 0.5);
+				signatureItem.setEngagement((item.get(IndexFields.ENGAGEMENT) != null) ? ((Number) item.get(IndexFields.ENGAGEMENT)).doubleValue() : 0.5);
+				signatureItem.setRelevance((item.get(IndexFields.RELEVANCE) != null) ? ((Number) item.get(IndexFields.RELEVANCE)).doubleValue() : 0.5);
+				signatureItem.setOwner(setUser((Map<String, Object>) item.get(IndexFields.OWNER)));
+				signatureItem.setCreator(setUser((Map<String, Object>) item.get(IndexFields.CREATOR)));
+				signatureItems.add(signatureItem);
+			});
+		}
 		return signatureItems;
 	}
 
 	@SuppressWarnings("unchecked")
 	private List<SignatureResources> generateSignatureResources(Map<String, Object> model, List<Map<String, Object>> resources) {
-		List<SignatureResources> signatureResources = new ArrayList<>(); 
-		resources.forEach(resource -> {
-			SignatureResources signatureResource = new SignatureResources();
-			signatureResource.setId((String) resource.get(IndexFields.ID));
-			signatureResource.setTitle((String) resource.get(IndexFields.TITLE));
-			signatureResource.setUrl((String) resource.get(IndexFields.URL));
-			signatureResource.setContentSubFormat((String) resource.get(IndexFields.CONTENT_SUB_FORMAT));
-			signatureResource.setThumbnail((String) resource.get(IndexFields.THUMBNAIL));
-			signatureResource.setEfficacy((resource.get(IndexFields.EFFICACY) != null) ? ((Number) resource.get(IndexFields.EFFICACY)).doubleValue() : 0.5);
-			signatureResource.setEngagement((resource.get(IndexFields.ENGAGEMENT) != null) ? ((Number) resource.get(IndexFields.ENGAGEMENT)).doubleValue() : 0.5);
-			signatureResource.setRelevance((resource.get(IndexFields.RELEVANCE) != null) ? ((Number) resource.get(IndexFields.RELEVANCE)).doubleValue() : 0.5);
-			signatureResource.setCreator(setUser((Map<String, Object>) resource.get(IndexFields.CREATOR)));
-			signatureResources.add(signatureResource);
-		});
+		List<SignatureResources> signatureResources = new ArrayList<>();
+		if (resources != null && resources.size() > 0) {
+			resources.forEach(resource -> {
+				SignatureResources signatureResource = new SignatureResources();
+				signatureResource.setId((String) resource.get(IndexFields.ID));
+				signatureResource.setTitle((String) resource.get(IndexFields.TITLE));
+				signatureResource.setUrl((String) resource.get(IndexFields.URL));
+				signatureResource.setContentSubFormat((String) resource.get(IndexFields.CONTENT_SUB_FORMAT));
+				signatureResource.setThumbnail((String) resource.get(IndexFields.THUMBNAIL));
+				signatureResource.setEfficacy((resource.get(IndexFields.EFFICACY) != null) ? ((Number) resource.get(IndexFields.EFFICACY)).doubleValue() : 0.5);
+				signatureResource.setEngagement((resource.get(IndexFields.ENGAGEMENT) != null) ? ((Number) resource.get(IndexFields.ENGAGEMENT)).doubleValue() : 0.5);
+				signatureResource.setRelevance((resource.get(IndexFields.RELEVANCE) != null) ? ((Number) resource.get(IndexFields.RELEVANCE)).doubleValue() : 0.5);
+				signatureResource.setCreator(setUser((Map<String, Object>) resource.get(IndexFields.CREATOR)));
+				signatureResources.add(signatureResource);
+			});
+		}
 		return signatureResources;
 	}
 
