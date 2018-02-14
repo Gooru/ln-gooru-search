@@ -48,26 +48,26 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 			response.setSearchResults(searchResult);			
 		   if(responseAsMap.get(SEARCH_HITS) !=null) {
 			   Map<String, Object> hit = (Map<String, Object>) responseAsMap.get(SEARCH_HITS);
-			   if(((List<Map<String, Object>>) (hit).get(SEARCH_HITS) )!= null) {
-					Map<String,Object> stats = new HashMap<String,Object>(3);
-					 stats.put("totalHitCount",((Integer) hit.get(SEARCH_TOTAL)).longValue());
-					 stats.put("pageSize",searchData.getSize());
-					 stats.put("pageNumber", searchData.getPageNum());
-					 
-					 Map<String,Object> query = new HashMap <String,Object>(4);
-					 query.put("userQueryString", searchData.getUserQueryString());
-					 query.put("rewrittenQueryString", searchData.getQueryString());
-					 if(searchData.getSpellCheckQueryString()!= null && !searchData.getSpellCheckQueryString().isEmpty()) {
-						  query.put("current",searchData.getSpellCheckQueryString());
-						  query.put("rewriteType",SPELLCHECKER);
-					 }	 
-					 response.setQuery(query);
-					 response.setStats(stats);
-		
+				if (((List<Map<String, Object>>) (hit).get(SEARCH_HITS)) != null) {
+					Map<String, Object> stats = new HashMap<String, Object>(3);
+					stats.put("totalHitCount", ((Integer) hit.get(SEARCH_TOTAL)).longValue());
+					stats.put("pageSize", searchData.getSize());
+					stats.put("pageNumber", searchData.getPageNum());
+
+					Map<String, Object> query = new HashMap<String, Object>(4);
+					query.put("userQueryString", searchData.getUserQueryString());
+					query.put("rewrittenQueryString", searchData.getQueryString());
+					if (searchData.getSpellCheckQueryString() != null && !searchData.getSpellCheckQueryString().isEmpty()) {
+						query.put("current", searchData.getSpellCheckQueryString());
+						query.put("rewriteType", SPELLCHECKER);
+					}
+					response.setQuery(query);
+					response.setStats(stats);
+
 					List<Map<String, Object>> hits = (List<Map<String, Object>>) (hit).get(SEARCH_HITS);
 					response.setTotalHitCount(((Integer) hit.get(SEARCH_TOTAL)).longValue());
 					response.setResultCount(hits.size());
-					//response.setSpellCheckQueryString(searchData.getSpellCheckQueryString()); 
+					// response.setSpellCheckQueryString(searchData.getSpellCheckQueryString());
 				}
 
 			}

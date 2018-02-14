@@ -99,7 +99,7 @@ public class LessonDeserializeProcessor extends DeserializeProcessor<List<Lesson
 		if (taxonomyMap != null) {
 			Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
 			if (input.isCrosswalk()) {
-				if (TAX_FILTERS.matcher(input.getTaxFilterType()).matches()) {
+				if (input.getTaxFilterType() != null && TAX_FILTERS.matcher(input.getTaxFilterType()).matches()) {
 					setCrosswalkData(input, lessonResult, taxonomyMap);
 				} else if (input.getUserTaxonomyPreference() != null) {
 					long start = System.currentTimeMillis();

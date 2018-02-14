@@ -170,8 +170,14 @@ public class PedagogyResourceDeserializeProcessor extends PedagogyDeserializePro
 				resource.setViewCount(viewsCount);
 			}
 
-			if (statisticsMap.containsKey(IndexFields.HAS_FRAMEBREAKER) && ((Boolean) statisticsMap.get(IndexFields.HAS_FRAMEBREAKER))) {
-				hasFrameBreaker = true;
+			try {
+				if (statisticsMap.containsKey(IndexFields.HAS_FRAMEBREAKER) && ((Boolean) statisticsMap.get(IndexFields.HAS_FRAMEBREAKER))) {
+					hasFrameBreaker = true;
+				}
+			} catch (Exception e) {
+				if (((Integer) statisticsMap.get(IndexFields.HAS_FRAMEBREAKER)) != null && ((Integer) statisticsMap.get(IndexFields.HAS_FRAMEBREAKER)) == 1) {
+					hasFrameBreaker = true;
+				}
 			}
 			resource.setHasFrameBreaker(hasFrameBreaker);
 			resource.setRemixedInCollectionCount((statisticsMap.get(IndexFields.COLLECTION_COUNT) != null) ? ((Number) statisticsMap.get(IndexFields.COLLECTION_COUNT)).longValue() : 0);

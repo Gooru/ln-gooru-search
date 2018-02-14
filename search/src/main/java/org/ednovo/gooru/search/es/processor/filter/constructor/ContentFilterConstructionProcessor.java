@@ -27,7 +27,7 @@ public class ContentFilterConstructionProcessor extends FilterConstructionProces
 			if (!searchData.getFilters().containsKey(FLT_PUBLISH_STATUS)) {
 				searchData.putFilter(FLT_PUBLISH_STATUS, PublishedStatus.PUBLISHED.getStatus());
 			}
-			if ((TAX_FILTERS.matcher(searchData.getTaxFilterType()).matches()) && searchData.isCrosswalk()) {
+			if ((searchData.getTaxFilterType() != null && TAX_FILTERS.matcher(searchData.getTaxFilterType()).matches()) && searchData.isCrosswalk()) {
 				if (searchData.getFilters().containsKey(AMPERSAND_STANDARD) && StringUtils.isNotBlank(searchData.getFilters().get(AMPERSAND_STANDARD).toString())) {
 					searchData.putFilter(AMPERSAND_EQ_INTERNAL_CODE, searchData.getFilters().get(AMPERSAND_STANDARD).toString().toLowerCase());
 					searchData.getFilters().remove(AMPERSAND_STANDARD);

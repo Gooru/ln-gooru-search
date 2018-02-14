@@ -283,28 +283,30 @@ public abstract class SearchProcessor<I extends SearchData, O extends Object> im
 		return libraryNameFound;
 	}
 
-	public boolean standardValidate(SearchData searchData){
+	public boolean standardValidate(SearchData searchData) {
 		long start = System.currentTimeMillis();
 		boolean standardFound = false;
 		String queryString = searchData.getQueryString().trim();
 		int dotsCount = StringUtils.countMatches(queryString, DOT);
 		int hyphenCount = StringUtils.countMatches(queryString, HYPHEN);
-		String subject = queryString.substring(0, queryString.indexOf(HYPHEN));
-		int dotsCountInSubject = StringUtils.countMatches(subject, DOT);
+		if (queryString.contains(HYPHEN)) {
+			String subject = queryString.substring(0, queryString.indexOf(HYPHEN));
+			int dotsCountInSubject = StringUtils.countMatches(subject, DOT);
 
-		if (dotsCountInSubject == 2 && ((dotsCount > 2 && !(dotsCount == queryString.length())) || (hyphenCount > 2 && !(hyphenCount == queryString.length())))
-				&& !searchData.getParameters().containsKey(SEARCH_FLT_STANDARD)) {
-			if (getSearchSetting(SEARCH_TAXONOMY_ROOT_CODE) != null) {
-				if ((Arrays.asList(getSearchSetting(SEARCH_TAXONOMY_ROOT_CODE).split(COMMA)).contains(queryString.substring(0, queryString.indexOf(DOT))))) {
-					standardFound = true;
-					searchData.setTaxFilterType(TYPE_STANDARD);
-					searchData.setQueryString("*");
-					searchData.getParameters().put("flt.standard", queryString.toLowerCase());
+			if (dotsCountInSubject == 2 && ((dotsCount > 2 && !(dotsCount == queryString.length())) || (hyphenCount > 2 && !(hyphenCount == queryString.length())))
+					&& !searchData.getParameters().containsKey(SEARCH_FLT_STANDARD)) {
+				if (getSearchSetting(SEARCH_TAXONOMY_ROOT_CODE) != null) {
+					if ((Arrays.asList(getSearchSetting(SEARCH_TAXONOMY_ROOT_CODE).split(COMMA)).contains(queryString.substring(0, queryString.indexOf(DOT))))) {
+						standardFound = true;
+						searchData.setTaxFilterType(TYPE_STANDARD);
+						searchData.setQueryString("*");
+						searchData.getParameters().put("flt.standard", queryString.toLowerCase());
+					}
 				}
 			}
-		}
-		if(logger.isDebugEnabled()){
-			logger.debug("Time taken to detect standards : " + (System.currentTimeMillis() - start) + "ms");
+			if (logger.isDebugEnabled()) {
+				logger.debug("Time taken to detect standards : " + (System.currentTimeMillis() - start) + "ms");
+			}
 		}
 		return standardFound;
 	}
@@ -324,14 +326,16 @@ public abstract class SearchProcessor<I extends SearchData, O extends Object> im
 		boolean possibleStandardFound = false;
 		int dotsCount = StringUtils.countMatches(queryString, DOT);
 		int hyphenCount = StringUtils.countMatches(queryString, HYPHEN);
-		String subject = queryString.substring(0, queryString.indexOf(HYPHEN));
-		int dotsCountInSubject = StringUtils.countMatches(subject, DOT);
+		if (queryString.contains(HYPHEN)) {
+			String subject = queryString.substring(0, queryString.indexOf(HYPHEN));
+			int dotsCountInSubject = StringUtils.countMatches(subject, DOT);
 
-		if (dotsCountInSubject == 2 && (dotsCount > 2 || hyphenCount > 2)) {
-			possibleStandardFound = true;
-		}
-		if (logger.isDebugEnabled()) {
-			logger.debug("Time taken to detect standards loosely: " + (System.currentTimeMillis() - start) + "ms");
+			if (dotsCountInSubject == 2 && (dotsCount > 2 || hyphenCount > 2)) {
+				possibleStandardFound = true;
+			}
+			if (logger.isDebugEnabled()) {
+				logger.debug("Time taken to detect standards loosely: " + (System.currentTimeMillis() - start) + "ms");
+			}
 		}
 		return possibleStandardFound;
 	}

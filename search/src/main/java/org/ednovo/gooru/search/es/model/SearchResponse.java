@@ -21,8 +21,6 @@ public class SearchResponse<R> implements Serializable {
 
   private long totalHitCount;
 
-  private long searchCount;
-
   private int resultCount;
 
   private long executionTime;
@@ -46,15 +44,7 @@ public class SearchResponse<R> implements Serializable {
   public void setTotalHitCount(long totalHitCount) {
     this.totalHitCount = totalHitCount;
   }
-
-  public long getSearchCount() {
-    return searchCount;
-  }
-
-  public void setSearchCount(long searchCount) {
-    this.searchCount = searchCount;
-  }
-
+  
   public int getResultCount() {
     return resultCount;
   }

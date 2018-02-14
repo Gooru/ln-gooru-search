@@ -261,8 +261,14 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 				resource.setViews(viewsCount);
 			}
 
-			if (statisticsMap.containsKey(IndexFields.HAS_FRAMEBREAKER) && ((Boolean) statisticsMap.get(IndexFields.HAS_FRAMEBREAKER))) {
-				hasFrameBreaker = true;
+			try {
+				if (statisticsMap.containsKey(IndexFields.HAS_FRAMEBREAKER) && ((Boolean) statisticsMap.get(IndexFields.HAS_FRAMEBREAKER))) {
+					hasFrameBreaker = true;
+				}
+			} catch (Exception e) {
+				if (((Integer) statisticsMap.get(IndexFields.HAS_FRAMEBREAKER)) != null && ((Integer) statisticsMap.get(IndexFields.HAS_FRAMEBREAKER)) == 1) {
+					hasFrameBreaker = true;
+				}
 			}
 			resource.setBrokenStatus((statisticsMap.get(IndexFields.STATUS_IS_BROKEN) != null) ? (Integer) statisticsMap.get(IndexFields.STATUS_IS_BROKEN) : 0);
 			resource.setHasFrameBreaker(hasFrameBreaker);
@@ -287,7 +293,7 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 		if (taxonomyMap != null) {
 			Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
 			if (input.isCrosswalk()) {
-				if (TAX_FILTERS.matcher(input.getTaxFilterType()).matches()) {
+				if (input.getTaxFilterType() != null && TAX_FILTERS.matcher(input.getTaxFilterType()).matches()) {
 					setCrosswalkData(input, resource, taxonomyMap);
 				} else if (input.getUserTaxonomyPreference() != null) {
 					long start = System.currentTimeMillis();

@@ -259,7 +259,7 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 		if (taxonomyMap != null) {
 			Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
 			if (searchData.isCrosswalk()) {
-				if (TAX_FILTERS.matcher(searchData.getTaxFilterType()).matches()) {
+				if (searchData.getTaxFilterType() != null && TAX_FILTERS.matcher(searchData.getTaxFilterType()).matches()) {
 					setCrosswalkData(searchData, output, taxonomyMap);
 				} else if (searchData.getUserTaxonomyPreference() != null) {
 					long start = System.currentTimeMillis();
