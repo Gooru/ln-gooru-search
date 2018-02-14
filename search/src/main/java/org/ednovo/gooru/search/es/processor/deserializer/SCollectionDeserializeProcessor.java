@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.ednovo.gooru.search.domain.service.CollectionSearchResult;
 import org.ednovo.gooru.search.es.constant.IndexFields;
-import org.ednovo.gooru.search.es.model.Code;
 import org.ednovo.gooru.search.es.model.License;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
@@ -143,7 +142,7 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 		}
 		output.setRatings(ratings);
 
-		Map<String, Object> licenseMap = (Map<String, Object>) model.get(SEARCH_LICENSE);
+		Map<String, Object> licenseMap = (Map<String, Object>) model.get(IndexFields.LICENSE);
 		if (licenseMap != null) {
 			License license = new License();
 			license.setName((String) licenseMap.get(SEARCH_NAME));
@@ -256,63 +255,24 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 			output.setCourse(courseMap);
 		}
 		
-		Map<String, Object> taxonomyMap = new HashMap<String, Object>();
-		if (model.containsKey(IndexFields.TAXONOMY)) {
-			taxonomyMap = (Map<String, Object>) model.get(IndexFields.TAXONOMY);
-		}
+		Map<String, Object> taxonomyMap = (Map<String, Object>) model.get(IndexFields.TAXONOMY);
 		if (taxonomyMap != null) {
 			Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
-			if (searchData.isStandardsSearch() && searchData.isCrosswalk()) {
-				setCrosswalkData(searchData, output, taxonomyMap);
-			} else if (searchData.getUserTaxonomyPreference() != null) {
-				long start = System.currentTimeMillis();
-				taxonomySetAsMap = transformTaxonomy(taxonomyMap, searchData);
-				logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
+			if (searchData.isCrosswalk()) {
+				if (TAX_FILTERS.matcher(searchData.getTaxFilterType()).matches()) {
+					setCrosswalkData(searchData, output, taxonomyMap);
+				} else if (searchData.getUserTaxonomyPreference() != null) {
+					long start = System.currentTimeMillis();
+					taxonomySetAsMap = transformTaxonomy(taxonomyMap, searchData);
+					logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
+				}
 			}
-			output.setTaxonomySet(taxonomySetAsMap);		
-			output.setTaxonomyDataSet((String) taxonomyMap.get(IndexFields.TAXONOMY_DATA_SET));
-		
-			List<Code> taxonomySubject = (List<Code>) taxonomyMap.get(IndexFields.SUBJECT);
-			output.setSubject(getTaxonomyMetadataLabel(taxonomySubject));
+			output.setTaxonomySet(taxonomySetAsMap);			
 		}
 
 		return output;
 	}
 
-	@SuppressWarnings("unchecked")
-	private void setCrosswalkData(SearchData input, CollectionSearchResult collection, Map<String, Object> taxonomyMap) {
-		String fltStandard = null;
-		String fltStandardDisplay = null;
-		if(input.getFilters().containsKey(AMPERSAND_EQ_INTERNAL_CODE)) fltStandard = input.getFilters().get(AMPERSAND_EQ_INTERNAL_CODE).toString();
-		if(input.getFilters().containsKey(AMPERSAND_EQ_DISPLAY_CODE)) fltStandardDisplay = input.getFilters().get(AMPERSAND_EQ_DISPLAY_CODE).toString();
-		Boolean isCrosswalked = false;
-		List<String> leafInternalCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_INTERNAL_CODES);
-		List<String> leafDisplayCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_DISPLAY_CODES);
-		List<Map<String, Object>> equivalentCompetencies = new ArrayList<>();
-		fetchCrosswalks(input, leafInternalCodes, equivalentCompetencies);
-
-		if (!(leafInternalCodes != null && leafInternalCodes.size() > 0 && fltStandard != null && leafInternalCodes.contains(fltStandard.toUpperCase()))
-				&& !(leafDisplayCodes != null && leafDisplayCodes.size() > 0 && fltStandardDisplay != null && leafDisplayCodes.contains(fltStandardDisplay.toUpperCase()))) {
-			isCrosswalked = true;
-		}
-		collection.setIsCrosswalked(isCrosswalked);
-		if (equivalentCompetencies.size() > 0) collection.setTaxonomyEquivalentCompetencies(equivalentCompetencies);
-	}
-	
-	private void fetchCrosswalks(SearchData input, List<String> leafInternalCodes, List<Map<String, Object>> equivalentCompetencies) {
-		List<Map<String, Object>> crosswalkResponses = searchCrosswalk(input, leafInternalCodes);
-		if (crosswalkResponses != null && !crosswalkResponses.isEmpty()) {
-			leafInternalCodes.forEach(leafInternalCode -> {
-				Map<String, Object> crosswalksAsMap = new HashMap<>();
-				crosswalksAsMap.put(IndexFields.ID, leafInternalCode);
-				List<Map<String, String>> crosswalkCodes = null;
-				crosswalkCodes = deserializeCrosswalkResponse(crosswalkResponses, leafInternalCode, crosswalkCodes);
-				crosswalksAsMap.put(IndexFields.CROSSWALK_CODES, crosswalkCodes);
-				if (crosswalkCodes != null && crosswalkCodes.size() > 0) equivalentCompetencies.add(crosswalksAsMap);
-			});
-		}
-	}
-	
 	@Override
 	protected SearchProcessorType getType() {
 		return SearchProcessorType.SCollectionDeserializer;

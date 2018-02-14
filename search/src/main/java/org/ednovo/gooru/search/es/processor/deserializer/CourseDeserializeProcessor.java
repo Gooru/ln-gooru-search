@@ -129,9 +129,19 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
 		}
 
 		// set taxonomy
-		if (model.get(IndexFields.TAXONOMY) != null) {
-			Map<String, Object> tax = (Map<String, Object>) model.get(IndexFields.TAXONOMY);
-			courseResult.setTaxonomy((Map<String, Object>) tax.get(IndexFields.TAXONOMY_SET));
+		Map<String, Object> taxonomyMap = (Map<String, Object>) model.get(IndexFields.TAXONOMY);
+		if (taxonomyMap != null) {
+			Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
+			if (input.isCrosswalk()) {
+				if (TAX_FILTERS.matcher(input.getTaxFilterType()).matches()) {
+					setCrosswalkData(input, courseResult, taxonomyMap);
+				} else if (input.getUserTaxonomyPreference() != null) {
+					long start = System.currentTimeMillis();
+					taxonomySetAsMap = transformTaxonomy(taxonomyMap, input);
+					logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
+				}
+			}
+			courseResult.setTaxonomy(taxonomySetAsMap);
 		}
 
 		return courseResult;
@@ -284,4 +294,5 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
 		}
 		return featuredSubjectBucketSortedList;
 	}
+
 }

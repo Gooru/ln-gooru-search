@@ -3,6 +3,7 @@
  */
 package org.ednovo.gooru.search.es.processor;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -285,24 +286,20 @@ public abstract class SearchProcessor<I extends SearchData, O extends Object> im
 	public boolean standardValidate(SearchData searchData){
 		long start = System.currentTimeMillis();
 		boolean standardFound = false;
-		String queryString = searchData.getQueryString();
-		int dotsCount = StringUtils.countMatches(queryString, SEARCH_DOT_SEPERTOR);
-		int hyphenCount = StringUtils.countMatches(queryString, SEARCH_HYPHEN_SEPERTOR);
-		
-		if(((dotsCount > 2 && !(dotsCount == queryString.length())) || (hyphenCount > 2 && !(hyphenCount == queryString.length()))) && !searchData.getParameters().containsKey(SEARCH_FLT_STANDARD)){
+		String queryString = searchData.getQueryString().trim();
+		int dotsCount = StringUtils.countMatches(queryString, DOT);
+		int hyphenCount = StringUtils.countMatches(queryString, HYPHEN);
+		String subject = queryString.substring(0, queryString.indexOf(HYPHEN));
+		int dotsCountInSubject = StringUtils.countMatches(subject, DOT);
+
+		if (dotsCountInSubject == 2 && ((dotsCount > 2 && !(dotsCount == queryString.length())) || (hyphenCount > 2 && !(hyphenCount == queryString.length())))
+				&& !searchData.getParameters().containsKey(SEARCH_FLT_STANDARD)) {
 			if (getSearchSetting(SEARCH_TAXONOMY_ROOT_CODE) != null) {
-				String[] rootCodes = getSearchSetting(SEARCH_TAXONOMY_ROOT_CODE).split(SEARCH_COMMA_SEPARATOR);
-				if (rootCodes != null && rootCodes.length > 0) {
-					for (String rootCode : rootCodes) {
-						if (queryString.startsWith(rootCode)) {
-							standardFound = true;
-							searchData.setStandardsSearch(true);
-							/*
-							 * searchData.setQueryString("*"); 
-							 * searchData.getParameters().put("flt.standard", queryString.toLowerCase());
-							 */ break;
-						}
-					}
+				if ((Arrays.asList(getSearchSetting(SEARCH_TAXONOMY_ROOT_CODE).split(COMMA)).contains(queryString.substring(0, queryString.indexOf(DOT))))) {
+					standardFound = true;
+					searchData.setTaxFilterType(TYPE_STANDARD);
+					searchData.setQueryString("*");
+					searchData.getParameters().put("flt.standard", queryString.toLowerCase());
 				}
 			}
 		}
@@ -314,7 +311,7 @@ public abstract class SearchProcessor<I extends SearchData, O extends Object> im
 
     //Loose detection of standards by checking if there are dots or hyphens in the query string
     //Needed because the standard could itself be mis spelt and may not be represented as part of the root code.
-    public boolean standardValidateLite(SearchData searchData) {
+	public boolean standardValidateLite(SearchData searchData) {
       long start = System.currentTimeMillis();
       String queryString = searchData.getQueryString();
       boolean possibleStandardFound = matchesStandardsPattern(queryString) && !searchData.getParameters().containsKey(SEARCH_FLT_STANDARD) ;
@@ -322,20 +319,23 @@ public abstract class SearchProcessor<I extends SearchData, O extends Object> im
       return possibleStandardFound;
     }
 
-    public boolean matchesStandardsPattern(String queryString) {
-      long start = System.currentTimeMillis();
-      boolean possibleStandardFound = false;
-      int dotsCount = StringUtils.countMatches(queryString, SEARCH_DOT_SEPERTOR);
-      int hyphenCount = StringUtils.countMatches(queryString, SEARCH_HYPHEN_SEPERTOR);
+	public boolean matchesStandardsPattern(String queryString) {
+		long start = System.currentTimeMillis();
+		boolean possibleStandardFound = false;
+		int dotsCount = StringUtils.countMatches(queryString, DOT);
+		int hyphenCount = StringUtils.countMatches(queryString, HYPHEN);
+		String subject = queryString.substring(0, queryString.indexOf(HYPHEN));
+		int dotsCountInSubject = StringUtils.countMatches(subject, DOT);
 
-      if ((dotsCount > 2 || hyphenCount > 2)) {
-        possibleStandardFound = true;
-      }
-      if(logger.isDebugEnabled()){
-    	  logger.debug("Time taken to detect standards loosely: " + (System.currentTimeMillis() - start) + "ms");
-      }
-      return possibleStandardFound;
-    }
+		if (dotsCountInSubject == 2 && (dotsCount > 2 || hyphenCount > 2)) {
+			possibleStandardFound = true;
+		}
+		if (logger.isDebugEnabled()) {
+			logger.debug("Time taken to detect standards loosely: " + (System.currentTimeMillis() - start) + "ms");
+		}
+		return possibleStandardFound;
+	}
+	
     public boolean chemicalFormulaValidate(SearchData searchData) {
         long start = System.currentTimeMillis();
         boolean chemFormulaFound = false;
@@ -362,48 +362,5 @@ public abstract class SearchProcessor<I extends SearchData, O extends Object> im
         }
         return chemFormulaFound;
       }
-	
-	/*public void updateNewFormatAndInstructional(){
-		String value = configSettingRepository.getSetting(RESOURCE_FORMAT_INSTRUCTIONAL_DATA);
-		if(value != null && value.trim().length() > 0){
-			try {
-				JSONObject jsonObject = new JSONObject(value);
-				JSONArray jsonArray = jsonObject.getJSONArray(DATA);
-				for(int i=0 ; i < jsonArray.length(); i++){
-					JSONObject category = jsonArray.getJSONObject(i);
-					JSONArray categoryName = category.names();
-					for(int j=0; j < categoryName.length(); j++){
-						String type = categoryName.getString(j);
-						if(type.equalsIgnoreCase(EXAM) || type.equalsIgnoreCase(SEARCH_ASSESSMENT) || type.equalsIgnoreCase(ACTIVITY) || type.equalsIgnoreCase(SEARCH_QUIZ)){
-							
-							JSONArray typeArray = category.getJSONArray(type);
-							for(int k=0 ; k < typeArray.length() ; k++){
-								JSONObject multiCategoryType = typeArray.getJSONObject(k);
-								if(multiCategoryType.has(VALIDATE) && multiCategoryType.getString(VALIDATE).equalsIgnoreCase(HTTP)){
-									RESOURCE_FORMAT_KEY_VALUE.put(type+"-http",multiCategoryType.getString(RESOURCEFORMAT));
-								} else {
-									RESOURCE_FORMAT_KEY_VALUE.put(type,multiCategoryType.getString(RESOURCEFORMAT));
-								}
-								if(multiCategoryType.has(INSTRUCTIONALUSE) && multiCategoryType.getString(INSTRUCTIONALUSE).trim().length() > 0){
-									INSTRUCTIONAL_USE_KEY_VALUE.put(type, multiCategoryType.getString(INSTRUCTIONALUSE));
-								}
-							}
-							
-						} else {
-							JSONObject typeObj = category.getJSONObject(type);
-							RESOURCE_FORMAT_KEY_VALUE.put(type,typeObj.getString(RESOURCEFORMAT));
-							if(typeObj.has(INSTRUCTIONALUSE) && typeObj.getString(INSTRUCTIONALUSE).trim().length() > 0){
-								INSTRUCTIONAL_USE_KEY_VALUE.put(type, typeObj.getString(INSTRUCTIONALUSE));
-							}
-						}
-					}
-				}
-				
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		}
-	}*/
-	
-	
+
 }

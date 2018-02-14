@@ -12,9 +12,7 @@ public class ContentSearchResult extends ContentUnusedFields implements Serializ
 	private static final String INDEX_TYPE = "resource";
 
 	private String url;
-
-	private String title;
-
+	
 	private Map<String, String> resourceFormat;
 
 	private Map<String, String> resourceType;
@@ -85,10 +83,6 @@ public class ContentSearchResult extends ContentUnusedFields implements Serializ
 	private String mediaType;
 	
 	private String category;
-
-	private Boolean isCrosswalked = false;
-	
-	private List<Map<String, Object>> taxonomyEquivalentCompetencies;
 	
 	private Map<String, Object> license;
 
@@ -102,8 +96,6 @@ public class ContentSearchResult extends ContentUnusedFields implements Serializ
 	
 	private Long remixedInExternalAssessmentCount;
 	
-	private Map<String, Object> taxonomy;
-
 	private Double efficacy;
 	
 	private Double engagement;
@@ -116,14 +108,6 @@ public class ContentSearchResult extends ContentUnusedFields implements Serializ
 
 	public void setUrl(String url) {
 		this.url = url;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
 	}
 
 	public Map<String, String> getResourceFormat() {
@@ -435,22 +419,6 @@ public class ContentSearchResult extends ContentUnusedFields implements Serializ
 	public void setCategory(String category) {
 		this.category = category;
 	}
-
-	public Boolean getIsCrosswalked() {
-		return isCrosswalked;
-	}
-
-	public void setIsCrosswalked(Boolean isCrosswalked) {
-		this.isCrosswalked = isCrosswalked;
-	}
-	
-	public List<Map<String, Object>> getTaxonomyEquivalentCompetencies() {
-		return taxonomyEquivalentCompetencies;
-	}
-
-	public void setTaxonomyEquivalentCompetencies(List<Map<String, Object>> taxonomyEquivalentCompetencies) {
-		this.taxonomyEquivalentCompetencies = taxonomyEquivalentCompetencies;
-	}
 	
 	public String getMediaType() {
 		return mediaType;
@@ -482,12 +450,6 @@ public class ContentSearchResult extends ContentUnusedFields implements Serializ
 
 	public void setRemixedInExternalAssessmentCount(Long remixedInExternalAssessmentCount) {
 		this.remixedInExternalAssessmentCount = remixedInExternalAssessmentCount;
-	}
-	public Map<String, Object> getTaxonomy() {
-		return taxonomy;
-	}
-	public void setTaxonomy(Map<String, Object> taxonomy) {
-		this.taxonomy = taxonomy;
 	}
 
 	public Double getEfficacy() {

@@ -27,31 +27,31 @@ public class ContentFilterConstructionProcessor extends FilterConstructionProces
 			if (!searchData.getFilters().containsKey(FLT_PUBLISH_STATUS)) {
 				searchData.putFilter(FLT_PUBLISH_STATUS, PublishedStatus.PUBLISHED.getStatus());
 			}
-			if (searchData.isStandardsSearch() && searchData.isCrosswalk()) {
+			if ((TAX_FILTERS.matcher(searchData.getTaxFilterType()).matches()) && searchData.isCrosswalk()) {
 				if (searchData.getFilters().containsKey(AMPERSAND_STANDARD) && StringUtils.isNotBlank(searchData.getFilters().get(AMPERSAND_STANDARD).toString())) {
 					searchData.putFilter(AMPERSAND_EQ_INTERNAL_CODE, searchData.getFilters().get(AMPERSAND_STANDARD).toString().toLowerCase());
 					searchData.getFilters().remove(AMPERSAND_STANDARD);
 				}
+				
 				if (searchData.getFilters().containsKey(AMPERSAND_STANDARD_DISPLAY) && StringUtils.isNotBlank(searchData.getFilters().get(AMPERSAND_STANDARD_DISPLAY).toString())) {
 					searchData.putFilter(AMPERSAND_EQ_DISPLAY_CODE, searchData.getFilters().get(AMPERSAND_STANDARD_DISPLAY).toString().toLowerCase());
 					searchData.getFilters().remove(AMPERSAND_STANDARD_DISPLAY);
 				}
+				
+/*				if (searchData.getFilters().containsKey(AMPERSAND_COURSE) && StringUtils.isNotBlank(searchData.getFilters().get(AMPERSAND_COURSE).toString())) {
+					searchData.putFilter(AMPERSAND_EQ_COURSE_INTERNAL_CODE, searchData.getFilters().get(AMPERSAND_COURSE).toString().toLowerCase());
+					searchData.getFilters().remove(AMPERSAND_COURSE);
+				}
+				
+				if (searchData.getFilters().containsKey(AMPERSAND_DOMAIN) && StringUtils.isNotBlank(searchData.getFilters().get(AMPERSAND_DOMAIN).toString())) {
+					searchData.putFilter(AMPERSAND_EQ_DOMAIN_INTERNAL_CODE, searchData.getFilters().get(AMPERSAND_DOMAIN).toString().toLowerCase());
+					searchData.getFilters().remove(AMPERSAND_DOMAIN);
+				}*/
 			}
 		} else {
 			searchData.putFilter(FLT_PUBLISH_STATUS, PublishedStatus.PUBLISHED.getStatus());
 		}
-        		
-		/*		//User user = searchData.getUser();
-	//	if(!(searchData.getUser().getUserRoleSetString().contains(SEARCH_SUPER_ADMIN) || searchData.getUser().getUserRoleSetString().contains(SEARCH_CONTENT_ADMIN))) {
-		  if (!searchData.isRestricted() && !searchData.getType().equalsIgnoreCase(LIBRARY)) {
-			if (searchData.getType().equalsIgnoreCase(RESOURCE)) {
-				//searchData.putFilter("&^restricted", "sharing:public|creator.gooruUId:" + user.getGooruUId() + "|owner.gooruUId:" + user.getGooruUId());
-			} else {
-				//searchData.putFilter("&^restricted", "sharing:public|creator.gooruUId:" + user.getGooruUId() + "|owner.gooruUId:" + user.getGooruUId() + "|partyPermissions@uId:" + StringUtils.join(UserGroupSupport.getPartyPermits(), ","));
-			}
-		  }
-	   // }
-     	searchData.putFilter("&^isCanonical", searchData.isShowCanonicalOnly() ? STR_ONE : STR_ZERO_COMMA_ONE);*/
+
 	}   
 
 	@Override

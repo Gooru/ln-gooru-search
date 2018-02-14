@@ -6,14 +6,12 @@ import java.util.Map;
 
 import org.ednovo.gooru.search.es.model.UserV2;
 
-public class UnitSearchResult implements Serializable {
+public class UnitSearchResult extends SearchResult implements Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 6280104303486215679L;
-
-	private String id;
 
 	private String lastModified;
 
@@ -26,12 +24,6 @@ public class UnitSearchResult implements Serializable {
 	private UserV2 owner;
 
 	private UserV2 orginalCreator;
-
-	private String publishStatus;
-
-	private Map<String, Object> taxonomy;
-
-	private String title;
 	
 	private String format;
 
@@ -60,14 +52,6 @@ public class UnitSearchResult implements Serializable {
 	private Double engagement;
 	
 	private Double relevance;
-	
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
 
 	public String getLastModified() {
 		return lastModified;
@@ -115,30 +99,6 @@ public class UnitSearchResult implements Serializable {
 
 	public void setOrginalCreator(UserV2 orginalCreator) {
 		this.orginalCreator = orginalCreator;
-	}
-
-	public String getPublishStatus() {
-		return publishStatus;
-	}
-
-	public void setPublishStatus(String publishStatus) {
-		this.publishStatus = publishStatus;
-	}
-
-	public Map<String, Object> getTaxonomy() {
-		return taxonomy;
-	}
-
-	public void setTaxonomy(Map<String, Object> taxonomy) {
-		this.taxonomy = taxonomy;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
 	}
 
 	public Map<String, Object> getCourse() {
@@ -252,4 +212,5 @@ public class UnitSearchResult implements Serializable {
 	public void setRelevance(Double relevance) {
 		this.relevance = relevance;
 	}
+
 }

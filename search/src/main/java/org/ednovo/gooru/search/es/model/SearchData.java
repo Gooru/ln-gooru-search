@@ -98,9 +98,9 @@ public class SearchData implements Serializable {
 	private boolean showCanonicalOnly;
 	
 	private boolean  isActiveEnable;
-	
-	private boolean isStandardsSearch = false;
-	
+
+	private String taxFilterType;
+
 	private Integer pageNum;
 	
 	private String contributorType;
@@ -432,12 +432,12 @@ public class SearchData implements Serializable {
 		return showSingleSubjectResults;
 	}
 
-	public void setStandardsSearch(boolean isStandardsSearch) {
-		this.isStandardsSearch = isStandardsSearch;
+	public String getTaxFilterType() {
+		return taxFilterType;
 	}
 
-	public boolean isStandardsSearch() {
-		return isStandardsSearch;
+	public void setTaxFilterType(String taxFilterType) {
+		this.taxFilterType = taxFilterType;
 	}
 
 	public List<String> getResourceGooruOIds() {

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ednovo.gooru.search.domain.service.SearchResult;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.EsIndex;
 import org.ednovo.gooru.search.es.constant.IndexFields;
@@ -130,24 +131,23 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 		String internalCode = codeAsMap.get(IndexFields.ID);
 		final String subject = getSubjectFromCodeId(internalCode);
 		String framework = null;
-		Boolean isTransformed = false;
 		try {
 			if (standardPrefs != null && standardPrefs.has(subject)) {
 				framework = standardPrefs.getString(subject);
-				if (framework != null && !internalCode.startsWith(framework + DOT) && crosswalkCodes != null) {
-					for (Map<String, String> crosswalk : crosswalkCodes) {
-						if (!crosswalk.get(FRAMEWORK_CODE).equalsIgnoreCase(framework)) {
-							continue;
+				if (framework != null) {
+					if (!internalCode.startsWith(framework + DOT) && crosswalkCodes != null) {
+						for (Map<String, String> crosswalk : crosswalkCodes) {
+							if (!crosswalk.get(IndexFields.FRAMEWORK_CODE).equalsIgnoreCase(framework)) {
+								continue;
+							}
+							crosswalk.put(LEAF_INTERNAL_CODE, internalCode);
+							crosswalk.put(IndexFields.PARENT_TITLE, codeAsMap.get(IndexFields.PARENT_TITLE));
+							txCurriculumInfoAsList.add(crosswalk);
 						}
-						crosswalk.put(LEAF_INTERNAL_CODE, internalCode);
-						crosswalk.put(PARENT_TITLE, codeAsMap.get(PARENT_TITLE));
-						txCurriculumInfoAsList.add(crosswalk);
-						isTransformed = true;
+					} else if (internalCode.startsWith(framework + DOT)) {
+						txCurriculumInfoAsList.add(codeAsMap);
 					}
 				}
-			}
-			if(!isTransformed) {
-				txCurriculumInfoAsList.add(codeAsMap);
 			}
 		} catch (JSONException e) {
 			logger.error("JsonException during taxonomy tranformation!", e.getMessage());
@@ -174,20 +174,38 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 		return codeId.substring((codeId.indexOf(DOT) + 1), codeId.indexOf(HYPHEN));
 	}
 
-	protected Long getAvgTimeSpent(Object avgTimeSpentObj) {
-		Long avgTimeSpent = 0L;
-		try {
-			Integer avgTSInt = (Integer) avgTimeSpentObj;
-			avgTimeSpent = avgTSInt.longValue();
-		} catch (Exception e) {
-			if (e instanceof ClassCastException) {
-				avgTimeSpent = (Long) avgTimeSpentObj;
-			} else {
-				logger.error("Error in setting avg timespnet " + e);
-			}
+	@SuppressWarnings("unchecked")
+	protected void setCrosswalkData(SearchData input, SearchResult resource, Map<String, Object> taxonomyMap) {
+		String fltStandard = null;
+		String fltStandardDisplay = null;
+		if(input.getFilters().containsKey(AMPERSAND_EQ_INTERNAL_CODE)) fltStandard = input.getFilters().get(AMPERSAND_EQ_INTERNAL_CODE).toString();
+		if(input.getFilters().containsKey(AMPERSAND_EQ_DISPLAY_CODE)) fltStandardDisplay = input.getFilters().get(AMPERSAND_EQ_DISPLAY_CODE).toString();
+		Boolean isCrosswalked = false;
+		List<String> leafInternalCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_INTERNAL_CODES);
+		List<String> leafDisplayCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_DISPLAY_CODES);
+		List<Map<String, Object>> equivalentCompetencies = new ArrayList<>();
+		fetchCrosswalks(input, leafInternalCodes, equivalentCompetencies);
+	
+		if (!(leafInternalCodes != null && leafInternalCodes.size() > 0 && fltStandard != null && leafInternalCodes.contains(fltStandard.toUpperCase()))
+				&& !(leafDisplayCodes != null && leafDisplayCodes.size() > 0 && fltStandardDisplay != null && leafDisplayCodes.contains(fltStandardDisplay.toUpperCase()))) {
+			isCrosswalked = true;
 		}
+		resource.setIsCrosswalked(isCrosswalked);
+		if (equivalentCompetencies.size() > 0) resource.setTaxonomyEquivalentCompetencies(equivalentCompetencies);
+	}
 
-		return avgTimeSpent;
+	protected void fetchCrosswalks(SearchData input, List<String> leafInternalCodes, List<Map<String, Object>> equivalentCompetencies) {
+		List<Map<String, Object>> crosswalkResponses = searchCrosswalk(input, leafInternalCodes);
+		if (crosswalkResponses != null && !crosswalkResponses.isEmpty()) {
+			leafInternalCodes.forEach(leafInternalCode -> {
+				Map<String, Object> crosswalksAsMap = new HashMap<>();
+				crosswalksAsMap.put(IndexFields.ID, leafInternalCode);
+				List<Map<String, String>> crosswalkCodes = null;
+				crosswalkCodes = deserializeCrosswalkResponse(crosswalkResponses, leafInternalCode, crosswalkCodes);
+				crosswalksAsMap.put(IndexFields.CROSSWALK_CODES, crosswalkCodes);
+				if (crosswalkCodes != null && crosswalkCodes.size() > 0) equivalentCompetencies.add(crosswalksAsMap);
+			});
+		}
 	}
 	
 	@SuppressWarnings("unchecked")

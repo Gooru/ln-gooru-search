@@ -6,7 +6,7 @@ import org.ednovo.gooru.search.es.processor.SearchProcessorType;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LessonFilterConstructionProcessor extends FilterConstructionProcessor {
+public class LessonFilterConstructionProcessor extends ContentFilterConstructionProcessor {
 
 
 	@Override

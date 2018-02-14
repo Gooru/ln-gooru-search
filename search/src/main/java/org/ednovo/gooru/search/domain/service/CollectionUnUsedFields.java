@@ -3,7 +3,7 @@ package org.ednovo.gooru.search.domain.service;
 import java.util.List;
 import java.util.Map;
 
-public class CollectionUnUsedFields {
+public class CollectionUnUsedFields extends SearchResult {
 	
 	private String assetURI;
 	private long contentId;

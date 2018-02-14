@@ -121,7 +121,7 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 		return deserializeToResource(model, input);
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "unused" })
 	private ContentSearchResult deserializeToResource(Map<String, Object> dataMap, SearchData input) {
 		String contentFormat = (String) dataMap.get(IndexFields.CONTENT_FORMAT);
 		String contentSubFormat = (String) dataMap.get(IndexFields.CONTENT_SUB_FORMAT);
@@ -162,7 +162,7 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 			resource.setFolder("");
 			
 			Map<String,Object> thumbnails = new HashMap<>();
-			thumbnails.put(THUMBNAIL_URL, resource.getAssetURI() + resource.getThumbnail());
+			thumbnails.put(IndexFields.URL, resource.getAssetURI() + resource.getThumbnail());
 			resource.setThumbnails(thumbnails);
 		}
 
@@ -198,7 +198,7 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 
 				List<String> grade = metadata.get(IndexFields.GRADE);
 				if(grade != null && grade.size() > 0){
-					resource.setGrade(String.join(SEARCH_COMMA_SEPARATOR, grade));
+					resource.setGrade(String.join(COMMA, grade));
 				}
 			}
 		}
@@ -261,10 +261,10 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 				resource.setViews(viewsCount);
 			}
 
-			if (((Integer) statisticsMap.get(SEARCH_HAS_FRAMEBREAKER)) != null && ((Integer) statisticsMap.get(SEARCH_HAS_FRAMEBREAKER)) == 1) {
+			if (statisticsMap.containsKey(IndexFields.HAS_FRAMEBREAKER) && ((Boolean) statisticsMap.get(IndexFields.HAS_FRAMEBREAKER))) {
 				hasFrameBreaker = true;
 			}
-			resource.setBrokenStatus((statisticsMap.get(SEARCH_STATUS_BROKEN) != null) ? (Integer) statisticsMap.get(SEARCH_STATUS_BROKEN) : 0);
+			resource.setBrokenStatus((statisticsMap.get(IndexFields.STATUS_IS_BROKEN) != null) ? (Integer) statisticsMap.get(IndexFields.STATUS_IS_BROKEN) : 0);
 			resource.setHasFrameBreaker(hasFrameBreaker);
 			Integer collectionCount = 0;
 			if (statisticsMap.get(IndexFields.USED_IN_COLLECTION_COUNT) != null) {
@@ -287,7 +287,7 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 		if (taxonomyMap != null) {
 			Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
 			if (input.isCrosswalk()) {
-				if (input.isStandardsSearch()) {
+				if (TAX_FILTERS.matcher(input.getTaxFilterType()).matches()) {
 					setCrosswalkData(input, resource, taxonomyMap);
 				} else if (input.getUserTaxonomyPreference() != null) {
 					long start = System.currentTimeMillis();
@@ -296,7 +296,6 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 				}
 			}
 			resource.setTaxonomySet(taxonomySetAsMap);		
-			resource.setTaxonomyDataSet((String) taxonomyMap.get(IndexFields.TAXONOMY_DATA_SET));
 		}
 
 		if (dataMap.get(IndexFields.COLLECTION_TITLES) != null) {
@@ -375,40 +374,6 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 		return resource;
 	}
 	
-	@SuppressWarnings("unchecked")
-	private void setCrosswalkData(SearchData input, ContentSearchResult resource, Map<String, Object> taxonomyMap) {
-		String fltStandard = null;
-		String fltStandardDisplay = null;
-		if(input.getFilters().containsKey(AMPERSAND_EQ_INTERNAL_CODE)) fltStandard = input.getFilters().get(AMPERSAND_EQ_INTERNAL_CODE).toString();
-		if(input.getFilters().containsKey(AMPERSAND_EQ_DISPLAY_CODE)) fltStandardDisplay = input.getFilters().get(AMPERSAND_EQ_DISPLAY_CODE).toString();
-		Boolean isCrosswalked = false;
-		List<String> leafInternalCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_INTERNAL_CODES);
-		List<String> leafDisplayCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_DISPLAY_CODES);
-		List<Map<String, Object>> equivalentCompetencies = new ArrayList<>();
-		fetchCrosswalks(input, leafInternalCodes, equivalentCompetencies);
-	
-		if (!(leafInternalCodes != null && leafInternalCodes.size() > 0 && fltStandard != null && leafInternalCodes.contains(fltStandard.toUpperCase()))
-				&& !(leafDisplayCodes != null && leafDisplayCodes.size() > 0 && fltStandardDisplay != null && leafDisplayCodes.contains(fltStandardDisplay.toUpperCase()))) {
-			isCrosswalked = true;
-		}
-		resource.setIsCrosswalked(isCrosswalked);
-		if (equivalentCompetencies.size() > 0) resource.setTaxonomyEquivalentCompetencies(equivalentCompetencies);
-	}
-
-	private void fetchCrosswalks(SearchData input, List<String> leafInternalCodes, List<Map<String, Object>> equivalentCompetencies) {
-		List<Map<String, Object>> crosswalkResponses = searchCrosswalk(input, leafInternalCodes);
-		if (crosswalkResponses != null && !crosswalkResponses.isEmpty()) {
-			leafInternalCodes.forEach(leafInternalCode -> {
-				Map<String, Object> crosswalksAsMap = new HashMap<>();
-				crosswalksAsMap.put(IndexFields.ID, leafInternalCode);
-				List<Map<String, String>> crosswalkCodes = null;
-				crosswalkCodes = deserializeCrosswalkResponse(crosswalkResponses, leafInternalCode, crosswalkCodes);
-				crosswalksAsMap.put(IndexFields.CROSSWALK_CODES, crosswalkCodes);
-				if (crosswalkCodes != null && crosswalkCodes.size() > 0) equivalentCompetencies.add(crosswalksAsMap);
-			});
-		}
-	}
-
 	@SuppressWarnings("unchecked")
 	private Question convertToQuestion(Map<String, Object> source) {
 		Question question = new Question();

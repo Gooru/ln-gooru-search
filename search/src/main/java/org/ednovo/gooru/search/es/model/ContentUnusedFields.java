@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
-public class ContentUnusedFields implements Serializable {
+import org.ednovo.gooru.search.domain.service.SearchResult;
+
+public class ContentUnusedFields extends SearchResult implements Serializable {
 
 	/**
 	 * 

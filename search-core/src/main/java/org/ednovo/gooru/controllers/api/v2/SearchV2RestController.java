@@ -115,8 +115,14 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		searchDataMap.put("allowDuplicates", true);
 		searchDataMap.put("includeCollectionItem", includeCollectionItem);
 		searchDataMap.put("includeCIMin", includeCIMetaData);
-		if (searchDataMap.containsKey("flt.standard") || searchDataMap.containsKey("flt.standardDisplay")) {
-			searchData.setStandardsSearch(true);
+		if (searchDataMap.containsKey("flt.standard") || searchDataMap.containsKey("flt.standardDisplay") ) {
+			searchData.setTaxFilterType("standard");
+		}
+		if (searchDataMap.containsKey("flt.course")) {
+			searchData.setTaxFilterType("course");
+		}
+		if (searchDataMap.containsKey("flt.domain")) {
+			searchData.setTaxFilterType("domain");
 		}
 		// client controlled value to enable / disable spell check.
 		searchDataMap.put("disableSpellCheck", disableSpellCheck);

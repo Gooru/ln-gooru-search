@@ -139,7 +139,7 @@ public class PedagogyResourceDeserializeProcessor extends PedagogyDeserializePro
 			if (metadata != null) {
 				List<String> grade = metadata.get(IndexFields.GRADE);
 				if(grade != null && grade.size() > 0){
-					resource.setGrade(String.join(SEARCH_COMMA_SEPARATOR, grade));
+					resource.setGrade(String.join(COMMA, grade));
 				}
 			}
 		}
@@ -170,7 +170,7 @@ public class PedagogyResourceDeserializeProcessor extends PedagogyDeserializePro
 				resource.setViewCount(viewsCount);
 			}
 
-			if (((Integer) statisticsMap.get(SEARCH_HAS_FRAMEBREAKER)) != null && ((Integer) statisticsMap.get(SEARCH_HAS_FRAMEBREAKER)) == 1) {
+			if (statisticsMap.containsKey(IndexFields.HAS_FRAMEBREAKER) && ((Boolean) statisticsMap.get(IndexFields.HAS_FRAMEBREAKER))) {
 				hasFrameBreaker = true;
 			}
 			resource.setHasFrameBreaker(hasFrameBreaker);
