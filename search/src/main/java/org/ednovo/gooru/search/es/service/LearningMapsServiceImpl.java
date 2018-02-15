@@ -96,7 +96,7 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 			inputSearchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_FORMAT, (type.equalsIgnoreCase(TYPE_SCOLLECTION) ? TYPE_COLLECTION : type));
 			if (type.equalsIgnoreCase(TYPE_QUESTION)) inputSearchData.setType(TYPE_RESOURCE);
 		} else if (type.equalsIgnoreCase(TYPE_ASSESSMENT)) {
-			inputSearchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_FORMAT, "assessment,assessment-external");
+			inputSearchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_FORMAT, type);
 			inputSearchData.setType(TYPE_SCOLLECTION);
 		}
 		if (CUL_MATCH.matcher(type).matches() && !searchData.getDefaultQuery().equalsIgnoreCase(STAR))

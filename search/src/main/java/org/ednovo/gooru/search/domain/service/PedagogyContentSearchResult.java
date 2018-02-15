@@ -34,16 +34,12 @@ public class PedagogyContentSearchResult extends PedagogySearchResult implements
 	private String contentFormat;
 
 	private String contentSubFormat;
-		
-	private Map<String, Object> taxonomyEquivalentCompetencies;
-		
+				
 	private Long remixedInCollectionCount;
 	
 	private Long remixedInAssessmentCount;
 		
 	private String grade;
-
-	private Map<String, Object> taxonomy;
 
 	private Double efficacy;
 	
@@ -134,14 +130,6 @@ public class PedagogyContentSearchResult extends PedagogySearchResult implements
 	public void setContentSubFormat(String contentSubFormat) {
 		this.contentSubFormat = contentSubFormat;
 	}
-	
-	public Map<String, Object> getTaxonomyEquivalentCompetencies() {
-		return taxonomyEquivalentCompetencies;
-	}
-
-	public void setTaxonomyEquivalentCompetencies(Map<String, Object> taxonomyEquivalentCompetencies) {
-		this.taxonomyEquivalentCompetencies = taxonomyEquivalentCompetencies;
-	}
 
 	public Long getRemixedInCollectionCount() {
 		return remixedInCollectionCount;
@@ -157,14 +145,6 @@ public class PedagogyContentSearchResult extends PedagogySearchResult implements
 
 	public void setRemixedInAssessmentCount(Long remixedInAssessmentCount) {
 		this.remixedInAssessmentCount = remixedInAssessmentCount;
-	}
-
-	public Map<String, Object> getTaxonomy() {
-		return taxonomy;
-	}
-	
-	public void setTaxonomy(Map<String, Object> taxonomy) {
-		this.taxonomy = taxonomy;
 	}
 	
 	public String getGrade() {

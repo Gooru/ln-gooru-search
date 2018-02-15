@@ -157,7 +157,9 @@ public enum SearchProcessorType {
 	
 	PedagogyLessonDeserializer(),
 	
-	PedagogyCourseDeserializer();
+	PedagogyCourseDeserializer(),
+	
+	PedagogyRubricDeserializer();
 
 	private SearchProcessorType() {
 	}
