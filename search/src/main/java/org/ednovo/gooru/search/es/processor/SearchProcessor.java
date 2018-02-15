@@ -291,16 +291,21 @@ public abstract class SearchProcessor<I extends SearchData, O extends Object> im
 		int hyphenCount = StringUtils.countMatches(queryString, HYPHEN);
 		if (queryString.contains(HYPHEN)) {
 			String subject = queryString.substring(0, queryString.indexOf(HYPHEN));
-			int dotsCountInSubject = StringUtils.countMatches(subject, DOT);
 
-			if (dotsCountInSubject == 2 && ((dotsCount > 2 && !(dotsCount == queryString.length())) || (hyphenCount > 2 && !(hyphenCount == queryString.length())))
-					&& !searchData.getParameters().containsKey(SEARCH_FLT_STANDARD)) {
+			if (((dotsCount > 2 && !(dotsCount == queryString.length())) || (hyphenCount > 2 && !(hyphenCount == queryString.length()))) && !searchData.getParameters().containsKey(SEARCH_FLT_STANDARD)
+					&& !searchData.getParameters().containsKey(SEARCH_FLT_GUT_CODE)) {
 				if (getSearchSetting(SEARCH_TAXONOMY_ROOT_CODE) != null) {
-					if ((Arrays.asList(getSearchSetting(SEARCH_TAXONOMY_ROOT_CODE).split(COMMA)).contains(queryString.substring(0, queryString.indexOf(DOT))))) {
+					int dotsCountInSubject = StringUtils.countMatches(subject, DOT);
+					if (dotsCountInSubject == 2 && (Arrays.asList(getSearchSetting(SEARCH_TAXONOMY_ROOT_CODE).split(COMMA)).contains(queryString.substring(0, queryString.indexOf(DOT))))) {
 						standardFound = true;
 						searchData.setTaxFilterType(TYPE_STANDARD);
-						searchData.setQueryString("*");
-						searchData.getParameters().put("flt.standard", queryString.toLowerCase());
+						searchData.setQueryString(STAR);
+						searchData.getParameters().put(SEARCH_FLT_STANDARD, queryString.toLowerCase());
+					} else if (dotsCountInSubject == 1
+							&& (Arrays.asList(getSearchSetting(SEARCH_TAXONOMY_SUBJECT_CLASSIFICATION).split(COMMA)).contains(queryString.substring(0, queryString.indexOf(DOT))))) {
+						standardFound = true;
+						searchData.setQueryString(STAR);
+						searchData.getParameters().put(SEARCH_FLT_GUT_CODE, queryString.toLowerCase());
 					}
 				}
 			}

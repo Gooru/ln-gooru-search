@@ -219,6 +219,8 @@ public interface Constants {
 
 	public static final String SEARCH_TAXONOMY_ROOT_CODE = "search.taxonomy.root.code";
 
+	public static final String SEARCH_TAXONOMY_SUBJECT_CLASSIFICATION = "search.taxonomy.subject.classification";
+
 	public static final String FLT_STANDARD = "flt.standard";
 
 	public static final String FLT_STANDARD_DISPLAY = "flt.standardDisplay";
@@ -312,6 +314,7 @@ public interface Constants {
 	public static final String SEARCH_VALUE_EMPTY = "Empty";
 	public static final String SEARCH_VALUE_NOTEMPTY = "NotEmpty";
 	public static final String SEARCH_FLT_STANDARD = "flt.standard";
+	public static final String SEARCH_FLT_GUT_CODE = "flt.gutCode";
 	public static final String SESSION_TOKEN_SEARCH = "sessionToken";
 	public static final String GOORU_HEADER_SESSION_TOKEN = "Gooru-Session-Token";
 	public static final String GOORU_API_KEY = "Gooru-ApiKey";
