@@ -7,14 +7,12 @@ import java.util.Map;
 import org.ednovo.gooru.search.es.model.License;
 import org.ednovo.gooru.search.es.model.UserV2;
 
-public class CourseSearchResult implements Serializable {
+public class CourseSearchResult extends SearchResult implements Serializable {
 
 	/**
 	* 
 	*/
 	private static final long serialVersionUID = 6280104303486215659L;
-
-	private String id;
 
 	private String lastModified;
 
@@ -32,8 +30,6 @@ public class CourseSearchResult implements Serializable {
 
 	private boolean visibleOnProfile;
 
-	private String publishStatus;
-
 	private Integer unitCount;
 
 	private Integer courseRemixCount;
@@ -44,13 +40,9 @@ public class CourseSearchResult implements Serializable {
 
 	private Integer sequence;
 
-	private Map<String, Object> taxonomy;
-
 	private Integer collaboratorCount;
 
 	private String thumbnail;
-
-	private String title;
 
 	private String description;
 
@@ -85,7 +77,7 @@ public class CourseSearchResult implements Serializable {
 	private Double engagement;
 	
 	private Double relevance;
-	
+
 	public String getLastModified() {
 		return lastModified;
 	}
@@ -150,14 +142,6 @@ public class CourseSearchResult implements Serializable {
 		this.visibleOnProfile = visibleOnProfile;
 	}
 
-	public String getPublishStatus() {
-		return publishStatus;
-	}
-
-	public void setPublishStatus(String publishStatus) {
-		this.publishStatus = publishStatus;
-	}
-
 	public Integer getUnitCount() {
 		return unitCount;
 	}
@@ -197,15 +181,7 @@ public class CourseSearchResult implements Serializable {
 	public void setSequence(Integer sequence) {
 		this.sequence = sequence;
 	}
-
-	public Map<String, Object> getTaxonomy() {
-		return taxonomy;
-	}
-
-	public void setTaxonomy(Map<String, Object> taxonomy) {
-		this.taxonomy = taxonomy;
-	}
-
+	
 	public Integer getCollaboratorCount() {
 		return collaboratorCount;
 	}
@@ -222,28 +198,12 @@ public class CourseSearchResult implements Serializable {
 		this.thumbnail = thumbnail;
 	}
 
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
 	public String getDescription() {
 		return description;
 	}
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
 	}
 
 	public Integer getSubjectSequence() {
@@ -373,4 +333,5 @@ public class CourseSearchResult implements Serializable {
 	public void setRelevance(Double relevance) {
 		this.relevance = relevance;
 	}
+
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
 import org.springframework.stereotype.Component;
@@ -13,8 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PublisherDeserilaizeProcessor<O extends Set<Map<String, Object>>, S extends Map<String, Object>> extends DeserializeProcessor<O, S> { 
 
-
-
+@SuppressWarnings("unchecked")
 @Override
 O deserialize(Map<String, Object> model, SearchData input, O output) {
 	Map<String, Object> hitsMap = (Map<String, Object>) model.get(SEARCH_HITS);
@@ -28,7 +28,7 @@ O deserialize(Map<String, Object> model, SearchData input, O output) {
 			return output;
 		}
 		Map<String, Object> fields = (Map<String, Object>) hit.get(SEARCH_SOURCE);
-		values.add((String) fields.get(SEARCH_PUBLISHER_NAME));
+		values.add((String) fields.get(IndexFields.PUBLISHER_NAME));
 	}
 	
 	
@@ -45,6 +45,7 @@ protected SearchProcessorType getType() {
 }
 
 
+@SuppressWarnings("unchecked")
 @Override
 S collect(Map<String, Object> model, SearchData input, S output) {
     output = (S)new HashMap<String, Object>();    

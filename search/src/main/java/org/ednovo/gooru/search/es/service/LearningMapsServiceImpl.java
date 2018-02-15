@@ -62,7 +62,8 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 		search(searchData, TYPE_QUESTION, contentResultAsMap);
 		search(searchData, TYPE_SCOLLECTION, contentResultAsMap);
 		search(searchData, TYPE_ASSESSMENT, contentResultAsMap);
-		
+		search(searchData, TYPE_RUBRIC, contentResultAsMap);
+
 		setStandardKeywordToQuery(searchData, key, codes, fwCode);
 		if (!searchData.getDefaultQuery().equalsIgnoreCase(STAR)) searchData.getParameters().remove(FLT_STANDARD);
 
@@ -85,7 +86,7 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 		inputSearchData.setSize(searchData.getSize());
 		inputSearchData.putFilters(searchData.getFilters());
 		inputSearchData.setCrosswalk(searchData.isCrosswalk());
-		inputSearchData.setStandardsSearch(searchData.isStandardsSearch());
+		inputSearchData.setTaxFilterType(searchData.getTaxFilterType());
 		inputSearchData.setParameters(searchData.getParameters());
 		inputSearchData.setUserTenantId(searchData.getUserTenantId());
 		inputSearchData.setUserTenantRootId(searchData.getUserTenantRootId());
@@ -105,7 +106,7 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 		searchMap.put(TOTAL_HIT_COUNT, searchResponse.getStats().get(TOTAL_HIT_COUNT));
 		searchMap.put(RESULT_COUNT, searchResponse.getStats().get(RESULT_COUNT));
 		searchMap.put(SEARCH_RESULTS, searchResponse.getSearchResults());
-		if (type.matches("scollection")) {
+		if (type.equalsIgnoreCase(TYPE_SCOLLECTION)) {
 			resultAsMap.put(TYPE_COLLECTION, searchMap);
 		} else {
 			resultAsMap.put(type, searchMap);

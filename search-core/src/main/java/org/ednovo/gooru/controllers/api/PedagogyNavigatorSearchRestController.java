@@ -81,8 +81,14 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		searchData.setUserTaxonomyPreference((JSONObject) request.getAttribute(Constants.USER_PREFERENCES));
 		MapWrapper<Object> searchDataMap = new MapWrapper<Object>(request.getParameterMap());
 
-		if (searchDataMap.containsKey(FLT_STANDARD) || searchDataMap.containsKey(FLT_STANDARD_DISPLAY)) {
-			searchData.setStandardsSearch(true);
+		if (searchDataMap.containsKey("flt.standard") || searchDataMap.containsKey("flt.standardDisplay") ) {
+			searchData.setTaxFilterType("standard");
+		}
+		if (searchDataMap.containsKey("flt.course")) {
+			searchData.setTaxFilterType("course");
+		}
+		if (searchDataMap.containsKey("flt.domain")) {
+			searchData.setTaxFilterType("domain");
 		}
 		searchData.setParameters(searchDataMap);
 
@@ -195,8 +201,14 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			}
 			searchData.getParameters().put(FLT_FWCODE, fwCode);
 		}
-		if (searchData.getParameters().containsKey(FLT_STANDARD) || searchData.getParameters().containsKey(FLT_STANDARD_DISPLAY) || searchData.getParameters().containsKey(FLT_TAXONOMY_GUT_CODE)) {
-			searchData.setStandardsSearch(true);
+		if (searchDataMap.containsKey("flt.standard") || searchDataMap.containsKey("flt.standardDisplay") ) {
+			searchData.setTaxFilterType("standard");
+		}
+		if (searchDataMap.containsKey("flt.course")) {
+			searchData.setTaxFilterType("course");
+		}
+		if (searchDataMap.containsKey("flt.domain")) {
+			searchData.setTaxFilterType("domain");
 		}
 		
 		searchData.setOriginalQuery(query);

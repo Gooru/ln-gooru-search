@@ -102,10 +102,10 @@ public abstract class SuggestDeserializeProcessor<O, S> extends SearchProcessor<
 				framework = standardPrefs.getString(subject);
 				if (framework != null && !internalCode.startsWith(framework + DOT) && crosswalkCodes != null) {
 					for (Map<String, String> crosswalk : crosswalkCodes) {
-						if (!crosswalk.get(FRAMEWORK_CODE).equalsIgnoreCase(framework)) {
+						if (!crosswalk.get(IndexFields.FRAMEWORK_CODE).equalsIgnoreCase(framework)) {
 							continue;
 						}
-						crosswalk.put(PARENT_TITLE, codeAsMap.get(PARENT_TITLE));
+						crosswalk.put(IndexFields.PARENT_TITLE, codeAsMap.get(IndexFields.PARENT_TITLE));
 						convertKeysToSnakeCase(finalConvertedMap, crosswalk);
 						isTransformed = true;
 					}
@@ -150,7 +150,7 @@ public abstract class SuggestDeserializeProcessor<O, S> extends SearchProcessor<
 			if (!v.isEmpty()) {
 				String key = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, k);
 				if (!k.equalsIgnoreCase(IndexFields.GRADE)) {
-					txMetadata.put(key, String.join(SEARCH_COMMA_SEPARATOR, ((List<String>) v)));
+					txMetadata.put(key, String.join(COMMA, ((List<String>) v)));
 				} else {
 					txMetadata.put(key, v);
 				}
