@@ -16,6 +16,7 @@ import org.ednovo.gooru.search.es.model.MapWrapper;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.model.Taxonomy;
+import org.ednovo.gooru.search.model.GutPrerequisites;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -24,9 +25,9 @@ import org.springframework.stereotype.Service;
  * 
  */
 @Service
-public class PedagogySearchServiceImpl implements PedagogySearchService, Constants {
+public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 
-	private static final Logger logger = LoggerFactory.getLogger(PedagogySearchServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(LearningMapsServiceImpl.class);
 	
 	@Override
 	public SearchResponse<Object> searchPedagogy(SearchData searchData) {
@@ -39,22 +40,21 @@ public class PedagogySearchServiceImpl implements PedagogySearchService, Constan
 		if (searchData.getParameters() != null && searchData.getParameters().getValues().size() != 0) {
 			MapWrapper<Object> parameters = searchData.getParameters();
 			if (parameters != null) {
-				if ((parameters.containsKey(FLT_STANDARD_DISPLAY) || (parameters.containsKey(FLT_STANDARD))) && parameters.containsKey(FLT_FWCODE)) {
-					fwCode = (parameters.getString(FLT_FWCODE));
-					if (parameters.containsKey(FLT_STANDARD_DISPLAY)) {
-						codes = (parameters.getString(FLT_STANDARD_DISPLAY)).split(COMMA);
-						key = IndexFields.CODE;
-					} else if (parameters.containsKey(FLT_STANDARD)) {
-						codes = (parameters.getString(FLT_STANDARD)).split(COMMA);
-						key = IndexFields.ID;
-					}
-				} else if (parameters.containsKey(FLT_FWCODE)) {
-					parameters.remove(FLT_FWCODE);
+				fwCode = (parameters.getString(FLT_FWCODE));
+				if (parameters.containsKey(FLT_STANDARD_DISPLAY)) {
+					codes = (parameters.getString(FLT_STANDARD_DISPLAY)).split(COMMA);
+					key = IndexFields.CODE;
+				} else if (parameters.containsKey(FLT_STANDARD)) {
+					codes = (parameters.getString(FLT_STANDARD)).split(COMMA);
+					key = IndexFields.ID;
+				} else if (parameters.containsKey(FLT_TAXONOMY_GUT_CODE)) {
+					codes = (parameters.getString(FLT_TAXONOMY_GUT_CODE)).split(COMMA);
+					key = TAXONOMY_GUT_CODE;
 				}
 			}
 		}
 		if (key != null && codes != null) {
-			generateSearchedCodeData(searchData, key, codes, fwCode, searchResult);
+			generateRequestedCodeInfo(searchData, key, codes, fwCode, searchResult);
 			generateStandardFilter(searchData, key, codes, fwCode);
 		}
 
@@ -62,7 +62,8 @@ public class PedagogySearchServiceImpl implements PedagogySearchService, Constan
 		search(searchData, TYPE_QUESTION, contentResultAsMap);
 		search(searchData, TYPE_SCOLLECTION, contentResultAsMap);
 		search(searchData, TYPE_ASSESSMENT, contentResultAsMap);
-		
+		search(searchData, TYPE_RUBRIC, contentResultAsMap);
+
 		setStandardKeywordToQuery(searchData, key, codes, fwCode);
 		if (!searchData.getDefaultQuery().equalsIgnoreCase(STAR)) searchData.getParameters().remove(FLT_STANDARD);
 
@@ -85,17 +86,17 @@ public class PedagogySearchServiceImpl implements PedagogySearchService, Constan
 		inputSearchData.setSize(searchData.getSize());
 		inputSearchData.putFilters(searchData.getFilters());
 		inputSearchData.setCrosswalk(searchData.isCrosswalk());
-		inputSearchData.setStandardsSearch(searchData.isStandardsSearch());
+		inputSearchData.setTaxFilterType(searchData.getTaxFilterType());
 		inputSearchData.setParameters(searchData.getParameters());
 		inputSearchData.setUserTenantId(searchData.getUserTenantId());
 		inputSearchData.setUserTenantRootId(searchData.getUserTenantRootId());
 		inputSearchData.setUserPermits(searchData.getUserPermits());
 		inputSearchData.setType(type);
 		if (RQC_MATCH.matcher(type).matches()) {
-			inputSearchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_FORMAT, type.equalsIgnoreCase(TYPE_SCOLLECTION) ? TYPE_COLLECTION : type);
+			inputSearchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_FORMAT, (type.equalsIgnoreCase(TYPE_SCOLLECTION) ? TYPE_COLLECTION : type));
 			if (type.equalsIgnoreCase(TYPE_QUESTION)) inputSearchData.setType(TYPE_RESOURCE);
 		} else if (type.equalsIgnoreCase(TYPE_ASSESSMENT)) {
-			inputSearchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_FORMAT, "assessment,assessment-external");
+			inputSearchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_FORMAT, type);
 			inputSearchData.setType(TYPE_SCOLLECTION);
 		}
 		if (CUL_MATCH.matcher(type).matches() && !searchData.getDefaultQuery().equalsIgnoreCase(STAR))
@@ -105,7 +106,11 @@ public class PedagogySearchServiceImpl implements PedagogySearchService, Constan
 		searchMap.put(TOTAL_HIT_COUNT, searchResponse.getStats().get(TOTAL_HIT_COUNT));
 		searchMap.put(RESULT_COUNT, searchResponse.getStats().get(RESULT_COUNT));
 		searchMap.put(SEARCH_RESULTS, searchResponse.getSearchResults());
-		resultAsMap.put(type, searchMap);
+		if (type.equalsIgnoreCase(TYPE_SCOLLECTION)) {
+			resultAsMap.put(TYPE_COLLECTION, searchMap);
+		} else {
+			resultAsMap.put(type, searchMap);
+		}
 		logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - uStart) + " ms");
 		return resultAsMap;
 	}
@@ -114,12 +119,16 @@ public class PedagogySearchServiceImpl implements PedagogySearchService, Constan
 	private void generateStandardFilter(SearchData searchData, String key, String[] codes, String fwCode) {
 		if (searchData.getParameters() != null && searchData.getParameters().getValues().size() != 0) {
 			MapWrapper<Object> parameters = searchData.getParameters();
-			if (parameters != null && (parameters.containsKey(FLT_STANDARD_DISPLAY) || (parameters.containsKey(FLT_STANDARD))) && parameters.containsKey(FLT_FWCODE)) {
+			if (parameters != null && ((parameters.containsKey(FLT_STANDARD_DISPLAY) || (parameters.containsKey(FLT_STANDARD)) && parameters.containsKey(FLT_FWCODE)) || (parameters.containsKey(FLT_TAXONOMY_GUT_CODE)))) {
 				SearchData crosswalkRequest = new SearchData();
 				crosswalkRequest.setPretty(searchData.getPretty());
 				crosswalkRequest.setIndexType(EsIndex.CROSSWALK);
-				crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CROSSWALK_CODES + DOT + key, (StringUtils.join(codes, COMMA)));
-				if (fwCode != null) crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CROSSWALK_CODES + DOT + IndexFields.FRAMEWORK_CODE, fwCode);
+				if (parameters.containsKey(FLT_TAXONOMY_GUT_CODE)) {
+					crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.ID, (StringUtils.join(codes, COMMA)));
+				} else {
+					crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CROSSWALK_CODES + DOT + key, (StringUtils.join(codes, COMMA)));
+					if (fwCode != null) crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CROSSWALK_CODES + DOT + IndexFields.FRAMEWORK_CODE, fwCode);
+				}
 				crosswalkRequest.setQueryString(STAR);
 				List<Map<String, Object>> crosswalkResponses = (List<Map<String, Object>>) SearchHandler.getSearcher(SearchHandlerType.CROSSWALK.name()).search(crosswalkRequest).getSearchResults();
 				Set<String> filterCodes = new HashSet<>();
@@ -133,28 +142,67 @@ public class PedagogySearchServiceImpl implements PedagogySearchService, Constan
 					}
 				}
 				if (!filterCodes.isEmpty()) {
+					parameters.remove(FLT_TAXONOMY_GUT_CODE);
 					parameters.remove(FLT_STANDARD);
 					parameters.remove(FLT_STANDARD_DISPLAY);
 					parameters.remove(FLT_FWCODE);
 					searchData.getParameters().put(FLT_STANDARD, StringUtils.join(filterCodes, COMMA));
+				} else {
+					searchData.getParameters().put(FLT_STANDARD, StringUtils.join(codes, COMMA));
 				}
 			}
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private void generateSearchedCodeData(SearchData searchData, String key,  String[] codes, String fwCode, Map<String, Object> searchResult) {
+	private void generateRequestedCodeInfo(SearchData searchData, String key,  String[] codes, String requestedFwCode, Map<String, Object> searchResult) {
 		SearchData taxonomyRequest = new SearchData();
 		taxonomyRequest.setPretty(searchData.getPretty());
 		taxonomyRequest.setIndexType(EsIndex.TAXONOMY);
-		if (key.equals(IndexFields.CODE)) key = IndexFields.DISPLAY_CODE;
 		taxonomyRequest.putFilter(AMPERSAND + CARET_SYMBOL + key, (StringUtils.join(codes, COMMA)));
-		if (fwCode != null) taxonomyRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.FRAMEWORK_CODE, fwCode);
+		if (requestedFwCode != null) taxonomyRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.FRAMEWORK_CODE, requestedFwCode);
 		taxonomyRequest.setQueryString(STAR);
 		List<Taxonomy> taxonomyResponses = (List<Taxonomy>) SearchHandler.getSearcher(SearchHandlerType.TAXONOMY.name()).search(taxonomyRequest).getSearchResults();
 		if (taxonomyResponses != null && !taxonomyResponses.isEmpty()) {
 			Taxonomy response = taxonomyResponses.get(0);
-			searchResult.put(PREREQUISITES, response.getGutPrerequisites());
+			List<GutPrerequisites> gutPrerequisites = response.getGutPrerequisites();
+			if (!key.equalsIgnoreCase(TAXONOMY_GUT_CODE)) {
+				Set<Map<String, String>> progressions = new HashSet<>();
+				if (gutPrerequisites != null && gutPrerequisites.size() > 0) {
+					gutPrerequisites.forEach(a -> {
+						GutPrerequisites gutPrerequisite = (GutPrerequisites) a;
+						SearchData crosswalkRequest = new SearchData();
+						crosswalkRequest.setPretty(searchData.getPretty());
+						crosswalkRequest.setIndexType(EsIndex.CROSSWALK);
+						crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.ID, gutPrerequisite.getId());
+						crosswalkRequest.setQueryString(STAR);
+						List<Map<String, Object>> crosswalkResponses = (List<Map<String, Object>>) SearchHandler.getSearcher(SearchHandlerType.CROSSWALK.name()).search(crosswalkRequest)
+								.getSearchResults();
+						if (crosswalkResponses != null && !crosswalkResponses.isEmpty()) {
+							crosswalkResponses.forEach(cwResponse -> {
+								Map<String, Object> source = (Map<String, Object>) cwResponse.get(SEARCH_SOURCE);
+								List<Map<String, String>> crosswalkCodes = (List<Map<String, String>>) source.get(IndexFields.CROSSWALK_CODES);
+								crosswalkCodes.forEach(code -> {
+									String cwFw = (String) code.get(IndexFields.FRAMEWORK_CODE);
+									if (cwFw.equalsIgnoreCase(requestedFwCode)) {
+										Map<String, String> cwCode = new HashMap<>();
+										cwCode.put(IndexFields.CODE, (String) code.get(IndexFields.CODE));
+										cwCode.put(IndexFields.TITLE, (String) code.get(IndexFields.TITLE));
+										progressions.add(cwCode);
+									}
+								});
+							});
+						}
+					});
+				}
+				searchResult.put(PREREQUISITES, progressions);
+			}
+			if (key.equalsIgnoreCase(TAXONOMY_GUT_CODE)) searchResult.put(PREREQUISITES, gutPrerequisites);
+			searchResult.put(SIGNATURE_CONTENTS, response.getSignatureContents());
+			searchResult.put(IndexFields.GUT_CODE, response.getGutCode());
+			searchResult.put(IndexFields.CODE, response.getDisplayCode());
+			searchResult.put(IndexFields.CODE_TYPE, response.getCodeType());
+			searchResult.put(IndexFields.TITLE, response.getTitle());
 		}
 	}
 
@@ -165,7 +213,6 @@ public class PedagogySearchServiceImpl implements PedagogySearchService, Constan
 			input.setPretty(searchData.getPretty());
 			input.setParameters(new MapWrapper<Object>());
 			input.setQueryString(STAR);
-			if (key.equals(IndexFields.CODE)) key = IndexFields.DISPLAY_CODE;
 			input.putFilter(key, StringUtils.join(codes, COMMA));
 			if (fwCode != null) input.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.FRAMEWORK_CODE, fwCode);
 			List<Taxonomy> searchResponse = (List<Taxonomy>) SearchHandler.getSearcher(SearchHandlerType.TAXONOMY.name()).search(input).getSearchResults();

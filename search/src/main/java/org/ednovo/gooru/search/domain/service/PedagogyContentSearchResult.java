@@ -29,23 +29,17 @@ public class PedagogyContentSearchResult extends PedagogySearchResult implements
 
 	private Boolean hasFrameBreaker;
 
-	private Map<String, Object> taxonomySet;
-
 	private List<String> publisher;
 
 	private String contentFormat;
 
 	private String contentSubFormat;
-		
-	private Map<String, Object> taxonomyEquivalentCompetencies;
-		
+				
 	private Long remixedInCollectionCount;
 	
 	private Long remixedInAssessmentCount;
 		
 	private String grade;
-
-	private Map<String, Object> taxonomy;
 
 	private Double efficacy;
 	
@@ -108,15 +102,7 @@ public class PedagogyContentSearchResult extends PedagogySearchResult implements
 	public void setHasFrameBreaker(Boolean hasFrameBreaker) {
 		this.hasFrameBreaker = hasFrameBreaker;
 	}
-	
-	public Map<String, Object> getTaxonomySet() {
-		return taxonomySet;
-	}
 
-	public void setTaxonomySet(Map<String, Object> taxonomySet) {
-		this.taxonomySet = taxonomySet;
-	}
-	
 	public static String getIndexType() {
 		return INDEX_TYPE;
 	}
@@ -144,14 +130,6 @@ public class PedagogyContentSearchResult extends PedagogySearchResult implements
 	public void setContentSubFormat(String contentSubFormat) {
 		this.contentSubFormat = contentSubFormat;
 	}
-	
-	public Map<String, Object> getTaxonomyEquivalentCompetencies() {
-		return taxonomyEquivalentCompetencies;
-	}
-
-	public void setTaxonomyEquivalentCompetencies(Map<String, Object> taxonomyEquivalentCompetencies) {
-		this.taxonomyEquivalentCompetencies = taxonomyEquivalentCompetencies;
-	}
 
 	public Long getRemixedInCollectionCount() {
 		return remixedInCollectionCount;
@@ -167,14 +145,6 @@ public class PedagogyContentSearchResult extends PedagogySearchResult implements
 
 	public void setRemixedInAssessmentCount(Long remixedInAssessmentCount) {
 		this.remixedInAssessmentCount = remixedInAssessmentCount;
-	}
-
-	public Map<String, Object> getTaxonomy() {
-		return taxonomy;
-	}
-	
-	public void setTaxonomy(Map<String, Object> taxonomy) {
-		this.taxonomy = taxonomy;
 	}
 	
 	public String getGrade() {

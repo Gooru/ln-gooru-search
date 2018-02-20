@@ -135,5 +135,13 @@ public class IndexFields {
 	public static final String RELEVANCE = "relevance";
 	public static final String GUT_PREREQUISITES = "gutPrerequisites";
 	public static final String DISPLAY_CODE = "displayCode";
+	public static final String SIGNATURE_COLLECTIONS = "signatureCollections";
+	public static final String SIGNATURE_ASSESSMENTS = "signatureAssessments";
+	public static final String SIGNATURE_RESOURCES = "signatureResources";
+	public static final String CODE_ID = "codeId";
+	public static final String HAS_FRAMEBREAKER = "hasFrameBreaker";
+	public static final String STATUS_IS_BROKEN = "statusIsBroken";
+	public static final String PUBLISHER_NAME = "publishername";
+	public static final String PARENT_TITLE = "parentTitle";
 
 }

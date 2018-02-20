@@ -3,7 +3,6 @@
  */
 package org.ednovo.gooru.search.es.processor.deserializer;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,7 +84,7 @@ public abstract class PedagogyDeserializeProcessor<O, S> extends SearchProcessor
 					if (crosswalkCodes != null) {
 						for (Map<String, String> crosswalk : crosswalkCodes) {
 							if (!((String) crosswalk.get(IndexFields.ID)).equalsIgnoreCase((String) codeAsMap.get(IndexFields.ID))) {
-								crosswalk.put(PARENT_TITLE, codeAsMap.get(PARENT_TITLE));
+								crosswalk.put(IndexFields.PARENT_TITLE, codeAsMap.get(IndexFields.PARENT_TITLE));
 								crosswalk.put(CROSSWALK_ID, crosswalk.get(IndexFields.ID));
 								crosswalk.put(IndexFields.ID, codeAsMap.get(IndexFields.ID));
 								convertKeysToSnakeCase(finalCrosswalkMap, crosswalk);

@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.ednovo.gooru.search.es.model.UserV2;
 
-public class RubricSearchResult implements Serializable {
+public class RubricSearchResult extends SearchResult implements Serializable {
 
 	private static final long serialVersionUID = 5673214015280665128L;
 
@@ -14,15 +14,11 @@ public class RubricSearchResult implements Serializable {
 
 	private String url;
 
-	private String title;
-
 	private String thumbnail;
 
 	private String description;
 
 	private String createdAt;
-
-	private String id;
 
 	private String updatedAt;
 
@@ -36,19 +32,11 @@ public class RubricSearchResult implements Serializable {
 
 	private Integer questionCount;
 
-	private Map<String, Object> taxonomy;
-
 	private String resultUId;
-
-	private String publishStatus;
 
 	private String contentFormat;
 	
 	private List<Map<String, Object>> categories;
-
-	private Boolean isCrosswalked = false;
-	
-	private List<Map<String, Object>> taxonomyEquivalentCompetencies;
 	
 	private Map<String, Object> course;
 	
@@ -74,14 +62,6 @@ public class RubricSearchResult implements Serializable {
 		this.url = url;
 	}
 
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
 	public String getThumbnail() {
 		return thumbnail;
 	}
@@ -104,14 +84,6 @@ public class RubricSearchResult implements Serializable {
 
 	public void setCreatedAt(String createdAt) {
 		this.createdAt = createdAt;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
 	}
 
 	public String getUpdatedAt() {
@@ -162,28 +134,12 @@ public class RubricSearchResult implements Serializable {
 		this.questionCount = questionCount;
 	}
 
-	public Map<String, Object> getTaxonomy() {
-		return taxonomy;
-	}
-
-	public void setTaxonomy(Map<String, Object> taxonomy) {
-		this.taxonomy = taxonomy;
-	}
-
 	public String getResultUId() {
 		return resultUId;
 	}
 
 	public void setResultUId(String resultUId) {
 		this.resultUId = resultUId;
-	}
-
-	public String getPublishStatus() {
-		return publishStatus;
-	}
-
-	public void setPublishStatus(String publishStatus) {
-		this.publishStatus = publishStatus;
 	}
 
 	public String getContentFormat() {
@@ -200,22 +156,6 @@ public class RubricSearchResult implements Serializable {
 
 	public void setCategories(List<Map<String, Object>> categories) {
 		this.categories = categories;
-	}
-
-	public Boolean getIsCrosswalked() {
-		return isCrosswalked;
-	}
-
-	public void setIsCrosswalked(Boolean isCrosswalked) {
-		this.isCrosswalked = isCrosswalked;
-	}
-
-	public List<Map<String, Object>> getTaxonomyEquivalentCompetencies() {
-		return taxonomyEquivalentCompetencies;
-	}
-
-	public void setTaxonomyEquivalentCompetencies(List<Map<String, Object>> taxonomyEquivalentCompetencies) {
-		this.taxonomyEquivalentCompetencies = taxonomyEquivalentCompetencies;
 	}
 
 	public Map<String, Object> getCourse() {

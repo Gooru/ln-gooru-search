@@ -3,6 +3,7 @@
  */
 package org.ednovo.gooru.search.es.processor.filter.constructor;
 
+import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
@@ -19,7 +20,7 @@ public class SCollectionFilterConstructionProcessor extends ContentFilterConstru
 	public void process(SearchData searchData,
 			SearchResponse<Object> response) {
 		super.process(searchData, response);
-		searchData.putFilter(NOT_SYMBOL + CARET_SYMBOL + CONTENT_SUB_FORMAT, CollectionSubFormat.BENCHMARK.name());
+		searchData.putFilter(NOT_SYMBOL + CARET_SYMBOL + IndexFields.CONTENT_SUB_FORMAT, CollectionSubFormat.BENCHMARK.name());
 	}
 
 	@Override

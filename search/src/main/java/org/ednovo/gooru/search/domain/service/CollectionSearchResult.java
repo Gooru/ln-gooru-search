@@ -14,8 +14,6 @@ public class CollectionSearchResult extends CollectionUnUsedFields implements Se
 	*/
 	private static final long serialVersionUID = 5673214015280665109L;
 
-	private String id;
-	private String title;
 	private String type;
 	private String lastModified;
 	private String addDate;
@@ -61,8 +59,6 @@ public class CollectionSearchResult extends CollectionUnUsedFields implements Se
 	private String userProfileImage;
 	private Map<String, Object> course;
 	private Map<String, Object> taxonomySet;
-	private Boolean isCrosswalked = false;
-	private List<Map<String, Object>> taxonomyEquivalentCompetencies;
 	private Long remixedInCourseCount;
 	private Long usedByStudentCount;
 
@@ -327,22 +323,6 @@ public class CollectionSearchResult extends CollectionUnUsedFields implements Se
 		this.usernameDisplay = usernameDisplay;
 	}
 
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
 	public String getType() {
 		return type;
 	}
@@ -445,22 +425,6 @@ public class CollectionSearchResult extends CollectionUnUsedFields implements Se
 
 	public void setTaxonomySet(Map<String, Object> taxonomySet) {
 		this.taxonomySet = taxonomySet;
-	}
-	
-	public Boolean getIsCrosswalked() {
-		return isCrosswalked;
-	}
-
-	public void setIsCrosswalked(Boolean isCrosswalked) {
-		this.isCrosswalked = isCrosswalked;
-	}
-	
-	public List<Map<String, Object>> getTaxonomyEquivalentCompetencies() {
-		return taxonomyEquivalentCompetencies;
-	}
-
-	public void setTaxonomyEquivalentCompetencies(List<Map<String, Object>> taxonomyEquivalentCompetencies) {
-		this.taxonomyEquivalentCompetencies = taxonomyEquivalentCompetencies;
 	}
 
 	public Long getRemixedInCourseCount() {
