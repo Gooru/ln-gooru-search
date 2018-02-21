@@ -6,7 +6,7 @@ import org.ednovo.gooru.search.es.processor.SearchProcessorType;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RubricFilterConstructionProcessor extends FilterConstructionProcessor {
+public class RubricFilterConstructionProcessor extends ContentFilterConstructionProcessor {
 
 	@Override
 	public void process(SearchData searchData, SearchResponse<Object> response) {

@@ -38,6 +38,11 @@ public class ContentFilterConstructionProcessor extends FilterConstructionProces
 					searchData.getFilters().remove(AMPERSAND_STANDARD_DISPLAY);
 				}
 				
+				if (searchData.getFilters().containsKey(AMPERSAND_RELATED_LEAF_INTERNAL_CODES) && StringUtils.isNotBlank(searchData.getFilters().get(AMPERSAND_RELATED_LEAF_INTERNAL_CODES).toString())) {
+					searchData.putFilter(AMPERSAND_EQ_RELATED_INTERNAL_CODE, searchData.getFilters().get(AMPERSAND_RELATED_LEAF_INTERNAL_CODES).toString().toLowerCase());
+					searchData.getFilters().remove(AMPERSAND_RELATED_LEAF_INTERNAL_CODES);
+				}
+				
 /*				if (searchData.getFilters().containsKey(AMPERSAND_COURSE) && StringUtils.isNotBlank(searchData.getFilters().get(AMPERSAND_COURSE).toString())) {
 					searchData.putFilter(AMPERSAND_EQ_COURSE_INTERNAL_CODE, searchData.getFilters().get(AMPERSAND_COURSE).toString().toLowerCase());
 					searchData.getFilters().remove(AMPERSAND_COURSE);
