@@ -56,6 +56,8 @@ public class FilterConstructionProcessor extends SearchProcessor<SearchData, Obj
 					type = "!";
 				}else if(keys[0].equals(FLT_OR)) {
 					type = "|";
+				}else if(keys[0].equals("aggBy")) {
+					type = "<>-";
 				}
 				else if (keys[0].equals(BOOST_FIELD)) {
 					String[] fields = keys[1].split("\\^");

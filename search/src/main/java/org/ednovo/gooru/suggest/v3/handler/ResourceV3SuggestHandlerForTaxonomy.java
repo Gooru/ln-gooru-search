@@ -80,8 +80,8 @@ public class ResourceV3SuggestHandlerForTaxonomy extends SuggestHandler<Map<Stri
 
 		final TaxonomyContextData taxonomyData = (TaxonomyContextData) dataProviderInput.get(SuggestDataProviderType.TAXONOMY);
 
-		final SearchResponse<List<SimpleSuggestResponse>> suggestResponseResource = new SearchResponse<List<SimpleSuggestResponse>>();
-		final SearchResponse<List<ContentSearchResult>> searchResponseResource = new SearchResponse<List<ContentSearchResult>>();
+		final SearchResponse<List<SimpleSuggestResponse>> suggestResponseResource = new SearchResponse<>();
+		final SearchResponse<List<ContentSearchResult>> searchResponseResource = new SearchResponse<>();
 		final SearchResponse<Object> searchRes = new SearchResponse<Object>();
 		final Integer score = suggestData.getSuggestContextData().getScore();
 		final Long timespent = suggestData.getSuggestContextData().getTimeSpent();

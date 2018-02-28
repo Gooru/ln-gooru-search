@@ -523,4 +523,5 @@ public interface Constants {
 	public static final String FLT_TAXONOMY_GUT_CODE = "flt.taxonomyGutCode";
 	public static final String TAXONOMY_GUT_CODE = "taxonomyGutCode";
 	Pattern TAX_FILTERS = Pattern.compile("standard");
+	public static final String AGG_FIELDNAME = "<>-^field";
 }

@@ -100,8 +100,8 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 		final ResourceContextData resourceData = (ResourceContextData) dataProviderInput.get(SuggestDataProviderType.RESOURCE);
 		final CollectionContextData collectionData = (CollectionContextData) dataProviderInput.get(SuggestDataProviderType.COLLECTION);
 		
-		final SearchResponse<List<SimpleSuggestResponse>> suggestResponseResource = new SearchResponse<List<SimpleSuggestResponse>>();
-		final SearchResponse<List<ContentSearchResult>> searchResponseResource = new SearchResponse<List<ContentSearchResult>>();
+		final SearchResponse<List<SimpleSuggestResponse>> suggestResponseResource = new SearchResponse<>();
+		final SearchResponse<List<ContentSearchResult>> searchResponseResource = new SearchResponse<>();
 		final SearchResponse<Object> searchRes = new SearchResponse<Object>();
 		final String contextType = suggestData.getSuggestContextData().getContextType();
 		final Integer score = suggestData.getSuggestContextData().getScore();

@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
  * @author SearchTeam
  *
  */
+@SuppressWarnings("rawtypes")
 @Component
 public class ResourceDeserializeProcessor extends DeserializeProcessor<List<ContentSearchResult>, ContentSearchResult> {
 
@@ -42,7 +43,7 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 		output = new ArrayList<ContentSearchResult>();
 		Set<String> contentUrls = new HashSet<String>();
 		Set<String> contentTitles = new HashSet<String>();
-		if (model != null && model.get(SEARCH_HITS) != null) {
+		if (model != null && model.get(SEARCH_HITS) != null && !((List<Map<String, Object>>) ((Map<String, Object>) model.get(SEARCH_HITS)).get(SEARCH_HITS)).isEmpty()) {
 			List<Map<String, Object>> hits = (List<Map<String, Object>>) ((Map<String, Object>) model.get(SEARCH_HITS)).get(SEARCH_HITS);
 			List<String> resourceIds = new ArrayList<String>();
 			float minScore = 0;

@@ -8,6 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.management.Query;
+
 import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.filter.BoolQuery;
@@ -17,6 +19,7 @@ import org.ednovo.gooru.search.es.filter.MustNotQuery;
 import org.ednovo.gooru.search.es.filter.NestedFilter;
 import org.ednovo.gooru.search.es.filter.NotFilter;
 import org.ednovo.gooru.search.es.filter.OrFilter;
+import org.ednovo.gooru.search.es.filter.QueryString;
 import org.ednovo.gooru.search.es.filter.RangeFilter;
 import org.ednovo.gooru.search.es.filter.ShouldQuery;
 import org.ednovo.gooru.search.es.filter.TermFilter;
@@ -168,8 +171,11 @@ public class FilterBuilderUtils {
 				key = IndexFields.COURSE;
 			}
 			filter = new MissingFilter(key);
-		}
-		else {
+		} else if(type != null && type.equalsIgnoreCase("&?")){
+			filter = value;
+		} else if (type != null && type.equalsIgnoreCase("<>-")) {
+			return;
+		} else {
 			filter = buildFilter(value, key);
 		}
 

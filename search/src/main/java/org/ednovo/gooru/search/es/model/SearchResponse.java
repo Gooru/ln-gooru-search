@@ -4,6 +4,7 @@
 package org.ednovo.gooru.search.es.model;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -12,69 +13,79 @@ import java.util.Map;
  */
 public class SearchResponse<R> implements Serializable {
 
-  /**
-   * 
-   */
-  private static final long serialVersionUID = 3657537671508783010L;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3657537671508783010L;
 
-  private R searchResults;
+	private R searchResults;
 
-  private long totalHitCount;
+	private Long totalHitCount;
 
-  private int resultCount;
+	private Integer resultCount;
 
-  private long executionTime;
+	private Long executionTime;
 
-  private Map<String, Object> query;
+	private Map<String, Object> query;
 
-  private Map<String, Object> stats;
+	private Map<String, Object> stats;
 
-  public R getSearchResults() {
-    return searchResults;
-  }
+	private List<Map<String, Object>> aggregations;
 
-  public void setSearchResults(R searchResults) {
-    this.searchResults = searchResults;
-  }
+	public R getSearchResults() {
+		return searchResults;
+	}
 
-  public long getTotalHitCount() {
-    return totalHitCount;
-  }
+	public void setSearchResults(R searchResults) {
+		this.searchResults = searchResults;
+	}
 
-  public void setTotalHitCount(long totalHitCount) {
-    this.totalHitCount = totalHitCount;
-  }
-  
-  public int getResultCount() {
-    return resultCount;
-  }
+	public List<Map<String, Object>> getAggregations() {
+		return aggregations;
+	}
 
-  public void setResultCount(int resultCount) {
-    this.resultCount = resultCount;
-  }
+	public void setAggregations(List<Map<String, Object>> aggregations) {
+		this.aggregations = aggregations;
+	}
 
-  public long getExecutionTime() {
-    return executionTime;
-  }
+	public Long getTotalHitCount() {
+		return totalHitCount;
+	}
 
-  public void setExecutionTime(long executionTime) {
-    this.executionTime = executionTime;
-  }
+	public void setTotalHitCount(Long totalHitCount) {
+		this.totalHitCount = totalHitCount;
+	}
 
-  public Map<String, Object> getQuery() {
-    return query;
-  }
+	public Integer getResultCount() {
+		return resultCount;
+	}
 
-  public Map<String, Object> getStats() {
-    return stats;
-  }
+	public void setResultCount(Integer resultCount) {
+		this.resultCount = resultCount;
+	}
 
-  public void setQuery(Map<String, Object> query) {
-    this.query = query;
-  }
+	public Long getExecutionTime() {
+		return executionTime;
+	}
 
-  public void setStats(Map<String, Object> stats) {
-    this.stats = stats;
-  }
+	public void setExecutionTime(Long executionTime) {
+		this.executionTime = executionTime;
+	}
+
+	public Map<String, Object> getQuery() {
+		return query;
+	}
+
+	public Map<String, Object> getStats() {
+		return stats;
+	}
+
+	public void setQuery(Map<String, Object> query) {
+		this.query = query;
+	}
+
+	public void setStats(Map<String, Object> stats) {
+		this.stats = stats;
+	}
 
 }
