@@ -29,7 +29,6 @@ import org.springframework.stereotype.Component;
  * @author SearchTeam
  *
  */
-@SuppressWarnings("rawtypes")
 @Component
 public class ResourceDeserializeProcessor extends DeserializeProcessor<List<ContentSearchResult>, ContentSearchResult> {
 
@@ -91,7 +90,7 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 					contentUrls.add(url);
 					contentTitles.add(title.toLowerCase());
 					// check the resource has less than the minScore640
-					if (!parameters.getBoolean(UN_RESTRICTED_SEARCH) && (Double) searchHit.get(SEARCH_SOURCE) < minScore) {
+					if (!parameters.getBoolean(UN_RESTRICTED_SEARCH) && (Double) searchHit.get(IndexFields._SCORE) < minScore) {
 						lessScoreResourceCount++;
 						lessScoreResourceGooruOid.append(fields.get(IndexFields.ID) + " , ");
 						if (output.size() > 4) {

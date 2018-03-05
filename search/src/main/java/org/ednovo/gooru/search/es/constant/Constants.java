@@ -524,4 +524,12 @@ public interface Constants {
 	public static final String TAXONOMY_GUT_CODE = "taxonomyGutCode";
 	Pattern TAX_FILTERS = Pattern.compile("standard");
 	public static final String AGG_FIELDNAME = "<>-^field";
+	public static final String TYPE_CROSSWALK = "crosswalk";
+	Pattern SEARCH_TYPES_MATCH = Pattern.compile("resource|question|collection|scollection|rubric|course|unit|lesson|publisher|searchQuery|autocomplete");
+	public static final String AGG_BY = "agggBy";
+	public static final String AGG_RESPONSE_LIMIT = "aggSize";
+	public static final String AGGS = "aggs";
+	public static final String RESCORE = "rescore";
+	public static final String POST_FILTER = "post_filter";
+
 }

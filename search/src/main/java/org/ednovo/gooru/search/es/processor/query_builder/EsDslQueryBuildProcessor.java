@@ -19,6 +19,7 @@ import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.processor.SearchProcessor;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
 import org.ednovo.gooru.search.es.processor.util.FilterBuilderUtils;
+import org.ednovo.gooru.search.es.service.SearchSettingService;
 import org.springframework.stereotype.Component;
 
 /**
@@ -148,26 +149,28 @@ public class EsDslQueryBuildProcessor extends SearchProcessor<SearchData, Object
 			queryObj.put("window_size", getCassandraSettingAsInt(RESCORE_SCRIPT_LIMIT, DEFAULT_RESCORE_WINDOW_SIZE));
 			searchData.getQueryDsl().put("rescore", queryObj);
 		}
-		if (searchData.getFilters().containsKey(AGG_FIELDNAME) && searchData.getFilters().get(AGG_FIELDNAME) != null) {
-			String aggField = searchData.getFilters().get(AGG_FIELDNAME).toString();
-			searchData.getFilters().remove(AGG_FIELDNAME);
+		if (searchData.getFilters() != null && searchData.getFilters().containsKey(AGG_FIELDNAME) && searchData.getFilters().get(AGG_FIELDNAME) != null) {
 			Map<String, Object> aggMap = new HashMap<>(1);
 			Map<String, Object> aggTermMap = new HashMap<>(1);
 			Map<String, Object> aggTermFieldMap = new HashMap<>(2);
+			String aggField = searchData.getFilters().get(AGG_FIELDNAME).toString();
+			searchData.getFilters().remove(AGG_FIELDNAME);
+			if (SearchSettingService.getAggAlias(aggField) != null) {
+				aggField = SearchSettingService.getAggAlias(aggField);
+			}
 			aggTermFieldMap.put(FIELD, aggField);
-			if (searchData.getParameters().containsKey("aggSize")) {
-				int aggSize = searchData.getParameters().getInteger("aggSize");
+			if (searchData.getParameters().containsKey(AGG_RESPONSE_LIMIT)) {
+				int aggSize = searchData.getParameters().getInteger(AGG_RESPONSE_LIMIT);
 				aggTermFieldMap.put(SIZE, aggSize);
 			}
 			aggTermMap.put(TERMS, aggTermFieldMap);
 			aggMap.put("agg_key", aggTermMap);
-			searchData.getQueryDsl().put("aggs", aggMap);
+			searchData.getQueryDsl().put(AGGS, aggMap);
 			searchData.setSize(0);
 			searchData.setAggregationRequest(true);
-			searchData.getQueryDsl().remove("rescore");
+			searchData.getQueryDsl().put(SIZE, searchData.getSize()).remove(RESCORE);
 			searchData.getFilters().put("&?^queryString", queryString);
 		}
-		searchData.getQueryDsl().put(FROM, searchData.isPaginated() ? searchData.getFrom() * searchData.getSize() : searchData.getFrom()).put(SIZE, searchData.getSize());
 	}
 
 	@Override
@@ -178,9 +181,9 @@ public class EsDslQueryBuildProcessor extends SearchProcessor<SearchData, Object
 			Object boolQuery = FilterBuilderUtils.buildFilters(searchData.getFilters());
 			if (boolQuery != null) {
 				if(searchData.isAggregationRequest()) {
-					searchData.getQueryDsl().put("query", boolQuery); 
+					searchData.getQueryDsl().put(QUERY, boolQuery); 
 				} else {
-					searchData.getQueryDsl().put("post_filter", boolQuery);
+					searchData.getQueryDsl().put(POST_FILTER, boolQuery);
 				}
 			}
 		}
