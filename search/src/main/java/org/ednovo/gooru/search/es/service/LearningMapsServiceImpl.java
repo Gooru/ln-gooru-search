@@ -64,6 +64,7 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 		search(searchData, TYPE_ASSESSMENT, contentResultAsMap);
 		search(searchData, TYPE_RUBRIC, contentResultAsMap);
 
+		//To be disabled with aggregated tags are in working condition
 		setStandardKeywordToQuery(searchData, key, codes, fwCode);
 		if (!searchData.getDefaultQuery().equalsIgnoreCase(STAR)) searchData.getParameters().remove(FLT_STANDARD);
 
@@ -99,6 +100,13 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 			inputSearchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_FORMAT, type);
 			inputSearchData.setType(TYPE_SCOLLECTION);
 		}
+		//To be enabled with aggregated tags are in working condition
+/*		if (CUL_MATCH.matcher(type).matches()) {
+			if (searchData.getParameters().containsKey(FLT_STANDARD)) {
+				searchData.getParameters().put(FLT_RELATED_LEAF_INTERNAL_CODES, searchData.getParameters().getString(FLT_STANDARD));
+				searchData.getParameters().remove(FLT_STANDARD);
+			}
+		}*/
 		if (CUL_MATCH.matcher(type).matches() && !searchData.getDefaultQuery().equalsIgnoreCase(STAR))
 			inputSearchData.setParameters(new MapWrapper<>());
 		SearchResponse<Object> searchResponse = (SearchResponse<Object>) SearchHandler.getSearcher((PEDAGOGY_UNDERSCORE + inputSearchData.getType()).toUpperCase()).search(inputSearchData);

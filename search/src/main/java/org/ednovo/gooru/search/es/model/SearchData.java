@@ -127,6 +127,8 @@ public class SearchData implements Serializable {
 	
 	private String defaultQuery = "*";
 
+	private boolean isAggregationRequest = false;
+	
 	public boolean isShowCanonicalOnly() {
 		return showCanonicalOnly;
 	}
@@ -558,6 +560,14 @@ public class SearchData implements Serializable {
 
 	public void setDefaultQuery(String defaultQuery) {
 		this.defaultQuery = defaultQuery;
+	}
+
+	public boolean isAggregationRequest() {
+		return isAggregationRequest;
+	}
+
+	public void setAggregationRequest(boolean isAggregationRequest) {
+		this.isAggregationRequest = isAggregationRequest;
 	}
 
 }

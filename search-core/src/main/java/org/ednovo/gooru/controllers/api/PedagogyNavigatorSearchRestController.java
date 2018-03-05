@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.SearchInputType;
@@ -89,6 +88,11 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		}
 		if (searchDataMap.containsKey("flt.domain")) {
 			searchData.setTaxFilterType("domain");
+		}
+		if (searchDataMap.containsKey("flt.gutCode")) {
+			searchData.setTaxFilterType("standard");
+			searchDataMap.put(FLT_TAXONOMY_GUT_CODE, searchDataMap.getString("flt.gutCode"));
+			searchDataMap.remove("flt.gutCode");
 		}
 		searchData.setParameters(searchDataMap);
 
@@ -189,19 +193,18 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 
 		searchData.setUserTaxonomyPreference((JSONObject) request.getAttribute(Constants.USER_PREFERENCES));
 		MapWrapper<Object> searchDataMap = new MapWrapper<Object>(request.getParameterMap());
-		searchData.setParameters(searchDataMap);
 
 		if (StringUtils.isBlank(fwCode) && StringUtils.isNotBlank(standardCode)) {
-			searchData.getParameters().put(FLT_TAXONOMY_GUT_CODE, standardCode);
+			searchDataMap.put(FLT_TAXONOMY_GUT_CODE, standardCode);
 		} else if (StringUtils.isNotBlank(fwCode)){
 			if (isDisplayCode) {
-				searchData.getParameters().put(FLT_STANDARD_DISPLAY, standardCode);
+				searchDataMap.put(FLT_STANDARD_DISPLAY, standardCode);
 			} else {
-				searchData.getParameters().put(FLT_STANDARD, standardCode);
+				searchDataMap.put(FLT_STANDARD, standardCode);
 			}
-			searchData.getParameters().put(FLT_FWCODE, fwCode);
+			searchDataMap.put(FLT_FWCODE, fwCode);
 		}
-		if (searchDataMap.containsKey("flt.standard") || searchDataMap.containsKey("flt.standardDisplay") ) {
+		if (searchDataMap.containsKey("flt.standard") || searchDataMap.containsKey("flt.standardDisplay") || searchDataMap.containsKey(FLT_TAXONOMY_GUT_CODE) ) {
 			searchData.setTaxFilterType("standard");
 		}
 		if (searchDataMap.containsKey("flt.course")) {
@@ -210,7 +213,8 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		if (searchDataMap.containsKey("flt.domain")) {
 			searchData.setTaxFilterType("domain");
 		}
-		
+		searchData.setParameters(searchDataMap);
+
 		searchData.setOriginalQuery(query);
 		searchData.setQueryString(query);
 		searchData.setPretty(pretty);

@@ -11,7 +11,7 @@ import static org.ednovo.gooru.search.es.processor.SearchProcessorType.FacetFilt
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.FilterDetection;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.LimitValidation;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.ResourceDeserializer;
-import static org.ednovo.gooru.search.es.processor.SearchProcessorType.ResourceEsDslQueryBuild;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.EsDslQueryBuild;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.ResourceFilterConstruction;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.SubjectFacetFilter;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.TaxonomyQueryExpansion;
@@ -33,7 +33,7 @@ public class ResourceV2SearchHandler extends SearchHandler<SearchData, Map<Strin
 
 	private static final SearchProcessorType[][] searchProcessorTypes = new SearchProcessorType[][] {
 			{ BlackListQueryValidation }, { FilterDetection }, { LimitValidation }, { TaxonomyQueryExpansion }, { DictionaryQueryExpansion }, { TenantFilterConstruction },
-			 { ResourceFilterConstruction }, {SubjectFacetFilter}, { ResourceEsDslQueryBuild }, { EsSuggestDslQueryBuild },{ FacetFilterConstruction }, { Elasticsearch },
+			 { ResourceFilterConstruction }, {SubjectFacetFilter}, { EsDslQueryBuild }, { EsSuggestDslQueryBuild },{ FacetFilterConstruction }, { Elasticsearch },
 			{ ResourceDeserializer } };
 
 	@Override

@@ -143,5 +143,6 @@ public class IndexFields {
 	public static final String STATUS_IS_BROKEN = "statusIsBroken";
 	public static final String PUBLISHER_NAME = "publishername";
 	public static final String PARENT_TITLE = "parentTitle";
+	public static final String _SCORE = "_score";
 
 }

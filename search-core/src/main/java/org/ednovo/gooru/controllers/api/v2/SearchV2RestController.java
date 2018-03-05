@@ -115,14 +115,18 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		searchDataMap.put("allowDuplicates", true);
 		searchDataMap.put("includeCollectionItem", includeCollectionItem);
 		searchDataMap.put("includeCIMin", includeCIMetaData);
-		if (searchDataMap.containsKey("flt.standard") || searchDataMap.containsKey("flt.standardDisplay") ) {
-			searchData.setTaxFilterType("standard");
+		if (searchDataMap.containsKey(FLT_STANDARD) || searchDataMap.containsKey(FLT_STANDARD_DISPLAY) ) {
+			searchData.setTaxFilterType(TYPE_STANDARD);
 		}
 		if (searchDataMap.containsKey("flt.course")) {
-			searchData.setTaxFilterType("course");
+			searchData.setTaxFilterType(TYPE_COURSE);
 		}
 		if (searchDataMap.containsKey("flt.domain")) {
 			searchData.setTaxFilterType("domain");
+		}
+		if (searchDataMap.containsKey(AGG_BY)) {
+			searchDataMap.put("aggBy.field", searchDataMap.getString(AGG_BY));
+			searchDataMap.remove(AGG_BY);
 		}
 		// client controlled value to enable / disable spell check.
 		searchDataMap.put("disableSpellCheck", disableSpellCheck);
@@ -221,6 +225,9 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			throw new SearchException(HttpStatus.NOT_IMPLEMENTED, "Not supported");
 		} else if (type.equalsIgnoreCase(TYPE_COMPETENCY_GRAPH)) {
 			type = KEYWORD_COMPETENCY;
+		}
+		if (!SEARCH_TYPES_MATCH.matcher(type).matches()) {
+			throw new BadRequestException("Unsupported type! Please pass a valid path variable : type");
 		}
 
 		if (searchData.getQueryString() != null && ((StringUtils.startsWithAny(searchData.getQueryString(), new String[] { "AND NOT ", "OR NOT ", "NOT AND ", "NOT OR ", "OR ", "AND " })) || (StringUtils.endsWithAny(searchData.getQueryString(), new String[] { " AND NOT", " OR NOT", " NOT AND", " NOT OR", " OR", " AND" })))) {

@@ -225,6 +225,8 @@ public interface Constants {
 
 	public static final String FLT_STANDARD_DISPLAY = "flt.standardDisplay";
 
+	public static final String FLT_RELATED_LEAF_INTERNAL_CODES = "flt.relatedLeafInternalCodes";
+
 	public static final String SEARCH_HITS = "hits";
 
 	public static final String SEARCH_TOTAL = "total";
@@ -388,8 +390,10 @@ public interface Constants {
 	public static final String AMPERSAND_DOMAIN = "&^domain";
 	public static final String AMPERSAND_STANDARD = "&^standard";
 	public static final String AMPERSAND_STANDARD_DISPLAY = "&^standardDisplay";
+	public static final String AMPERSAND_RELATED_LEAF_INTERNAL_CODES = "&^relatedLeafInternalCodes";
 	public static final String AMPERSAND_EQ_INTERNAL_CODE = "&^taxonomy.allEquivalentInternalCodes";
 	public static final String AMPERSAND_EQ_DISPLAY_CODE = "&^taxonomy.allEquivalentDisplayCodes";
+	public static final String AMPERSAND_EQ_RELATED_INTERNAL_CODE = "&^taxonomy.allEqRelatedInternalCodes";
 	public static final String AMPERSAND_EQ_COURSE_INTERNAL_CODE = "&^taxonomy.allEqCourseInternalCodes";
 	public static final String AMPERSAND_EQ_DOMAIN_INTERNAL_CODE = "&^taxonomy.allEqDomainInternalCodes";
 
@@ -519,4 +523,13 @@ public interface Constants {
 	public static final String FLT_TAXONOMY_GUT_CODE = "flt.taxonomyGutCode";
 	public static final String TAXONOMY_GUT_CODE = "taxonomyGutCode";
 	Pattern TAX_FILTERS = Pattern.compile("standard");
+	public static final String AGG_FIELDNAME = "<>-^field";
+	public static final String TYPE_CROSSWALK = "crosswalk";
+	Pattern SEARCH_TYPES_MATCH = Pattern.compile("resource|question|collection|scollection|rubric|course|unit|lesson|publisher|searchQuery|autocomplete");
+	public static final String AGG_BY = "agggBy";
+	public static final String AGG_RESPONSE_LIMIT = "aggSize";
+	public static final String AGGS = "aggs";
+	public static final String RESCORE = "rescore";
+	public static final String POST_FILTER = "post_filter";
+
 }
