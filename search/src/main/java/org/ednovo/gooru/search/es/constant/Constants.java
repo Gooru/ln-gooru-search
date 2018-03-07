@@ -227,6 +227,8 @@ public interface Constants {
 
 	public static final String FLT_RELATED_LEAF_INTERNAL_CODES = "flt.relatedLeafInternalCodes";
 
+	public static final String FLT_RELATED_GUT_CODES = "flt.relatedGutCode";
+
 	public static final String SEARCH_HITS = "hits";
 
 	public static final String SEARCH_TOTAL = "total";
@@ -429,7 +431,7 @@ public interface Constants {
 	public static final String API_COMPETENCY_NODE = "api.competency.node";
 	public static final String DNS_ENV = "dns.env";
 	public static final String KEYWORDS = "keywords";
-	Pattern DEFAULT_FILTERS = Pattern.compile("flt.collectionType|flt.contentFormat|flt.resourceFormat|flt.publishStatus|flt.courseType");
+	Pattern DEFAULT_FILTERS = Pattern.compile("flt.collectionType|flt.contentFormat|flt.resourceFormat|flt.publishStatus|flt.courseType|aggBy");
 	public static final String KEYWORD = "keyword";
 	public static final String ANALYZER = "analyzer";
 	public static final String MATCH = "match";
@@ -526,7 +528,7 @@ public interface Constants {
 	public static final String AGG_FIELDNAME = "<>-^field";
 	public static final String TYPE_CROSSWALK = "crosswalk";
 	Pattern SEARCH_TYPES_MATCH = Pattern.compile("resource|question|collection|scollection|rubric|course|unit|lesson|publisher|searchQuery|autocomplete");
-	public static final String AGG_BY = "agggBy";
+	public static final String AGG_BY = "aggBy";
 	public static final String AGG_RESPONSE_LIMIT = "aggSize";
 	public static final String AGGS = "aggs";
 	public static final String RESCORE = "rescore";
