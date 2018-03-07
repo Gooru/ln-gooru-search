@@ -36,6 +36,9 @@ public class EsDslQueryBuildProcessor extends SearchProcessor<SearchData, Object
 			searchDataType = searchData.getIndexType().getName().toUpperCase();
 		}
 		String typeLower = searchDataType.toLowerCase();
+		if (typeLower.startsWith(PEDAGOGY_UNDERSCORE)) {
+			typeLower = typeLower.replaceFirst(PEDAGOGY_UNDERSCORE, "");
+		}
 		//Map<String, Object> queryString = new HashMap<String, Object>(1);
 		searchData.getQueryDsl().put(FROM, searchData.isPaginated() ? searchData.getFrom() * searchData.getSize() : searchData.getFrom()).put(SIZE, searchData.getSize());
 		String fields = "";

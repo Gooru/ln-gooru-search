@@ -66,7 +66,10 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 
 		//To be disabled with aggregated tags are in working condition
 		setStandardKeywordToQuery(searchData, key, codes, fwCode);
-		if (!searchData.getDefaultQuery().equalsIgnoreCase(STAR)) searchData.getParameters().remove(FLT_STANDARD);
+		if (!searchData.getDefaultQuery().equalsIgnoreCase(STAR)) {
+			searchData.getParameters().remove(FLT_STANDARD);
+			searchData.getParameters().remove(FLT_RELATED_GUT_CODES);
+		}
 
 		search(searchData, TYPE_COURSE, contentResultAsMap);
 		search(searchData, TYPE_UNIT, contentResultAsMap);
@@ -150,11 +153,15 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 					}
 				}
 				if (!filterCodes.isEmpty()) {
-					parameters.remove(FLT_TAXONOMY_GUT_CODE);
-					parameters.remove(FLT_STANDARD);
-					parameters.remove(FLT_STANDARD_DISPLAY);
-					parameters.remove(FLT_FWCODE);
-					searchData.getParameters().put(FLT_STANDARD, StringUtils.join(filterCodes, COMMA));
+					searchData.getParameters().remove(FLT_STANDARD);
+					searchData.getParameters().remove(FLT_STANDARD_DISPLAY);
+					searchData.getParameters().remove(FLT_FWCODE);
+					if(searchData.getParameters().containsKey(FLT_TAXONOMY_GUT_CODE)) {
+						searchData.getParameters().put(FLT_RELATED_GUT_CODES, StringUtils.join(codes, COMMA));
+						searchData.getParameters().remove(FLT_TAXONOMY_GUT_CODE);
+					} else {
+						searchData.getParameters().put(FLT_STANDARD, StringUtils.join(filterCodes, COMMA));
+					}
 				} else {
 					searchData.getParameters().put(FLT_STANDARD, StringUtils.join(codes, COMMA));
 				}
@@ -216,7 +223,7 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 
 	@SuppressWarnings("unchecked")
 	private void setStandardKeywordToQuery(SearchData searchData, String key, String[] codes, String fwCode) {
-		if (searchData.getParameters().containsKey(FLT_STANDARD) || searchData.getParameters().containsKey(FLT_STANDARD_DISPLAY)) {
+		if (searchData.getParameters().containsKey(FLT_STANDARD) || searchData.getParameters().containsKey(FLT_STANDARD_DISPLAY) || searchData.getParameters().containsKey(FLT_RELATED_GUT_CODES)) {
 			SearchData input = new SearchData();
 			input.setPretty(searchData.getPretty());
 			input.setParameters(new MapWrapper<Object>());

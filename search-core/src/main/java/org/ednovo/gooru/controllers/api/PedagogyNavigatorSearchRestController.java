@@ -159,6 +159,8 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			@RequestParam(defaultValue = "true") boolean isCrosswalk,
 			@RequestParam(defaultValue = "true") boolean isDisplayCode) throws Exception {
 		long start = System.currentTimeMillis();
+		
+		if (StringUtils.countMatches(standardCode, HYPHEN) < 3) throw new BadRequestException("Invalid code! Please pass valid competency/micro-competency.");
 
 		SearchData searchData = generateLMSearchData(request, standardCode, fwCode, sessionToken, limit, startAt, pageNum, pretty, query, isCrosswalk, isDisplayCode);
 		String excludeAttributeArray[] = {};

@@ -327,6 +327,9 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 				if (parameterKey.contains(FLT) && (!parameterKey.equalsIgnoreCase(FLT_COLLECTION_TYPE) && !(parameterKey.equalsIgnoreCase(FLT_RESOURCE_FORMAT) && parameterMap.get(FLT_RESOURCE_FORMAT).toString().equalsIgnoreCase(TYPE_QUESTION)) && !(parameterKey.equalsIgnoreCase(FLT_RATING) && parameterMap.get(FLT_RATING).toString().contains(STR_ZERO)))) {
 					hasFilter = true;
 					break;
+				} else if (parameterKey.equalsIgnoreCase("aggBy")) {
+					hasFilter = true;
+					break;
 				}
 			}
 			query = query.replaceAll(ESCAPED_STAR, EMPTY_STRING);
