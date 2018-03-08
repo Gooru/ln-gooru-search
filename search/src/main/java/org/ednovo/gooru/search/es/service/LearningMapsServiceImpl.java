@@ -1,5 +1,6 @@
 package org.ednovo.gooru.search.es.service;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -65,11 +66,7 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 		search(searchData, TYPE_RUBRIC, contentResultAsMap);
 
 		//To be disabled with aggregated tags are in working condition
-		setStandardKeywordToQuery(searchData, key, codes, fwCode);
-		if (!searchData.getDefaultQuery().equalsIgnoreCase(STAR)) {
-			searchData.getParameters().remove(FLT_STANDARD);
-			searchData.getParameters().remove(FLT_RELATED_GUT_CODES);
-		}
+		setFilterWithExtractedKeywordsAndSubjects(searchData, key, codes, fwCode);
 
 		search(searchData, TYPE_COURSE, contentResultAsMap);
 		search(searchData, TYPE_UNIT, contentResultAsMap);
@@ -78,6 +75,21 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 		searchResult.put(Constants.CONTENTS, contentResultAsMap);
 		searchResponse.setSearchResults(searchResult);
 		return searchResponse;
+	}
+
+	private void extractSubjects(List<String> stds, Set<String> subjects, Boolean isGut) {
+		if (stds != null) {
+			stds.forEach(std -> {
+				if (std.contains(HYPHEN)) {
+					if (isGut) {
+						subjects.add(std.substring(0, std.indexOf(HYPHEN)));
+					} else {
+						subjects.add(std.substring(0, std.indexOf(HYPHEN)));
+						subjects.add(std.substring((std.indexOf(DOT) + 1), std.indexOf(HYPHEN)));
+					}
+				}
+			});
+		}
 	}
 	
 	@Override
@@ -103,15 +115,15 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 			inputSearchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_FORMAT, type);
 			inputSearchData.setType(TYPE_SCOLLECTION);
 		}
-		//To be enabled with aggregated tags are in working condition
+		//To be enabled when aggregated tags are in working condition
 /*		if (CUL_MATCH.matcher(type).matches()) {
 			if (searchData.getParameters().containsKey(FLT_STANDARD)) {
 				searchData.getParameters().put(FLT_RELATED_LEAF_INTERNAL_CODES, searchData.getParameters().getString(FLT_STANDARD));
 				searchData.getParameters().remove(FLT_STANDARD);
 			}
 		}*/
-		if (CUL_MATCH.matcher(type).matches() && !searchData.getDefaultQuery().equalsIgnoreCase(STAR))
-			inputSearchData.setParameters(new MapWrapper<>());
+/*		if (CUL_MATCH.matcher(type).matches() && !searchData.getDefaultQuery().equalsIgnoreCase(STAR))
+			inputSearchData.setParameters(new MapWrapper<>());*/
 		SearchResponse<Object> searchResponse = (SearchResponse<Object>) SearchHandler.getSearcher((PEDAGOGY_UNDERSCORE + inputSearchData.getType()).toUpperCase()).search(inputSearchData);
 		Map<String, Object> searchMap = new HashMap<>();
 		searchMap.put(TOTAL_HIT_COUNT, searchResponse.getStats().get(TOTAL_HIT_COUNT));
@@ -222,7 +234,7 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void setStandardKeywordToQuery(SearchData searchData, String key, String[] codes, String fwCode) {
+	private void setFilterWithExtractedKeywordsAndSubjects(SearchData searchData, String key, String[] codes, String fwCode) {
 		if (searchData.getParameters().containsKey(FLT_STANDARD) || searchData.getParameters().containsKey(FLT_STANDARD_DISPLAY) || searchData.getParameters().containsKey(FLT_RELATED_GUT_CODES)) {
 			SearchData input = new SearchData();
 			input.setPretty(searchData.getPretty());
@@ -241,8 +253,19 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 						queryBuilder.append(keyword);
 					}
 				}
-				if (queryBuilder.length() > 0)
+				if (queryBuilder.length() > 0) {
 					searchData.setDefaultQuery(queryBuilder.toString());
+					List<String> stds = null;
+					List<String> gutStds = null;
+					if (searchData.getParameters().getString(FLT_STANDARD) != null) stds = Arrays.asList(searchData.getParameters().getString(FLT_STANDARD).split(COMMA));
+					if (searchData.getParameters().getString(FLT_RELATED_GUT_CODES) != null) gutStds = Arrays.asList(searchData.getParameters().getString(FLT_RELATED_GUT_CODES).split(COMMA));
+					Set<String> subjects = new HashSet<>();
+					extractSubjects(stds, subjects, false);
+					extractSubjects(gutStds, subjects, true);
+					if (!subjects.isEmpty()) searchData.getParameters().put(FLT_SUBJECT, StringUtils.join(subjects, COMMA));
+					searchData.getParameters().remove(FLT_STANDARD);
+					searchData.getParameters().remove(FLT_RELATED_GUT_CODES);
+				}
 			}
 		}
 	}
