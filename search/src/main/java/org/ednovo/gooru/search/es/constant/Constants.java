@@ -222,6 +222,8 @@ public interface Constants {
 	public static final String SEARCH_TAXONOMY_SUBJECT_CLASSIFICATION = "search.taxonomy.subject.classification";
 
 	public static final String FLT_STANDARD = "flt.standard";
+	
+	public static final String FLT_SUBJECT = "flt.subject";
 
 	public static final String FLT_STANDARD_DISPLAY = "flt.standardDisplay";
 

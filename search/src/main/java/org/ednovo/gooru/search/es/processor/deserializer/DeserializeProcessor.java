@@ -141,7 +141,7 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 		final String subject = getSubjectFromCodeId(internalCode);
 		String framework = null;
 		try {
-			if (standardPrefs != null && standardPrefs.has(subject)) {
+			if (standardPrefs != null && subject != null && standardPrefs.has(subject)) {
 				framework = standardPrefs.getString(subject);
 				if (framework != null) {
 					if (!internalCode.startsWith(framework + DOT) && crosswalkCodes != null) {
@@ -180,7 +180,7 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 	}
 
 	private String getSubjectFromCodeId(String codeId) {
-		return codeId.substring((codeId.indexOf(DOT) + 1), codeId.indexOf(HYPHEN));
+		return codeId.contains(HYPHEN) ? codeId.substring((codeId.indexOf(DOT) + 1), codeId.indexOf(HYPHEN)) : null;
 	}
 
 	@SuppressWarnings("unchecked")
