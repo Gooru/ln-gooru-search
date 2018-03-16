@@ -159,15 +159,12 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 						}
 					}
 				}
-				if (!filterCodes.isEmpty()) {
-					searchData.getParameters().remove(FLT_STANDARD);
-					searchData.getParameters().remove(FLT_STANDARD_DISPLAY);
-					searchData.getParameters().remove(FLT_FWCODE);
-					searchData.getParameters().put(FLT_STANDARD, StringUtils.join(codes, COMMA));
-					//searchData.getParameters().put(FLT_RELATED_GUT_CODES, StringUtils.join(filterCodes, COMMA));
-				} else {
-					searchData.getParameters().put(FLT_STANDARD, StringUtils.join(codes, COMMA));
-				}
+				searchData.getParameters().remove(FLT_STANDARD);
+				searchData.getParameters().remove(FLT_FWCODE);
+				searchData.getParameters().put(FLT_STANDARD, StringUtils.join(codes, COMMA));
+				if (parameters.containsKey(FLT_STANDARD_DISPLAY)) searchData.getParameters().put(FLT_STANDARD, StringUtils.join(filterCodes, COMMA));
+				searchData.getParameters().remove(FLT_STANDARD_DISPLAY);
+				// searchData.getParameters().put(FLT_RELATED_GUT_CODES, StringUtils.join(filterCodes, COMMA));
 			} else if (searchData.getParameters().containsKey(FLT_TAXONOMY_GUT_CODE)) {
 				searchData.getParameters().put(FLT_RELATED_GUT_CODES, StringUtils.join(codes, COMMA));
 				searchData.getParameters().remove(FLT_TAXONOMY_GUT_CODE);
