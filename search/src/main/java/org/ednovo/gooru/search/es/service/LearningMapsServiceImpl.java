@@ -122,8 +122,6 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 				searchData.getParameters().remove(FLT_STANDARD);
 			}
 		}*/
-/*		if (CUL_MATCH.matcher(type).matches() && !searchData.getDefaultQuery().equalsIgnoreCase(STAR))
-			inputSearchData.setParameters(new MapWrapper<>());*/
 		SearchResponse<Object> searchResponse = (SearchResponse<Object>) SearchHandler.getSearcher((PEDAGOGY_UNDERSCORE + inputSearchData.getType()).toUpperCase()).search(inputSearchData);
 		Map<String, Object> searchMap = new HashMap<>();
 		searchMap.put(TOTAL_HIT_COUNT, searchResponse.getStats().get(TOTAL_HIT_COUNT));
@@ -134,7 +132,7 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 		} else {
 			resultAsMap.put(type, searchMap);
 		}
-		logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - uStart) + " ms");
+		logger.info("Elapsed time to complete {} search process : {} ms", type , (System.currentTimeMillis() - uStart));
 		return resultAsMap;
 	}
 
@@ -142,22 +140,19 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 	private void generateStandardFilter(SearchData searchData, String key, String[] codes, String fwCode) {
 		if (searchData.getParameters() != null && searchData.getParameters().getValues().size() != 0) {
 			MapWrapper<Object> parameters = searchData.getParameters();
-			if (parameters != null && ((parameters.containsKey(FLT_STANDARD_DISPLAY) || (parameters.containsKey(FLT_STANDARD)) && parameters.containsKey(FLT_FWCODE)) || (parameters.containsKey(FLT_TAXONOMY_GUT_CODE)))) {
+			if (parameters != null && ((parameters.containsKey(FLT_STANDARD_DISPLAY) || (parameters.containsKey(FLT_STANDARD))) && parameters.containsKey(FLT_FWCODE))) {
 				SearchData crosswalkRequest = new SearchData();
 				crosswalkRequest.setPretty(searchData.getPretty());
 				crosswalkRequest.setIndexType(EsIndex.CROSSWALK);
-				if (parameters.containsKey(FLT_TAXONOMY_GUT_CODE)) {
-					crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.ID, (StringUtils.join(codes, COMMA)));
-				} else {
-					crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CROSSWALK_CODES + DOT + key, (StringUtils.join(codes, COMMA)));
-					if (fwCode != null) crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CROSSWALK_CODES + DOT + IndexFields.FRAMEWORK_CODE, fwCode);
-				}
+				crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CROSSWALK_CODES + DOT + key, (StringUtils.join(codes, COMMA)));
+				if (fwCode != null) crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CROSSWALK_CODES + DOT + IndexFields.FRAMEWORK_CODE, fwCode);
 				crosswalkRequest.setQueryString(STAR);
 				List<Map<String, Object>> crosswalkResponses = (List<Map<String, Object>>) SearchHandler.getSearcher(SearchHandlerType.CROSSWALK.name()).search(crosswalkRequest).getSearchResults();
 				Set<String> filterCodes = new HashSet<>();
 				if (crosswalkResponses != null && !crosswalkResponses.isEmpty()) {
 					for (Map<String, Object> response : crosswalkResponses) {
 						Map<String, Object> source = (Map<String, Object>) response.get(SEARCH_SOURCE);
+						//filterCodes.add(((String) source.get(IndexFields.GUT_CODE)).toLowerCase());
 						List<Map<String, String>> crosswalkCodes = (List<Map<String, String>>) source.get(IndexFields.CROSSWALK_CODES);
 						for (Map<String, String> code : crosswalkCodes) {
 							filterCodes.add(((String) code.get(IndexFields.ID)).toLowerCase());
@@ -168,15 +163,14 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 					searchData.getParameters().remove(FLT_STANDARD);
 					searchData.getParameters().remove(FLT_STANDARD_DISPLAY);
 					searchData.getParameters().remove(FLT_FWCODE);
-					if(searchData.getParameters().containsKey(FLT_TAXONOMY_GUT_CODE)) {
-						searchData.getParameters().put(FLT_RELATED_GUT_CODES, StringUtils.join(codes, COMMA));
-						searchData.getParameters().remove(FLT_TAXONOMY_GUT_CODE);
-					} else {
-						searchData.getParameters().put(FLT_STANDARD, StringUtils.join(filterCodes, COMMA));
-					}
+					searchData.getParameters().put(FLT_STANDARD, StringUtils.join(codes, COMMA));
+					//searchData.getParameters().put(FLT_RELATED_GUT_CODES, StringUtils.join(filterCodes, COMMA));
 				} else {
 					searchData.getParameters().put(FLT_STANDARD, StringUtils.join(codes, COMMA));
 				}
+			} else if (searchData.getParameters().containsKey(FLT_TAXONOMY_GUT_CODE)) {
+				searchData.getParameters().put(FLT_RELATED_GUT_CODES, StringUtils.join(codes, COMMA));
+				searchData.getParameters().remove(FLT_TAXONOMY_GUT_CODE);
 			}
 		}
 	}
@@ -223,8 +217,7 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 					});
 				}
 				searchResult.put(PREREQUISITES, progressions);
-			}
-			if (key.equalsIgnoreCase(TAXONOMY_GUT_CODE)) searchResult.put(PREREQUISITES, gutPrerequisites);
+			} else if (key.equalsIgnoreCase(TAXONOMY_GUT_CODE)) searchResult.put(PREREQUISITES, gutPrerequisites);
 			searchResult.put(SIGNATURE_CONTENTS, response.getSignatureContents());
 			searchResult.put(IndexFields.GUT_CODE, response.getGutCode());
 			searchResult.put(IndexFields.CODE, response.getDisplayCode());
