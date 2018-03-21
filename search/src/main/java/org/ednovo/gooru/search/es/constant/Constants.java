@@ -535,5 +535,7 @@ public interface Constants {
 	public static final String AGGS = "aggs";
 	public static final String RESCORE = "rescore";
 	public static final String POST_FILTER = "post_filter";
+	public static final String CONTENT_COUNTS = "contentCounts";
+	public static final String STATS = "stats";
 
 }

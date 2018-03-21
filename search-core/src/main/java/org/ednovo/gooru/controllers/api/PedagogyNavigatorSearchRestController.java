@@ -21,7 +21,7 @@ import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.model.User;
 import org.ednovo.gooru.search.es.model.UserGroupSupport;
 import org.ednovo.gooru.search.es.processor.util.SerializerUtil;
-import org.ednovo.gooru.search.es.service.LearningMapsService;
+import org.ednovo.gooru.search.es.service.PedagogyNavigatorService;
 import org.ednovo.gooru.search.es.service.SearchSettingService;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -44,13 +44,13 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 	protected static final Logger logger = LoggerFactory.getLogger(PedagogyNavigatorSearchRestController.class);
 	
 	@Autowired
-	private LearningMapsService pedagogySearchService;
+	private PedagogyNavigatorService pedagogySearchService;
 		
 	@SuppressWarnings("unchecked")
 	@RequestMapping(method = { RequestMethod.GET }, value = "/{type}")
 	public ModelAndView search(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) String sessionToken,
 			@RequestParam(defaultValue = "10", value = "length") Integer limit, @RequestParam(defaultValue = "0") Integer startAt, @RequestParam(defaultValue = "1", value = "start") Integer pageNum,
-			@RequestParam(defaultValue = "0") String pretty, @RequestParam(value = "q") String query, @PathVariable String type,
+			@RequestParam(defaultValue = "0") String pretty, @RequestParam(value = "q", defaultValue = "*") String query, @PathVariable String type,
 			@RequestParam(required = false, defaultValue = "true") boolean isCrosswalk) throws Exception {
 		long start = System.currentTimeMillis();
 
@@ -200,6 +200,62 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		try {
 			SearchResponse<Object> searchResponse = pedagogySearchService.searchPedagogy(searchData);
 			logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
+			return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
+		} catch (SearchException searchException) {
+			response.setStatus(searchException.getStatus().value());
+			return toModelAndView(searchException.getMessage());
+		}
+	}
+	
+	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/stats")
+	public ModelAndView fetchLearningMapStats(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam(required = true) String subjectClassification,
+			@RequestParam(required = false) String subjectCode,
+			@RequestParam(required = false) String courseCode,
+			@RequestParam(required = false) String domainCode,
+			@RequestParam(required = false) String codeType,
+			@RequestParam(required = false) String sessionToken,
+			@RequestParam(defaultValue = "10", value = "length") Integer limit, 
+			@RequestParam(defaultValue = "0") Integer startAt, 
+			@RequestParam(defaultValue = "1", value = "start") Integer pageNum,
+			@RequestParam(defaultValue = "0") String pretty) throws Exception {
+		long start = System.currentTimeMillis();
+		if (subjectCode != null) {
+			String[] subjectList = subjectCode.split(COMMA);
+			for (String subject : subjectList) {
+				int dotCount = StringUtils.countMatches(subject, DOT);
+				int hyphenCount = StringUtils.countMatches(subject, HYPHEN);
+				if (dotCount < 1 || dotCount > 3 || hyphenCount > 0)
+					throw new BadRequestException("Invalid code! Please pass valid subject.");
+			}
+		}
+		if (courseCode != null) {
+			String[] courseList = courseCode.split(COMMA);
+			for (String course : courseList) {
+				int hyphenCount = StringUtils.countMatches(course, HYPHEN);
+				if (!(hyphenCount == 1))
+					throw new BadRequestException("Invalid code! Please pass valid course.");
+			}
+		}
+		if (domainCode != null) {
+			String[] domainList = domainCode.split(COMMA);
+			for (String domain : domainList) {
+				int hyphenCount = StringUtils.countMatches(domain, HYPHEN);
+				if (!(hyphenCount == 2))
+					throw new BadRequestException("Invalid code! Please pass valid domain.");
+			}
+		}
+		SearchData searchData = new SearchData();
+		searchData.setFrom(startAt);
+		searchData.setPageNum(pageNum);
+		searchData.setSize(limit > 0 ? limit : 10);
+		if (searchData.getFrom() < 1) {
+			searchData.setFrom((pageNum - 1) * searchData.getSize());
+		}
+		String excludeAttributeArray[] = {};
+		try {
+			SearchResponse<Object> searchResponse = pedagogySearchService.fetchLearningMapStats(searchData, subjectClassification, subjectCode, courseCode, domainCode, codeType);
+			logger.info("Elapsed time to fetch LM Stats :" + (System.currentTimeMillis() - start) + " ms");
 			return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
 		} catch (SearchException searchException) {
 			response.setStatus(searchException.getStatus().value());

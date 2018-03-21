@@ -1,5 +1,6 @@
 package org.ednovo.gooru.search.es.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,9 +18,11 @@ import org.ednovo.gooru.search.es.model.MapWrapper;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.model.Taxonomy;
+import org.ednovo.gooru.search.es.repository.LearningMapStatsRepository;
 import org.ednovo.gooru.search.model.GutPrerequisites;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 /**
  * @author Renuka
@@ -30,74 +33,15 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 
 	private static final Logger logger = LoggerFactory.getLogger(LearningMapsServiceImpl.class);
 	
-	@Override
-	public SearchResponse<Object> searchPedagogy(SearchData searchData) {
-		SearchResponse<Object> searchResponse = new SearchResponse<Object>();
-		Map<String, Object> searchResult = new HashMap<>();
-		Map<String, Object> contentResultAsMap = new HashMap<>();
-		String[] codes = null;
-		String key = null;
-		String fwCode = null;
-		if (searchData.getParameters() != null && searchData.getParameters().getValues().size() != 0) {
-			MapWrapper<Object> parameters = searchData.getParameters();
-			if (parameters != null) {
-				fwCode = (parameters.getString(FLT_FWCODE));
-				if (parameters.containsKey(FLT_STANDARD_DISPLAY)) {
-					codes = (parameters.getString(FLT_STANDARD_DISPLAY)).split(COMMA);
-					key = IndexFields.CODE;
-				} else if (parameters.containsKey(FLT_STANDARD)) {
-					codes = (parameters.getString(FLT_STANDARD)).split(COMMA);
-					key = IndexFields.ID;
-				} else if (parameters.containsKey(FLT_TAXONOMY_GUT_CODE)) {
-					codes = (parameters.getString(FLT_TAXONOMY_GUT_CODE)).split(COMMA);
-					key = TAXONOMY_GUT_CODE;
-				}
-			}
-		}
-		if (key != null && codes != null) {
-			generateRequestedCodeInfo(searchData, key, codes, fwCode, searchResult);
-			generateStandardFilter(searchData, key, codes, fwCode);
-		}
-
-		search(searchData, TYPE_RESOURCE, contentResultAsMap);
-		search(searchData, TYPE_QUESTION, contentResultAsMap);
-		search(searchData, TYPE_SCOLLECTION, contentResultAsMap);
-		search(searchData, TYPE_ASSESSMENT, contentResultAsMap);
-		search(searchData, TYPE_RUBRIC, contentResultAsMap);
-
-		//To be disabled with aggregated tags are in working condition
-		setFilterWithExtractedKeywordsAndSubjects(searchData, key, codes, fwCode);
-
-		search(searchData, TYPE_COURSE, contentResultAsMap);
-		search(searchData, TYPE_UNIT, contentResultAsMap);
-		search(searchData, TYPE_LESSON, contentResultAsMap);
-		
-		searchResult.put(Constants.CONTENTS, contentResultAsMap);
-		searchResponse.setSearchResults(searchResult);
-		return searchResponse;
-	}
-
-	private void extractSubjects(List<String> stds, Set<String> subjects, Boolean isGut) {
-		if (stds != null) {
-			stds.forEach(std -> {
-				if (std.contains(HYPHEN)) {
-					if (isGut) {
-						subjects.add(std.substring(0, std.indexOf(HYPHEN)));
-					} else {
-						subjects.add(std.substring(0, std.indexOf(HYPHEN)));
-						subjects.add(std.substring((std.indexOf(DOT) + 1), std.indexOf(HYPHEN)));
-					}
-				}
-			});
-		}
-	}
+	@Autowired
+	private LearningMapStatsRepository learningMapStatsRepository;
 	
 	@Override
 	public Map<String, Object> search(SearchData searchData, String type, Map<String, Object> resultAsMap) {
 		long uStart = System.currentTimeMillis();
 		SearchData inputSearchData = new SearchData();
 		inputSearchData.setPretty(searchData.getPretty());
-		inputSearchData.setQueryString(searchData.getDefaultQuery());
+		inputSearchData.setQueryString(searchData.getQueryString());
 		inputSearchData.setFrom(searchData.getFrom());
 		inputSearchData.setSize(searchData.getSize());
 		inputSearchData.putFilters(searchData.getFilters());
@@ -114,6 +58,11 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 		} else if (type.equalsIgnoreCase(TYPE_ASSESSMENT)) {
 			inputSearchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_FORMAT, type);
 			inputSearchData.setType(TYPE_SCOLLECTION);
+		}
+		if (CUL_MATCH.matcher(type).matches() && !searchData.getDefaultQuery().equalsIgnoreCase(STAR)) {
+			String queryString = searchData.getDefaultQuery();
+			if(!searchData.getQueryString().equalsIgnoreCase(STAR)) queryString = searchData.getQueryString() + " AND (" + searchData.getDefaultQuery() + ")";
+			inputSearchData.setQueryString(queryString);
 		}
 		//To be enabled when aggregated tags are in working condition
 /*		if (CUL_MATCH.matcher(type).matches()) {
@@ -137,7 +86,8 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void generateStandardFilter(SearchData searchData, String key, String[] codes, String fwCode) {
+	@Override
+	public void generateStandardFilter(SearchData searchData, String key, String[] codes, String fwCode) {
 		if (searchData.getParameters() != null && searchData.getParameters().getValues().size() != 0) {
 			MapWrapper<Object> parameters = searchData.getParameters();
 			if (parameters != null && ((parameters.containsKey(FLT_STANDARD_DISPLAY) || (parameters.containsKey(FLT_STANDARD))) && parameters.containsKey(FLT_FWCODE))) {
@@ -152,6 +102,7 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 				if (crosswalkResponses != null && !crosswalkResponses.isEmpty()) {
 					for (Map<String, Object> response : crosswalkResponses) {
 						Map<String, Object> source = (Map<String, Object>) response.get(SEARCH_SOURCE);
+// To be enabled when GUT is fully functional
 						//filterCodes.add(((String) source.get(IndexFields.GUT_CODE)).toLowerCase());
 						List<Map<String, String>> crosswalkCodes = (List<Map<String, String>>) source.get(IndexFields.CROSSWALK_CODES);
 						for (Map<String, String> code : crosswalkCodes) {
@@ -164,6 +115,7 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 				searchData.getParameters().put(FLT_STANDARD, StringUtils.join(codes, COMMA));
 				if (parameters.containsKey(FLT_STANDARD_DISPLAY)) searchData.getParameters().put(FLT_STANDARD, StringUtils.join(filterCodes, COMMA));
 				searchData.getParameters().remove(FLT_STANDARD_DISPLAY);
+// To be enabled when GUT is fully functional
 				// searchData.getParameters().put(FLT_RELATED_GUT_CODES, StringUtils.join(filterCodes, COMMA));
 			} else if (searchData.getParameters().containsKey(FLT_TAXONOMY_GUT_CODE)) {
 				searchData.getParameters().put(FLT_RELATED_GUT_CODES, StringUtils.join(codes, COMMA));
@@ -173,7 +125,8 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void generateRequestedCodeInfo(SearchData searchData, String key,  String[] codes, String requestedFwCode, Map<String, Object> searchResult) {
+	@Override
+	public void generateRequestedCodeInfo(SearchData searchData, String key,  String[] codes, String requestedFwCode, Map<String, Object> searchResult) {
 		SearchData taxonomyRequest = new SearchData();
 		taxonomyRequest.setPretty(searchData.getPretty());
 		taxonomyRequest.setIndexType(EsIndex.TAXONOMY);
@@ -184,7 +137,7 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 		if (taxonomyResponses != null && !taxonomyResponses.isEmpty()) {
 			Taxonomy response = taxonomyResponses.get(0);
 			List<GutPrerequisites> gutPrerequisites = response.getGutPrerequisites();
-			if (!key.equalsIgnoreCase(TAXONOMY_GUT_CODE)) {
+			if (!key.equalsIgnoreCase(TAXONOMY_GUT_CODE) && requestedFwCode != null) {
 				Set<Map<String, String>> progressions = new HashSet<>();
 				if (gutPrerequisites != null && gutPrerequisites.size() > 0) {
 					gutPrerequisites.forEach(a -> {
@@ -224,7 +177,8 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void setFilterWithExtractedKeywordsAndSubjects(SearchData searchData, String key, String[] codes, String fwCode) {
+	@Override
+	public void setFilterWithExtractedKeywordsAndSubjects(SearchData searchData, String key, String[] codes, String fwCode) {
 		if (searchData.getParameters().containsKey(FLT_STANDARD) || searchData.getParameters().containsKey(FLT_STANDARD_DISPLAY) || searchData.getParameters().containsKey(FLT_RELATED_GUT_CODES)) {
 			SearchData input = new SearchData();
 			input.setPretty(searchData.getPretty());
@@ -258,6 +212,52 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 				}
 			}
 		}
+	}
+	
+	@Override
+	public void getLearningMapStats(SearchData searchData, Map<String, Object> searchResult, String subjectClassification, String subjectCode, String courseCode, String domainCode, String codeType) {
+		List<Map<String, Object>> contentStatsAsList = getLearningMapStatsRepository().getStats(subjectClassification, subjectCode, courseCode, domainCode, codeType, searchData.getFrom(), searchData.getSize());
+		List<Map<String, Object>> stats = new ArrayList<>();
+		if (contentStatsAsList != null) {
+			for(Map<String, Object> contentStat : contentStatsAsList) {
+				Map<String, Object> statsAsMap = new HashMap<>();
+				generateRequestedCodeInfo(searchData, TAXONOMY_GUT_CODE, contentStat.get(IndexFields.ID).toString().split(COMMA), null, statsAsMap);
+				statsAsMap.put(IndexFields.ID, contentStat.get(IndexFields.ID).toString());
+				statsAsMap.put("subjectCode", contentStat.get("subjectCode").toString());
+				statsAsMap.put("courseCode", contentStat.get("courseCode").toString());
+				statsAsMap.put("domainCode", contentStat.get("domainCode").toString());
+				statsAsMap.remove(SIGNATURE_CONTENTS);
+				statsAsMap.remove(IndexFields.GUT_CODE);
+				contentStat.remove(IndexFields.ID);
+				contentStat.remove("subjectCode");
+				contentStat.remove("courseCode");
+				contentStat.remove("domainCode");
+				statsAsMap.put(CONTENT_COUNTS, contentStat);
+				stats.add(statsAsMap);
+			}
+		}
+		Long totalHitCount = getLearningMapStatsRepository().getTotalCount(subjectClassification, subjectCode, courseCode, domainCode, codeType);
+		searchResult.put(STATS, stats);
+		searchResult.put(TOTAL_HIT_COUNT, totalHitCount);
+	}
+	
+	private void extractSubjects(List<String> stds, Set<String> subjects, Boolean isGut) {
+		if (stds != null) {
+			stds.forEach(std -> {
+				if (std.contains(HYPHEN)) {
+					if (isGut) {
+						subjects.add(std.substring(0, std.indexOf(HYPHEN)));
+					} else {
+						subjects.add(std.substring(0, std.indexOf(HYPHEN)));
+						subjects.add(std.substring((std.indexOf(DOT) + 1), std.indexOf(HYPHEN)));
+					}
+				}
+			});
+		}
+	}
+	
+	private LearningMapStatsRepository getLearningMapStatsRepository() {
+		return learningMapStatsRepository;
 	}
 
 }
