@@ -146,7 +146,7 @@ public class SuggestV3RestController extends BaseController {
 		suggestData.setUserTenantRootId(userTenantRootId);
 		
 		suggestData.setFrom(0);
-		suggestData.setSize(pageSize);
+		suggestData.setSize(pageSize > 0 ? pageSize : 10);
 		suggestData.setPretty(pretty);
 		suggestData.setSessionToken(sessionToken);
 		suggestData.setRemoteAddress(request.getRemoteAddr());

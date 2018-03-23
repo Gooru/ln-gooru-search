@@ -233,16 +233,16 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		if (searchData.getQueryString() != null && ((StringUtils.startsWithAny(searchData.getQueryString(), new String[] { "AND NOT ", "OR NOT ", "NOT AND ", "NOT OR ", "OR ", "AND " })) || (StringUtils.endsWithAny(searchData.getQueryString(), new String[] { " AND NOT", " OR NOT", " NOT AND", " NOT OR", " OR", " AND" })))) {
 			searchService.trimInvalidExpression(searchData);
 		}
+
 		searchData.setType(type);
-		searchData.setFrom(startAt);
-		searchData.setPageNum(pageNum);
+		searchData.setFrom(startAt > 0 ? startAt : 0);
+		searchData.setPageNum(pageNum > 0 ? pageNum : 1);
+		searchData.setSize(pageSize >= 0 ? pageSize : 8);
 		if (type.equalsIgnoreCase(TYPE_SCOLLECTION) && includeCollectionItem) {
 			searchData.setSize(5);
-		} else {
-			searchData.setSize(pageSize);
 		}
 		if (searchData.getFrom() < 1) {
-			searchData.setFrom((pageNum - 1) * searchData.getSize());
+			searchData.setFrom((searchData.getPageNum() - 1) * searchData.getSize());
 		}
 		searchData.setRemoteAddress(request.getRemoteAddr());
 		searchData.setUser(apiCaller);
@@ -406,11 +406,11 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		}
 
 		searchData.setType(type);
-		searchData.setFrom(startAt);
-		searchData.setPageNum(pageNum);
-		searchData.setSize(pageSize);
+		searchData.setFrom(startAt > 0 ? startAt : 0);
+		searchData.setPageNum(pageNum > 0 ? pageNum : 1);
+		searchData.setSize(pageSize >= 0 ? pageSize : 8);
 		if (searchData.getFrom() < 1) {
-			searchData.setFrom((pageNum - 1) * searchData.getSize());
+			searchData.setFrom((searchData.getPageNum() - 1) * searchData.getSize());
 		}
 		searchData.setRemoteAddress(request.getRemoteAddr());
 		User apiCaller = (User) request.getAttribute(USER);

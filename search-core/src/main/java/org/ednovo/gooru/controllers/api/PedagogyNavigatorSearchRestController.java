@@ -110,11 +110,11 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		}
 
 		searchData.setType(type);
-		searchData.setFrom(startAt);
-		searchData.setPageNum(pageNum);
-		searchData.setSize(limit);
+		searchData.setFrom(startAt > 0 ? startAt : 0);
+		searchData.setPageNum(pageNum > 0 ? pageNum : 1);
+		searchData.setSize(limit >= 0 ? limit : 10);
 		if (searchData.getFrom() < 1) {
-			searchData.setFrom((pageNum - 1) * searchData.getSize());
+			searchData.setFrom((searchData.getPageNum() - 1) * searchData.getSize());
 		}
 		searchData.setRemoteAddress(request.getRemoteAddr());
 		searchData.setUser(apiCaller);
@@ -146,7 +146,6 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/subject/{subjectCode:.+}")
 	public ModelAndView searchLearningMapsBySubject(HttpServletRequest request, HttpServletResponse response,
 			@PathVariable String subjectCode,
@@ -244,13 +243,15 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 				if (!(hyphenCount == 2))
 					throw new BadRequestException("Invalid code! Please pass valid domain.");
 			}
-		}
+		}		
+
 		SearchData searchData = new SearchData();
-		searchData.setFrom(startAt);
-		searchData.setPageNum(pageNum);
-		searchData.setSize(limit > 0 ? limit : 10);
+		searchData.setPretty(pretty);
+		searchData.setFrom(startAt > 0 ? startAt : 0);
+		searchData.setPageNum(pageNum > 0 ? pageNum : 1);
+		searchData.setSize(limit >= 0 ? limit : 10);
 		if (searchData.getFrom() < 1) {
-			searchData.setFrom((pageNum - 1) * searchData.getSize());
+			searchData.setFrom((searchData.getPageNum() - 1) * searchData.getSize());
 		}
 		String excludeAttributeArray[] = {};
 		try {
@@ -289,11 +290,11 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		searchData.setCrosswalk(isCrosswalk);
 
 		searchData.setType(LEARNING_MAPS);
-		searchData.setFrom(startAt);
-		searchData.setPageNum(pageNum);
-		searchData.setSize(limit);
+		searchData.setFrom(startAt > 0 ? startAt : 0);
+		searchData.setPageNum(pageNum > 0 ? pageNum : 1);
+		searchData.setSize(limit >= 0 ? limit : 10);
 		if (searchData.getFrom() < 1) {
-			searchData.setFrom((pageNum - 1) * searchData.getSize());
+			searchData.setFrom((searchData.getPageNum() - 1) * searchData.getSize());
 		}
 		searchData.setRemoteAddress(request.getRemoteAddr());
 		searchData.setUser(apiCaller);
@@ -308,6 +309,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		return searchData;
 	}
 
+	@SuppressWarnings("unchecked")
 	private void processParameters(HttpServletRequest request, SearchData searchData, String code, String fwCode, String codeType, boolean isDisplayCode) {
 		MapWrapper<Object> searchDataMap = new MapWrapper<Object>(request.getParameterMap());
 

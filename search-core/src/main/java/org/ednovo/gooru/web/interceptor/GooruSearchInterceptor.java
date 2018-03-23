@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.ednovo.gooru.kafka.producer.KafkaRegistry;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.exception.MethodFailureException;
+import org.ednovo.gooru.search.es.exception.UnauthorizedException;
 import org.ednovo.gooru.search.es.model.SessionContextSupport;
 import org.ednovo.gooru.search.es.model.User;
 import org.ednovo.gooru.search.model.GooruAuthenticationToken;
@@ -42,6 +43,8 @@ public class GooruSearchInterceptor extends HandlerInterceptorAdapter {
 		if (authenticationContext != null && authenticationContext.getErrorMessage() != null) {
 			if (authenticationContext.getErrorCode() == 403) {
 				throw new AccessDeniedException(authenticationContext.getErrorMessage());
+			} else if (authenticationContext.getErrorCode() == 401) {
+				throw new UnauthorizedException(authenticationContext.getErrorMessage());
 			} else {
 
 				throw new MethodFailureException(authenticationContext.getErrorMessage());

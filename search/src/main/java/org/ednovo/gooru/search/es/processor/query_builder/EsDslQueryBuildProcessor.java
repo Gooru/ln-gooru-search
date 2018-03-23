@@ -39,7 +39,6 @@ public class EsDslQueryBuildProcessor extends SearchProcessor<SearchData, Object
 		if (typeLower.startsWith(PEDAGOGY_UNDERSCORE)) {
 			typeLower = typeLower.replaceFirst(PEDAGOGY_UNDERSCORE, "");
 		}
-		//Map<String, Object> queryString = new HashMap<String, Object>(1);
 		searchData.getQueryDsl().put(FROM, searchData.isPaginated() ? searchData.getFrom() * searchData.getSize() : searchData.getFrom()).put(SIZE, searchData.getSize());
 		String fields = "";
 
@@ -87,7 +86,6 @@ public class EsDslQueryBuildProcessor extends SearchProcessor<SearchData, Object
 		Query mainQuery = new Query(searchData.getQueryString(), queryFields, true, searchData.getDefaultOperator(), searchData.isAllowLeadingWildcard(), analyzer,
 				getCassandraSettingAsFloat("search." + typeLower + ".query.user_query.boost"));
 		QueryString queryString = new QueryString(mainQuery);
-		//queryString.put("query_string", mainQuery);
 		String lang = getSearchSetting("search." + searchData.getType().toLowerCase() + ".query.nativescore.lang");
 		String score = getSearchSetting("search." + searchData.getType().toLowerCase() + ".query.score");
 		// FIXME:temporary fix because of IllegalArgumentException issue with calculating score in lucene when use match all docs.
