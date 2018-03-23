@@ -127,11 +127,15 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void generateRequestedCodeInfo(SearchData searchData, String key,  String[] codes, String requestedFwCode, Map<String, Object> searchResult) {
+		Map<String, Object> signatureContents = null;
+		String gutCode = null; String code = null; String codeType = null; String title = null;
+		List<GutPrerequisites> prerequisites = new ArrayList<>();
 		SearchData taxonomyRequest = new SearchData();
 		taxonomyRequest.setPretty(searchData.getPretty());
 		taxonomyRequest.setIndexType(EsIndex.TAXONOMY);
 		taxonomyRequest.putFilter(AMPERSAND + CARET_SYMBOL + key, (StringUtils.join(codes, COMMA)));
 		if (requestedFwCode != null) taxonomyRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.FRAMEWORK_CODE, requestedFwCode);
+		if (key.equalsIgnoreCase(TAXONOMY_GUT_CODE)) gutCode = codes[0];
 		taxonomyRequest.setQueryString(STAR);
 		List<Taxonomy> taxonomyResponses = (List<Taxonomy>) SearchHandler.getSearcher(SearchHandlerType.TAXONOMY.name()).search(taxonomyRequest).getSearchResults();
 		if (taxonomyResponses != null && !taxonomyResponses.isEmpty()) {
@@ -153,12 +157,12 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 							crosswalkResponses.forEach(cwResponse -> {
 								Map<String, Object> source = (Map<String, Object>) cwResponse.get(SEARCH_SOURCE);
 								List<Map<String, String>> crosswalkCodes = (List<Map<String, String>>) source.get(IndexFields.CROSSWALK_CODES);
-								crosswalkCodes.forEach(code -> {
-									String cwFw = (String) code.get(IndexFields.FRAMEWORK_CODE);
+								crosswalkCodes.forEach(cw -> {
+									String cwFw = (String) cw.get(IndexFields.FRAMEWORK_CODE);
 									if (cwFw.equalsIgnoreCase(requestedFwCode)) {
 										Map<String, String> cwCode = new HashMap<>();
-										cwCode.put(IndexFields.CODE, (String) code.get(IndexFields.CODE));
-										cwCode.put(IndexFields.TITLE, (String) code.get(IndexFields.TITLE));
+										cwCode.put(IndexFields.CODE, (String) cw.get(IndexFields.CODE));
+										cwCode.put(IndexFields.TITLE, (String) cw.get(IndexFields.TITLE));
 										progressions.add(cwCode);
 									}
 								});
@@ -167,13 +171,19 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 					});
 				}
 				searchResult.put(PREREQUISITES, progressions);
-			} else if (key.equalsIgnoreCase(TAXONOMY_GUT_CODE)) searchResult.put(PREREQUISITES, gutPrerequisites);
-			searchResult.put(SIGNATURE_CONTENTS, response.getSignatureContents());
-			searchResult.put(IndexFields.GUT_CODE, response.getGutCode());
-			searchResult.put(IndexFields.CODE, response.getDisplayCode());
-			searchResult.put(IndexFields.CODE_TYPE, response.getCodeType());
-			searchResult.put(IndexFields.TITLE, response.getTitle());
+			} else if (key.equalsIgnoreCase(TAXONOMY_GUT_CODE)) prerequisites = gutPrerequisites;
+			signatureContents = response.getSignatureContents();
+			gutCode = response.getGutCode();
+			code =  response.getDisplayCode();
+			codeType =  response.getCodeType();
+			title = response.getTitle();
 		}
+		if (key.equalsIgnoreCase(TAXONOMY_GUT_CODE)) searchResult.put(PREREQUISITES, prerequisites);
+		searchResult.put(SIGNATURE_CONTENTS, signatureContents);
+		searchResult.put(IndexFields.GUT_CODE, gutCode);
+		searchResult.put(IndexFields.CODE, code);
+		searchResult.put(IndexFields.CODE_TYPE, codeType);
+		searchResult.put(IndexFields.TITLE, title);
 	}
 
 	@SuppressWarnings("unchecked")

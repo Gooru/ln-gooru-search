@@ -402,7 +402,7 @@ public interface Constants {
 	public static final String AMPERSAND_EQ_DOMAIN_INTERNAL_CODE = "&^taxonomy.allEqDomainInternalCodes";
 
 	public static final String STANDARD_PREFERENCE = "standard_preference";
-
+	public static final String ACCESS_TOKEN_VALIDITY = "access_token_validity";
 	public static final String LEAF_INTERNAL_CODE = "leafInternalCode";
 
 	public static final String PRE_TEST = "pre-test";
