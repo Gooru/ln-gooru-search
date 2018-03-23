@@ -52,7 +52,7 @@ public class GooruSearchInterceptor extends HandlerInterceptorAdapter {
 		}
 		if (authenticationContext == null) {
 			logger.debug("*******Inside interceptor");
-			throw new AccessDeniedException("Invalid Session Token");
+			throw new UnauthorizedException("Invalid Session Token");
 		}
 		Enumeration<?> e = gooruConstants.propertyNames();
 		while (e.hasMoreElements()) {
