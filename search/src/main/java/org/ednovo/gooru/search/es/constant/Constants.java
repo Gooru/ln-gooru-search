@@ -522,7 +522,6 @@ public interface Constants {
 	public static final String RESULT_COUNT = "resultCount";
 	public static final String SEARCH_RESULTS = "searchResults";
 	public static final String FLT_FWCODE = "flt.fwCode";
-	public static final String PREREQUISITES = "prerequisites";
 	public static final String SIGNATURE_CONTENTS = "signatureContents";
 	public static final String FLT_TAXONOMY_GUT_CODE = "flt.taxonomyGutCode";
 	public static final String TAXONOMY_GUT_CODE = "taxonomyGutCode";
@@ -537,5 +536,8 @@ public interface Constants {
 	public static final String POST_FILTER = "post_filter";
 	public static final String CONTENT_COUNTS = "contentCounts";
 	public static final String STATS = "stats";
+	public static final String COLLECTIONS = "collections";
+	public static final String ASSESSMENTS = "assessments";
+	public static final String RESOURCES = "resources";
 
 }

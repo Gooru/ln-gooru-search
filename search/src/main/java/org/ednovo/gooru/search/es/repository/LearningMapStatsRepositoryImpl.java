@@ -68,18 +68,18 @@ public class LearningMapStatsRepositoryImpl extends BaseRepository implements Le
 		Long totalHitCount = 0l;
 		try {
 			String sql = "select count(*) from learning_map_stats where subject_classification = '"+subjectClassification+"'";
-			if (subjectCode != null) sql += " and subject_code =:SUBJECT_CODE";
-			if (courseCode != null) sql += " and course_code =:COURSE_CODE";
-			if (domainCode != null) sql += " and domain_code =:DOMAIN_CODE";
+			if (StringUtils.isNotBlank(subjectCode))  sql += " and subject_code =:SUBJECT_CODE";
+			if (StringUtils.isNotBlank(courseCode)) sql += " and course_code =:COURSE_CODE";
+			if (StringUtils.isNotBlank(domainCode))  sql += " and domain_code =:DOMAIN_CODE";
 			if (codeType != null) {
 				if (codeType.equalsIgnoreCase("competency")) sql += " and code_type in ('standard_level_1','standard_level_2')";
 				else sql += " and code_type = 'learning_target_level_0'";
 			}
 			
 			Query query = getSessionFactory().getCurrentSession().createSQLQuery(sql);
-			if (subjectCode != null) query.setParameterList("SUBJECT_CODE", subjectCode.split(","));
-			if (courseCode != null) query.setParameterList("COURSE_CODE", courseCode.split(","));
-			if (domainCode != null) query.setParameterList("DOMAIN_CODE", domainCode.split(","));
+			if (StringUtils.isNotBlank(subjectCode)) query.setParameterList("SUBJECT_CODE", subjectCode.split(","));
+			if (StringUtils.isNotBlank(courseCode)) query.setParameterList("COURSE_CODE", courseCode.split(","));
+			if (StringUtils.isNotBlank(domainCode)) query.setParameterList("DOMAIN_CODE", domainCode.split(","));
 			
 			totalHitCount = ((Number) query.list().get(0)).longValue();
 		} catch (Exception e) {

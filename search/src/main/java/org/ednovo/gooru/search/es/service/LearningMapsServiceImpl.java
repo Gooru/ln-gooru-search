@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -140,10 +141,32 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 		List<Taxonomy> taxonomyResponses = (List<Taxonomy>) SearchHandler.getSearcher(SearchHandlerType.TAXONOMY.name()).search(taxonomyRequest).getSearchResults();
 		if (taxonomyResponses != null && !taxonomyResponses.isEmpty()) {
 			Taxonomy response = taxonomyResponses.get(0);
-			List<GutPrerequisites> gutPrerequisites = response.getGutPrerequisites();
-			if (!key.equalsIgnoreCase(TAXONOMY_GUT_CODE) && requestedFwCode != null) {
-				Set<Map<String, String>> progressions = new HashSet<>();
-				if (gutPrerequisites != null && gutPrerequisites.size() > 0) {
+			Map<String, Object> gutResponseAsMap = response.getGutData();
+			if (gutResponseAsMap != null) {
+				List<GutPrerequisites> gutPrerequisites = new ArrayList<GutPrerequisites>();
+				if (key.equalsIgnoreCase(TAXONOMY_GUT_CODE)) {
+					Map<String, Object> gutAsMap = (Map<String, Object>) gutResponseAsMap.get(codes[0]);
+					prerequisites = (List<GutPrerequisites>) gutAsMap.get(IndexFields.PREREQUISITES);
+					signatureContents = (Map<String, Object>) gutAsMap.get(SIGNATURE_CONTENTS);
+					gutCode = (String) gutAsMap.get(IndexFields.ID);
+					code = (String) gutAsMap.get(IndexFields.CODE);
+					codeType = (String) gutAsMap.get(IndexFields.CODE_TYPE);
+					title = (String) gutAsMap.get(IndexFields.TITLE);
+				} else if (requestedFwCode != null) {
+					Map<String, Object> gutAsMap = new HashMap<>();
+					for (Entry<String, Object> gut : gutResponseAsMap.entrySet()) {
+						gutAsMap = (Map<String, Object>) gut.getValue();
+						gutPrerequisites.addAll((List<GutPrerequisites>) ((Map<String, Object>) gut.getValue()).get(IndexFields.PREREQUISITES));
+					}
+					signatureContents = (Map<String, Object>) gutAsMap.get(SIGNATURE_CONTENTS);
+					gutCode = (String) gutAsMap.get(IndexFields.ID);
+					code = (String) gutAsMap.get(IndexFields.CODE);
+					codeType = (String) gutAsMap.get(IndexFields.CODE_TYPE);
+					title = (String) gutAsMap.get(IndexFields.TITLE);
+				}
+				// crosswalk prerequisites
+				if (gutPrerequisites != null && gutPrerequisites.size() > 0 && requestedFwCode != null) {
+					Set<Map<String, String>> progressions = new HashSet<>();
 					gutPrerequisites.forEach(a -> {
 						GutPrerequisites gutPrerequisite = (GutPrerequisites) a;
 						SearchData crosswalkRequest = new SearchData();
@@ -169,16 +192,12 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 							});
 						}
 					});
+					searchResult.put(IndexFields.PREREQUISITES, progressions);
 				}
-				searchResult.put(PREREQUISITES, progressions);
-			} else if (key.equalsIgnoreCase(TAXONOMY_GUT_CODE)) prerequisites = gutPrerequisites;
-			signatureContents = response.getSignatureContents();
-			gutCode = response.getGutCode();
-			code =  response.getDisplayCode();
-			codeType =  response.getCodeType();
-			title = response.getTitle();
+			}
 		}
-		if (key.equalsIgnoreCase(TAXONOMY_GUT_CODE)) searchResult.put(PREREQUISITES, prerequisites);
+		
+		if (key.equalsIgnoreCase(TAXONOMY_GUT_CODE)) searchResult.put(IndexFields.PREREQUISITES, prerequisites);
 		searchResult.put(SIGNATURE_CONTENTS, signatureContents);
 		searchResult.put(IndexFields.GUT_CODE, gutCode);
 		searchResult.put(IndexFields.CODE, code);

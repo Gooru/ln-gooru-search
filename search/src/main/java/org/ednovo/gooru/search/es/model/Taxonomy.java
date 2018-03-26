@@ -20,7 +20,8 @@ public class Taxonomy implements Serializable {
 	private List<String> keywords;
 	private List<GutPrerequisites> gutPrerequisites;
 	private Map<String, Object> signatureContents;
-	
+	private Map<String, Object> gutData;
+
 	public String getId() {
 		return id;
 	}
@@ -101,4 +102,11 @@ public class Taxonomy implements Serializable {
 		this.signatureContents = signatureContents;
 	}
 
+	public Map<String, Object> getGutData() {
+		return gutData;
+	}
+
+	public void setGutData(Map<String, Object> gutData) {
+		this.gutData = gutData;
+	}
 }

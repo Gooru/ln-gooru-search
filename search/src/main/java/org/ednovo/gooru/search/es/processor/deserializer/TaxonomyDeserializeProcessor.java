@@ -49,32 +49,41 @@ public class TaxonomyDeserializeProcessor extends DeserializeProcessor<List<Taxo
 		code.setDisplayCode((String) model.get(IndexFields.CODE));
 		code.setTitle((String) model.get(IndexFields.TITLE));
 		code.setDescription((String) model.get(IndexFields.DESCRIPTION));
-		code.setGutCode((String) model.get(IndexFields.GUT_CODE));
 		code.setCodeType((String) model.get(IndexFields.CODE_TYPE));
 		code.setKeywords((List<String>) model.get(IndexFields.KEYWORDS));
 		
-		List<GutPrerequisites> gutPrerequisites = new ArrayList<>(); 
-		List<Map<String, String>> prerequisites = (List<Map<String, String>>) model.get(IndexFields.GUT_PREREQUISITES);
-		if (prerequisites != null) {
-			prerequisites.forEach(p -> {
-				GutPrerequisites gutPrerequisite = new GutPrerequisites();
-				gutPrerequisite.setId(p.get(IndexFields.ID));
-				gutPrerequisite.setCode(p.get(IndexFields.CODE));
-				gutPrerequisite.setTitle(p.get(IndexFields.TITLE));
-				gutPrerequisites.add(gutPrerequisite);
+		List<Map<String, Object>> gutDataAsList = (List<Map<String, Object>>) model.get(IndexFields.GUT_DATA);
+		if (gutDataAsList != null && !gutDataAsList.isEmpty()) {
+			Map<String, Object> outputGutData = new HashMap<>();
+			gutDataAsList.forEach(a -> {
+				Map<String, Object> gutData = (Map<String, Object>) a;
+				Map<String, Object> gutDataAsMap = new HashMap<>();
+				List<GutPrerequisites> gutPrerequisites = new ArrayList<>();
+				List<Map<String, String>> prerequisites = (List<Map<String, String>>) gutData.get(IndexFields.PREREQUISITES);
+				if (prerequisites != null) {
+					prerequisites.forEach(p -> {
+						GutPrerequisites gutPrerequisite = new GutPrerequisites();
+						gutPrerequisite.setId(p.get(IndexFields.ID));
+						gutPrerequisite.setCode(p.get(IndexFields.CODE));
+						gutPrerequisite.setTitle(p.get(IndexFields.TITLE));
+						gutPrerequisites.add(gutPrerequisite);
+					});
+				}
+				gutDataAsMap.put(IndexFields.PREREQUISITES, gutPrerequisites);
+
+				Map<String, Object> signatureContents = new HashMap<>();
+				signatureContents.put(COLLECTIONS, generateSignatureCollections(model, (List<Map<String, Object>>) gutData.get(IndexFields.SIGNATURE_COLLECTIONS)));
+				signatureContents.put(ASSESSMENTS, generateSignatureCollections(model, (List<Map<String, Object>>) gutData.get(IndexFields.SIGNATURE_ASSESSMENTS)));
+				signatureContents.put(RESOURCES, generateSignatureResources(model, (List<Map<String, Object>>) gutData.get(IndexFields.SIGNATURE_RESOURCES)));
+				gutDataAsMap.put(SIGNATURE_CONTENTS, signatureContents);
+				gutDataAsMap.put(IndexFields.CODE, (String) gutData.get(IndexFields.CODE));
+				gutDataAsMap.put(IndexFields.CODE_TYPE, (String) gutData.get(IndexFields.CODE_TYPE));
+				gutDataAsMap.put(IndexFields.TITLE, (String) gutData.get(IndexFields.TITLE));
+				gutDataAsMap.put(IndexFields.ID, (String) gutData.get(IndexFields.ID));
+				outputGutData.put((String) gutData.get(IndexFields.ID), gutDataAsMap);
 			});
+			code.setGutData(outputGutData);
 		}
-		code.setGutPrerequisites(gutPrerequisites);
-
-		Map<String, Object> signatureContents = new HashMap<>();
-		List<SignatureItems> signatureCollections = generateSignatureCollections(model, (List<Map<String, Object>>) model.get(IndexFields.SIGNATURE_COLLECTIONS));
-		List<SignatureItems> signatureAssessments = generateSignatureCollections(model, (List<Map<String, Object>>) model.get(IndexFields.SIGNATURE_ASSESSMENTS));
-		List<SignatureResources> signatureResources = generateSignatureResources(model, (List<Map<String, Object>>) model.get(IndexFields.SIGNATURE_RESOURCES));
-
-		signatureContents.put("collections", signatureCollections);
-		signatureContents.put("assessments", signatureAssessments);
-		signatureContents.put("resources", signatureResources);
-		code.setSignatureContents(signatureContents);
 		return code;
 
 	}
