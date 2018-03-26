@@ -22,9 +22,9 @@ public class LearningMapStatsRepositoryImpl extends BaseRepository implements Le
 		try {
 			String sql = "select id, subject_code, course_code, domain_code, resource, question,collection, assessment, rubric, course, unit, lesson, signature_resource, signature_collection, signature_assessment from learning_map_stats where subject_classification = '"+subjectClassification+"'";
 
-			if (StringUtils.isNotBlank(subjectCode))  sql += " and subject_code =:SUBJECT_CODE";
-			if (StringUtils.isNotBlank(courseCode)) sql += " and course_code =:COURSE_CODE";
-			if (StringUtils.isNotBlank(domainCode))  sql += " and domain_code =:DOMAIN_CODE";
+			if (StringUtils.isNotBlank(subjectCode))  sql += " and subject_code in (:SUBJECT_CODE)";
+			if (StringUtils.isNotBlank(courseCode)) sql += " and course_code in (:COURSE_CODE)";
+			if (StringUtils.isNotBlank(domainCode))  sql += " and domain_code in (:DOMAIN_CODE)";
 			if(codeType != null) {
 				if (codeType.equalsIgnoreCase("competency"))  sql += " and code_type in ('standard_level_1','standard_level_2')" ;
 				else sql += " and code_type = 'learning_target_level_0'" ;
@@ -68,9 +68,9 @@ public class LearningMapStatsRepositoryImpl extends BaseRepository implements Le
 		Long totalHitCount = 0l;
 		try {
 			String sql = "select count(*) from learning_map_stats where subject_classification = '"+subjectClassification+"'";
-			if (StringUtils.isNotBlank(subjectCode))  sql += " and subject_code =:SUBJECT_CODE";
-			if (StringUtils.isNotBlank(courseCode)) sql += " and course_code =:COURSE_CODE";
-			if (StringUtils.isNotBlank(domainCode))  sql += " and domain_code =:DOMAIN_CODE";
+			if (StringUtils.isNotBlank(subjectCode))  sql += " and subject_code in (:SUBJECT_CODE)";
+			if (StringUtils.isNotBlank(courseCode)) sql += " and course_code in (:COURSE_CODE)";
+			if (StringUtils.isNotBlank(domainCode))  sql += " and domain_code in (:DOMAIN_CODE)";
 			if (codeType != null) {
 				if (codeType.equalsIgnoreCase("competency")) sql += " and code_type in ('standard_level_1','standard_level_2')";
 				else sql += " and code_type = 'learning_target_level_0'";
