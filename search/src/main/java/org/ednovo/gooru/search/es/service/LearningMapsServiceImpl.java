@@ -255,12 +255,14 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 				statsAsMap.put("subjectCode", contentStat.get("subjectCode").toString());
 				statsAsMap.put("courseCode", contentStat.get("courseCode").toString());
 				statsAsMap.put("domainCode", contentStat.get("domainCode").toString());
+				statsAsMap.put("type", contentStat.get(IndexFields.CODE_TYPE).toString());
 				statsAsMap.remove(SIGNATURE_CONTENTS);
 				statsAsMap.remove(IndexFields.GUT_CODE);
 				contentStat.remove(IndexFields.ID);
 				contentStat.remove("subjectCode");
 				contentStat.remove("courseCode");
 				contentStat.remove("domainCode");
+				contentStat.remove(IndexFields.CODE_TYPE);
 				statsAsMap.put(CONTENT_COUNTS, contentStat);
 				stats.add(statsAsMap);
 			}
