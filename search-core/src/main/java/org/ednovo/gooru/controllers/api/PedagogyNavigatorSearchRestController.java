@@ -219,7 +219,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			@RequestParam(defaultValue = "1", value = "start") Integer pageNum,
 			@RequestParam(defaultValue = "0") String pretty) throws Exception {
 		long start = System.currentTimeMillis();
-		if (subjectCode != null) {
+		if (StringUtils.isNotBlank(subjectCode)) {
 			String[] subjectList = subjectCode.split(COMMA);
 			for (String subject : subjectList) {
 				int dotCount = StringUtils.countMatches(subject, DOT);
@@ -228,7 +228,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 					throw new BadRequestException("Invalid code! Please pass valid subject.");
 			}
 		}
-		if (courseCode != null) {
+		if (StringUtils.isNotBlank(courseCode)) {
 			String[] courseList = courseCode.split(COMMA);
 			for (String course : courseList) {
 				int hyphenCount = StringUtils.countMatches(course, HYPHEN);
@@ -236,7 +236,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 					throw new BadRequestException("Invalid code! Please pass valid course.");
 			}
 		}
-		if (domainCode != null) {
+		if (StringUtils.isNotBlank(domainCode)) {
 			String[] domainList = domainCode.split(COMMA);
 			for (String domain : domainList) {
 				int hyphenCount = StringUtils.countMatches(domain, HYPHEN);

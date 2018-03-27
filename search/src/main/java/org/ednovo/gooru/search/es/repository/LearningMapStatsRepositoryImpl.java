@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,20 +20,20 @@ public class LearningMapStatsRepositoryImpl extends BaseRepository implements Le
 	public List<Map<String, Object>> getStats(String subjectClassification, String subjectCode, String courseCode, String domainCode, String codeType, int offset, int limit) {
 		List<Map<String, Object>> resultSet = null;
 		try {
-			String sql = "select id, subject_code, course_code, domain_code, resource, question,collection, assessment, rubric, course, unit, lesson, signature_resource, signature_collection, signature_assessment from learning_map_stats where subject_classification = '"+subjectClassification+"'";
+			String sql = "select id, subject_code, course_code, domain_code, resource, question,collection, assessment, rubric, course, unit, lesson, signature_resource, signature_collection, signature_assessment, code_type from learning_map_stats where subject_classification = '"+subjectClassification+"'";
 
-			if (subjectCode != null)  sql += " and subject_code =:SUBJECT_CODE";
-			if (courseCode != null) sql += " and course_code =:COURSE_CODE";
-			if (domainCode != null)  sql += " and domain_code =:DOMAIN_CODE";
+			if (StringUtils.isNotBlank(subjectCode))  sql += " and subject_code in (:SUBJECT_CODE)";
+			if (StringUtils.isNotBlank(courseCode)) sql += " and course_code in (:COURSE_CODE)";
+			if (StringUtils.isNotBlank(domainCode))  sql += " and domain_code in (:DOMAIN_CODE)";
 			if(codeType != null) {
 				if (codeType.equalsIgnoreCase("competency"))  sql += " and code_type in ('standard_level_1','standard_level_2')" ;
 				else sql += " and code_type = 'learning_target_level_0'" ;
 			}
 			if (limit > 0) sql += " offset " + offset + " limit " + limit;
 			Query query = getSessionFactory().getCurrentSession().createSQLQuery(sql);
-			if (subjectCode != null) query.setParameterList("SUBJECT_CODE", subjectCode.split(","));
-			if (courseCode != null) query.setParameterList("COURSE_CODE", courseCode.split(","));
-			if (domainCode != null) query.setParameterList("DOMAIN_CODE", domainCode.split(","));
+			if (StringUtils.isNotBlank(subjectCode)) query.setParameterList("SUBJECT_CODE", subjectCode.split(","));
+			if (StringUtils.isNotBlank(courseCode)) query.setParameterList("COURSE_CODE", courseCode.split(","));
+			if (StringUtils.isNotBlank(domainCode)) query.setParameterList("DOMAIN_CODE", domainCode.split(","));
 			if (query != null && arrayList(query).size() > 0) {
 				resultSet = new ArrayList<>();
 				for (Object[] object : arrayList(query)) {
@@ -53,6 +54,7 @@ public class LearningMapStatsRepositoryImpl extends BaseRepository implements Le
 					resultMap.put("signatureResource", Integer.valueOf(object[12].toString()));
 					resultMap.put("signatureCollection", Integer.valueOf(object[13].toString()));
 					resultMap.put("signatureAssessment", Integer.valueOf(object[14].toString()));
+					resultMap.put("codeType", object[15].toString());
 					resultSet.add(resultMap);
 				}
 			}
@@ -67,18 +69,18 @@ public class LearningMapStatsRepositoryImpl extends BaseRepository implements Le
 		Long totalHitCount = 0l;
 		try {
 			String sql = "select count(*) from learning_map_stats where subject_classification = '"+subjectClassification+"'";
-			if (subjectCode != null) sql += " and subject_code =:SUBJECT_CODE";
-			if (courseCode != null) sql += " and course_code =:COURSE_CODE";
-			if (domainCode != null) sql += " and domain_code =:DOMAIN_CODE";
+			if (StringUtils.isNotBlank(subjectCode))  sql += " and subject_code in (:SUBJECT_CODE)";
+			if (StringUtils.isNotBlank(courseCode)) sql += " and course_code in (:COURSE_CODE)";
+			if (StringUtils.isNotBlank(domainCode))  sql += " and domain_code in (:DOMAIN_CODE)";
 			if (codeType != null) {
 				if (codeType.equalsIgnoreCase("competency")) sql += " and code_type in ('standard_level_1','standard_level_2')";
 				else sql += " and code_type = 'learning_target_level_0'";
 			}
 			
 			Query query = getSessionFactory().getCurrentSession().createSQLQuery(sql);
-			if (subjectCode != null) query.setParameterList("SUBJECT_CODE", subjectCode.split(","));
-			if (courseCode != null) query.setParameterList("COURSE_CODE", courseCode.split(","));
-			if (domainCode != null) query.setParameterList("DOMAIN_CODE", domainCode.split(","));
+			if (StringUtils.isNotBlank(subjectCode)) query.setParameterList("SUBJECT_CODE", subjectCode.split(","));
+			if (StringUtils.isNotBlank(courseCode)) query.setParameterList("COURSE_CODE", courseCode.split(","));
+			if (StringUtils.isNotBlank(domainCode)) query.setParameterList("DOMAIN_CODE", domainCode.split(","));
 			
 			totalHitCount = ((Number) query.list().get(0)).longValue();
 		} catch (Exception e) {
