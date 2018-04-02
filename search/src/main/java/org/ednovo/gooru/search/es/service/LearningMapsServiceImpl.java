@@ -251,18 +251,15 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 			for(Map<String, Object> contentStat : contentStatsAsList) {
 				Map<String, Object> statsAsMap = new HashMap<>();
 				generateRequestedCodeInfo(searchData, TAXONOMY_GUT_CODE, contentStat.get(IndexFields.ID).toString().split(COMMA), null, statsAsMap);
-				statsAsMap.put(IndexFields.ID, contentStat.get(IndexFields.ID).toString());
-				statsAsMap.put("subjectCode", contentStat.get("subjectCode").toString());
-				statsAsMap.put("courseCode", contentStat.get("courseCode").toString());
-				statsAsMap.put("domainCode", contentStat.get("domainCode").toString());
-				statsAsMap.put("type", contentStat.get(IndexFields.CODE_TYPE).toString());
+				statsAsMap.put(IndexFields.ID, contentStat.get(IndexFields.ID).toString()); contentStat.remove(IndexFields.ID);
+				statsAsMap.put("subjectCode", contentStat.get("subjectCode").toString()); contentStat.remove("subjectCode");
+				statsAsMap.put("courseCode", contentStat.get("courseCode").toString()); contentStat.remove("courseCode");
+				statsAsMap.put("domainCode", contentStat.get("domainCode").toString()); contentStat.remove("domainCode");
+				statsAsMap.put("type", contentStat.get(IndexFields.CODE_TYPE).toString()); contentStat.remove(IndexFields.CODE_TYPE);
+				statsAsMap.put("parentId", contentStat.get("parentId").toString()); contentStat.remove("parentId");
+				statsAsMap.put("sequenceId", (Integer) contentStat.get("sequenceId")); contentStat.remove("sequenceId");
 				statsAsMap.remove(SIGNATURE_CONTENTS);
 				statsAsMap.remove(IndexFields.GUT_CODE);
-				contentStat.remove(IndexFields.ID);
-				contentStat.remove("subjectCode");
-				contentStat.remove("courseCode");
-				contentStat.remove("domainCode");
-				contentStat.remove(IndexFields.CODE_TYPE);
 				statsAsMap.put(CONTENT_COUNTS, contentStat);
 				stats.add(statsAsMap);
 			}
