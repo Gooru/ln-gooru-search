@@ -55,7 +55,7 @@ public class LearningMapStatsRepositoryImpl extends BaseRepository implements Le
 					resultMap.put("signatureCollection", Integer.valueOf(object[13].toString()));
 					resultMap.put("signatureAssessment", Integer.valueOf(object[14].toString()));
 					resultMap.put("codeType", object[15].toString());
-					resultMap.put("parentId", object[16].toString());
+					resultMap.put("parentId", object[16] == null ? null : object[16].toString());
 					resultMap.put("sequenceId", Integer.valueOf(object[17].toString()));
 					resultSet.add(resultMap);
 				}

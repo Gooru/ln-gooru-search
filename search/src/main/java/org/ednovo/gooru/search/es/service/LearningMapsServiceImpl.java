@@ -256,7 +256,7 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 				statsAsMap.put("courseCode", contentStat.get("courseCode").toString()); contentStat.remove("courseCode");
 				statsAsMap.put("domainCode", contentStat.get("domainCode").toString()); contentStat.remove("domainCode");
 				statsAsMap.put("type", contentStat.get(IndexFields.CODE_TYPE).toString()); contentStat.remove(IndexFields.CODE_TYPE);
-				statsAsMap.put("parentId", contentStat.get("parentId").toString()); contentStat.remove("parentId");
+				statsAsMap.put("parentId", contentStat.get("parentId") == null ? null : contentStat.get("parentId").toString()); contentStat.remove("parentId");
 				statsAsMap.put("sequenceId", (Integer) contentStat.get("sequenceId")); contentStat.remove("sequenceId");
 				statsAsMap.remove(SIGNATURE_CONTENTS);
 				statsAsMap.remove(IndexFields.GUT_CODE);
