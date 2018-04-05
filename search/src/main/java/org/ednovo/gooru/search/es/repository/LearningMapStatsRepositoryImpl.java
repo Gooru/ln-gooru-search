@@ -20,7 +20,7 @@ public class LearningMapStatsRepositoryImpl extends BaseRepository implements Le
 	public List<Map<String, Object>> getStats(String subjectClassification, String subjectCode, String courseCode, String domainCode, String codeType, int offset, int limit) {
 		List<Map<String, Object>> resultSet = null;
 		try {
-			String sql = "select id, subject_code, course_code, domain_code, resource, question,collection, assessment, rubric, course, unit, lesson, signature_resource, signature_collection, signature_assessment, code_type from learning_map_stats where subject_classification = '"+subjectClassification+"'";
+			String sql = "select id, subject_code, course_code, domain_code, resource, question,collection, assessment, rubric, course, unit, lesson, signature_resource, signature_collection, signature_assessment, code_type, parent_id, sequence_id from learning_map_stats where subject_classification = '"+subjectClassification+"'";
 
 			if (StringUtils.isNotBlank(subjectCode))  sql += " and subject_code in (:SUBJECT_CODE)";
 			if (StringUtils.isNotBlank(courseCode)) sql += " and course_code in (:COURSE_CODE)";
@@ -55,6 +55,8 @@ public class LearningMapStatsRepositoryImpl extends BaseRepository implements Le
 					resultMap.put("signatureCollection", Integer.valueOf(object[13].toString()));
 					resultMap.put("signatureAssessment", Integer.valueOf(object[14].toString()));
 					resultMap.put("codeType", object[15].toString());
+					resultMap.put("parentId", object[16] == null ? null : object[16].toString());
+					resultMap.put("sequenceId", Integer.valueOf(object[17].toString()));
 					resultSet.add(resultMap);
 				}
 			}
