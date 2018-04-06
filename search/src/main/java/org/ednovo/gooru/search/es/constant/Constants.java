@@ -225,6 +225,10 @@ public interface Constants {
 	
 	public static final String FLT_SUBJECT = "flt.subject";
 
+	public static final String FLT_COURSE = "flt.course";
+
+	public static final String FLT_DOMAIN = "flt.domain";
+
 	public static final String FLT_STANDARD_DISPLAY = "flt.standardDisplay";
 
 	public static final String FLT_RELATED_LEAF_INTERNAL_CODES = "flt.relatedLeafInternalCodes";
@@ -250,7 +254,7 @@ public interface Constants {
 	public static final String SEARCH_LAST_NAME = "lastName";
 
 	public static final String SEARCH_TAXONOMY = "taxonomy";
-	public static final String SEARCH_TAXONOMY_SUBJECT = "subject";
+	public static final String SUBJECT = "subject";
 	public static final String SEARCH_ORGANIZATION = "organization";
 	public static final String SEARCH_CODE = "code";
 	public static final String SEARCH_NAME = "name";
@@ -539,5 +543,6 @@ public interface Constants {
 	public static final String COLLECTIONS = "collections";
 	public static final String ASSESSMENTS = "assessments";
 	public static final String RESOURCES = "resources";
+	public static final String DOMAIN = "domain";
 
 }

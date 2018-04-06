@@ -164,7 +164,67 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		if (dotCount < 1 || dotCount > 3 || hyphenCount > 0) throw new BadRequestException("Invalid code! Please pass valid subject.");
 		
 		SearchData searchData = new SearchData();
-		searchData = generateLMSearchData(request, searchData, subjectCode, fwCode, sessionToken, limit, startAt, pageNum, pretty, query, isCrosswalk, SEARCH_TAXONOMY_SUBJECT, isDisplayCode);
+		searchData = generateLMSearchData(request, searchData, subjectCode, fwCode, sessionToken, limit, startAt, pageNum, pretty, query, isCrosswalk, SUBJECT, isDisplayCode);
+		
+		String excludeAttributeArray[] = {};
+		try {
+			SearchResponse<Object> searchResponse = pedagogySearchService.searchPedagogy(searchData);
+			logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
+			return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
+		} catch (SearchException searchException) {
+			response.setStatus(searchException.getStatus().value());
+			return toModelAndView(searchException.getMessage());
+		}
+	}
+	
+	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/course/{courseCode:.+}")
+	public ModelAndView searchLearningMapsByCourse(HttpServletRequest request, HttpServletResponse response,
+			@PathVariable String courseCode,
+			@RequestParam(required = false) String fwCode,
+			@RequestParam(required = false) String sessionToken,
+			@RequestParam(defaultValue = "10", value = "length") Integer limit, 
+			@RequestParam(defaultValue = "0") Integer startAt, 
+			@RequestParam(defaultValue = "1", value = "start") Integer pageNum,
+			@RequestParam(defaultValue = "0") String pretty, 
+			@RequestParam(required = false, defaultValue = "*", value = "q") String query,
+			@RequestParam(defaultValue = "true") boolean isCrosswalk,
+			@RequestParam(defaultValue = "true") boolean isDisplayCode) throws Exception {
+		long start = System.currentTimeMillis();
+		int hyphenCount = StringUtils.countMatches(courseCode, HYPHEN);
+		if (!(hyphenCount == 1)) throw new BadRequestException("Invalid code! Please pass valid course.");
+		
+		SearchData searchData = new SearchData();
+		searchData = generateLMSearchData(request, searchData, courseCode, fwCode, sessionToken, limit, startAt, pageNum, pretty, query, isCrosswalk, TYPE_COURSE, isDisplayCode);
+		
+		String excludeAttributeArray[] = {};
+		try {
+			SearchResponse<Object> searchResponse = pedagogySearchService.searchPedagogy(searchData);
+			logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
+			return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
+		} catch (SearchException searchException) {
+			response.setStatus(searchException.getStatus().value());
+			return toModelAndView(searchException.getMessage());
+		}
+	}
+	
+	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/domain/{domainCode:.+}")
+	public ModelAndView searchLearningMapsByDomain(HttpServletRequest request, HttpServletResponse response,
+			@PathVariable String domainCode,
+			@RequestParam(required = false) String fwCode,
+			@RequestParam(required = false) String sessionToken,
+			@RequestParam(defaultValue = "10", value = "length") Integer limit, 
+			@RequestParam(defaultValue = "0") Integer startAt, 
+			@RequestParam(defaultValue = "1", value = "start") Integer pageNum,
+			@RequestParam(defaultValue = "0") String pretty, 
+			@RequestParam(required = false, defaultValue = "*", value = "q") String query,
+			@RequestParam(defaultValue = "true") boolean isCrosswalk,
+			@RequestParam(defaultValue = "true") boolean isDisplayCode) throws Exception {
+		long start = System.currentTimeMillis();
+		int hyphenCount = StringUtils.countMatches(domainCode, HYPHEN);
+		if (!(hyphenCount == 2)) throw new BadRequestException("Invalid code! Please pass valid domain.");
+		
+		SearchData searchData = new SearchData();
+		searchData = generateLMSearchData(request, searchData, domainCode, fwCode, sessionToken, limit, startAt, pageNum, pretty, query, isCrosswalk, "domain", isDisplayCode);
 		
 		String excludeAttributeArray[] = {};
 		try {
@@ -324,20 +384,24 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 				}
 				searchDataMap.put(FLT_FWCODE, fwCode);
 			}
-		} else if (codeType.equalsIgnoreCase(SEARCH_TAXONOMY_SUBJECT)) {
+		} else if (codeType.equalsIgnoreCase(SUBJECT)) {
 			searchDataMap.put(FLT_SUBJECT, code);
+		} else if (codeType.equalsIgnoreCase(TYPE_COURSE)) {
+			searchDataMap.put(FLT_COURSE, code);
+		} else if (codeType.equalsIgnoreCase(DOMAIN)) {
+			searchDataMap.put(FLT_DOMAIN, code);
 		}
 		if (searchDataMap.containsKey(FLT_STANDARD) || searchDataMap.containsKey(FLT_STANDARD_DISPLAY) || searchDataMap.containsKey(FLT_TAXONOMY_GUT_CODE) ) {
 			searchData.setTaxFilterType(TYPE_STANDARD);
 		}
-		if (searchDataMap.containsKey("flt.subject")) {
-			searchData.setTaxFilterType("subject");
+		if (searchDataMap.containsKey(FLT_SUBJECT)) {
+			searchData.setTaxFilterType(SUBJECT);
 		}
-		if (searchDataMap.containsKey("flt.course")) {
-			searchData.setTaxFilterType("course");
+		if (searchDataMap.containsKey(FLT_COURSE)) {
+			searchData.setTaxFilterType(TYPE_COURSE);
 		}
-		if (searchDataMap.containsKey("flt.domain")) {
-			searchData.setTaxFilterType("domain");
+		if (searchDataMap.containsKey(FLT_DOMAIN)) {
+			searchData.setTaxFilterType(DOMAIN);
 		}
 		searchData.setParameters(searchDataMap);
 	}
