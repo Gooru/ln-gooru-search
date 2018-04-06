@@ -32,7 +32,7 @@ public class FacetDeserializeProcessor extends SearchProcessor<SearchData, List<
 			});
 			if (result != null && result.get(FACETS) != null) {
 				Map<String,Object> map = (Map<String,Object>)result.get(FACETS);
-				Map<String,Object> rmap = (Map<String,Object>) map.get(SEARCH_TAXONOMY_SUBJECT);
+				Map<String,Object> rmap = (Map<String,Object>) map.get(SUBJECT);
 				if(rmap != null){
 					response.setSearchResults((List<Map<String, Object>>) rmap.get(TERMS));
 				}
