@@ -143,9 +143,15 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 			Taxonomy response = taxonomyResponses.get(0);
 			Map<String, Object> gutResponseAsMap = response.getGutData();
 			if (gutResponseAsMap != null) {
-				List<GutPrerequisites> gutPrerequisites = new ArrayList<GutPrerequisites>();
 				if (key.equalsIgnoreCase(TAXONOMY_GUT_CODE)) {
-					Map<String, Object> gutAsMap = (Map<String, Object>) gutResponseAsMap.get(codes[0]);
+					String gutId = codes[0];
+					for (int i = 0; i <= codes.length; i++) {
+						if (gutResponseAsMap.keySet().contains(codes[i])) {
+							gutId = codes[i];
+							break;
+						}
+					}
+					Map<String, Object> gutAsMap = (Map<String, Object>) gutResponseAsMap.get(gutId);
 					prerequisites = (List<GutPrerequisites>) gutAsMap.get(IndexFields.PREREQUISITES);
 					signatureContents = (Map<String, Object>) gutAsMap.get(SIGNATURE_CONTENTS);
 					gutCode = (String) gutAsMap.get(IndexFields.ID);
@@ -154,6 +160,7 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 					title = (String) gutAsMap.get(IndexFields.TITLE);
 				} else if (requestedFwCode != null) {
 					Map<String, Object> gutAsMap = new HashMap<>();
+					List<GutPrerequisites> gutPrerequisites = new ArrayList<GutPrerequisites>();
 					for (Entry<String, Object> gut : gutResponseAsMap.entrySet()) {
 						gutAsMap = (Map<String, Object>) gut.getValue();
 						gutPrerequisites.addAll((List<GutPrerequisites>) ((Map<String, Object>) gut.getValue()).get(IndexFields.PREREQUISITES));
@@ -163,36 +170,36 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 					code = (String) gutAsMap.get(IndexFields.CODE);
 					codeType = (String) gutAsMap.get(IndexFields.CODE_TYPE);
 					title = (String) gutAsMap.get(IndexFields.TITLE);
-				}
-				// crosswalk prerequisites
-				if (gutPrerequisites != null && gutPrerequisites.size() > 0 && requestedFwCode != null) {
-					Set<Map<String, String>> progressions = new HashSet<>();
-					gutPrerequisites.forEach(a -> {
-						GutPrerequisites gutPrerequisite = (GutPrerequisites) a;
-						SearchData crosswalkRequest = new SearchData();
-						crosswalkRequest.setPretty(searchData.getPretty());
-						crosswalkRequest.setIndexType(EsIndex.CROSSWALK);
-						crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.ID, gutPrerequisite.getId());
-						crosswalkRequest.setQueryString(STAR);
-						List<Map<String, Object>> crosswalkResponses = (List<Map<String, Object>>) SearchHandler.getSearcher(SearchHandlerType.CROSSWALK.name()).search(crosswalkRequest)
-								.getSearchResults();
-						if (crosswalkResponses != null && !crosswalkResponses.isEmpty()) {
-							crosswalkResponses.forEach(cwResponse -> {
-								Map<String, Object> source = (Map<String, Object>) cwResponse.get(SEARCH_SOURCE);
-								List<Map<String, String>> crosswalkCodes = (List<Map<String, String>>) source.get(IndexFields.CROSSWALK_CODES);
-								crosswalkCodes.forEach(cw -> {
-									String cwFw = (String) cw.get(IndexFields.FRAMEWORK_CODE);
-									if (cwFw.equalsIgnoreCase(requestedFwCode)) {
-										Map<String, String> cwCode = new HashMap<>();
-										cwCode.put(IndexFields.CODE, (String) cw.get(IndexFields.CODE));
-										cwCode.put(IndexFields.TITLE, (String) cw.get(IndexFields.TITLE));
-										progressions.add(cwCode);
-									}
+					// crosswalk prerequisites
+					if (gutPrerequisites.size() > 0 && requestedFwCode != null) {
+						Set<Map<String, String>> progressions = new HashSet<>();
+						gutPrerequisites.forEach(a -> {
+							GutPrerequisites gutPrerequisite = (GutPrerequisites) a;
+							SearchData crosswalkRequest = new SearchData();
+							crosswalkRequest.setPretty(searchData.getPretty());
+							crosswalkRequest.setIndexType(EsIndex.CROSSWALK);
+							crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.ID, gutPrerequisite.getId());
+							crosswalkRequest.setQueryString(STAR);
+							List<Map<String, Object>> crosswalkResponses = (List<Map<String, Object>>) SearchHandler.getSearcher(SearchHandlerType.CROSSWALK.name()).search(crosswalkRequest)
+									.getSearchResults();
+							if (crosswalkResponses != null && !crosswalkResponses.isEmpty()) {
+								crosswalkResponses.forEach(cwResponse -> {
+									Map<String, Object> source = (Map<String, Object>) cwResponse.get(SEARCH_SOURCE);
+									List<Map<String, String>> crosswalkCodes = (List<Map<String, String>>) source.get(IndexFields.CROSSWALK_CODES);
+									crosswalkCodes.forEach(cw -> {
+										String cwFw = (String) cw.get(IndexFields.FRAMEWORK_CODE);
+										if (cwFw.equalsIgnoreCase(requestedFwCode)) {
+											Map<String, String> cwCode = new HashMap<>();
+											cwCode.put(IndexFields.CODE, (String) cw.get(IndexFields.CODE));
+											cwCode.put(IndexFields.TITLE, (String) cw.get(IndexFields.TITLE));
+											progressions.add(cwCode);
+										}
+									});
 								});
-							});
-						}
-					});
-					searchResult.put(IndexFields.PREREQUISITES, progressions);
+							}
+						});
+						searchResult.put(IndexFields.PREREQUISITES, progressions);
+					}
 				}
 			}
 		}
@@ -204,7 +211,7 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 		searchResult.put(IndexFields.CODE_TYPE, codeType);
 		searchResult.put(IndexFields.TITLE, title);
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void setFilterWithExtractedKeywordsAndSubjects(SearchData searchData, String key, String[] codes, String fwCode) {
