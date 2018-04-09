@@ -373,34 +373,28 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 	private void processParameters(HttpServletRequest request, SearchData searchData, String code, String fwCode, String codeType, boolean isDisplayCode) {
 		MapWrapper<Object> searchDataMap = new MapWrapper<Object>(request.getParameterMap());
 
-		if (codeType.equalsIgnoreCase(TYPE_STANDARD)) {
-			if (StringUtils.isBlank(fwCode) && StringUtils.isNotBlank(code)) {
-				searchDataMap.put(FLT_TAXONOMY_GUT_CODE, code);
-			} else if (StringUtils.isNotBlank(fwCode)) {
-				if (isDisplayCode) {
-					searchDataMap.put(FLT_STANDARD_DISPLAY, code);
-				} else {
-					searchDataMap.put(FLT_STANDARD, code);
+		if (codeType.equalsIgnoreCase(TYPE_STANDARD) || (searchDataMap.containsKey(FLT_STANDARD) || searchDataMap.containsKey(FLT_STANDARD_DISPLAY) || searchDataMap.containsKey(FLT_TAXONOMY_GUT_CODE) )) {
+			if (StringUtils.isNotBlank(code)) {
+				if (StringUtils.isBlank(fwCode) && StringUtils.isNotBlank(code)) {
+					searchDataMap.put(FLT_TAXONOMY_GUT_CODE, code);
+				} else if (StringUtils.isNotBlank(fwCode)) {
+					if (isDisplayCode) {
+						searchDataMap.put(FLT_STANDARD_DISPLAY, code);
+					} else {
+						searchDataMap.put(FLT_STANDARD, code);
+					}
+					searchDataMap.put(FLT_FWCODE, fwCode);
 				}
-				searchDataMap.put(FLT_FWCODE, fwCode);
 			}
-		} else if (codeType.equalsIgnoreCase(SUBJECT)) {
-			searchDataMap.put(FLT_SUBJECT, code);
-		} else if (codeType.equalsIgnoreCase(TYPE_COURSE)) {
-			searchDataMap.put(FLT_COURSE, code);
-		} else if (codeType.equalsIgnoreCase(DOMAIN)) {
-			searchDataMap.put(FLT_DOMAIN, code);
-		}
-		if (searchDataMap.containsKey(FLT_STANDARD) || searchDataMap.containsKey(FLT_STANDARD_DISPLAY) || searchDataMap.containsKey(FLT_TAXONOMY_GUT_CODE) ) {
 			searchData.setTaxFilterType(TYPE_STANDARD);
-		}
-		if (searchDataMap.containsKey(FLT_SUBJECT)) {
+		} else if (codeType.equalsIgnoreCase(SUBJECT) || searchDataMap.containsKey(FLT_SUBJECT)) {
+			searchDataMap.put(FLT_SUBJECT, code);
 			searchData.setTaxFilterType(SUBJECT);
-		}
-		if (searchDataMap.containsKey(FLT_COURSE)) {
+		} else if (codeType.equalsIgnoreCase(TYPE_COURSE) || searchDataMap.containsKey(FLT_COURSE)) {
+			searchDataMap.put(FLT_COURSE, code);
 			searchData.setTaxFilterType(TYPE_COURSE);
-		}
-		if (searchDataMap.containsKey(FLT_DOMAIN)) {
+		} else if (codeType.equalsIgnoreCase(DOMAIN) || searchDataMap.containsKey(FLT_DOMAIN)) {
+			searchDataMap.put(FLT_DOMAIN, code);
 			searchData.setTaxFilterType(DOMAIN);
 		}
 		searchData.setParameters(searchDataMap);
