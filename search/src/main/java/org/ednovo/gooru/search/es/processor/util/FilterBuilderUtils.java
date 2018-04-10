@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.filter.BoolQuery;
 import org.ednovo.gooru.search.es.filter.FilterQuery;
-import org.ednovo.gooru.search.es.filter.MissingFilter;
+import org.ednovo.gooru.search.es.filter.ExistsFilter;
 import org.ednovo.gooru.search.es.filter.MustNotQuery;
 import org.ednovo.gooru.search.es.filter.NestedFilter;
 import org.ednovo.gooru.search.es.filter.RangeFilter;
@@ -151,7 +151,7 @@ public class FilterBuilderUtils {
 			if(key.equalsIgnoreCase(FLT_COURSE_MISSING)){
 				key = IndexFields.COURSE;
 			}
-			filter = new MissingFilter(key);
+			filter = new ExistsFilter(key);
 		} else if(type != null && type.equalsIgnoreCase("&?")){
 			filter = value;
 		} else if (type != null && type.equalsIgnoreCase("<>-")) {
@@ -184,7 +184,7 @@ public class FilterBuilderUtils {
 		}
 
 		if (type != null && type.equals("#")) {
-			return new MissingFilter(key);
+			return new ExistsFilter(key);
 		}
 
 		if (values instanceof String) {
