@@ -10,11 +10,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ednovo.gooru.search.domain.service.CompetencySearchResult;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.SearchInputType;
 import org.ednovo.gooru.search.es.exception.BadRequestException;
+import org.ednovo.gooru.search.es.exception.NotFoundException;
 import org.ednovo.gooru.search.es.exception.SearchException;
 import org.ednovo.gooru.search.es.handler.SearchHandler;
+import org.ednovo.gooru.search.es.handler.SearchHandlerType;
 import org.ednovo.gooru.search.es.model.MapWrapper;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.SearchResponse;
@@ -224,7 +227,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		if (!(hyphenCount == 2)) throw new BadRequestException("Invalid code! Please pass valid domain.");
 		
 		SearchData searchData = new SearchData();
-		searchData = generateLMSearchData(request, searchData, domainCode, fwCode, sessionToken, limit, startAt, pageNum, pretty, query, isCrosswalk, "domain", isDisplayCode);
+		searchData = generateLMSearchData(request, searchData, domainCode, fwCode, sessionToken, limit, startAt, pageNum, pretty, query, isCrosswalk, DOMAIN, isDisplayCode);
 		
 		String excludeAttributeArray[] = {};
 		try {
@@ -238,7 +241,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 	}
 	
 	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/standard/{standardCode:.+}")
-	public ModelAndView searchLearningMaps(HttpServletRequest request, HttpServletResponse response,
+	public ModelAndView searchLearningMapsByCompetency(HttpServletRequest request, HttpServletResponse response,
 			@PathVariable String standardCode,
 			@RequestParam(required = false) String fwCode,
 			@RequestParam(required = false) String sessionToken,
@@ -324,6 +327,40 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/search")
+	public ModelAndView learningMapSearch(HttpServletRequest request, HttpServletResponse response, 
+			@RequestParam(required = false) String sessionToken,
+			@RequestParam(defaultValue = "10", value = "length") Integer limit, 
+			@RequestParam(defaultValue = "0") Integer startAt, 
+			@RequestParam(defaultValue = "1", value = "start") Integer pageNum,
+			@RequestParam(defaultValue = "0") String pretty, 
+			@RequestParam(value = "q", defaultValue = "*") String query,
+			@RequestParam(required = false, defaultValue = "true") boolean isCrosswalk) throws Exception {
+		long start = System.currentTimeMillis();
+		SearchResponse<Object> searchResponse = new SearchResponse<Object>();
+		try {
+			/**
+			 * Here, when no filter is chosen, * search and keyword request with length less than 3 without * are skipped.
+			 **/
+			query = checkQueryValidity(query, (Map<String, Object>) request.getParameterMap());
+			String standardCode = pedagogySearchService.fetchKwToCompetency(query, pretty);
+			SearchData searchData = new SearchData();
+			if (StringUtils.isNotBlank(standardCode)) {
+				searchData = generateLMSearchData(request, searchData, standardCode, null, sessionToken, limit, startAt, pageNum, pretty, query, isCrosswalk, KEYWORD_COMPETENCY, false);
+				searchResponse = pedagogySearchService.searchPedagogy(searchData);
+			} else {
+				throw new NotFoundException("No matching GUT found for requested search term : "+ query);
+			}
+			String excludeAttributeArray[] = {};
+			logger.info("Elapsed time to complete KwToComp LM search process :" + (System.currentTimeMillis() - start) + " ms");
+			return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
+		} catch (SearchException searchException) {
+			response.setStatus(searchException.getStatus().value());
+			return toModelAndView(searchException.getMessage());
+		}
+	}
+	
 	private SearchData generateLMSearchData(HttpServletRequest request, SearchData searchData, String code, String fwCode, String sessionToken, Integer limit, Integer startAt, Integer pageNum, String pretty,
 			String query, boolean isCrosswalk, String codeType, boolean isDisplayCode) {
 		User apiCaller = (User) request.getAttribute(USER);
@@ -373,7 +410,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 	private void processParameters(HttpServletRequest request, SearchData searchData, String code, String fwCode, String codeType, boolean isDisplayCode) {
 		MapWrapper<Object> searchDataMap = new MapWrapper<Object>(request.getParameterMap());
 
-		if (codeType.equalsIgnoreCase(TYPE_STANDARD) || (searchDataMap.containsKey(FLT_STANDARD) || searchDataMap.containsKey(FLT_STANDARD_DISPLAY) || searchDataMap.containsKey(FLT_TAXONOMY_GUT_CODE) )) {
+		if (codeType.equalsIgnoreCase(TYPE_STANDARD) || codeType.equalsIgnoreCase(KEYWORD_COMPETENCY) || (searchDataMap.containsKey(FLT_STANDARD) || searchDataMap.containsKey(FLT_STANDARD_DISPLAY) || searchDataMap.containsKey(FLT_TAXONOMY_GUT_CODE) )) {
 			if (StringUtils.isNotBlank(code)) {
 				if (StringUtils.isBlank(fwCode) && StringUtils.isNotBlank(code)) {
 					searchDataMap.put(FLT_TAXONOMY_GUT_CODE, code);
@@ -387,6 +424,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 				}
 			}
 			searchData.setTaxFilterType(TYPE_STANDARD);
+			if (codeType.equalsIgnoreCase(KEYWORD_COMPETENCY)) searchData.setTaxFilterType(KEYWORD_COMPETENCY);
 		} else if (codeType.equalsIgnoreCase(SUBJECT) || searchDataMap.containsKey(FLT_SUBJECT)) {
 			searchDataMap.put(FLT_SUBJECT, code);
 			searchData.setTaxFilterType(SUBJECT);

@@ -11,6 +11,7 @@ public class KeywordCompetencyFilterConstructionProcessor extends FilterConstruc
 	@Override
 	public void process(SearchData searchData, SearchResponse<Object> response) {
 		super.process(searchData, response);
+		searchData.putFilter("#^gutCodes", "gutCodes");
 	}
 
 	@Override

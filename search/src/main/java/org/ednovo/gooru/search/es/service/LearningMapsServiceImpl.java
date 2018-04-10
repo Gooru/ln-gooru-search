@@ -88,14 +88,14 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void generateStandardFilter(SearchData searchData, String key, String[] codes, String fwCode) {
+	public void generateStandardFilter(SearchData searchData, String key, String taxCodes, String fwCode) {
 		if (searchData.getParameters() != null && searchData.getParameters().getValues().size() != 0) {
 			MapWrapper<Object> parameters = searchData.getParameters();
 			if (parameters != null && ((parameters.containsKey(FLT_STANDARD_DISPLAY) || (parameters.containsKey(FLT_STANDARD))) && parameters.containsKey(FLT_FWCODE))) {
 				SearchData crosswalkRequest = new SearchData();
 				crosswalkRequest.setPretty(searchData.getPretty());
 				crosswalkRequest.setIndexType(EsIndex.CROSSWALK);
-				crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CROSSWALK_CODES + DOT + key, (StringUtils.join(codes, COMMA)));
+				crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CROSSWALK_CODES + DOT + key, taxCodes);
 				if (fwCode != null) crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CROSSWALK_CODES + DOT + IndexFields.FRAMEWORK_CODE, fwCode);
 				crosswalkRequest.setQueryString(STAR);
 				List<Map<String, Object>> crosswalkResponses = (List<Map<String, Object>>) SearchHandler.getSearcher(SearchHandlerType.CROSSWALK.name()).search(crosswalkRequest).getSearchResults();
@@ -113,13 +113,13 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 				}
 				searchData.getParameters().remove(FLT_STANDARD);
 				searchData.getParameters().remove(FLT_FWCODE);
-				searchData.getParameters().put(FLT_STANDARD, StringUtils.join(codes, COMMA));
+				searchData.getParameters().put(FLT_STANDARD, taxCodes);
 				if (parameters.containsKey(FLT_STANDARD_DISPLAY)) searchData.getParameters().put(FLT_STANDARD, StringUtils.join(filterCodes, COMMA));
 				searchData.getParameters().remove(FLT_STANDARD_DISPLAY);
 // To be enabled when GUT is fully functional
 				// searchData.getParameters().put(FLT_RELATED_GUT_CODES, StringUtils.join(filterCodes, COMMA));
 			} else if (searchData.getParameters().containsKey(FLT_TAXONOMY_GUT_CODE)) {
-				searchData.getParameters().put(FLT_RELATED_GUT_CODES, StringUtils.join(codes, COMMA));
+				searchData.getParameters().put(FLT_RELATED_GUT_CODES, taxCodes);
 				searchData.getParameters().remove(FLT_TAXONOMY_GUT_CODE);
 			}
 		}
@@ -127,7 +127,8 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void generateRequestedCodeInfo(SearchData searchData, String key,  String[] codes, String requestedFwCode, Map<String, Object> searchResult) {
+	public void generateRequestedCodeInfo(SearchData searchData, String key,  String taxCodes, String requestedFwCode, Map<String, Object> searchResult) {
+		String[] codes = taxCodes.split(COMMA);
 		Map<String, Object> signatureContents = null;
 		String gutCode = null; String code = null; String codeType = null; String title = null;
 		List<GutPrerequisites> prerequisites = new ArrayList<>();
@@ -211,16 +212,34 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 		searchResult.put(IndexFields.CODE_TYPE, codeType);
 		searchResult.put(IndexFields.TITLE, title);
 	}
+
+	@Override
+	public void generateRequestedCodesInfo(SearchData searchData, String key,  String gutCodes, String requestedFwCode, Map<String, Object> searchResult) {
+		String[] codes = gutCodes.split(COMMA);
+		List<Map<String, Object>> gutdata = new ArrayList<>(codes.length);
+		for (String code : codes) {
+			Map<String, Object> result = new HashMap<>();
+			generateRequestedCodeInfo(searchData, key, code, requestedFwCode, searchResult);
+			result.put(SIGNATURE_CONTENTS, searchResult.get(SIGNATURE_CONTENTS));searchResult.remove(SIGNATURE_CONTENTS);
+			result.put(IndexFields.GUT_CODE, searchResult.get(IndexFields.GUT_CODE));searchResult.remove(IndexFields.GUT_CODE);
+			result.put(IndexFields.CODE, searchResult.get(IndexFields.CODE));searchResult.remove(IndexFields.CODE);
+			result.put(IndexFields.CODE_TYPE, searchResult.get(IndexFields.CODE_TYPE));searchResult.remove(IndexFields.CODE_TYPE);
+			result.put(IndexFields.TITLE, searchResult.get(IndexFields.TITLE));searchResult.remove(IndexFields.TITLE);
+			result.put(IndexFields.PREREQUISITES, searchResult.get(IndexFields.PREREQUISITES));searchResult.remove(IndexFields.PREREQUISITES);
+			gutdata.add(result);
+		}
+		searchResult.put(IndexFields.GUT_DATA, gutdata);
+	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public void setFilterWithExtractedKeywordsAndSubjects(SearchData searchData, String key, String[] codes, String fwCode) {
+	public void setFilterWithExtractedKeywordsAndSubjects(SearchData searchData, String key, String taxCodes, String fwCode) {
 		if (searchData.getParameters().containsKey(FLT_STANDARD) || searchData.getParameters().containsKey(FLT_STANDARD_DISPLAY) || searchData.getParameters().containsKey(FLT_RELATED_GUT_CODES)) {
 			SearchData input = new SearchData();
 			input.setPretty(searchData.getPretty());
 			input.setParameters(new MapWrapper<Object>());
 			input.setQueryString(STAR);
-			input.putFilter(key, StringUtils.join(codes, COMMA));
+			input.putFilter(key, taxCodes);
 			if (fwCode != null) input.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.FRAMEWORK_CODE, fwCode);
 			List<Taxonomy> searchResponse = (List<Taxonomy>) SearchHandler.getSearcher(SearchHandlerType.TAXONOMY.name()).search(input).getSearchResults();
 			if (searchResponse != null && !searchResponse.isEmpty()) {
@@ -257,7 +276,7 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 		if (contentStatsAsList != null) {
 			for(Map<String, Object> contentStat : contentStatsAsList) {
 				Map<String, Object> statsAsMap = new HashMap<>();
-				generateRequestedCodeInfo(searchData, TAXONOMY_GUT_CODE, contentStat.get(IndexFields.ID).toString().split(COMMA), null, statsAsMap);
+				generateRequestedCodeInfo(searchData, TAXONOMY_GUT_CODE, contentStat.get(IndexFields.ID).toString(), null, statsAsMap);
 				statsAsMap.put(IndexFields.ID, contentStat.get(IndexFields.ID).toString()); contentStat.remove(IndexFields.ID);
 				statsAsMap.put("subjectCode", contentStat.get("subjectCode").toString()); contentStat.remove("subjectCode");
 				statsAsMap.put("courseCode", contentStat.get("courseCode").toString()); contentStat.remove("courseCode");

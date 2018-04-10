@@ -9,4 +9,6 @@ public interface PedagogyNavigatorService {
 
 	SearchResponse<Object> fetchLearningMapStats(SearchData searchData, String subjectClassification, String subjectCode, String courseCode, String domainCode, String codeType);
 
+	String fetchKwToCompetency(String query, String pretty);
+
 }

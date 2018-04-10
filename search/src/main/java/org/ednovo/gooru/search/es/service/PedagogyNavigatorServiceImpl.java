@@ -3,8 +3,12 @@ package org.ednovo.gooru.search.es.service;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+import org.ednovo.gooru.search.domain.service.CompetencySearchResult;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.IndexFields;
+import org.ednovo.gooru.search.es.handler.SearchHandler;
+import org.ednovo.gooru.search.es.handler.SearchHandlerType;
 import org.ednovo.gooru.search.es.model.MapWrapper;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.SearchResponse;
@@ -30,7 +34,7 @@ public class PedagogyNavigatorServiceImpl implements PedagogyNavigatorService, C
 		SearchResponse<Object> searchResponse = new SearchResponse<Object>();
 		Map<String, Object> searchResult = new HashMap<>();
 		Map<String, Object> contentResultAsMap = new HashMap<>();
-		String[] codes = null;
+		String codes = null;
 		String key = null;
 		String fwCode = null;
 		if (searchData.getParameters() != null && searchData.getParameters().getValues().size() != 0) {
@@ -38,19 +42,20 @@ public class PedagogyNavigatorServiceImpl implements PedagogyNavigatorService, C
 			if (parameters != null) {
 				fwCode = (parameters.getString(FLT_FWCODE));
 				if (parameters.containsKey(FLT_STANDARD_DISPLAY)) {
-					codes = (parameters.getString(FLT_STANDARD_DISPLAY)).split(COMMA);
+					codes = (parameters.getString(FLT_STANDARD_DISPLAY));
 					key = IndexFields.CODE;
 				} else if (parameters.containsKey(FLT_STANDARD)) {
-					codes = (parameters.getString(FLT_STANDARD)).split(COMMA);
+					codes = (parameters.getString(FLT_STANDARD));
 					key = IndexFields.ID;
 				} else if (parameters.containsKey(FLT_TAXONOMY_GUT_CODE)) {
-					codes = (parameters.getString(FLT_TAXONOMY_GUT_CODE)).split(COMMA);
+					codes = (parameters.getString(FLT_TAXONOMY_GUT_CODE));
 					key = TAXONOMY_GUT_CODE;
 				}
 			}
 		}
 		if (key != null && codes != null) {
-			getLearningMapsService().generateRequestedCodeInfo(searchData, key, codes, fwCode, searchResult);
+			if (!searchData.getTaxFilterType().equals(KEYWORD_COMPETENCY)) getLearningMapsService().generateRequestedCodeInfo(searchData, key, codes, fwCode, searchResult);
+			else getLearningMapsService().generateRequestedCodesInfo(searchData, key, codes, fwCode, searchResult);
 			getLearningMapsService().generateStandardFilter(searchData, key, codes, fwCode);
 		}
 
@@ -79,6 +84,20 @@ public class PedagogyNavigatorServiceImpl implements PedagogyNavigatorService, C
 		getLearningMapsService().getLearningMapStats(searchData, searchResult, subjectClassification, subjectCode, courseCode, domainCode, codeType);
 		searchResponse.setSearchResults(searchResult);
 		return searchResponse;
+	}
+	
+	@Override
+	public String fetchKwToCompetency(String query, String pretty) {
+		String standardCode = null;
+		SearchData kwToCompRequest = new SearchData();
+		kwToCompRequest.setOriginalQuery(query);
+		kwToCompRequest.setQueryString(query);
+		kwToCompRequest.setType(KEYWORD_COMPETENCY);
+		kwToCompRequest.setPretty(pretty);
+		CompetencySearchResult kwToCompResponse = (CompetencySearchResult) SearchHandler.getSearcher(SearchHandlerType.KEYWORDCOMPETENCY.name()).search(kwToCompRequest).getSearchResults();
+		if (kwToCompResponse.getGutCodes() != null && kwToCompResponse.getGutCodes().size() > 0)
+			standardCode = StringUtils.join(kwToCompResponse.getGutCodes(), COMMA);
+		return standardCode;
 	}
 	
 	private LearningMapsService getLearningMapsService() {
