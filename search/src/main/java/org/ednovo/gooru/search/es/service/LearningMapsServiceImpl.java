@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.EsIndex;
 import org.ednovo.gooru.search.es.constant.IndexFields;
+import org.ednovo.gooru.search.es.exception.NotFoundException;
 import org.ednovo.gooru.search.es.handler.SearchHandler;
 import org.ednovo.gooru.search.es.handler.SearchHandlerType;
 import org.ednovo.gooru.search.es.model.MapWrapper;
@@ -129,10 +130,10 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 	@Override
 	public void generateRequestedCodeInfo(SearchData searchData, String key,  String taxCodes, String requestedFwCode, Map<String, Object> searchResult) {
 		String[] codes = taxCodes.split(COMMA);
-		Map<String, Object> signatureContents = null;
-		String gutCode = null; String code = null; String codeType = null; String title = null;
+		String gutCode = null;
 		List<GutPrerequisites> prerequisites = new ArrayList<>();
 		SearchData taxonomyRequest = new SearchData();
+		Map<String, Object> gutAsMap = new HashMap<>();
 		taxonomyRequest.setPretty(searchData.getPretty());
 		taxonomyRequest.setIndexType(EsIndex.TAXONOMY);
 		taxonomyRequest.putFilter(AMPERSAND + CARET_SYMBOL + key, (StringUtils.join(codes, COMMA)));
@@ -152,25 +153,15 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 							break;
 						}
 					}
-					Map<String, Object> gutAsMap = (Map<String, Object>) gutResponseAsMap.get(gutId);
+					gutAsMap = (Map<String, Object>) gutResponseAsMap.get(gutId);
 					prerequisites = (List<GutPrerequisites>) gutAsMap.get(IndexFields.PREREQUISITES);
-					signatureContents = (Map<String, Object>) gutAsMap.get(SIGNATURE_CONTENTS);
-					gutCode = (String) gutAsMap.get(IndexFields.ID);
-					code = (String) gutAsMap.get(IndexFields.CODE);
-					codeType = (String) gutAsMap.get(IndexFields.CODE_TYPE);
-					title = (String) gutAsMap.get(IndexFields.TITLE);
+					searchResult.put(IndexFields.PREREQUISITES, prerequisites);
 				} else if (requestedFwCode != null) {
-					Map<String, Object> gutAsMap = new HashMap<>();
 					List<GutPrerequisites> gutPrerequisites = new ArrayList<GutPrerequisites>();
 					for (Entry<String, Object> gut : gutResponseAsMap.entrySet()) {
 						gutAsMap = (Map<String, Object>) gut.getValue();
 						gutPrerequisites.addAll((List<GutPrerequisites>) ((Map<String, Object>) gut.getValue()).get(IndexFields.PREREQUISITES));
 					}
-					signatureContents = (Map<String, Object>) gutAsMap.get(SIGNATURE_CONTENTS);
-					gutCode = (String) gutAsMap.get(IndexFields.ID);
-					code = (String) gutAsMap.get(IndexFields.CODE);
-					codeType = (String) gutAsMap.get(IndexFields.CODE_TYPE);
-					title = (String) gutAsMap.get(IndexFields.TITLE);
 					// crosswalk prerequisites
 					if (gutPrerequisites.size() > 0 && requestedFwCode != null) {
 						Set<Map<String, String>> progressions = new HashSet<>();
@@ -203,14 +194,20 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 					}
 				}
 			}
+		} else {
+			throw new NotFoundException("LM API: Requested Code not found : " + taxCodes);
 		}
 		
 		if (key.equalsIgnoreCase(TAXONOMY_GUT_CODE)) searchResult.put(IndexFields.PREREQUISITES, prerequisites);
-		searchResult.put(SIGNATURE_CONTENTS, signatureContents);
-		searchResult.put(IndexFields.GUT_CODE, gutCode);
-		searchResult.put(IndexFields.CODE, code);
-		searchResult.put(IndexFields.CODE_TYPE, codeType);
-		searchResult.put(IndexFields.TITLE, title);
+		searchResult.put(SIGNATURE_CONTENTS, (Map<String, Object>) gutAsMap.get(SIGNATURE_CONTENTS));
+		searchResult.put(IndexFields.GUT_CODE, ((String) gutAsMap.get(IndexFields.ID)) != null ? (String) gutAsMap.get(IndexFields.ID) : gutCode);
+		searchResult.put(IndexFields.CODE, (String) gutAsMap.get(IndexFields.CODE));
+		searchResult.put(IndexFields.CODE_TYPE, (String) gutAsMap.get(IndexFields.CODE_TYPE));
+		searchResult.put(IndexFields.TITLE, (String) gutAsMap.get(IndexFields.TITLE));
+		searchResult.put(IndexFields.SUBJECT, (String) gutAsMap.get(IndexFields.SUBJECT));
+		searchResult.put(IndexFields.COURSE, (String) gutAsMap.get(IndexFields.COURSE));
+		searchResult.put(IndexFields.DOMAIN, (String) gutAsMap.get(IndexFields.DOMAIN));
+		
 	}
 
 	@Override
