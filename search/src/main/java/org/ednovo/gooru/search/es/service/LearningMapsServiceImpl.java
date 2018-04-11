@@ -223,6 +223,9 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 			result.put(IndexFields.CODE_TYPE, searchResult.get(IndexFields.CODE_TYPE));searchResult.remove(IndexFields.CODE_TYPE);
 			result.put(IndexFields.TITLE, searchResult.get(IndexFields.TITLE));searchResult.remove(IndexFields.TITLE);
 			result.put(IndexFields.PREREQUISITES, searchResult.get(IndexFields.PREREQUISITES));searchResult.remove(IndexFields.PREREQUISITES);
+			result.put(IndexFields.SUBJECT, searchResult.get(IndexFields.SUBJECT));searchResult.remove(IndexFields.SUBJECT);
+			result.put(IndexFields.COURSE, searchResult.get(IndexFields.COURSE));searchResult.remove(IndexFields.COURSE);
+			result.put(IndexFields.DOMAIN, searchResult.get(IndexFields.DOMAIN));searchResult.remove(IndexFields.DOMAIN);
 			gutdata.add(result);
 		}
 		searchResult.put(IndexFields.GUT_DATA, gutdata);
