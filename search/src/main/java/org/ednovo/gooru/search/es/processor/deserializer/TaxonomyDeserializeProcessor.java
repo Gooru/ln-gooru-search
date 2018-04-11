@@ -80,6 +80,9 @@ public class TaxonomyDeserializeProcessor extends DeserializeProcessor<List<Taxo
 				gutDataAsMap.put(IndexFields.CODE_TYPE, (String) gutData.get(IndexFields.CODE_TYPE));
 				gutDataAsMap.put(IndexFields.TITLE, (String) gutData.get(IndexFields.TITLE));
 				gutDataAsMap.put(IndexFields.ID, (String) gutData.get(IndexFields.ID));
+				gutDataAsMap.put(IndexFields.SUBJECT, (String) gutData.get(IndexFields.SUBJECT));
+				gutDataAsMap.put(IndexFields.COURSE, (String) gutData.get(IndexFields.COURSE));
+				gutDataAsMap.put(IndexFields.DOMAIN, (String) gutData.get(IndexFields.DOMAIN));
 				outputGutData.put((String) gutData.get(IndexFields.ID), gutDataAsMap);
 			});
 			code.setGutData(outputGutData);
