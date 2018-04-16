@@ -115,14 +115,18 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		searchDataMap.put("allowDuplicates", true);
 		searchDataMap.put("includeCollectionItem", includeCollectionItem);
 		searchDataMap.put("includeCIMin", includeCIMetaData);
-		if (searchDataMap.containsKey("flt.standard") || searchDataMap.containsKey("flt.standardDisplay") ) {
-			searchData.setTaxFilterType("standard");
+		if (searchDataMap.containsKey(FLT_STANDARD) || searchDataMap.containsKey(FLT_STANDARD_DISPLAY) ) {
+			searchData.setTaxFilterType(TYPE_STANDARD);
 		}
 		if (searchDataMap.containsKey("flt.course")) {
-			searchData.setTaxFilterType("course");
+			searchData.setTaxFilterType(TYPE_COURSE);
 		}
 		if (searchDataMap.containsKey("flt.domain")) {
 			searchData.setTaxFilterType("domain");
+		}
+		if (searchDataMap.containsKey(AGG_BY)) {
+			searchDataMap.put("aggBy.field", searchDataMap.getString(AGG_BY));
+			searchDataMap.remove(AGG_BY);
 		}
 		// client controlled value to enable / disable spell check.
 		searchDataMap.put("disableSpellCheck", disableSpellCheck);
@@ -222,20 +226,23 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		} else if (type.equalsIgnoreCase(TYPE_COMPETENCY_GRAPH)) {
 			type = KEYWORD_COMPETENCY;
 		}
+		if (!SEARCH_TYPES_MATCH.matcher(type).matches()) {
+			throw new BadRequestException("Unsupported type! Please pass a valid path variable : type");
+		}
 
 		if (searchData.getQueryString() != null && ((StringUtils.startsWithAny(searchData.getQueryString(), new String[] { "AND NOT ", "OR NOT ", "NOT AND ", "NOT OR ", "OR ", "AND " })) || (StringUtils.endsWithAny(searchData.getQueryString(), new String[] { " AND NOT", " OR NOT", " NOT AND", " NOT OR", " OR", " AND" })))) {
 			searchService.trimInvalidExpression(searchData);
 		}
+
 		searchData.setType(type);
-		searchData.setFrom(startAt);
-		searchData.setPageNum(pageNum);
+		searchData.setFrom(startAt > 0 ? startAt : 0);
+		searchData.setPageNum(pageNum > 0 ? pageNum : 1);
+		searchData.setSize(pageSize >= 0 ? pageSize : 8);
 		if (type.equalsIgnoreCase(TYPE_SCOLLECTION) && includeCollectionItem) {
 			searchData.setSize(5);
-		} else {
-			searchData.setSize(pageSize);
 		}
 		if (searchData.getFrom() < 1) {
-			searchData.setFrom((pageNum - 1) * searchData.getSize());
+			searchData.setFrom((searchData.getPageNum() - 1) * searchData.getSize());
 		}
 		searchData.setRemoteAddress(request.getRemoteAddr());
 		searchData.setUser(apiCaller);
@@ -320,6 +327,9 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 				if (parameterKey.contains(FLT) && (!parameterKey.equalsIgnoreCase(FLT_COLLECTION_TYPE) && !(parameterKey.equalsIgnoreCase(FLT_RESOURCE_FORMAT) && parameterMap.get(FLT_RESOURCE_FORMAT).toString().equalsIgnoreCase(TYPE_QUESTION)) && !(parameterKey.equalsIgnoreCase(FLT_RATING) && parameterMap.get(FLT_RATING).toString().contains(STR_ZERO)))) {
 					hasFilter = true;
 					break;
+				} else if (parameterKey.equalsIgnoreCase(AGG_BY)) {
+					hasFilter = true;
+					break;
 				}
 			}
 			query = query.replaceAll(ESCAPED_STAR, EMPTY_STRING);
@@ -396,11 +406,11 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		}
 
 		searchData.setType(type);
-		searchData.setFrom(startAt);
-		searchData.setPageNum(pageNum);
-		searchData.setSize(pageSize);
+		searchData.setFrom(startAt > 0 ? startAt : 0);
+		searchData.setPageNum(pageNum > 0 ? pageNum : 1);
+		searchData.setSize(pageSize >= 0 ? pageSize : 8);
 		if (searchData.getFrom() < 1) {
-			searchData.setFrom((pageNum - 1) * searchData.getSize());
+			searchData.setFrom((searchData.getPageNum() - 1) * searchData.getSize());
 		}
 		searchData.setRemoteAddress(request.getRemoteAddr());
 		User apiCaller = (User) request.getAttribute(USER);

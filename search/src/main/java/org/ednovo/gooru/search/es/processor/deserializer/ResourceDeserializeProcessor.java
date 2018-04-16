@@ -42,7 +42,7 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 		output = new ArrayList<ContentSearchResult>();
 		Set<String> contentUrls = new HashSet<String>();
 		Set<String> contentTitles = new HashSet<String>();
-		if (model != null && model.get(SEARCH_HITS) != null) {
+		if (model != null && model.get(SEARCH_HITS) != null && !((List<Map<String, Object>>) ((Map<String, Object>) model.get(SEARCH_HITS)).get(SEARCH_HITS)).isEmpty()) {
 			List<Map<String, Object>> hits = (List<Map<String, Object>>) ((Map<String, Object>) model.get(SEARCH_HITS)).get(SEARCH_HITS);
 			List<String> resourceIds = new ArrayList<String>();
 			float minScore = 0;
@@ -90,7 +90,7 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 					contentUrls.add(url);
 					contentTitles.add(title.toLowerCase());
 					// check the resource has less than the minScore640
-					if (!parameters.getBoolean(UN_RESTRICTED_SEARCH) && (Double) searchHit.get(SEARCH_SOURCE) < minScore) {
+					if (!parameters.getBoolean(UN_RESTRICTED_SEARCH) && (Double) searchHit.get(IndexFields._SCORE) < minScore) {
 						lessScoreResourceCount++;
 						lessScoreResourceGooruOid.append(fields.get(IndexFields.ID) + " , ");
 						if (output.size() > 4) {

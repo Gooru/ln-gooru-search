@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.constant.Constants;
+import org.ednovo.gooru.search.es.exception.UnauthorizedException;
 import org.ednovo.gooru.search.es.model.User;
 import org.ednovo.gooru.search.es.processor.util.JsonDeserializer;
 import org.ednovo.gooru.search.es.processor.util.SerializerUtil;
@@ -72,7 +73,7 @@ public class BaseController extends SerializerUtil  implements Constants  {
             sessionToken = request.getHeader(OAUTH_AUTHORIZATION);
        }
         if ((StringUtils.trimToNull(sessionToken) == null || sessionToken.equalsIgnoreCase("NA") || sessionToken.equalsIgnoreCase("null") || sessionToken.equalsIgnoreCase("undefined"))) {
-            throw new AccessDeniedException("Invalid SessionToken : " + sessionToken);
+            throw new UnauthorizedException("Invalid SessionToken : " + sessionToken);
         }
 		return sessionToken;
 	}

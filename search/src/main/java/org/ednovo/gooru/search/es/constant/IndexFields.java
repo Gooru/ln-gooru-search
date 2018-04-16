@@ -77,7 +77,8 @@ public class IndexFields {
 	public static final String IS_COPYRIGHT_OWNER = "isCopyrightOwner";
 	public static final String COPYRIGHT_OWNER_LIST = "copyrightOwnerList";
 	public static final String TWENTY_ONE_CENTURY_SKILL = "21CenturySkills";
-	
+	public static final String PREREQUISITES = "prerequisites";
+
 	// course fields 
 	public static final String COURSE_REMIXCOUNT = "courseRemixCount";
 	public static final String UNIT_COUNT = "unitCount";
@@ -117,6 +118,7 @@ public class IndexFields {
 	public static final Object COLLECTION = "collection";
 	public static final Object CONTENT = "content";
 	public static final String GUT_CODE = "gutCode";
+	public static final String GUT_CODES = "gutCodes";
 	public static final String CROSSWALK_CODES = "crosswalkCodes";
 	public static final String PUBLISHER_SUGGEST = "publisherSuggest";
 	public static final String TENANT = "tenant";
@@ -133,7 +135,6 @@ public class IndexFields {
 	public static final String EFFICACY = "efficacy";
 	public static final String ENGAGEMENT = "engagement";
 	public static final String RELEVANCE = "relevance";
-	public static final String GUT_PREREQUISITES = "gutPrerequisites";
 	public static final String DISPLAY_CODE = "displayCode";
 	public static final String SIGNATURE_COLLECTIONS = "signatureCollections";
 	public static final String SIGNATURE_ASSESSMENTS = "signatureAssessments";
@@ -143,5 +144,7 @@ public class IndexFields {
 	public static final String STATUS_IS_BROKEN = "statusIsBroken";
 	public static final String PUBLISHER_NAME = "publishername";
 	public static final String PARENT_TITLE = "parentTitle";
+	public static final String _SCORE = "_score";
+	public static final String GUT_DATA = "gutData";
 
 }

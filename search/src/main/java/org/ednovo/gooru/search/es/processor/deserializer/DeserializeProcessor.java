@@ -45,14 +45,22 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 					new TypeReference<Map<String, Object>>() {
 					});
 			O searchResult = deserialize(responseAsMap, searchData, null);
-			response.setSearchResults(searchResult);			
-		   if(responseAsMap.get(SEARCH_HITS) !=null) {
-			   Map<String, Object> hit = (Map<String, Object>) responseAsMap.get(SEARCH_HITS);
+			if(!searchData.isAggregationRequest()) response.setSearchResults(searchResult);			
+			if (responseAsMap.get(SEARCH_HITS) != null) {
+				Map<String, Object> hit = (Map<String, Object>) responseAsMap.get(SEARCH_HITS);
 				if (((List<Map<String, Object>>) (hit).get(SEARCH_HITS)) != null) {
+					List<Map<String, Object>> hits = (List<Map<String, Object>>) (hit).get(SEARCH_HITS);
+					if (!searchData.isAggregationRequest()) {
+						response.setTotalHitCount(((Integer) hit.get(SEARCH_TOTAL)).longValue());
+						response.setResultCount(hits.size());
+					}
 					Map<String, Object> stats = new HashMap<String, Object>(3);
 					stats.put("totalHitCount", ((Integer) hit.get(SEARCH_TOTAL)).longValue());
-					stats.put("pageSize", searchData.getSize());
-					stats.put("pageNumber", searchData.getPageNum());
+					if (!searchData.isAggregationRequest()) {
+						stats.put("pageSize", searchData.getSize());
+						stats.put("pageNumber", searchData.getPageNum());
+					}
+					response.setStats(stats);
 
 					Map<String, Object> query = new HashMap<String, Object>(4);
 					query.put("userQueryString", searchData.getUserQueryString());
@@ -62,14 +70,15 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 						query.put("rewriteType", SPELLCHECKER);
 					}
 					response.setQuery(query);
-					response.setStats(stats);
 
-					List<Map<String, Object>> hits = (List<Map<String, Object>>) (hit).get(SEARCH_HITS);
-					response.setTotalHitCount(((Integer) hit.get(SEARCH_TOTAL)).longValue());
-					response.setResultCount(hits.size());
 					// response.setSpellCheckQueryString(searchData.getSpellCheckQueryString());
 				}
-
+			} 
+		   	if (searchData.isAggregationRequest() && responseAsMap.get("aggregations") != null) {
+				List<Map<String, Object>> bucketList = (List<Map<String, Object>>) ((Map<String, Object>) ((Map<String, Object>) responseAsMap.get("aggregations")).get("agg_key")).get("buckets");
+				if(bucketList.size() > 0) {
+					response.setAggregations(bucketList);
+				}
 			}
 			/*if(searchData.getFacet() !=  null && searchData.getFacet().trim().length() > 0 && responseAsMap.get(FACETS) !=null){
 				response.setFacets(responseAsMap.get(FACETS));
@@ -132,7 +141,7 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 		final String subject = getSubjectFromCodeId(internalCode);
 		String framework = null;
 		try {
-			if (standardPrefs != null && standardPrefs.has(subject)) {
+			if (standardPrefs != null && subject != null && standardPrefs.has(subject)) {
 				framework = standardPrefs.getString(subject);
 				if (framework != null) {
 					if (!internalCode.startsWith(framework + DOT) && crosswalkCodes != null) {
@@ -171,7 +180,7 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 	}
 
 	private String getSubjectFromCodeId(String codeId) {
-		return codeId.substring((codeId.indexOf(DOT) + 1), codeId.indexOf(HYPHEN));
+		return codeId.contains(HYPHEN) ? codeId.substring((codeId.indexOf(DOT) + 1), codeId.indexOf(HYPHEN)) : null;
 	}
 
 	@SuppressWarnings("unchecked")

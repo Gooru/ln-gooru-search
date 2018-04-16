@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.ednovo.gooru.search.es.constant.Constants;
+import org.ednovo.gooru.search.es.exception.UnauthorizedException;
 import org.ednovo.gooru.search.model.GooruAuthenticationToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,8 @@ public class AuthorizationFilter implements Filter {
 			int errorCode = 500;
 			if (ex instanceof AccessDeniedException) {
 				errorCode = 403;
+			} else if (ex instanceof UnauthorizedException) {
+				errorCode = 401;
 			}
 			Authentication auth = new GooruAuthenticationToken(ex, null, ex.getMessage(), errorCode);
 			SecurityContextHolder.getContext().setAuthentication(auth);

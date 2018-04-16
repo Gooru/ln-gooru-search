@@ -32,6 +32,8 @@ public final class SearchSettingService {
 
 	private static String FILTER_DETECTION = "filter-detection@";
 
+	private static String AGG_ALIAS = "agg-alias@";
+
 	// Don't change order. Add new keys at the end since key position is used.
 	private static String[] settingsListKeys = { "filter-case@lowercase", "filter-splitBy@approx", "filter-skipWords@all", "search.resource.filter_detection", "search.scollection.filter_detection", "search.question.filter_detection", "search.collection.filter_detection",
 		"search.quiz.filter_detection", "index-splitBy@singleTilta", "search-splitBy@singleTilta", "index-case@lowercase","search.content.colon_filter_detection","search.schooldistirct.filter_detection" };
@@ -160,6 +162,11 @@ public final class SearchSettingService {
 
 	public static String getFilterAlias(String name) {
 		String value = getCache(FILTER_ALIAS + name);
+		return value != null ? value : name;
+	}
+	
+	public static String getAggAlias(String name) {
+		String value = getCache(AGG_ALIAS + name);
 		return value != null ? value : name;
 	}
 

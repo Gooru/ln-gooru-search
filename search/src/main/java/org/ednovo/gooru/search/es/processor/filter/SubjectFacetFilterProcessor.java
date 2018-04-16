@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.ednovo.gooru.search.es.filter.Filters;
 import org.ednovo.gooru.search.es.handler.SearchHandler;
 import org.ednovo.gooru.search.es.handler.SearchHandlerType;
 import org.ednovo.gooru.search.es.model.SearchData;
@@ -38,18 +37,16 @@ public class SubjectFacetFilterProcessor extends SearchProcessor<SearchData, Obj
 		if(subjectFilter != null){
 			return;
 		}
-		Filters filters = new Filters(FilterBuilderUtils.buildFilter(searchFilters));
-		
-		Map<String, Object> andFilter = new HashMap<String, Object>();
+		Object boolQuery = FilterBuilderUtils.buildFilters(searchData.getFilters());
+		if(boolQuery != null) searchData.getQueryDsl().put(POST_FILTER, boolQuery);		
 
 		Map<String, Object> facetTerms = new HashMap<String, Object>();
 		Map<String, Object> facetFilter = new HashMap<String, Object>();
 		Map<String, Object> facets = new HashMap<String, Object>();
-		andFilter.put(AND, filters);
 
 		facetTerms.put(FIELD, FACET_FIELD);
 		facetFilter.put(TERMS, facetTerms);
-		facetFilter.put(FACET_FILTER, andFilter);
+		facetFilter.put(FACET_FILTER, boolQuery);
 		facets.put(FACET_NAME, facetFilter);
 		searchData.getQueryDsl().put(FACETS, facets);
 		searchData.setFacetSubjectSearch(true);

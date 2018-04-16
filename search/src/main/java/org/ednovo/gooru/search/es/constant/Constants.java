@@ -222,8 +222,18 @@ public interface Constants {
 	public static final String SEARCH_TAXONOMY_SUBJECT_CLASSIFICATION = "search.taxonomy.subject.classification";
 
 	public static final String FLT_STANDARD = "flt.standard";
+	
+	public static final String FLT_SUBJECT = "flt.subject";
+
+	public static final String FLT_COURSE = "flt.course";
+
+	public static final String FLT_DOMAIN = "flt.domain";
 
 	public static final String FLT_STANDARD_DISPLAY = "flt.standardDisplay";
+
+	public static final String FLT_RELATED_LEAF_INTERNAL_CODES = "flt.relatedLeafInternalCodes";
+
+	public static final String FLT_RELATED_GUT_CODES = "flt.relatedGutCode";
 
 	public static final String SEARCH_HITS = "hits";
 
@@ -244,7 +254,7 @@ public interface Constants {
 	public static final String SEARCH_LAST_NAME = "lastName";
 
 	public static final String SEARCH_TAXONOMY = "taxonomy";
-	public static final String SEARCH_TAXONOMY_SUBJECT = "subject";
+	public static final String SUBJECT = "subject";
 	public static final String SEARCH_ORGANIZATION = "organization";
 	public static final String SEARCH_CODE = "code";
 	public static final String SEARCH_NAME = "name";
@@ -388,13 +398,15 @@ public interface Constants {
 	public static final String AMPERSAND_DOMAIN = "&^domain";
 	public static final String AMPERSAND_STANDARD = "&^standard";
 	public static final String AMPERSAND_STANDARD_DISPLAY = "&^standardDisplay";
+	public static final String AMPERSAND_RELATED_LEAF_INTERNAL_CODES = "&^relatedLeafInternalCodes";
 	public static final String AMPERSAND_EQ_INTERNAL_CODE = "&^taxonomy.allEquivalentInternalCodes";
 	public static final String AMPERSAND_EQ_DISPLAY_CODE = "&^taxonomy.allEquivalentDisplayCodes";
+	public static final String AMPERSAND_EQ_RELATED_INTERNAL_CODE = "&^taxonomy.allEqRelatedInternalCodes";
 	public static final String AMPERSAND_EQ_COURSE_INTERNAL_CODE = "&^taxonomy.allEqCourseInternalCodes";
 	public static final String AMPERSAND_EQ_DOMAIN_INTERNAL_CODE = "&^taxonomy.allEqDomainInternalCodes";
 
 	public static final String STANDARD_PREFERENCE = "standard_preference";
-
+	public static final String ACCESS_TOKEN_VALIDITY = "access_token_validity";
 	public static final String LEAF_INTERNAL_CODE = "leafInternalCode";
 
 	public static final String PRE_TEST = "pre-test";
@@ -425,7 +437,7 @@ public interface Constants {
 	public static final String API_COMPETENCY_NODE = "api.competency.node";
 	public static final String DNS_ENV = "dns.env";
 	public static final String KEYWORDS = "keywords";
-	Pattern DEFAULT_FILTERS = Pattern.compile("flt.collectionType|flt.contentFormat|flt.resourceFormat|flt.publishStatus|flt.courseType");
+	Pattern DEFAULT_FILTERS = Pattern.compile("flt.collectionType|flt.contentFormat|flt.resourceFormat|flt.publishStatus|flt.courseType|aggBy");
 	public static final String KEYWORD = "keyword";
 	public static final String ANALYZER = "analyzer";
 	public static final String MATCH = "match";
@@ -514,9 +526,23 @@ public interface Constants {
 	public static final String RESULT_COUNT = "resultCount";
 	public static final String SEARCH_RESULTS = "searchResults";
 	public static final String FLT_FWCODE = "flt.fwCode";
-	public static final String PREREQUISITES = "prerequisites";
 	public static final String SIGNATURE_CONTENTS = "signatureContents";
 	public static final String FLT_TAXONOMY_GUT_CODE = "flt.taxonomyGutCode";
 	public static final String TAXONOMY_GUT_CODE = "taxonomyGutCode";
 	Pattern TAX_FILTERS = Pattern.compile("standard");
+	public static final String AGG_FIELDNAME = "<>-^field";
+	public static final String TYPE_CROSSWALK = "crosswalk";
+	Pattern SEARCH_TYPES_MATCH = Pattern.compile("resource|question|collection|scollection|rubric|course|unit|lesson|publisher|searchQuery|autocomplete");
+	public static final String AGG_BY = "aggBy";
+	public static final String AGG_RESPONSE_LIMIT = "aggSize";
+	public static final String AGGS = "aggs";
+	public static final String RESCORE = "rescore";
+	public static final String POST_FILTER = "post_filter";
+	public static final String CONTENT_COUNTS = "contentCounts";
+	public static final String STATS = "stats";
+	public static final String COLLECTIONS = "collections";
+	public static final String ASSESSMENTS = "assessments";
+	public static final String RESOURCES = "resources";
+	public static final String DOMAIN = "domain";
+
 }

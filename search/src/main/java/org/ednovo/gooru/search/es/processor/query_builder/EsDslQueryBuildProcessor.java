@@ -12,12 +12,14 @@ import org.ednovo.gooru.search.es.constant.SearchType;
 import org.ednovo.gooru.search.es.filter.Filter;
 import org.ednovo.gooru.search.es.filter.FunctionScore;
 import org.ednovo.gooru.search.es.filter.Query;
+import org.ednovo.gooru.search.es.filter.QueryString;
 import org.ednovo.gooru.search.es.model.MapWrapper;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.processor.SearchProcessor;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
 import org.ednovo.gooru.search.es.processor.util.FilterBuilderUtils;
+import org.ednovo.gooru.search.es.service.SearchSettingService;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,8 +36,10 @@ public class EsDslQueryBuildProcessor extends SearchProcessor<SearchData, Object
 			searchDataType = searchData.getIndexType().getName().toUpperCase();
 		}
 		String typeLower = searchDataType.toLowerCase();
-		Map<String, Object> queryString = new HashMap<String, Object>(1);
-		searchData.getQueryDsl().put("from", searchData.isPaginated() ? searchData.getFrom() * searchData.getSize() : searchData.getFrom()).put("size", searchData.getSize());
+		if (typeLower.startsWith(PEDAGOGY_UNDERSCORE)) {
+			typeLower = typeLower.replaceFirst(PEDAGOGY_UNDERSCORE, "");
+		}
+		searchData.getQueryDsl().put(FROM, searchData.isPaginated() ? searchData.getFrom() * searchData.getSize() : searchData.getFrom()).put(SIZE, searchData.getSize());
 		String fields = "";
 
 		MapWrapper<Object> searchParameters = searchData.getParameters();
@@ -81,7 +85,7 @@ public class EsDslQueryBuildProcessor extends SearchProcessor<SearchData, Object
 
 		Query mainQuery = new Query(searchData.getQueryString(), queryFields, true, searchData.getDefaultOperator(), searchData.isAllowLeadingWildcard(), analyzer,
 				getCassandraSettingAsFloat("search." + typeLower + ".query.user_query.boost"));
-		queryString.put("query_string", mainQuery);
+		QueryString queryString = new QueryString(mainQuery);
 		String lang = getSearchSetting("search." + searchData.getType().toLowerCase() + ".query.nativescore.lang");
 		String score = getSearchSetting("search." + searchData.getType().toLowerCase() + ".query.score");
 		// FIXME:temporary fix because of IllegalArgumentException issue with calculating score in lucene when use match all docs.
@@ -146,6 +150,28 @@ public class EsDslQueryBuildProcessor extends SearchProcessor<SearchData, Object
 			queryObj.put("window_size", getCassandraSettingAsInt(RESCORE_SCRIPT_LIMIT, DEFAULT_RESCORE_WINDOW_SIZE));
 			searchData.getQueryDsl().put("rescore", queryObj);
 		}
+		if (searchData.getFilters() != null && searchData.getFilters().containsKey(AGG_FIELDNAME) && searchData.getFilters().get(AGG_FIELDNAME) != null) {
+			Map<String, Object> aggMap = new HashMap<>(1);
+			Map<String, Object> aggTermMap = new HashMap<>(1);
+			Map<String, Object> aggTermFieldMap = new HashMap<>(2);
+			String aggField = searchData.getFilters().get(AGG_FIELDNAME).toString();
+			searchData.getFilters().remove(AGG_FIELDNAME);
+			if (SearchSettingService.getAggAlias(aggField) != null) {
+				aggField = SearchSettingService.getAggAlias(aggField);
+			}
+			aggTermFieldMap.put(FIELD, aggField);
+			if (searchData.getParameters().containsKey(AGG_RESPONSE_LIMIT)) {
+				int aggSize = searchData.getParameters().getInteger(AGG_RESPONSE_LIMIT);
+				aggTermFieldMap.put(SIZE, aggSize);
+			}
+			aggTermMap.put(TERMS, aggTermFieldMap);
+			aggMap.put("agg_key", aggTermMap);
+			searchData.getQueryDsl().put(AGGS, aggMap);
+			searchData.setSize(0);
+			searchData.setAggregationRequest(true);
+			searchData.getQueryDsl().put(SIZE, searchData.getSize()).remove(RESCORE);
+			searchData.getFilters().put("&?^queryString", queryString);
+		}
 	}
 
 	@Override
@@ -155,7 +181,11 @@ public class EsDslQueryBuildProcessor extends SearchProcessor<SearchData, Object
 		if (searchData.getFilters() != null && searchData.getFilters().size() > 0) {
 			Object boolQuery = FilterBuilderUtils.buildFilters(searchData.getFilters());
 			if (boolQuery != null) {
-				searchData.getQueryDsl().put("post_filter", boolQuery);
+				if(searchData.isAggregationRequest()) {
+					searchData.getQueryDsl().put(QUERY, boolQuery); 
+				} else {
+					searchData.getQueryDsl().put(POST_FILTER, boolQuery);
+				}
 			}
 		}
 	}

@@ -135,61 +135,18 @@ public class FilterDetectionProcessor extends SearchProcessor<SearchData, Object
 			SearchResponse<Object> response) {
 		applyFilterColonQuery(searchData);
 
-		
 		List<String> keys = SearchSettingService.getListByName("search." + searchData.getType().toLowerCase() + ".filter_detection");
 		if (keys != null) {
 			for (String key : keys) {
 				Map<String, String> pattern = SearchSettingService.getFilterDetection(key);
 				validatePattern(searchData, pattern, key);
 			}
-		}
-		
-		String orgQuery = searchData.getQueryString().toLowerCase().trim();
-		/*if(libraryName.get(orgQuery) != null){
-			searchData.setQueryString("*");
-			searchData.putFilter("&^libraryName", libraryName.get(orgQuery));
-		}*/
-		
-		
-		/*String orgQuery = searchData.getQueryString().toLowerCase();
-		String fltSource = null;
-		if (searchData.getParameters().containsKey("flt.source")) {
-			fltSource = searchData.getParameters().getString("flt.source");
-		}
-		if (fltSource == null || fltSource.trim().length() == 0) {
-			for (String map : ElasticsearchFactory.mapResourceContentProvider.keySet()) {
-				if (map.length() > 0 &&  orgQuery.contains(map)){
-					String type = ElasticsearchFactory.mapResourceContentProvider.get(map);
-					if (type.equalsIgnoreCase("publisher")){
-						searchData.putFilter("&^publisher", map);
-					} else {
-						searchData.putFilter("&^aggregator", map);
-					}
-					orgQuery = orgQuery.replace(map, "").trim();
-					if (orgQuery.length() == 0 ) {
-						orgQuery = map;
-					}
-					searchData.setQueryString(orgQuery);
-					break;
-				}
-			}
-		}*/
+		}	
 	}
 
 	@Override
 	protected SearchProcessorType getType() {
 		return SearchProcessorType.FilterDetection;
-	}
-	
-	public static void main(String agrs []){
-		String query = "cells grade:1st std.";
-		String regex ="(1|1st|first)(std.|(s|S)tandard|(s|S)tandards)";
-
-		Matcher matcher = Pattern.compile(regex).matcher(query);
-		if (matcher.find()) {
-			query = query.replaceAll(matcher.group().replaceAll(FIND_SPECIAL_CHARACTERS_REGEX, REPLACE_CHARACTERS), " ");
-		
-		}
 	}
 	
 }

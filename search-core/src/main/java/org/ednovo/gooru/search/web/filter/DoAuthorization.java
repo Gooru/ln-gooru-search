@@ -1,5 +1,8 @@
 package org.ednovo.gooru.search.web.filter;
 
+import java.util.Properties;
+
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import org.ednovo.gooru.responses.auth.AuthPrefsResponseHolder;
@@ -17,7 +20,6 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -25,6 +27,14 @@ public class DoAuthorization {
 
 	@Autowired
 	private RedisClient redisClient;
+
+	@Autowired
+	@Resource(name = "configSettings")
+	private Properties searchSettings;
+
+	private Properties getSearchSettings() {
+		return this.searchSettings;
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(DoAuthorization.class);
 
@@ -37,7 +47,7 @@ public class DoAuthorization {
 		if (sessionToken != null) {
 			JSONObject accessToken = getAccessToken(sessionToken);
 			if (accessToken == null) {
-				throw new AccessDeniedException("Invalid session token : " + sessionToken);
+				throw new UnauthorizedException("Invalid session token : " + sessionToken);
 			}
 			logger.info("Accesstoken data fetched from redis : " + accessToken);
 			try {
@@ -67,6 +77,7 @@ public class DoAuthorization {
 					if(responseHolder.getPreferences() != null && responseHolder.getPreferences().has(Constants.STANDARD_PREFERENCE))
 						stdPref  = responseHolder.getPreferences().getJSONObject(Constants.STANDARD_PREFERENCE);
 					request.setAttribute(Constants.USER_PREFERENCES, stdPref);
+					renewAccessToken(accessToken, sessionToken);
 				}
 			} catch (Exception e) {
 				logger.error("Error processing authorize request " + e);
@@ -83,6 +94,17 @@ public class DoAuthorization {
 			logger.error("Read from redis failed", e);
 		}
 		return null;
+	}
+	
+	private void renewAccessToken(JSONObject message, String sessionToken) {
+		try {
+			Integer expireToken = message.has(Constants.ACCESS_TOKEN_VALIDITY) ? message.getInt(Constants.ACCESS_TOKEN_VALIDITY)
+					: Integer.valueOf(getSearchSettings().getProperty(Constants.ACCESS_TOKEN_VALIDITY));
+
+			redisClient.expire(sessionToken, expireToken);
+		} catch (Exception e) {
+			logger.error("Error while renewing sessionToken" + e);
+		}
 	}
 
 }

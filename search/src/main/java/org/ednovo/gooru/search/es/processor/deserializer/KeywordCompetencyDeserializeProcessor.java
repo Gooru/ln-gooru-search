@@ -1,6 +1,5 @@
 package org.ednovo.gooru.search.es.processor.deserializer;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -11,17 +10,11 @@ import org.ednovo.gooru.search.domain.service.CompetencySearchResult;
 import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
-import org.ednovo.gooru.search.es.service.CompetencyNodeDataProviderService;
-import org.ednovo.gooru.search.model.CompetencyNodeDTO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class KeywordCompetencyDeserializeProcessor extends DeserializeProcessor<CompetencySearchResult, CompetencySearchResult> {
 
-	@Autowired
-	private CompetencyNodeDataProviderService competencyNodeDataProviderService;
-	
 	@SuppressWarnings("unchecked")
 	@Override
 	CompetencySearchResult deserialize(Map<String, Object> model, SearchData searchData, CompetencySearchResult output) {
@@ -33,19 +26,16 @@ public class KeywordCompetencyDeserializeProcessor extends DeserializeProcessor<
 			Set<String> ids = new HashSet<String>();
 			for (Map<String, Object> hit : hits) {
 				Map<String, Object> fields = (Map<String, Object>) hit.get(SEARCH_SOURCE);
-				String gutCode = (String) fields.get(IndexFields.GUT_CODE);
+				List<String> gutCode = (List<String>) fields.get(IndexFields.GUT_CODES);
 				String id = (String) fields.get(IndexFields.ID);
 				if (gutCode != null) {
-					gutCodes.add(gutCode);
+					gutCodes.addAll(gutCode);
 					ids.add(id);
 				}
 			}
 			LOG.info("Matched Ids : {} GutCodes : {}", ids, gutCodes);
 			if (gutCodes != null && gutCodes.size() > 0) {
-				List<CompetencyNodeDTO> competencyList = new ArrayList<>();
-				competencyList = competencyNodeDataProviderService.getCompetencyNode(gutCodes.parallelStream().collect(Collectors.toList()), searchData, competencyList);
-				if (competencyList.size() > 0)
-					output.setCompetency_graph(competencyList);
+				output.setGutCodes(gutCodes.stream().collect(Collectors.toList()));
 			}
 		}
 		return output;
