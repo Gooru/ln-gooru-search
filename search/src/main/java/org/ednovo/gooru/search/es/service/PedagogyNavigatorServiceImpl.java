@@ -66,7 +66,7 @@ public class PedagogyNavigatorServiceImpl implements PedagogyNavigatorService, C
 		getLearningMapsService().search(searchData, TYPE_RUBRIC, contentResultAsMap);
 
 		// To be disabled when aggregated tags are fully functional
-		getLearningMapsService().setFilterWithExtractedKeywordsAndSubjects(searchData, key, codes, fwCode);
+		//getLearningMapsService().setFilterWithExtractedKeywordsAndSubjects(searchData, key, codes, fwCode);
 
 		getLearningMapsService().search(searchData, TYPE_COURSE, contentResultAsMap);
 		getLearningMapsService().search(searchData, TYPE_UNIT, contentResultAsMap);
