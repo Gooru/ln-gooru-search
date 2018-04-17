@@ -67,12 +67,12 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 			inputSearchData.setQueryString(queryString);
 		}
 		//To be enabled when aggregated tags are in working condition
-/*		if (CUL_MATCH.matcher(type).matches()) {
+		if (CUL_MATCH.matcher(type).matches()) {
 			if (searchData.getParameters().containsKey(FLT_STANDARD)) {
 				searchData.getParameters().put(FLT_RELATED_LEAF_INTERNAL_CODES, searchData.getParameters().getString(FLT_STANDARD));
 				searchData.getParameters().remove(FLT_STANDARD);
 			}
-		}*/
+		}
 		SearchResponse<Object> searchResponse = (SearchResponse<Object>) SearchHandler.getSearcher((PEDAGOGY_UNDERSCORE + inputSearchData.getType()).toUpperCase()).search(inputSearchData);
 		Map<String, Object> searchMap = new HashMap<>();
 		searchMap.put(TOTAL_HIT_COUNT, searchResponse.getStats().get(TOTAL_HIT_COUNT));
