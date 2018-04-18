@@ -15,8 +15,6 @@ public interface LearningMapsService {
 
 	void generateRequestedCodeInfo(SearchData searchData, String key, String codes, String requestedFwCode, Map<String, Object> searchResult);
 
-	void setFilterWithExtractedKeywordsAndSubjects(SearchData searchData, String key, String codes, String fwCode);
-
 	void getLearningMapStats(SearchData searchData, Map<String, Object> searchResult, String subjectClassification, String subjectCode, String courseCode, String domainCode, String codeType);
 
 	void generateRequestedCodesInfo(SearchData searchData, String key, String gutCodes, String requestedFwCode, Map<String, Object> searchResult);		

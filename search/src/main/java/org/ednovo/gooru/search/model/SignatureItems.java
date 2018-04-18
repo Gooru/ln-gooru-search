@@ -6,6 +6,7 @@ public class SignatureItems {
 
 	private String id;
 	private String title;
+	private String description;
 	private String thumbnail;
 	private UserV2 creator;
 	private UserV2 owner;
@@ -29,6 +30,14 @@ public class SignatureItems {
 		this.title = title;
 	}
 
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
 	public String getThumbnail() {
 		return thumbnail;
 	}
