@@ -2,7 +2,6 @@ package org.ednovo.gooru.search.domain.service;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 import org.ednovo.gooru.search.es.model.License;
 import org.ednovo.gooru.search.es.model.UserV2;
@@ -77,6 +76,8 @@ public class CourseSearchResult extends SearchResult implements Serializable {
 	private Double engagement;
 	
 	private Double relevance;
+
+	private List<String> audience;
 
 	public String getLastModified() {
 		return lastModified;
@@ -332,6 +333,14 @@ public class CourseSearchResult extends SearchResult implements Serializable {
 
 	public void setRelevance(Double relevance) {
 		this.relevance = relevance;
+	}
+
+	public List<String> getAudience() {
+		return audience;
+	}
+
+	public void setAudience(List<String> audience) {
+		this.audience = audience;
 	}
 
 }

@@ -35,33 +35,65 @@ public class LearningMapStatsRepositoryImpl extends BaseRepository implements Le
 			if (StringUtils.isNotBlank(courseCode)) query.setParameterList("COURSE_CODE", courseCode.split(","));
 			if (StringUtils.isNotBlank(domainCode)) query.setParameterList("DOMAIN_CODE", domainCode.split(","));
 			if (query != null && arrayList(query).size() > 0) {
-				resultSet = new ArrayList<>();
-				for (Object[] object : arrayList(query)) {
-					Map<String, Object> resultMap = new HashMap<>();
-					String id = object[0].toString();
-					resultMap.put("id", id);
-					resultMap.put("subjectCode", object[1].toString());
-					resultMap.put("courseCode", object[2].toString());
-					resultMap.put("domainCode", object[3].toString());
-					resultMap.put("resource", Integer.valueOf(object[4].toString()));
-					resultMap.put("question", Integer.valueOf(object[5].toString()));
-					resultMap.put("collection", Integer.valueOf(object[6].toString()));
-					resultMap.put("assessment", Integer.valueOf(object[7].toString()));
-					resultMap.put("rubric", Integer.valueOf(object[8].toString()));
-					resultMap.put("course", Integer.valueOf(object[9].toString()));
-					resultMap.put("unit", Integer.valueOf(object[10].toString()));
-					resultMap.put("lesson", Integer.valueOf(object[11].toString()));
-					resultMap.put("signatureResource", Integer.valueOf(object[12].toString()));
-					resultMap.put("signatureCollection", Integer.valueOf(object[13].toString()));
-					resultMap.put("signatureAssessment", Integer.valueOf(object[14].toString()));
-					resultMap.put("codeType", object[15].toString());
-					resultMap.put("parentId", object[16] == null ? null : object[16].toString());
-					resultMap.put("sequenceId", Integer.valueOf(object[17].toString()));
-					resultSet.add(resultMap);
-				}
+				resultSet = generateStatsResponse(query);
 			}
 		} catch (Exception e) {
 			LOG.error("Unable to fetch LM stats : Exception :: {}", e.getMessage());
+		}
+		return resultSet;
+	}
+	
+	@Override
+	public List<Map<String, Object>> getStatsByIds(String gutIds, String codeType, int offset, int limit) {
+		List<Map<String, Object>> resultSet = null;
+		try {
+			if (StringUtils.isNotBlank(gutIds)) {
+				String sql = "select id, subject_code, course_code, domain_code, resource, question,collection, assessment, rubric, course, unit, lesson, signature_resource, signature_collection, signature_assessment, code_type, parent_id, sequence_id from learning_map_stats WHERE id IN (:GUT_IDS)";
+				if (codeType != null) {
+					if (codeType.equalsIgnoreCase("competency"))
+						sql += " and code_type in ('standard_level_1','standard_level_2')";
+					else
+						sql += " and code_type = 'learning_target_level_0'";
+				}
+				if (limit > 0)
+					sql += " offset " + offset + " limit " + limit;
+				Query query = getSessionFactory().getCurrentSession().createSQLQuery(sql);
+				if (StringUtils.isNotBlank(gutIds)) query.setParameterList("GUT_IDS", gutIds.split(","));
+				if (query != null && arrayList(query).size() > 0) {
+					resultSet = generateStatsResponse(query);
+				}
+			}
+		} catch (Exception e) {
+			LOG.error("Unable to fetch LM stats by Ids : {} Exception :: {}", gutIds, e.getMessage());
+		}
+		return resultSet;
+	}
+
+	private List<Map<String, Object>> generateStatsResponse(Query query) {
+		List<Map<String, Object>> resultSet;
+		resultSet = new ArrayList<>();
+		for (Object[] object : arrayList(query)) {
+			Map<String, Object> resultMap = new HashMap<>();
+			String id = object[0].toString();
+			resultMap.put("id", id);
+			resultMap.put("subjectCode", object[1].toString());
+			resultMap.put("courseCode", object[2].toString());
+			resultMap.put("domainCode", object[3].toString());
+			resultMap.put("resource", Integer.valueOf(object[4].toString()));
+			resultMap.put("question", Integer.valueOf(object[5].toString()));
+			resultMap.put("collection", Integer.valueOf(object[6].toString()));
+			resultMap.put("assessment", Integer.valueOf(object[7].toString()));
+			resultMap.put("rubric", Integer.valueOf(object[8].toString()));
+			resultMap.put("course", Integer.valueOf(object[9].toString()));
+			resultMap.put("unit", Integer.valueOf(object[10].toString()));
+			resultMap.put("lesson", Integer.valueOf(object[11].toString()));
+			resultMap.put("signatureResource", Integer.valueOf(object[12].toString()));
+			resultMap.put("signatureCollection", Integer.valueOf(object[13].toString()));
+			resultMap.put("signatureAssessment", Integer.valueOf(object[14].toString()));
+			resultMap.put("codeType", object[15].toString());
+			resultMap.put("parentId", object[16] == null ? null : object[16].toString());
+			resultMap.put("sequenceId", Integer.valueOf(object[17].toString()));
+			resultSet.add(resultMap);
 		}
 		return resultSet;
 	}
@@ -87,6 +119,26 @@ public class LearningMapStatsRepositoryImpl extends BaseRepository implements Le
 			totalHitCount = ((Number) query.list().get(0)).longValue();
 		} catch (Exception e) {
 			LOG.error("getTotalCount :: Unable to fetch LM stats total : Exception :: {}", e.getMessage());
+		}
+		return totalHitCount;
+	}
+	
+	@Override
+	public Long getTotalCountByIds(String gutIds, String codeType) {
+		Long totalHitCount = 0l;
+		try {
+			String sql = "select count(*) from learning_map_stats WHERE id IN (:GUT_IDS)";
+			if (codeType != null) {
+				if (codeType.equalsIgnoreCase("competency")) sql += " and code_type in ('standard_level_1','standard_level_2')";
+				else sql += " and code_type = 'learning_target_level_0'";
+			}
+			
+			Query query = getSessionFactory().getCurrentSession().createSQLQuery(sql);
+			if (StringUtils.isNotBlank(gutIds)) query.setParameterList("GUT_IDS", gutIds.split(","));
+
+			totalHitCount = ((Number) query.list().get(0)).longValue();
+		} catch (Exception e) {
+			LOG.error("getTotalCount :: Unable to fetch LM stats search total : Exception :: {}", e.getMessage());
 		}
 		return totalHitCount;
 	}

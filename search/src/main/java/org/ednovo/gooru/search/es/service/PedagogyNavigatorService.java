@@ -7,8 +7,8 @@ public interface PedagogyNavigatorService {
 
 	SearchResponse<Object> searchPedagogy(SearchData searchData);
 
-	SearchResponse<Object> fetchLearningMapStats(SearchData searchData, String subjectClassification, String subjectCode, String courseCode, String domainCode, String codeType);
+	SearchResponse<Object> fetchLearningMapStats(SearchData searchData, String subjectClassification, String subjectCode, String courseCode, String domainCode, String gutIds, String codeType);
 
-	String fetchKwToCompetency(String query, String pretty);
+	String fetchKwToCompetency(String query, String pretty, Integer from, Integer size);
 
 }

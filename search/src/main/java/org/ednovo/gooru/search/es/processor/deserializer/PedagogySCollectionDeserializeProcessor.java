@@ -52,7 +52,6 @@ public class PedagogySCollectionDeserializeProcessor extends PedagogyDeserialize
 	@Override
 	PedagogyCollectionSearchResult collect(Map<String, Object> model, SearchData searchData, PedagogyCollectionSearchResult searchResult) {
 		PedagogyCollectionSearchResult output = new PedagogyCollectionSearchResult();
-		Integer questionCount = 0;
 		if (model.get(IndexFields.THUMBNAIL) != null) {
 			output.setThumbnail((String) model.get(IndexFields.THUMBNAIL));
 		}
@@ -101,12 +100,12 @@ public class PedagogySCollectionDeserializeProcessor extends PedagogyDeserialize
 			output.setCollectionRemixCount((Integer) statisticsMap.get(IndexFields.COLLECTION_REMIX_COUNT));
 		}
 		if (statisticsMap.get(IndexFields.QUESTION_COUNT) != null) {
-			questionCount = (Integer) statisticsMap.get(IndexFields.QUESTION_COUNT);
-			output.setQuestionCount(String.valueOf(questionCount != null ? questionCount : 0));
+			Integer questionCount = (Integer) statisticsMap.get(IndexFields.QUESTION_COUNT);
+			output.setQuestionCount(questionCount != null ? questionCount : 0);
 		}
 		if (statisticsMap.get(IndexFields.RESOURCE_COUNT) != null) {
 			Integer resourceCount = (Integer) statisticsMap.get(IndexFields.RESOURCE_COUNT);
-			output.setResourceCount(String.valueOf(resourceCount != null ? resourceCount : 0));
+			output.setResourceCount(resourceCount != null ? resourceCount : 0);
 		}
 		output.setRemixedInCourseCount(statisticsMap.get(IndexFields.REMIXED_IN_COURSE_COUNT) != null ? ((Number) statisticsMap.get(IndexFields.REMIXED_IN_COURSE_COUNT)).longValue() : 0L);
 		output.setUsedByStudentCount(statisticsMap.get(IndexFields.USED_BY_STUDENT_COUNT) != null ? ((Number) statisticsMap.get(IndexFields.USED_BY_STUDENT_COUNT)).longValue() : 0L);
@@ -120,6 +119,7 @@ public class PedagogySCollectionDeserializeProcessor extends PedagogyDeserialize
 		output.setId((String) model.get(IndexFields.ID));
 		
 		output.setPublishStatus((String) model.get(IndexFields.PUBLISH_STATUS));
+		output.setIsFeatured(statisticsMap.get(IndexFields.IS_FEATURED) != null ? (Boolean) statisticsMap.get(IndexFields.IS_FEATURED) : false);
 
 		if (model.containsKey(IndexFields.TITLE)) {
 			output.setTitle((String) model.get(IndexFields.TITLE));

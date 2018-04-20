@@ -160,7 +160,25 @@ public class PedagogyResourceDeserializeProcessor extends PedagogyDeserializePro
 		if (creatorMap == null && ownerMap != null) {
 			resource.setCreator(user);
 		}
-
+		
+		Map<String, Object> infoMap = (Map<String, Object>) dataMap.get(IndexFields.INFO);
+		if (infoMap != null) {
+			if (infoMap.containsKey(IndexFields.PUBLISHER) && infoMap.get(IndexFields.PUBLISHER) != null) {
+				List<String> infoPublisher = (List<String>) infoMap.get(IndexFields.PUBLISHER);
+				resource.setPublisher(infoPublisher);
+			}
+		}
+		Boolean isCopyrightOwner = dataMap.get(IndexFields.IS_COPYRIGHT_OWNER) == null ? false : (Boolean)dataMap.get(IndexFields.IS_COPYRIGHT_OWNER);
+		if (resource.getPublisher() == null || resource.getPublisher().isEmpty()) {
+			List<String> publisher = new ArrayList<>();
+			if (isCopyrightOwner) {
+				if (user != null && user.getUsernameDisplay() != null) publisher.add(user.getUsernameDisplay());
+			} else if (dataMap.containsKey(IndexFields.COPYRIGHT_OWNER_LIST) && ((List<String>) dataMap.get(IndexFields.COPYRIGHT_OWNER_LIST)).size() > 0) {
+				publisher = (List<String>) dataMap.get(IndexFields.COPYRIGHT_OWNER_LIST);
+			}
+			resource.setPublisher((publisher != null && publisher.size() > 0) ? publisher : null);
+		}
+		
 		Map<String, Object> statisticsMap = (Map<String, Object>) dataMap.get(IndexFields.STATISTICS);
 		boolean hasFrameBreaker = false;
 		if (statisticsMap != null) {
@@ -185,6 +203,7 @@ public class PedagogyResourceDeserializeProcessor extends PedagogyDeserializePro
 			resource.setEfficacy((statisticsMap.get(IndexFields.EFFICACY) != null) ? ((Number) statisticsMap.get(IndexFields.EFFICACY)).doubleValue() : 0.5);
 			resource.setEngagement((statisticsMap.get(IndexFields.ENGAGEMENT) != null) ? ((Number) statisticsMap.get(IndexFields.ENGAGEMENT)).doubleValue() : 0.5);
 			resource.setRelevance((statisticsMap.get(IndexFields.RELEVANCE) != null) ? ((Number) statisticsMap.get(IndexFields.RELEVANCE)).doubleValue() : 0.5);
+			resource.setIsFeatured(statisticsMap.get(IndexFields.IS_FEATURED) != null ? (Boolean) statisticsMap.get(IndexFields.IS_FEATURED) : false);
 		}
 
 		Map<String, Object> taxonomyMap = (Map<String, Object>) dataMap.get(IndexFields.TAXONOMY);
@@ -202,7 +221,6 @@ public class PedagogyResourceDeserializeProcessor extends PedagogyDeserializePro
 		Map<String, Object> questionMap = (Map<String, Object>) (source.get(IndexFields.QUESTION));
 		question.setId((String) source.get(IndexFields.ID));
 		question.setQuestionText((String) source.get(IndexFields.TITLE));
-		question.setTypeName((String) source.get(IndexFields.CONTENT_SUB_FORMAT));
 		if (questionMap != null) {
 			question.setExplanation((String) questionMap.get(IndexFields.EXPLANATION));
 

@@ -13,11 +13,7 @@ public class PedagogyQuestion extends PedagogyContentSearchResult {
 	private static final long serialVersionUID = -5780952748437855414L;
 
 	private static final String INDEX_TYPE = "question";
-	
-	private String type;
-
-	private String typeName;
-	
+		
 	private String questionText;
 
 	private String explanation;
@@ -27,22 +23,6 @@ public class PedagogyQuestion extends PedagogyContentSearchResult {
 	private Set<Answer> answers;
 
 	private Set<Hint> hints;
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public String getTypeName() {
-		return typeName;
-	}
-
-	public void setTypeName(String typeName) {
-		this.typeName = typeName;
-	}
 
 	public String getQuestionText() {
 		return questionText;

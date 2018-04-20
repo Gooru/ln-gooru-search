@@ -59,6 +59,7 @@ public class PedagogyRubricDeserializer extends PedagogyDeserializeProcessor<Lis
 				viewsCount = ((Number) statistics.get(IndexFields.VIEWS_COUNT)).longValue();
 				output.setViews(viewsCount);
 			}
+			output.setIsFeatured(statistics.get(IndexFields.IS_FEATURED) != null ? (Boolean) statistics.get(IndexFields.IS_FEATURED) : false);
 		}
 
 		// set creator

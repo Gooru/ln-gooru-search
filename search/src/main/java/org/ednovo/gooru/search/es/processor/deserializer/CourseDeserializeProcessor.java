@@ -127,7 +127,17 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
 		if (model.get(IndexFields.ORIGINAL_CREATOR) != null) {
 			courseResult.setOriginalCreator(setUser((Map<String, Object>) model.get(IndexFields.ORIGINAL_CREATOR)));
 		}
-
+		
+		// set metadata 
+		List<String> audience = null;
+		if (model.get(IndexFields.METADATA) != null) {
+			Map<String, List<String>> metadata = (Map<String, List<String>>) model.get(IndexFields.METADATA);
+			if (metadata != null && metadata.get(IndexFields.AUDIENCE) != null) {
+				audience = metadata.get(IndexFields.AUDIENCE);
+			}
+		}
+		courseResult.setAudience(audience);
+		
 		// set taxonomy
 		Map<String, Object> taxonomyMap = (Map<String, Object>) model.get(IndexFields.TAXONOMY);
 		if (taxonomyMap != null) {

@@ -78,7 +78,7 @@ public abstract class PedagogyDeserializeProcessor<O, S> extends SearchProcessor
 			if (curriculumInfoAsList != null && !curriculumInfoAsList.isEmpty()) {
 				List<Map<String, Object>> crosswalkResponse = searchCrosswalk(input, leafInternalCodes);
 				curriculumInfoAsList.forEach(codeAsMap -> {
-					convertKeysToSnakeCase(finalConvertedMap, codeAsMap);
+					finalConvertedMap.put(codeAsMap.get(IndexFields.ID), codeAsMap);
 					List<Map<String, String>> crosswalkCodes = null;
 					crosswalkCodes = deserializeCrosswalkResponse(crosswalkResponse, codeAsMap.get(IndexFields.ID), crosswalkCodes);
 					if (crosswalkCodes != null) {
@@ -87,17 +87,19 @@ public abstract class PedagogyDeserializeProcessor<O, S> extends SearchProcessor
 								crosswalk.put(IndexFields.PARENT_TITLE, codeAsMap.get(IndexFields.PARENT_TITLE));
 								crosswalk.put(CROSSWALK_ID, crosswalk.get(IndexFields.ID));
 								crosswalk.put(IndexFields.ID, codeAsMap.get(IndexFields.ID));
-								convertKeysToSnakeCase(finalCrosswalkMap, crosswalk);
+								finalCrosswalkMap.put(crosswalk.get(IndexFields.ID), crosswalk);
 							}
 						}
 						String fltStandard = null;
 						String fltStandardDisplay = null;
+						String fltRelatedGutCodes = null;
 						if(input.getFilters().containsKey(AMPERSAND_EQ_INTERNAL_CODE)) fltStandard = input.getFilters().get(AMPERSAND_EQ_INTERNAL_CODE).toString();
 						if(input.getFilters().containsKey(AMPERSAND_EQ_DISPLAY_CODE)) fltStandardDisplay = input.getFilters().get(AMPERSAND_EQ_DISPLAY_CODE).toString();
+						if(input.getFilters().containsKey(AMPERSAND_RELATED_GUT_CODES)) fltRelatedGutCodes = input.getFilters().get(AMPERSAND_RELATED_GUT_CODES).toString();
 						Boolean isCrosswalked = false;
 						List<String> leafDisplayCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_DISPLAY_CODES);
 						if (!(leafInternalCodes != null && leafInternalCodes.size() > 0 && fltStandard != null && leafInternalCodes.contains(fltStandard.toUpperCase()))
-								&& !(leafDisplayCodes != null && leafDisplayCodes.size() > 0 && fltStandardDisplay != null && leafDisplayCodes.contains(fltStandardDisplay.toUpperCase()))) {
+								&& !(leafDisplayCodes != null && leafDisplayCodes.size() > 0 && fltStandardDisplay != null && leafDisplayCodes.contains(fltStandardDisplay.toUpperCase())) && fltRelatedGutCodes == null) {
 							isCrosswalked = true;
 						}
 						output.setIsCrosswalked(isCrosswalked);
@@ -106,7 +108,7 @@ public abstract class PedagogyDeserializeProcessor<O, S> extends SearchProcessor
 			}
 		}
 		if(!finalConvertedMap.isEmpty()) output.setTaxonomy(finalConvertedMap);
-		if(!finalCrosswalkMap.isEmpty()) output.setTaxonomyEquivalentCompetencies(finalCrosswalkMap);
+		//if(!finalCrosswalkMap.isEmpty()) output.setTaxonomyEquivalentCompetencies(finalCrosswalkMap);
 	}
 
 	@SuppressWarnings("unchecked")
