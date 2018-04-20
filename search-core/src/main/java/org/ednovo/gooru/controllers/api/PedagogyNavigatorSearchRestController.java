@@ -50,7 +50,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 	@SuppressWarnings("unchecked")
 	@RequestMapping(method = { RequestMethod.GET }, value = "/{type}")
 	public ModelAndView search(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) String sessionToken,
-			@RequestParam(defaultValue = "10", value = "length") Integer limit, @RequestParam(defaultValue = "0") Integer startAt, @RequestParam(defaultValue = "1", value = "start") Integer pageNum,
+			@RequestParam(defaultValue = "5", value = "length") Integer limit, @RequestParam(defaultValue = "0") Integer startAt, @RequestParam(defaultValue = "1", value = "start") Integer pageNum,
 			@RequestParam(defaultValue = "0") String pretty, @RequestParam(value = "q", defaultValue = "*") String query, @PathVariable String type,
 			@RequestParam(required = false, defaultValue = "true") boolean isCrosswalk) throws Exception {
 		long start = System.currentTimeMillis();
@@ -152,7 +152,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			@PathVariable String subjectCode,
 			@RequestParam(required = false) String fwCode,
 			@RequestParam(required = false) String sessionToken,
-			@RequestParam(defaultValue = "10", value = "length") Integer limit, 
+			@RequestParam(defaultValue = "5", value = "length") Integer limit, 
 			@RequestParam(defaultValue = "0") Integer startAt, 
 			@RequestParam(defaultValue = "1", value = "start") Integer pageNum,
 			@RequestParam(defaultValue = "0") String pretty, 
@@ -183,7 +183,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			@PathVariable String courseCode,
 			@RequestParam(required = false) String fwCode,
 			@RequestParam(required = false) String sessionToken,
-			@RequestParam(defaultValue = "10", value = "length") Integer limit, 
+			@RequestParam(defaultValue = "5", value = "length") Integer limit, 
 			@RequestParam(defaultValue = "0") Integer startAt, 
 			@RequestParam(defaultValue = "1", value = "start") Integer pageNum,
 			@RequestParam(defaultValue = "0") String pretty, 
@@ -213,7 +213,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			@PathVariable String domainCode,
 			@RequestParam(required = false) String fwCode,
 			@RequestParam(required = false) String sessionToken,
-			@RequestParam(defaultValue = "10", value = "length") Integer limit, 
+			@RequestParam(defaultValue = "5", value = "length") Integer limit, 
 			@RequestParam(defaultValue = "0") Integer startAt, 
 			@RequestParam(defaultValue = "1", value = "start") Integer pageNum,
 			@RequestParam(defaultValue = "0") String pretty, 
@@ -243,7 +243,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			@PathVariable String standardCode,
 			@RequestParam(required = false) String fwCode,
 			@RequestParam(required = false) String sessionToken,
-			@RequestParam(defaultValue = "10", value = "length") Integer limit, 
+			@RequestParam(defaultValue = "5", value = "length") Integer limit, 
 			@RequestParam(defaultValue = "0") Integer startAt, 
 			@RequestParam(defaultValue = "1", value = "start") Integer pageNum,
 			@RequestParam(defaultValue = "0") String pretty, 
@@ -316,8 +316,48 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		}
 		String excludeAttributeArray[] = {};
 		try {
-			SearchResponse<Object> searchResponse = pedagogySearchService.fetchLearningMapStats(searchData, subjectClassification, subjectCode, courseCode, domainCode, codeType);
+			SearchResponse<Object> searchResponse = pedagogySearchService.fetchLearningMapStats(searchData, subjectClassification, subjectCode, courseCode, domainCode, null, codeType);
 			logger.info("Elapsed time to fetch LM Stats :" + (System.currentTimeMillis() - start) + " ms");
+			return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
+		} catch (SearchException searchException) {
+			response.setStatus(searchException.getStatus().value());
+			return toModelAndView(searchException.getMessage());
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/stats/search")
+	public ModelAndView fetchLearningMapStats(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam(value = "q", defaultValue = "*") String query,
+			@RequestParam(required = false) String codeType,
+			@RequestParam(required = false) String sessionToken,
+			@RequestParam(defaultValue = "10", value = "length") Integer limit, 
+			@RequestParam(defaultValue = "0") Integer startAt, 
+			@RequestParam(defaultValue = "1", value = "start") Integer pageNum,
+			@RequestParam(defaultValue = "0") String pretty) throws Exception {
+		long start = System.currentTimeMillis();
+		SearchResponse<Object> searchResponse = new SearchResponse<Object>();
+		try {
+			SearchData searchData = new SearchData();
+			searchData.setPretty(pretty);
+			searchData.setFrom(startAt > 0 ? startAt : 0);
+			searchData.setPageNum(pageNum > 0 ? pageNum : 1);
+			searchData.setSize(limit >= 0 ? limit : 10);
+			if (searchData.getFrom() < 1) {
+				searchData.setFrom((searchData.getPageNum() - 1) * searchData.getSize());
+			}
+			/**
+			 * Here, when no filter is chosen, * search and keyword request with length less than 3 without * are skipped.
+			 **/
+			query = checkQueryValidity(query, (Map<String, Object>) request.getParameterMap());
+			String standardCode = pedagogySearchService.fetchKwToCompetency(query, pretty, 0, 100);
+			if (StringUtils.isNotBlank(standardCode)) {
+				searchResponse = pedagogySearchService.fetchLearningMapStats(searchData, null, null, null, null, standardCode, codeType);
+			} else {
+				throw new NotFoundException("No matching GUT found for requested search term : " + query);
+			}
+			String excludeAttributeArray[] = {};
+			logger.info("Elapsed time to fetch LM Stats Search :" + (System.currentTimeMillis() - start) + " ms");
 			return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
 		} catch (SearchException searchException) {
 			response.setStatus(searchException.getStatus().value());
@@ -342,7 +382,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			 * Here, when no filter is chosen, * search and keyword request with length less than 3 without * are skipped.
 			 **/
 			query = checkQueryValidity(query, (Map<String, Object>) request.getParameterMap());
-			String standardCode = pedagogySearchService.fetchKwToCompetency(query, pretty);
+			String standardCode = pedagogySearchService.fetchKwToCompetency(query, pretty, 0, 40);
 			SearchData searchData = new SearchData();
 			if (StringUtils.isNotBlank(standardCode)) {
 				searchData = generateLMSearchData(request, searchData, standardCode, null, sessionToken, limit, startAt, pageNum, pretty, query, isCrosswalk, KEYWORD_COMPETENCY, false);

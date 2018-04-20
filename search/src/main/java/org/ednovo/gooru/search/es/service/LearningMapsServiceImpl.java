@@ -227,8 +227,10 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 	}
 
 	@Override
-	public void getLearningMapStats(SearchData searchData, Map<String, Object> searchResult, String subjectClassification, String subjectCode, String courseCode, String domainCode, String codeType) {
-		List<Map<String, Object>> contentStatsAsList = getLearningMapStatsRepository().getStats(subjectClassification, subjectCode, courseCode, domainCode, codeType, searchData.getFrom(), searchData.getSize());
+	public void getLearningMapStats(SearchData searchData, Map<String, Object> searchResult, String subjectClassification, String subjectCode, String courseCode, String domainCode, String gutIds, String codeType) {
+		List<Map<String, Object>> contentStatsAsList = null;
+		if (StringUtils.isNotBlank(gutIds)) contentStatsAsList = getLearningMapStatsRepository().getStatsByIds(gutIds, codeType, searchData.getFrom(), searchData.getSize());
+		else contentStatsAsList = getLearningMapStatsRepository().getStats(subjectClassification, subjectCode, courseCode, domainCode, codeType, searchData.getFrom(), searchData.getSize());
 		List<Map<String, Object>> stats = new ArrayList<>();
 		if (contentStatsAsList != null) {
 			for(Map<String, Object> contentStat : contentStatsAsList) {
@@ -243,11 +245,16 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 				statsAsMap.put("sequenceId", (Integer) contentStat.get("sequenceId")); contentStat.remove("sequenceId");
 				statsAsMap.remove(SIGNATURE_CONTENTS);
 				statsAsMap.remove(IndexFields.GUT_CODE);
+				statsAsMap.remove(IndexFields.SUBJECT);
+				statsAsMap.remove(IndexFields.COURSE);
+				statsAsMap.remove(IndexFields.DOMAIN);
 				statsAsMap.put(CONTENT_COUNTS, contentStat);
 				stats.add(statsAsMap);
 			}
 		}
-		Long totalHitCount = getLearningMapStatsRepository().getTotalCount(subjectClassification, subjectCode, courseCode, domainCode, codeType);
+		Long totalHitCount = 0L;
+		if(gutIds != null) totalHitCount = getLearningMapStatsRepository().getTotalCountByIds(gutIds, codeType);
+		else totalHitCount = getLearningMapStatsRepository().getTotalCount(subjectClassification, subjectCode, courseCode, domainCode, codeType);
 		searchResult.put(STATS, stats);
 		searchResult.put(TOTAL_HIT_COUNT, totalHitCount);
 	}

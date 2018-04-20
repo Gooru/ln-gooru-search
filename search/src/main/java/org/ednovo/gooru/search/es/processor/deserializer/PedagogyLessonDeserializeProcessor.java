@@ -86,7 +86,7 @@ public class PedagogyLessonDeserializeProcessor extends PedagogyDeserializeProce
 
 		// set original creator 
 		if(model.get(IndexFields.ORIGINAL_CREATOR) != null){
-			lessonResult.setOrginalCreator(setUser((Map<String, Object>) model.get(IndexFields.ORIGINAL_CREATOR)));
+			lessonResult.setOriginalCreator(setUser((Map<String, Object>) model.get(IndexFields.ORIGINAL_CREATOR)));
 		}
 
 		// set taxonomy
