@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class KeywordCompetencyV2SearchHandler extends SearchHandler<SearchData, Map<String, Object>> {
 
-	private static final SearchProcessorType[][] searchProcessorTypes = new SearchProcessorType[][] { { BlackListQueryValidation }, { LimitValidation }, { DictionaryQueryExpansion },
+	private static final SearchProcessorType[][] searchProcessorTypes = new SearchProcessorType[][] { { BlackListQueryValidation }, { DictionaryQueryExpansion },
 			{ KeywordCompetencyFilterConstruction }, { EsDslQueryBuild }, { Elasticsearch }, { KeywordCompetencyDeserializer } };
 
 	@Override

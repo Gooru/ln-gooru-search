@@ -19,7 +19,7 @@ public class PedagogyLessonSearchResult extends PedagogySearchResult implements 
 
 	private UserV2 owner;
 
-	private UserV2 orginalCreator;
+	private UserV2 originalCreator;
 
 	private Map<String, Object> taxonomy;
 	
@@ -63,12 +63,12 @@ public class PedagogyLessonSearchResult extends PedagogySearchResult implements 
 		this.owner = owner;
 	}
 
-	public UserV2 getOrginalCreator() {
-		return orginalCreator;
+	public UserV2 getOriginalCreator() {
+		return originalCreator;
 	}
 
-	public void setOrginalCreator(UserV2 orginalCreator) {
-		this.orginalCreator = orginalCreator;
+	public void setOriginalCreator(UserV2 originalCreator) {
+		this.originalCreator = originalCreator;
 	}
 
 	public Map<String, Object> getTaxonomy() {

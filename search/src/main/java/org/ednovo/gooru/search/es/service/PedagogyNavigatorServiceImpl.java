@@ -64,10 +64,6 @@ public class PedagogyNavigatorServiceImpl implements PedagogyNavigatorService, C
 		getLearningMapsService().search(searchData, TYPE_SCOLLECTION, contentResultAsMap);
 		getLearningMapsService().search(searchData, TYPE_ASSESSMENT, contentResultAsMap);
 		getLearningMapsService().search(searchData, TYPE_RUBRIC, contentResultAsMap);
-
-		// To be disabled when aggregated tags are fully functional
-		getLearningMapsService().setFilterWithExtractedKeywordsAndSubjects(searchData, key, codes, fwCode);
-
 		getLearningMapsService().search(searchData, TYPE_COURSE, contentResultAsMap);
 		getLearningMapsService().search(searchData, TYPE_UNIT, contentResultAsMap);
 		getLearningMapsService().search(searchData, TYPE_LESSON, contentResultAsMap);
@@ -78,22 +74,24 @@ public class PedagogyNavigatorServiceImpl implements PedagogyNavigatorService, C
 	}
 	
 	@Override
-	public SearchResponse<Object> fetchLearningMapStats(SearchData searchData, String subjectClassification, String subjectCode, String courseCode, String domainCode, String codeType) {
+	public SearchResponse<Object> fetchLearningMapStats(SearchData searchData, String subjectClassification, String subjectCode, String courseCode, String domainCode, String gutIds, String codeType) {
 		SearchResponse<Object> searchResponse = new SearchResponse<Object>();
 		Map<String, Object> searchResult = new HashMap<>();
-		getLearningMapsService().getLearningMapStats(searchData, searchResult, subjectClassification, subjectCode, courseCode, domainCode, codeType);
+		getLearningMapsService().getLearningMapStats(searchData, searchResult, subjectClassification, subjectCode, courseCode, domainCode, gutIds, codeType);
 		searchResponse.setSearchResults(searchResult);
 		return searchResponse;
 	}
 	
 	@Override
-	public String fetchKwToCompetency(String query, String pretty) {
+	public String fetchKwToCompetency(String query, String pretty, Integer from, Integer size) {
 		String standardCode = null;
 		SearchData kwToCompRequest = new SearchData();
 		kwToCompRequest.setOriginalQuery(query);
 		kwToCompRequest.setQueryString(query);
 		kwToCompRequest.setType(KEYWORD_COMPETENCY);
 		kwToCompRequest.setPretty(pretty);
+		kwToCompRequest.setFrom(from);
+		kwToCompRequest.setSize(size);
 		CompetencySearchResult kwToCompResponse = (CompetencySearchResult) SearchHandler.getSearcher(SearchHandlerType.KEYWORDCOMPETENCY.name()).search(kwToCompRequest).getSearchResults();
 		if (kwToCompResponse.getGutCodes() != null && kwToCompResponse.getGutCodes().size() > 0)
 			standardCode = StringUtils.join(kwToCompResponse.getGutCodes(), COMMA);

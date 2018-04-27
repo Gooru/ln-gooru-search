@@ -24,13 +24,11 @@ public class PedagogyCollectionSearchResult extends PedagogySearchResult impleme
 
 	private String learningObjective;
 
-	private Integer isFeatured;
-
 	private Integer collectionItemCount;
 
-	private String questionCount;
+	private Integer questionCount;
 
-	private String resourceCount;
+	private Integer resourceCount;
 
 	private Integer collectionRemixCount;
 
@@ -73,14 +71,6 @@ public class PedagogyCollectionSearchResult extends PedagogySearchResult impleme
 
 	public void setLearningObjective(String learningObjective) {
 		this.learningObjective = learningObjective;
-	}
-
-	public Integer getIsFeatured() {
-		return isFeatured;
-	}
-
-	public void setIsFeatured(Integer isFeatured) {
-		this.isFeatured = isFeatured;
 	}
 
 	public String getFormat() {
@@ -131,19 +121,19 @@ public class PedagogyCollectionSearchResult extends PedagogySearchResult impleme
 		this.collectionItemCount = collectionItemCount;
 	}
 
-	public void setQuestionCount(String questionCount) {
+	public void setQuestionCount(Integer questionCount) {
 		this.questionCount = questionCount;
 	}
 
-	public String getQuestionCount() {
+	public Integer getQuestionCount() {
 		return questionCount;
 	}
 
-	public void setResourceCount(String resourceCount) {
+	public void setResourceCount(Integer resourceCount) {
 		this.resourceCount = resourceCount;
 	}
 
-	public String getResourceCount() {
+	public Integer getResourceCount() {
 		return resourceCount;
 	}
 

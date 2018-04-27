@@ -404,6 +404,7 @@ public interface Constants {
 	public static final String AMPERSAND_EQ_RELATED_INTERNAL_CODE = "&^taxonomy.allEqRelatedInternalCodes";
 	public static final String AMPERSAND_EQ_COURSE_INTERNAL_CODE = "&^taxonomy.allEqCourseInternalCodes";
 	public static final String AMPERSAND_EQ_DOMAIN_INTERNAL_CODE = "&^taxonomy.allEqDomainInternalCodes";
+	public static final String AMPERSAND_RELATED_GUT_CODES = "&^relatedGutCode";
 
 	public static final String STANDARD_PREFERENCE = "standard_preference";
 	public static final String ACCESS_TOKEN_VALIDITY = "access_token_validity";

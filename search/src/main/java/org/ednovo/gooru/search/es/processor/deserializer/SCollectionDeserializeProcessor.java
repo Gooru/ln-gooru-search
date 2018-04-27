@@ -40,8 +40,8 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 			if (hit.isEmpty()) {
 				return output;
 			}
-			Map<String, Object> fields = (Map<String, Object>) hit.get(SEARCH_SOURCE);
-			CollectionSearchResult scollection = (CollectionSearchResult) collect(fields, searchData, null);
+			Map<String, Object> source = (Map<String, Object>) hit.get(SEARCH_SOURCE);
+			CollectionSearchResult scollection = (CollectionSearchResult) collect(source, searchData, null);
 			output.add(scollection);
 			resourceContentIds.add(scollection.getId());
 		}
@@ -153,10 +153,6 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 			output.setLicense(license);
 		}
 
-		List<String> audience = (List<String>) model.get(IndexFields.AUDIENCE);
-		output.setAudience(audience);
-		List<String> depthOfknowlede = (List<String>) model.get(IndexFields.DEPTH_OF_KNOWLEDGE);
-		output.setDepthOfknowledge(depthOfknowlede);
 		// String instructionalMethod =(String) model.get(SEARCH_INSTRUCTIONAL_METHOD);
 		output.setInstructionalMethod(null);
 		// String learningAndInovation =(String) model.get(SEARCH_LEARNING_AND_INOVATION);

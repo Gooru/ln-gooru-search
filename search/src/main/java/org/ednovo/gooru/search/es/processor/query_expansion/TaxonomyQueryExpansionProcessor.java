@@ -38,7 +38,7 @@ public class TaxonomyQueryExpansionProcessor extends SearchProcessor<SearchData,
 		taxonomyRequest.setPretty(searchData.getPretty());
 		taxonomyRequest.setIndexType(EsIndex.DICTIONARY);
 		taxonomyRequest.putFilter("&^type", "taxonomy");
-		taxonomyRequest.setQueryString("\""+searchData.getQueryString().toLowerCase()+"\"");
+		taxonomyRequest.setQueryString("\""+searchData.getQueryString().toLowerCase().replaceAll(FIND_SPECIAL_CHARACTERS_REGEX, " ")+"\"");
 		taxonomyRequest.setFrom(0);
 		taxonomyRequest.setSize(1);
 		List<Map<String, Object>> searchResponse = null;
@@ -59,5 +59,5 @@ public class TaxonomyQueryExpansionProcessor extends SearchProcessor<SearchData,
 	protected SearchProcessorType getType() {
 		return SearchProcessorType.TaxonomyQueryExpansion;
 	}
-
+	
 }

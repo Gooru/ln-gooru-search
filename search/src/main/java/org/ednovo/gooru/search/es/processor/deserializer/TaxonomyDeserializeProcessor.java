@@ -99,6 +99,7 @@ public class TaxonomyDeserializeProcessor extends DeserializeProcessor<List<Taxo
 				SignatureItems signatureItem = new SignatureItems();
 				signatureItem.setId((String) item.get(IndexFields.ID));
 				signatureItem.setTitle((String) item.get(IndexFields.TITLE));
+				signatureItem.setDescription((String) item.get(IndexFields.DESCRIPTION));
 				signatureItem.setThumbnail((String) item.get(IndexFields.THUMBNAIL));
 				signatureItem.setEfficacy((item.get(IndexFields.EFFICACY) != null) ? ((Number) item.get(IndexFields.EFFICACY)).doubleValue() : 0.5);
 				signatureItem.setEngagement((item.get(IndexFields.ENGAGEMENT) != null) ? ((Number) item.get(IndexFields.ENGAGEMENT)).doubleValue() : 0.5);
@@ -119,6 +120,7 @@ public class TaxonomyDeserializeProcessor extends DeserializeProcessor<List<Taxo
 				SignatureResources signatureResource = new SignatureResources();
 				signatureResource.setId((String) resource.get(IndexFields.ID));
 				signatureResource.setTitle((String) resource.get(IndexFields.TITLE));
+				signatureResource.setDescription((String) resource.get(IndexFields.DESCRIPTION));
 				signatureResource.setUrl((String) resource.get(IndexFields.URL));
 				signatureResource.setContentSubFormat((String) resource.get(IndexFields.CONTENT_SUB_FORMAT));
 				signatureResource.setThumbnail((String) resource.get(IndexFields.THUMBNAIL));

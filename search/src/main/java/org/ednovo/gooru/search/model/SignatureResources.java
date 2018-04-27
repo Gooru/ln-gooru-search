@@ -6,6 +6,7 @@ public class SignatureResources {
 
 	private String id;
 	private String title;
+	private String description;
 	private String thumbnail;
 	private String contentSubFormat;
 	private String url;
@@ -29,7 +30,15 @@ public class SignatureResources {
 	public void setTitle(String title) {
 		this.title = title;
 	}
+	
+	public String getDescription() {
+		return description;
+	}
 
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
 	public String getThumbnail() {
 		return thumbnail;
 	}
