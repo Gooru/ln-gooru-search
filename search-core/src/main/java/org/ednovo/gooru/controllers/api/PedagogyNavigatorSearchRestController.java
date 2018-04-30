@@ -95,6 +95,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			searchDataMap.put(FLT_TAXONOMY_GUT_CODE, searchDataMap.getString("flt.gutCode"));
 			searchDataMap.remove("flt.gutCode");
 		}
+		if (searchDataMap.containsKey("isAdmin") && searchDataMap.getBoolean("isAdmin")) searchData.setAdmin(true);
 		searchData.setParameters(searchDataMap);
 
 		if (query.contains("!")) {
@@ -238,7 +239,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		}
 	}
 	
-	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/standard/{standardCode:.+}")
+	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/competency/{standardCode:.+}")
 	public ModelAndView searchLearningMapsByCompetency(HttpServletRequest request, HttpServletResponse response,
 			@PathVariable String standardCode,
 			@RequestParam(required = false) String fwCode,
@@ -399,6 +400,35 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		}
 	}
 	
+	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/standard/{standardCode:.+}")
+	public ModelAndView searchLearningMapsByStandard(HttpServletRequest request, HttpServletResponse response,
+			@PathVariable String standardCode,
+			@RequestParam(required = false) String fwCode,
+			@RequestParam(required = false) String sessionToken,
+			@RequestParam(defaultValue = "5", value = "length") Integer limit, 
+			@RequestParam(defaultValue = "0") Integer startAt, 
+			@RequestParam(defaultValue = "1", value = "start") Integer pageNum,
+			@RequestParam(defaultValue = "0") String pretty, 
+			@RequestParam(required = false, defaultValue = "*", value = "q") String query,
+			@RequestParam(defaultValue = "true") boolean isCrosswalk,
+			@RequestParam(defaultValue = "true") boolean isDisplayCode) throws Exception {
+		long start = System.currentTimeMillis();
+		
+		if (!(isDisplayCode && fwCode != null) && StringUtils.countMatches(standardCode, HYPHEN) < 3) throw new BadRequestException("Invalid code! Please pass valid competency/micro-competency.");
+
+		SearchData searchData = new SearchData();
+		searchData = generateLMSearchData(request, searchData, standardCode, fwCode, sessionToken, limit, startAt, pageNum, pretty, query, isCrosswalk, TYPE_STANDARD, isDisplayCode);
+		String excludeAttributeArray[] = {};
+		try {
+			SearchResponse<Object> searchResponse = pedagogySearchService.searchPedagogyFromStaticTable(searchData);
+			logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
+			return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
+		} catch (SearchException searchException) {
+			response.setStatus(searchException.getStatus().value());
+			return toModelAndView(searchException.getMessage());
+		}
+	}
+	
 	private SearchData generateLMSearchData(HttpServletRequest request, SearchData searchData, String code, String fwCode, String sessionToken, Integer limit, Integer startAt, Integer pageNum, String pretty,
 			String query, boolean isCrosswalk, String codeType, boolean isDisplayCode) {
 		User apiCaller = (User) request.getAttribute(USER);
@@ -473,6 +503,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			searchDataMap.put(FLT_DOMAIN, code);
 			searchData.setTaxFilterType(DOMAIN);
 		}
+		if (searchDataMap.containsKey("isAdmin") && searchDataMap.getBoolean("isAdmin")) searchData.setAdmin(true);
 		searchData.setParameters(searchDataMap);
 	}
 	

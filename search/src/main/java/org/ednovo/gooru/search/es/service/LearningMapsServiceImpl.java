@@ -259,6 +259,27 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 		searchResult.put(TOTAL_HIT_COUNT, totalHitCount);
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Map<String, Object> getLearningMapsFromStaticTable(String gutId, SearchData searchData) {
+		Map<String, Object> lm = getLearningMapStatsRepository().getLearningMapsById(gutId);
+		for (String key : lm.keySet()) {
+			if (searchData.getSize() == 0 || lm.get(key) == null) {
+				Map<String, Object> searchMap = new HashMap<>();
+				Integer totalHitCount = 0;
+				if (lm.get(key) != null) {
+					Map<String, Object> contentMap = (Map<String, Object>) lm.get(key);
+					totalHitCount = (Integer) contentMap.get(TOTAL_HIT_COUNT);
+				}
+				searchMap.put(TOTAL_HIT_COUNT, totalHitCount);
+				searchMap.put(RESULT_COUNT, 0);
+				searchMap.put(SEARCH_RESULTS, new ArrayList<>());
+				lm.put(key, searchMap);
+			}
+		}
+		return lm;
+	}
+	
 	private LearningMapStatsRepository getLearningMapStatsRepository() {
 		return learningMapStatsRepository;
 	}
