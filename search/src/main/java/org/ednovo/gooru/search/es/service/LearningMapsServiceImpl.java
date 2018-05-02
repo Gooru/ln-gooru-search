@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -19,7 +18,6 @@ import org.ednovo.gooru.search.es.model.Gut;
 import org.ednovo.gooru.search.es.model.MapWrapper;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.SearchResponse;
-import org.ednovo.gooru.search.es.model.Taxonomy;
 import org.ednovo.gooru.search.es.repository.LearningMapStatsRepository;
 import org.ednovo.gooru.search.model.GutPrerequisites;
 import org.slf4j.Logger;
@@ -125,52 +123,52 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void generateRequestedCodeInfo(SearchData searchData, String key,  String taxCodes, String requestedFwCode, Map<String, Object> searchResult) {
+	public void generateRequestedCodeInfo(SearchData searchData, String key, String taxCodes, String requestedFwCode, Map<String, Object> searchResult) {
 		String[] codes = taxCodes.split(COMMA);
 		String gutCode = null;
 		SearchData taxonomyRequest = new SearchData();
-		Map<String, Object> gutAsMap = new HashMap<>();
 		taxonomyRequest.setPretty(searchData.getPretty());
-		taxonomyRequest.setIndexType(EsIndex.TAXONOMY);
-		taxonomyRequest.putFilter(AMPERSAND + CARET_SYMBOL + key, (StringUtils.join(codes, COMMA)));
-		if (requestedFwCode != null) taxonomyRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.FRAMEWORK_CODE, requestedFwCode);
+		taxonomyRequest.setIndexType(EsIndex.GUT);
+		if (key.equalsIgnoreCase(TAXONOMY_GUT_CODE)) { 
+			taxonomyRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.ID, (StringUtils.join(codes, COMMA)));
+			gutCode = codes[0];
+		} else taxonomyRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CROSSWALK_CODES + DOT + key, (StringUtils.join(codes, COMMA)));
+		if (requestedFwCode != null) taxonomyRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CROSSWALK_CODES + DOT + IndexFields.FRAMEWORK_CODE, requestedFwCode);
 		taxonomyRequest.setQueryString(STAR);
-		List<Taxonomy> taxonomyResponses = (List<Taxonomy>) SearchHandler.getSearcher(SearchHandlerType.TAXONOMY.name()).search(taxonomyRequest).getSearchResults();
+		List<Gut> taxonomyResponses = (List<Gut>) SearchHandler.getSearcher(SearchHandlerType.GUT.name()).search(taxonomyRequest).getSearchResults();
+		Gut response = new Gut();
 		if (taxonomyResponses != null && !taxonomyResponses.isEmpty()) {
-			Taxonomy response = taxonomyResponses.get(0);
-			Map<String, Object> gutResponseAsMap = response.getGutData();
-			if (gutResponseAsMap != null) {
-				if (requestedFwCode != null) {
-					List<GutPrerequisites> gutPrerequisites = new ArrayList<GutPrerequisites>();
-					for (Entry<String, Object> gut : gutResponseAsMap.entrySet()) {
-						gutAsMap = (Map<String, Object>) gut.getValue();
-						gutPrerequisites.addAll((List<GutPrerequisites>) ((Map<String, Object>) gut.getValue()).get(IndexFields.PREREQUISITES));
-					}
-					// crosswalk prerequisites
-					if (gutPrerequisites.size() > 0 && requestedFwCode != null) {
-						Set<Map<String, String>> progressions = new HashSet<>();
-						crosswalkPrereqquisites(searchData, requestedFwCode, gutPrerequisites, progressions);
-						searchResult.put(IndexFields.PREREQUISITES, progressions);
-					}
+			response = taxonomyResponses.get(0);
+			if (key.equalsIgnoreCase(TAXONOMY_GUT_CODE)) {
+				List<GutPrerequisites> prerequisites = new ArrayList<>();
+				prerequisites = (List<GutPrerequisites>) response.getGutPrerequisites();
+				searchResult.put(IndexFields.PREREQUISITES, prerequisites);
+			} else if (requestedFwCode != null) {
+				List<GutPrerequisites> gutPrerequisites = new ArrayList<GutPrerequisites>();
+				gutPrerequisites.addAll(response.getGutPrerequisites());
+				// crosswalk prerequisites for requested fw code
+				if (gutPrerequisites.size() > 0) {
+					Set<Map<String, String>> progressions = new HashSet<>();
+					crosswalkPrerequisites(searchData, requestedFwCode, gutPrerequisites, progressions);
+					searchResult.put(IndexFields.PREREQUISITES, progressions);
 				}
 			}
 		} else {
 			throw new NotFoundException("LM API: Requested Code not found : " + taxCodes);
 		}
 		
-		searchResult.put(SIGNATURE_CONTENTS, (Map<String, Object>) gutAsMap.get(SIGNATURE_CONTENTS));
-		searchResult.put(IndexFields.GUT_CODE, ((String) gutAsMap.get(IndexFields.ID)) != null ? (String) gutAsMap.get(IndexFields.ID) : gutCode);
-		searchResult.put(IndexFields.CODE, (String) gutAsMap.get(IndexFields.CODE));
-		searchResult.put(IndexFields.CODE_TYPE, (String) gutAsMap.get(IndexFields.CODE_TYPE));
-		searchResult.put(IndexFields.TITLE, (String) gutAsMap.get(IndexFields.TITLE));
-		searchResult.put(IndexFields.SUBJECT, (String) gutAsMap.get(IndexFields.SUBJECT));
-		searchResult.put(IndexFields.COURSE, (String) gutAsMap.get(IndexFields.COURSE));
-		searchResult.put(IndexFields.DOMAIN, (String) gutAsMap.get(IndexFields.DOMAIN));
-		
+		searchResult.put(SIGNATURE_CONTENTS, response.getSignatureContents());
+		searchResult.put(IndexFields.GUT_CODE, (response.getId()) != null ? response.getId() : gutCode);
+		searchResult.put(IndexFields.CODE, response.getDisplayCode());
+		searchResult.put(IndexFields.CODE_TYPE, response.getCodeType());
+		searchResult.put(IndexFields.TITLE, response.getTitle());
+		searchResult.put(IndexFields.SUBJECT, response.getSubjectLabel());
+		searchResult.put(IndexFields.COURSE, response.getCourseLabel());
+		searchResult.put(IndexFields.DOMAIN, response.getDomainLabel());
 	}
 
 	@SuppressWarnings("unchecked")
-	private void crosswalkPrereqquisites(SearchData searchData, String requestedFwCode, List<GutPrerequisites> gutPrerequisites, Set<Map<String, String>> progressions) {
+	private void crosswalkPrerequisites(SearchData searchData, String requestedFwCode, List<GutPrerequisites> gutPrerequisites, Set<Map<String, String>> progressions) {
 		gutPrerequisites.forEach(a -> {
 			GutPrerequisites gutPrerequisite = (GutPrerequisites) a;
 			SearchData crosswalkRequest = new SearchData();
@@ -197,38 +195,6 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 			}
 		});
 	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public void generateRequestedGutInfo(SearchData searchData, String key,  String taxCodes, String requestedFwCode, Map<String, Object> searchResult) {
-		String[] codes = taxCodes.split(COMMA);
-		List<GutPrerequisites> prerequisites = new ArrayList<>();
-		SearchData taxonomyRequest = new SearchData();
-		taxonomyRequest.setPretty(searchData.getPretty());
-		taxonomyRequest.setIndexType(EsIndex.TAXONOMY);
-		taxonomyRequest.putFilter(AMPERSAND + CARET_SYMBOL + key, (StringUtils.join(codes, COMMA)));
-		taxonomyRequest.setQueryString(STAR);
-		List<Gut> taxonomyResponses = (List<Gut>) SearchHandler.getSearcher(SearchHandlerType.GUT.name()).search(taxonomyRequest).getSearchResults();
-		Gut response = new Gut();
-		if (taxonomyResponses != null && !taxonomyResponses.isEmpty()) {
-			response = taxonomyResponses.get(0);
-			prerequisites = (List<GutPrerequisites>) response.getGutPrerequisites();
-			searchResult.put(IndexFields.PREREQUISITES, prerequisites);
-		} else {
-			throw new NotFoundException("LM API: Requested GUT Code not found : " + taxCodes);
-		}
-		
-		if (key.equalsIgnoreCase(TAXONOMY_GUT_CODE)) searchResult.put(IndexFields.PREREQUISITES, prerequisites);
-		searchResult.put(SIGNATURE_CONTENTS, response.getSignatureContents());
-		searchResult.put(IndexFields.GUT_CODE, codes[0]);
-		searchResult.put(IndexFields.CODE, response.getDisplayCode());
-		searchResult.put(IndexFields.CODE_TYPE, response.getCodeType());
-		searchResult.put(IndexFields.TITLE, response.getTitle());
-		searchResult.put(IndexFields.SUBJECT, response.getSubjectLabel());
-		searchResult.put(IndexFields.COURSE, response.getCourseLabel());
-		searchResult.put(IndexFields.DOMAIN, response.getDomainLabel());
-		
-	}
 	
 	@Override
 	public void generateRequestedCodesInfo(SearchData searchData, String key,  String gutCodes, String requestedFwCode, Map<String, Object> searchResult) {
@@ -236,7 +202,7 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 		List<Map<String, Object>> gutdata = new ArrayList<>(codes.length);
 		for (String code : codes) {
 			Map<String, Object> result = new HashMap<>();
-			generateRequestedGutInfo(searchData, key, code, requestedFwCode, searchResult);
+			generateRequestedCodeInfo(searchData, key, code, requestedFwCode, searchResult);
 			result.put(SIGNATURE_CONTENTS, searchResult.get(SIGNATURE_CONTENTS));searchResult.remove(SIGNATURE_CONTENTS);
 			result.put(IndexFields.GUT_CODE, searchResult.get(IndexFields.GUT_CODE));searchResult.remove(IndexFields.GUT_CODE);
 			result.put(IndexFields.CODE, searchResult.get(IndexFields.CODE));searchResult.remove(IndexFields.CODE);
@@ -260,7 +226,7 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 		if (contentStatsAsList != null) {
 			for(Map<String, Object> contentStat : contentStatsAsList) {
 				Map<String, Object> statsAsMap = new HashMap<>();
-				generateRequestedGutInfo(searchData, TAXONOMY_GUT_CODE, contentStat.get(IndexFields.ID).toString(), null, statsAsMap);
+				generateRequestedCodeInfo(searchData, TAXONOMY_GUT_CODE, contentStat.get(IndexFields.ID).toString(), null, statsAsMap);
 				statsAsMap.put(IndexFields.ID, contentStat.get(IndexFields.ID).toString()); contentStat.remove(IndexFields.ID);
 				statsAsMap.put("subjectCode", contentStat.get("subjectCode").toString()); contentStat.remove("subjectCode");
 				statsAsMap.put("courseCode", contentStat.get("courseCode").toString()); contentStat.remove("courseCode");

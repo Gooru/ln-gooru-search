@@ -22,5 +22,4 @@ public interface LearningMapsService {
 
 	Map<String, Object> getLearningMapsFromStaticTable(String gutId, SearchData searchData);
 
-	void generateRequestedGutInfo(SearchData searchData, String key, String taxCodes, String requestedFwCode, Map<String, Object> searchResult);		
 }
