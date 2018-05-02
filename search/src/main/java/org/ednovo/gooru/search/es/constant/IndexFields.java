@@ -146,5 +146,8 @@ public class IndexFields {
 	public static final String PARENT_TITLE = "parentTitle";
 	public static final String _SCORE = "_score";
 	public static final String GUT_DATA = "gutData";
+	public static final String SUBJECT_LABEL = "subjectLabel";
+	public static final String COURSE_LABEL = "courseLabel";
+	public static final String DOMAIN_LABEL = "domainLabel";
 
 }

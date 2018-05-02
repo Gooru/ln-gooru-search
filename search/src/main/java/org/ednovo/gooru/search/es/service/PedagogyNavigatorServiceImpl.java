@@ -44,18 +44,20 @@ public class PedagogyNavigatorServiceImpl implements PedagogyNavigatorService, C
 				if (parameters.containsKey(FLT_STANDARD_DISPLAY)) {
 					codes = (parameters.getString(FLT_STANDARD_DISPLAY));
 					key = IndexFields.CODE;
+					getLearningMapsService().generateRequestedCodeInfo(searchData, key, codes, fwCode, searchResult);
 				} else if (parameters.containsKey(FLT_STANDARD)) {
 					codes = (parameters.getString(FLT_STANDARD));
 					key = IndexFields.ID;
+					getLearningMapsService().generateRequestedCodeInfo(searchData, key, codes, fwCode, searchResult);
 				} else if (parameters.containsKey(FLT_TAXONOMY_GUT_CODE)) {
 					codes = (parameters.getString(FLT_TAXONOMY_GUT_CODE));
 					key = TAXONOMY_GUT_CODE;
+					if (!searchData.getTaxFilterType().equals(KEYWORD_COMPETENCY)) getLearningMapsService().generateRequestedGutInfo(searchData, key, codes, fwCode, searchResult);
+					else getLearningMapsService().generateRequestedCodesInfo(searchData, key, codes, fwCode, searchResult);
 				}
 			}
 		}
 		if (key != null && codes != null) {
-			if (!searchData.getTaxFilterType().equals(KEYWORD_COMPETENCY)) getLearningMapsService().generateRequestedCodeInfo(searchData, key, codes, fwCode, searchResult);
-			else getLearningMapsService().generateRequestedCodesInfo(searchData, key, codes, fwCode, searchResult);
 			getLearningMapsService().generateStandardFilter(searchData, key, codes, fwCode);
 		}
 
@@ -86,18 +88,20 @@ public class PedagogyNavigatorServiceImpl implements PedagogyNavigatorService, C
 				if (parameters.containsKey(FLT_STANDARD_DISPLAY)) {
 					codes = (parameters.getString(FLT_STANDARD_DISPLAY));
 					key = IndexFields.CODE;
+					getLearningMapsService().generateRequestedCodeInfo(searchData, key, codes, fwCode, searchResult);
 				} else if (parameters.containsKey(FLT_STANDARD)) {
 					codes = (parameters.getString(FLT_STANDARD));
 					key = IndexFields.ID;
+					getLearningMapsService().generateRequestedCodeInfo(searchData, key, codes, fwCode, searchResult);
 				} else if (parameters.containsKey(FLT_TAXONOMY_GUT_CODE)) {
 					codes = (parameters.getString(FLT_TAXONOMY_GUT_CODE));
 					key = TAXONOMY_GUT_CODE;
+					if (!searchData.getTaxFilterType().equals(KEYWORD_COMPETENCY)) getLearningMapsService().generateRequestedGutInfo(searchData, key, codes, fwCode, searchResult);
+					else getLearningMapsService().generateRequestedCodesInfo(searchData, key, codes, fwCode, searchResult);
 				}
 			}
 		}
 		if (key != null && codes != null) {
-			if (!searchData.getTaxFilterType().equals(KEYWORD_COMPETENCY)) getLearningMapsService().generateRequestedCodeInfo(searchData, key, codes, fwCode, searchResult);
-			else getLearningMapsService().generateRequestedCodesInfo(searchData, key, codes, fwCode, searchResult);
 			if (key.equalsIgnoreCase(IndexFields.ID) || key.equalsIgnoreCase(IndexFields.CODE)) {
 				codes = (String) searchResult.get(IndexFields.GUT_CODE);
 				logger.info("Using equivalent gut : {} for : {} " ,codes, key);

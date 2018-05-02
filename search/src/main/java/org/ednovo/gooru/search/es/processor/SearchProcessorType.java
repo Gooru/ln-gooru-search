@@ -159,7 +159,9 @@ public enum SearchProcessorType {
 	
 	PedagogyCourseDeserializer(),
 	
-	PedagogyRubricDeserializer();
+	PedagogyRubricDeserializer(),
+	
+	GutDeserializer();
 
 	private SearchProcessorType() {
 	}

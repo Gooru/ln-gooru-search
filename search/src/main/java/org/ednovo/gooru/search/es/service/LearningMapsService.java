@@ -20,5 +20,7 @@ public interface LearningMapsService {
 	void getLearningMapStats(SearchData searchData, Map<String, Object> searchResult, String subjectClassification, String subjectCode, String courseCode, String domainCode, String gutIds,
 			String codeType);
 
-	Map<String, Object> getLearningMapsFromStaticTable(String gutId, SearchData searchData);		
+	Map<String, Object> getLearningMapsFromStaticTable(String gutId, SearchData searchData);
+
+	void generateRequestedGutInfo(SearchData searchData, String key, String taxCodes, String requestedFwCode, Map<String, Object> searchResult);		
 }
