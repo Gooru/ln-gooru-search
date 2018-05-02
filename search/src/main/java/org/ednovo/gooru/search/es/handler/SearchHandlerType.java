@@ -59,7 +59,9 @@ public enum SearchHandlerType {
 
 	PEDAGOGY_COURSE(),
 
-	PEDAGOGY_RUBRIC();
+	PEDAGOGY_RUBRIC(),
+
+	GUT();
 
 	private SearchHandlerType() {
 	}

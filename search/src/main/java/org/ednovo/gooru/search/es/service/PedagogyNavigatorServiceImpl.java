@@ -74,6 +74,44 @@ public class PedagogyNavigatorServiceImpl implements PedagogyNavigatorService, C
 	}
 	
 	@Override
+	public SearchResponse<Object> searchPedagogyFromStaticTable(SearchData searchData) {
+		SearchResponse<Object> searchResponse = new SearchResponse<Object>();
+		Map<String, Object> searchResult = new HashMap<>();
+		Map<String, Object> contentResultAsMap = new HashMap<>();
+		String codes = null, key = null, fwCode = null;
+		if (searchData.getParameters() != null && searchData.getParameters().getValues().size() != 0) {
+			MapWrapper<Object> parameters = searchData.getParameters();
+			if (parameters != null) {
+				fwCode = (parameters.getString(FLT_FWCODE));
+				if (parameters.containsKey(FLT_STANDARD_DISPLAY)) {
+					codes = (parameters.getString(FLT_STANDARD_DISPLAY));
+					key = IndexFields.CODE;
+				} else if (parameters.containsKey(FLT_STANDARD)) {
+					codes = (parameters.getString(FLT_STANDARD));
+					key = IndexFields.ID;
+				} else if (parameters.containsKey(FLT_TAXONOMY_GUT_CODE)) {
+					codes = (parameters.getString(FLT_TAXONOMY_GUT_CODE));
+					key = TAXONOMY_GUT_CODE;
+					
+				}
+			}
+		}
+		if (key != null && codes != null) {
+			if (!searchData.getTaxFilterType().equals(KEYWORD_COMPETENCY)) getLearningMapsService().generateRequestedCodeInfo(searchData, key, codes, fwCode, searchResult);
+			else getLearningMapsService().generateRequestedCodesInfo(searchData, key, codes, fwCode, searchResult);
+			if (key.equalsIgnoreCase(IndexFields.ID) || key.equalsIgnoreCase(IndexFields.CODE)) {
+				codes = (String) searchResult.get(IndexFields.GUT_CODE);
+				logger.info("Using equivalent gut : {} for : {} " ,codes, key);
+			}
+		}
+
+		contentResultAsMap = getLearningMapsService().getLearningMapsFromStaticTable(codes, searchData);
+		searchResult.put(Constants.CONTENTS, contentResultAsMap);
+		searchResponse.setSearchResults(searchResult);
+		return searchResponse;
+	}
+	
+	@Override
 	public SearchResponse<Object> fetchLearningMapStats(SearchData searchData, String subjectClassification, String subjectCode, String courseCode, String domainCode, String gutIds, String codeType) {
 		SearchResponse<Object> searchResponse = new SearchResponse<Object>();
 		Map<String, Object> searchResult = new HashMap<>();
