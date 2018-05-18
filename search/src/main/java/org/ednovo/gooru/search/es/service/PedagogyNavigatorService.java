@@ -11,4 +11,6 @@ public interface PedagogyNavigatorService {
 
 	String fetchKwToCompetency(String query, String pretty, Integer from, Integer size);
 
+	SearchResponse<Object> searchPedagogyFromStaticTable(SearchData searchData);
+
 }

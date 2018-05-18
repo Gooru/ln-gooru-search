@@ -13,4 +13,6 @@ public interface LearningMapStatsRepository {
 
 	Long getTotalCountByIds(String gutIds, String codeType);
 
+	Map<String, Object> getLearningMapsById(String gutIds);
+
 }

@@ -129,6 +129,8 @@ public class SearchData implements Serializable {
 
 	private boolean isAggregationRequest = false;
 	
+	private boolean isAdmin = false;
+	
 	public boolean isShowCanonicalOnly() {
 		return showCanonicalOnly;
 	}
@@ -568,6 +570,14 @@ public class SearchData implements Serializable {
 
 	public void setAggregationRequest(boolean isAggregationRequest) {
 		this.isAggregationRequest = isAggregationRequest;
+	}
+
+	public boolean isAdmin() {
+		return isAdmin;
+	}
+
+	public void setAdmin(boolean isAdmin) {
+		this.isAdmin = isAdmin;
 	}
 
 }

@@ -4,9 +4,8 @@ import static org.ednovo.gooru.search.es.processor.SearchProcessorType.BlackList
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.DictionaryQueryExpansion;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.Elasticsearch;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.EsDslQueryBuild;
-import static org.ednovo.gooru.search.es.processor.SearchProcessorType.KeywordCompetencyFilterConstruction;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.KeywordCompetencyDeserializer;
-import static org.ednovo.gooru.search.es.processor.SearchProcessorType.LimitValidation;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.KeywordCompetencyFilterConstruction;
 
 import java.util.Map;
 
