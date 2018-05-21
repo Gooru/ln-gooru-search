@@ -26,9 +26,10 @@ public class ResourceFilterConstructionProcessor extends ContentFilterConstructi
 			searchData.getFilters().remove("&^type");
 		}
 		
-		// Default filter to get non-broken content 
+		// Default filters to get non-broken, and content with editorial tag >= 3
 		searchData.putFilter(FLT_STATUS_BROKEN, 0);
-		
+		searchData.putFilter(FLT_PUBLISHER_QUALITY_INDICATOR, "3,4,5");
+
 		if(searchData != null && searchData.getFilters() != null){
 			String contentFormat = null;
 			String courseId = null;
