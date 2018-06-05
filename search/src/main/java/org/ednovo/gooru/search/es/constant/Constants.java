@@ -347,7 +347,6 @@ public interface Constants {
 	String EMPTY_STRING = "";
 	String STAR = "*";
 	String INVALID_KEYWORD_ERROR_MESSAGE = "Please search with valid keyword having atleast 3 letters without * or search with some filter for relevant results";
-	String COLLECTION_TYPES = "collection|scollection|assessment";
 	String FLT_RATING = "flt.rating";
 	String FLT_COLLECTION_TYPE = "flt.collectionType";
 	String TWENTY_FIRST_CENTURY_SKILLS_CODE = "21_CS_";
@@ -378,7 +377,10 @@ public interface Constants {
 	public static final String FLT_IS_FEATURED = "&^isFeatured";
 	public static final String FLT_PUBLISH_STATUS = "&^publishStatus";
 	public static final String FLT_STATUS_BROKEN = "&^statistics.statusIsBroken";
-	public static final String FLT_CONTENT_FORMAT = "&^contentFormat";
+	public static final String AMPERSAND_CONTENT_FORMAT = "&^contentFormat";
+	public static final String FLT_CONTENT_FORMAT = "flt.contentFormat";
+	public static final String AMPERSAND_RESOURCE_FORMAT = "&^resourceFormat";
+	public static final String AMPERSAND_COLLECTION_TYPE = "&^collectionType";
 	public static final String FLT_COURSE_ID = "&^courseId";
 	public static final String FLT_TENANT_ID = "&^tenant.tenantId";
 	public static final String FLT_PUBLISHER_QUALITY_INDICATOR = "&^statistics.publisherQualityIndicator";
@@ -522,7 +524,9 @@ public interface Constants {
 	}
 	public static final String CONTENTS = "contents";
 	Pattern CUL_MATCH = Pattern.compile("course|unit|lesson");
-	Pattern RQC_MATCH = Pattern.compile("resource|question|collection|scollection");
+	Pattern RQC_MATCH = Pattern.compile("resource|question|collection|assessment|scollection");
+	Pattern RESOURCE_MATCH = Pattern.compile("resource|question");
+	Pattern COLLECTION_MATCH = Pattern.compile("scollection|collection|assessment");
 	public static final String PEDAGOGY_UNDERSCORE = "pedagogy_";
 	public static final String TOTAL_HIT_COUNT = "totalHitCount";
 	public static final String RESULT_COUNT = "resultCount";
@@ -534,7 +538,7 @@ public interface Constants {
 	Pattern TAX_FILTERS = Pattern.compile("standard");
 	public static final String AGG_FIELDNAME = "<>-^field";
 	public static final String TYPE_CROSSWALK = "crosswalk";
-	Pattern SEARCH_TYPES_MATCH = Pattern.compile("resource|question|collection|scollection|rubric|course|unit|lesson|publisher|searchQuery|autocomplete");
+	Pattern SEARCH_TYPES_MATCH = Pattern.compile("resource|question|collection|assessment|scollection|rubric|course|unit|lesson|publisher|searchQuery|autocomplete");
 	public static final String AGG_BY = "aggBy";
 	public static final String AGG_RESPONSE_LIMIT = "aggSize";
 	public static final String AGGS = "aggs";

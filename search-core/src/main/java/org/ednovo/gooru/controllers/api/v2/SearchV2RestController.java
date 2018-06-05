@@ -87,7 +87,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		/**
 		 * Here, when no filter is chosen, * search and keyword request with length less than 3 without * are skipped.
 		 **/
-		if (type.equalsIgnoreCase(TYPE_SCOLLECTION) || type.equalsIgnoreCase(RESOURCE)) {
+		if (RQC_MATCH.matcher(type).matches()) {
 			if (type.equalsIgnoreCase(TYPE_SCOLLECTION)) {
 				request.setAttribute(SEARCH_TYPE, COLLECTION);
 			} else {
@@ -225,6 +225,12 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			throw new SearchException(HttpStatus.NOT_IMPLEMENTED, "Not supported");
 		} else if (type.equalsIgnoreCase(TYPE_COMPETENCY_GRAPH)) {
 			type = KEYWORD_COMPETENCY;
+		} else if (COLLECTION_MATCH.matcher(type).matches() && !searchData.getParameters().containsKey(FLT_COLLECTION_TYPE)) {
+			searchData.putFilter(AMPERSAND_COLLECTION_TYPE, type);
+			type = TYPE_SCOLLECTION;
+		} else if (RESOURCE_MATCH.matcher(type).matches() && (!searchData.getParameters().containsKey(FLT_CONTENT_FORMAT) && !searchData.getParameters().containsKey(FLT_RESOURCE_FORMAT))) {
+			searchData.putFilter(AMPERSAND_CONTENT_FORMAT, type);
+			type = RESOURCE;
 		}
 		if (!SEARCH_TYPES_MATCH.matcher(type).matches()) {
 			throw new BadRequestException("Unsupported type! Please pass a valid path variable : type");
@@ -304,9 +310,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 				return toModelAndView(resultsJSON);
 			} else if (type.equalsIgnoreCase(TYPE_LIBRARY)) {
 				return toModelAndView(searchResponse.getSearchResults().toString());
-			} else if (type.equalsIgnoreCase(TYPE_ATTRIBUTION) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(TYPE_PUBLISHER) || type.equalsIgnoreCase(TYPE_AGGREGATOR)) {
-				return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
-			} else if (type.equalsIgnoreCase(KEYWORD_COMPETENCY)) {
+			} else if (type.equalsIgnoreCase(TYPE_ATTRIBUTION) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(TYPE_PUBLISHER) || type.equalsIgnoreCase(TYPE_AGGREGATOR) || type.equalsIgnoreCase(KEYWORD_COMPETENCY)) {
 				return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
 			} else if (CUL_MATCH.matcher(type).matches()) {
 				return toModelAndView(serialize(searchResponse, JSON, excludeAttributeArray, true, true));

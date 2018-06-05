@@ -32,8 +32,8 @@ public class ResourceFilterConstructionProcessor extends ContentFilterConstructi
 		if (searchData != null && searchData.getFilters() != null) {
 			String contentFormat = null;
 			String courseId = null;
-			if (searchData.getFilters().containsKey(FLT_CONTENT_FORMAT)) {
-				contentFormat = (String) searchData.getFilters().get(FLT_CONTENT_FORMAT);
+			if (searchData.getFilters().containsKey(AMPERSAND_CONTENT_FORMAT)) {
+				contentFormat = (String) searchData.getFilters().get(AMPERSAND_CONTENT_FORMAT);
 			}
 			if (contentFormat != null && contentFormat.equalsIgnoreCase(TYPE_RESOURCE)) searchData.putFilter(FLT_PUBLISHER_QUALITY_INDICATOR, "3,4,5");
 			
