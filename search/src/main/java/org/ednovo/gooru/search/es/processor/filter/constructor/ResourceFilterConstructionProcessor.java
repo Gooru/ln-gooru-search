@@ -46,8 +46,12 @@ public class ResourceFilterConstructionProcessor extends ContentFilterConstructi
 			}
 		}
 
-		if (searchData.getFilters() != null && searchData.getFilters().containsKey("&^resourceFormat")) {
-			String contentSubFormat = (String) searchData.getFilters().get("&^resourceFormat");
+		String contentSubFormat = null;
+		if (searchData.getFilters() != null) {
+			if (searchData.getFilters().containsKey("&^resourceFormat")) contentSubFormat = (String) searchData.getFilters().get("&^resourceFormat");
+			if (searchData.getFilters().containsKey("&^subFormat")) contentSubFormat = (String) searchData.getFilters().get("&^subFormat");
+		}
+		if (contentSubFormat != null) {
 			if (contentSubFormat.equalsIgnoreCase(SEARCH_QUESTION)) {
 				searchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_FORMAT, SEARCH_QUESTION);
 				
@@ -76,6 +80,7 @@ public class ResourceFilterConstructionProcessor extends ContentFilterConstructi
 				searchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_SUB_FORMAT, contentSubFormat);
 			}
 			searchData.getFilters().remove("&^resourceFormat");
+			searchData.getFilters().remove("&^subFormat");
 		}
 		
 	}
