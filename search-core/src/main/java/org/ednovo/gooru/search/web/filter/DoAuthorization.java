@@ -65,13 +65,13 @@ public class DoAuthorization {
 					user.setGooruUId(gooruUId);
 					request.setAttribute(Constants.USER, user);
 					request.setAttribute(Constants.SESSION_TOKEN_SEARCH, sessionToken);
-					request.setAttribute(EventConstants.APP_ID, responseHolder.getAppId());
-					request.setAttribute(EventConstants.PARTNER_ID, responseHolder.getPartnerId());
+					if (responseHolder.getAppId() != null) request.setAttribute(EventConstants.APP_ID, responseHolder.getAppId());
+					if (responseHolder.getPartnerId() != null) request.setAttribute(EventConstants.PARTNER_ID, responseHolder.getPartnerId());
 					request.setAttribute(Constants.CONTENT_CDN_URL, responseHolder.getContentCDN());
 					UserGroupSupport userGroup = new UserGroupSupport();
 					JSONObject tenant = responseHolder.getTenant();
 					userGroup.setTenantId(tenant.getString(EventConstants.TENANT_ID));
-					userGroup.setTenantRoot(tenant.getString(Constants.TENANT_ROOT));
+					if (tenant.getString(Constants.TENANT_ROOT) != null) userGroup.setTenantRoot(tenant.getString(Constants.TENANT_ROOT));
 					request.setAttribute(Constants.TENANT, userGroup);
 					JSONObject stdPref = null;
 					if(responseHolder.getPreferences() != null && responseHolder.getPreferences().has(Constants.STANDARD_PREFERENCE))

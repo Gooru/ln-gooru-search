@@ -53,7 +53,10 @@ public class ElasticsearchProcessor extends SearchProcessor<SearchData, Object> 
 		LOG.info("Creating Elasticsearch Rest client...");
 		HttpHost[] httpHosts = buildHosts(getSetting(S_ES_POINT));
 		SniffOnFailureListener sniffOnFailureListener = new SniffOnFailureListener();
-		RestClient restClient = RestClient.builder(httpHosts).setFailureListener(sniffOnFailureListener).build();
+		RestClient restClient = RestClient.builder(httpHosts)
+				.setRequestConfigCallback(requestConfigBuilder -> requestConfigBuilder.setConnectTimeout(5000)
+						.setConnectionRequestTimeout(30000).setSocketTimeout(60000))
+				.setMaxRetryTimeoutMillis(60000).setFailureListener(sniffOnFailureListener).build();
 		Sniffer sniffer = Sniffer.builder(restClient).setSniffAfterFailureDelayMillis(30000).build();
 		sniffOnFailureListener.setSniffer(sniffer);
 
