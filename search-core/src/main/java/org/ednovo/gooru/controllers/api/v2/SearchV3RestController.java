@@ -39,7 +39,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-
+/**
+ * @author Renuka
+ * 
+ */
 @Controller
 @RequestMapping(value = { "/v3/search" })
 public class SearchV3RestController  extends SerializerUtil implements Constants {

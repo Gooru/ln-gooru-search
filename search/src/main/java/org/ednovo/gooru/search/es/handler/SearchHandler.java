@@ -10,7 +10,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.ednovo.gooru.search.es.constant.EsIndex;
-import org.ednovo.gooru.search.es.exception.SearchException;
+import org.ednovo.gooru.search.es.exception.BadRequestException;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.processor.ProcessorChain;
@@ -19,7 +19,6 @@ import org.ednovo.gooru.search.es.service.SearchSettingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -96,7 +95,7 @@ public abstract class SearchHandler<I extends SearchData, O extends Object> {
 	private static SearchHandler<SearchData, Object> get(String name) {
 		SearchHandler<SearchData, Object> searcher = handlers.get(name);
 		if(searcher == null) {
-			throw new SearchException(HttpStatus.BAD_REQUEST, "Invalid Type");
+			throw new BadRequestException("Invalid Type");
 		}
 		return searcher;
 	}

@@ -437,8 +437,8 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 	}
 
 	private void setEventLogObject(HttpServletRequest request, SearchData searchData, SearchResponse<Object> searchResponse) throws JSONException {
-		JSONObject payloadObject = new JSONObject();
-		JSONObject session = new JSONObject();
+		Map<String, Object> payloadObject = new HashMap<>();
+		Map<String, Object> session = new HashMap<>();
 		SessionContextSupport.putLogParameter(EventConstants.EVENT_NAME, EventConstants.ITEM_DOT_SEARCH);
 		payloadObject.put(EventConstants.TEXT, searchData.getOriginalQuery());
 		if (searchData.getSessionToken() != null) {

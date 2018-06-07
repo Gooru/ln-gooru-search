@@ -23,7 +23,9 @@
 /////////////////////////////////////////////////////////////
 package org.ednovo.gooru.search.es.processor.util;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -268,20 +270,20 @@ public class SerializerUtil {
 		return false;
 	}*/
 
+	@SuppressWarnings("unchecked")
 	private static void log(final Object model, final String data) {
 		HttpServletRequest request = null;
 		if (RequestContextHolder.getRequestAttributes() != null) {
 			request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 			if (request != null && request.getMethod() != null && (request.getMethod().equalsIgnoreCase(RequestMethod.POST.name()) || request.getMethod().equalsIgnoreCase(RequestMethod.PUT.name()))) {
-				JSONObject payLoadObject = new JSONObject();
+				Map<String, Object> payLoadObject = new HashMap<>();
 				try {
 					if (SessionContextSupport.getLog() != null && SessionContextSupport.getLog().get("payLoadObject") != null) {
-						JSONParser payLoadParser = new JSONParser();
-						payLoadObject = (JSONObject) payLoadParser.parse(SessionContextSupport.getLog().get("payLoadObject").toString());
+						payLoadObject = (Map<String, Object>) SessionContextSupport.getLog().get("payLoadObject");
 					}
 					try {
 						if (data != null) {
-							payLoadObject.put("data", new JSONObject(data));
+							payLoadObject.put("data", data);
 						}
 					} catch (Exception e) {
 						LOGGER.error("Error: " + e);
