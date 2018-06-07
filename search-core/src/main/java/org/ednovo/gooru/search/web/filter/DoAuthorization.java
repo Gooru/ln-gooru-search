@@ -71,7 +71,7 @@ public class DoAuthorization {
 					UserGroupSupport userGroup = new UserGroupSupport();
 					JSONObject tenant = responseHolder.getTenant();
 					userGroup.setTenantId(tenant.getString(EventConstants.TENANT_ID));
-					if (tenant.getString(Constants.TENANT_ROOT) != null) userGroup.setTenantRoot(tenant.getString(Constants.TENANT_ROOT));
+					if (tenant.getString(Constants.TENANT_ROOT) != null && !tenant.getString(Constants.TENANT_ROOT).equalsIgnoreCase(Constants.NULL_STRING)) userGroup.setTenantRoot(tenant.getString(Constants.TENANT_ROOT));
 					request.setAttribute(Constants.TENANT, userGroup);
 					JSONObject stdPref = null;
 					if(responseHolder.getPreferences() != null && responseHolder.getPreferences().has(Constants.STANDARD_PREFERENCE))
