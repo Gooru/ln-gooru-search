@@ -36,7 +36,6 @@ import org.ednovo.gooru.search.es.model.ContentSearchResult;
 import org.ednovo.gooru.search.es.model.SessionContextSupport;
 import org.ednovo.gooru.search.es.model.User;
 import org.json.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.Errors;
