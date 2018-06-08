@@ -524,7 +524,8 @@ public interface Constants {
 	}
 	public static final String CONTENTS = "contents";
 	Pattern CUL_MATCH = Pattern.compile("course|unit|lesson");
-	Pattern RQC_MATCH = Pattern.compile("resource|question|collection|assessment|scollection");
+	Pattern RQCA_MATCH = Pattern.compile("resource|question|collection|assessment|scollection");
+	Pattern RQC_MATCH = Pattern.compile("resource|question|collection|scollection");
 	Pattern RESOURCE_MATCH = Pattern.compile("resource|question");
 	Pattern COLLECTION_MATCH = Pattern.compile("scollection|collection|assessment");
 	public static final String PEDAGOGY_UNDERSCORE = "pedagogy_";

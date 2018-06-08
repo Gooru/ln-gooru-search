@@ -88,7 +88,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		/**
 		 * Here, when no filter is chosen, * search and keyword request with length less than 3 without * are skipped.
 		 **/
-		if (RQC_MATCH.matcher(type).matches()) {
+		if (RQCA_MATCH.matcher(type).matches()) {
 			if (type.equalsIgnoreCase(TYPE_SCOLLECTION)) {
 				request.setAttribute(SEARCH_TYPE, COLLECTION);
 			} else {
