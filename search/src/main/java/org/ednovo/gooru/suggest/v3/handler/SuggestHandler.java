@@ -7,8 +7,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import org.ednovo.gooru.search.es.exception.SearchException;
-import org.springframework.http.HttpStatus;
+import org.ednovo.gooru.search.es.exception.BadRequestException;
 
 public abstract class SuggestHandler<O> implements SuggestBaseHandler<Object>{
 	
@@ -64,7 +63,7 @@ public abstract class SuggestHandler<O> implements SuggestBaseHandler<Object>{
 		List<SuggestHandler<Object>> suggesters;
 		suggesters = handlers.get(name);
 		if(suggesters == null || suggesters.size() <= 0) {
-			throw new SearchException(HttpStatus.BAD_REQUEST, "Invalid Type");
+			throw new BadRequestException("Invalid Type");
 		}
 		return suggesters;
 	}

@@ -26,26 +26,32 @@ public class ResourceFilterConstructionProcessor extends ContentFilterConstructi
 			searchData.getFilters().remove("&^type");
 		}
 		
-		// Default filter to get non-broken content 
+		// Default filter to get non-broken
 		searchData.putFilter(FLT_STATUS_BROKEN, 0);
-		
-		if(searchData != null && searchData.getFilters() != null){
+
+		if (searchData != null && searchData.getFilters() != null) {
 			String contentFormat = null;
 			String courseId = null;
-			if(searchData.getFilters().containsKey(FLT_CONTENT_FORMAT)){
-				contentFormat = (String) searchData.getFilters().get(FLT_CONTENT_FORMAT);
+			if (searchData.getFilters().containsKey(AMPERSAND_CONTENT_FORMAT)) {
+				contentFormat = (String) searchData.getFilters().get(AMPERSAND_CONTENT_FORMAT);
 			}
-			if(searchData.getFilters().containsKey(FLT_COURSE_ID)){
+//			if (contentFormat != null && contentFormat.equalsIgnoreCase(TYPE_RESOURCE)) searchData.putFilter(FLT_PUBLISHER_QUALITY_INDICATOR, "3,4,5");
+			
+			if (searchData.getFilters().containsKey(FLT_COURSE_ID)) {
 				courseId = (String) searchData.getFilters().get(FLT_COURSE_ID);
 			}
-			
-			if(courseId != null || (contentFormat != null && contentFormat.equalsIgnoreCase(SEARCH_QUESTION))){
+
+			if (courseId != null || (contentFormat != null && contentFormat.equalsIgnoreCase(SEARCH_QUESTION))) {
 				searchData.getFilters().remove(FLT_COURSE_MISSING);
 			}
 		}
 
-		if (searchData.getFilters() != null && searchData.getFilters().containsKey("&^resourceFormat")) {
-			String contentSubFormat = (String) searchData.getFilters().get("&^resourceFormat");
+		String contentSubFormat = null;
+		if (searchData.getFilters() != null) {
+			if (searchData.getFilters().containsKey("&^resourceFormat")) contentSubFormat = (String) searchData.getFilters().get("&^resourceFormat");
+			if (searchData.getFilters().containsKey("&^subFormat")) contentSubFormat = (String) searchData.getFilters().get("&^subFormat");
+		}
+		if (contentSubFormat != null) {
 			if (contentSubFormat.equalsIgnoreCase(SEARCH_QUESTION)) {
 				searchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_FORMAT, SEARCH_QUESTION);
 				
@@ -74,6 +80,7 @@ public class ResourceFilterConstructionProcessor extends ContentFilterConstructi
 				searchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_SUB_FORMAT, contentSubFormat);
 			}
 			searchData.getFilters().remove("&^resourceFormat");
+			searchData.getFilters().remove("&^subFormat");
 		}
 		
 	}

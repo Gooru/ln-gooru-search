@@ -39,23 +39,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-
+/**
+ * @author Renuka
+ * 
+ */
 @Controller
-@RequestMapping(value = { "/v2/search" })
-public class SearchV2RestController  extends SerializerUtil implements Constants {
+@RequestMapping(value = { "/v3/search" })
+public class SearchV3RestController  extends SerializerUtil implements Constants {
 	
 	@Autowired
 	private SearchService searchService;
 
-	protected static final Logger logger = LoggerFactory.getLogger(SearchV2RestController.class);
-	
-	@RequestMapping(method = RequestMethod.GET, value = { "/index/filters"})
-	public ModelAndView getSearchFilters(HttpServletRequest request,@RequestParam(required = false) String sessionToken, @RequestParam(value = "codeId", required = false) Integer codeId, @RequestParam(value = "type", required = false, defaultValue = "resource") String type, HttpServletResponse response,
-			final ModelMap model) throws Exception {
-		
-		return toModelAndView(serializeToJson(searchService.getSearchFilters(codeId, type), SEARCH_FORMAT));
-	}
-	  
+	protected static final Logger logger = LoggerFactory.getLogger(SearchV3RestController.class);
+
 	@SuppressWarnings("unchecked")
 	@RequestMapping(method = {RequestMethod.GET}, value = "/{type}")
 	public ModelAndView search(HttpServletRequest request, HttpServletResponse response, 
@@ -65,22 +61,14 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			@RequestParam(defaultValue = "0") Integer startAt,
 			@RequestParam(defaultValue = "1", value="start") Integer pageNum, 
 			@RequestParam(value="q") String query,
-			@RequestParam(required = false) String info, 
 			@RequestParam(required = false) String excludeAttributes, 
-			@RequestParam(required = false) String facet, 
 			@RequestParam(required = false, defaultValue= "false") boolean userDetails, 
 			@PathVariable String type, 
-			@RequestParam(required = false, defaultValue= "false") boolean includeCollectionItem,
-			@RequestParam(required = false, defaultValue= "false") boolean showSingleSubjectResults,
-			@RequestParam(required = false) String protocolSupported, 
-			@RequestParam(required = false, defaultValue= "false") boolean includeCIMetaData, 
-			@RequestParam(required = false, defaultValue= "false") boolean bsSearch,
-			@RequestParam(required = false, defaultValue= "true") boolean showCanonicalOnly,
 			@RequestParam(required = false, defaultValue= "true") boolean isCrosswalk,
 			@RequestParam(required = false, defaultValue = "false") boolean disableSpellCheck) throws Exception {
 
 		SearchData searchData = new SearchData();
-		searchData.setShowSingleSubjectResults(showSingleSubjectResults);
+		long start = System.currentTimeMillis();
 
 		// original query string from user
 		searchData.setUserQueryString(query);
@@ -89,49 +77,24 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		 * Here, when no filter is chosen, * search and keyword request with length less than 3 without * are skipped.
 		 **/
 		if (RQCA_MATCH.matcher(type).matches()) {
-			if (type.equalsIgnoreCase(TYPE_SCOLLECTION)) {
-				request.setAttribute(SEARCH_TYPE, COLLECTION);
-			} else {
-				request.setAttribute(SEARCH_TYPE, type);
-			}
+			request.setAttribute(SEARCH_TYPE, type);
 			query = checkQueryValidity(query, (Map<String, Object>) request.getParameterMap());
 		}
 
 		if (query.matches(SEARCH_SPLCHR)) {
 			throw new BadRequestException("Please enter a valid search term");
 		}
-		Map<String, Object> payloadObject = new HashMap<>();
-		Map<String, Object> session = new HashMap<>();
-		SessionContextSupport.putLogParameter("eventName", "item.search");
-		payloadObject.put(TEXT, query);
-		long start = System.currentTimeMillis();
+		
 		User apiCaller = (User) request.getAttribute(USER);
+		
+		// Process Parameters
+		MapWrapper<Object> searchDataMap = new MapWrapper<Object>(request.getParameterMap());
+		processParameters(disableSpellCheck, searchData, searchDataMap);
+		searchData.setParameters(searchDataMap);
 		
         // Set content cdn url 
 		String contentCdnUrl = (String) request.getAttribute(Constants.CONTENT_CDN_URL);
 		searchData.setContentCdnUrl(contentCdnUrl);
-		
-		MapWrapper<Object> searchDataMap = new MapWrapper<Object>(request.getParameterMap());
-
-		searchDataMap.put("allowDuplicates", true);
-		searchDataMap.put("includeCollectionItem", includeCollectionItem);
-		searchDataMap.put("includeCIMin", includeCIMetaData);
-		if (searchDataMap.containsKey(FLT_STANDARD) || searchDataMap.containsKey(FLT_STANDARD_DISPLAY) ) {
-			searchData.setTaxFilterType(TYPE_STANDARD);
-		}
-		if (searchDataMap.containsKey("flt.course")) {
-			searchData.setTaxFilterType(TYPE_COURSE);
-		}
-		if (searchDataMap.containsKey("flt.domain")) {
-			searchData.setTaxFilterType("domain");
-		}
-		if (searchDataMap.containsKey(AGG_BY)) {
-			searchDataMap.put("aggBy.field", searchDataMap.getString(AGG_BY));
-			searchDataMap.remove(AGG_BY);
-		}
-		// client controlled value to enable / disable spell check.
-		searchDataMap.put("disableSpellCheck", disableSpellCheck);
-		searchData.setParameters(searchDataMap);
 
 		// Set user permits
 		UserGroupSupport userGroup = (UserGroupSupport) request.getAttribute(Constants.TENANT);
@@ -139,24 +102,11 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		String userTenantRootId = userGroup.getTenantRoot();
 		searchData.setUserTenantId(userTenantId);
 		searchData.setUserTenantRootId(userTenantRootId);
+		searchData.setUserTaxonomyPreference((JSONObject) request.getAttribute(Constants.USER_PREFERENCES));
 
 		if (sessionToken == null) {
 			sessionToken = BaseController.getSessionToken(request);
 		}
-
-		if (sessionToken != null) {
-			session.put(EventConstants.SESSION_TOKEN, sessionToken);
-			session.put(EventConstants.PARTNER_ID, request.getAttribute(EventConstants.PARTNER_ID));
-			session.put(EventConstants.APP_ID, request.getAttribute(EventConstants.APP_ID));
-			session.put(EventConstants.TENANT_ID, userTenantId);
-			session.put(EventConstants.TENANT_ROOT, userTenantRootId);
-			session.put(EventConstants.API_KEY, EMPTY_STRING);
-			session.put(SEARCH_ORGANIZATION_UID, EMPTY_STRING);
-		}
-
-		SessionContextSupport.putLogParameter(EventConstants.SESSION, session);
-
-		searchData.setUserTaxonomyPreference((JSONObject) request.getAttribute(Constants.USER_PREFERENCES));
 
 		if (query.contains("!")) {
 			query = query.replace("!", EMPTY_STRING);
@@ -166,13 +116,8 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		searchData.setPretty(pretty);
 		searchData.setQueryType(SINGLE);
 		searchData.setSessionToken(sessionToken);
-		searchData.setBsSearch(bsSearch);
-		searchData.setShowCanonicalOnly(showCanonicalOnly);
 		searchData.setCrosswalk(isCrosswalk);
-		
-		if (facet != null && facet.trim().length() > 0) {
-			searchData.setFacet(facet);
-		}
+
 		if (type.equalsIgnoreCase(TYPE_STANDARD) || type.equalsIgnoreCase(STANDARD_CODE)) {
 			if (type.equalsIgnoreCase(TYPE_STANDARD)) {
 				String expandedQuery = searchData.getQueryString().replace(".", "").replace(".--", "").replace("-", "").replace("\"", "").replace(" ", "_");
@@ -185,14 +130,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			}
 			searchData.setParameters(searchDataMap);
 			type = TYPE_TAXONOMY;
-		} else if (type.equalsIgnoreCase(TYPE_PUBLISHER) || type.equalsIgnoreCase(TYPE_AGGREGATOR)) {
-			searchData.setType(type);
-			searchData.setQueryString(searchData.getQueryString() + "*");
-		} else if (type.equalsIgnoreCase(TYPE_ATTRIBUTION) || type.equalsIgnoreCase(TYPE_SOURCE)) {
-			String Suggestions = searchData.getQueryString();
-			if (Suggestions != null) {
-				Suggestions = Suggestions.replaceAll("\\s", "_");
-			}
+		} else if (type.equalsIgnoreCase(TYPE_PUBLISHER)) {
 			searchData.setType(type);
 			searchData.setQueryString(searchData.getQueryString() + "*");
 		} else if (type.equalsIgnoreCase(RESOURCE) && searchDataMap.getString(QUERY_TYPE) != null) {
@@ -206,32 +144,25 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 				type = SearchHandlerType.MULTI_RESOURCE.name();
 				searchData.setQueryType(MULTI_RESOURCE_FORMAT);
 			}
-		} else if (type.equalsIgnoreCase(COLLECTION_QUIZ)) {
-			type = TYPE_LIBRARY;
-		} else if (type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(AUTO_COMPLETE)) {
-			String expandedQuery = searchData.getQueryString().replace("\"", EMPTY_STRING).replace(" ", "_").replaceAll("([^a-z0-9A-Z_])", "\\\\$1");
-			if (expandedQuery == EMPTY_STRING) {
-				expandedQuery = STAR;
-			}
-			String queryString = "querysuggestion: " + expandedQuery + " OR querysuggestion: " + expandedQuery + STAR;
-			searchData.setQueryString(queryString);
-			if (type.equalsIgnoreCase(AUTO_COMPLETE)) {
-				type = SearchHandlerType.AUTOCOMPLETE.name();
-			}
-		} else if (type.equalsIgnoreCase(COLLECTION_SUGGEST)) {
-			type = COLLECTION;
-		} else if (type.equalsIgnoreCase(QUIZ_SUGGEST)) {
-			type = TYPE_QUIZ;
-		} else if(type.equalsIgnoreCase(TYPE_USER)) {
+		} else if (type.equalsIgnoreCase(TYPE_USER)) {
 			throw new SearchException(HttpStatus.NOT_IMPLEMENTED, "Not supported");
 		} else if (type.equalsIgnoreCase(TYPE_COMPETENCY_GRAPH)) {
 			type = KEYWORD_COMPETENCY;
-		} 
-		if (!SEARCH_TYPES_MATCH.matcher(type).matches()) {
+		} else if (COLLECTION_MATCH.matcher(type).matches()) {
+			if(searchData.getParameters().containsKey(FLT_COLLECTION_TYPE)) searchData.getParameters().remove(FLT_COLLECTION_TYPE);
+			searchData.putFilter(AMPERSAND_COLLECTION_TYPE, type);
+			type = TYPE_SCOLLECTION;
+		} else if (RESOURCE_MATCH.matcher(type).matches()) {
+			if (searchData.getParameters().containsKey(FLT_RESOURCE_FORMAT)) searchData.getParameters().remove(FLT_RESOURCE_FORMAT);
+			if (searchData.getParameters().containsKey(FLT_CONTENT_FORMAT)) searchData.getParameters().remove(FLT_CONTENT_FORMAT);
+			searchData.putFilter(AMPERSAND_CONTENT_FORMAT, type);
+			type = RESOURCE;
+		}
+		if (!SEARCH_TYPES_MATCH.matcher(type).matches() || ((COLLECTION_MATCH.matcher(type).matches() && searchData.getParameters().containsKey(FLT_COLLECTION_TYPE)) ||(RESOURCE_MATCH.matcher(type).matches() && (!searchData.getParameters().containsKey(FLT_CONTENT_FORMAT) && (searchData.getParameters().containsKey(FLT_RESOURCE_FORMAT) && RESOURCE_MATCH.matcher(searchData.getParameters().getString(FLT_RESOURCE_FORMAT)).matches()))))) {
 			throw new BadRequestException("Unsupported type! Please pass a valid path variable : type");
 		}
 
-		if (searchData.getQueryString() != null && ((StringUtils.startsWithAny(searchData.getQueryString(), new String[] { "AND NOT ", "OR NOT ", "NOT AND ", "NOT OR ", "OR ", "AND " })) || (StringUtils.endsWithAny(searchData.getQueryString(), new String[] { " AND NOT", " OR NOT", " NOT AND", " NOT OR", " OR", " AND" })))) {
+		if (searchData.getQueryString() != null && ((StringUtils.startsWithAny(searchData.getQueryString(), START_WITH_BOOLEAN_OPERATORS)) || (StringUtils.endsWithAny(searchData.getQueryString(), END_WITH_BOOLEAN_OPERATORS)))) {
 			searchService.trimInvalidExpression(searchData);
 		}
 
@@ -239,19 +170,14 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		searchData.setFrom(startAt > 0 ? startAt : 0);
 		searchData.setPageNum(pageNum > 0 ? pageNum : 1);
 		searchData.setSize(pageSize >= 0 ? pageSize : 8);
-		if (type.equalsIgnoreCase(TYPE_SCOLLECTION) && includeCollectionItem) {
-			searchData.setSize(5);
-		}
+
 		if (searchData.getFrom() < 1) {
 			searchData.setFrom((searchData.getPageNum() - 1) * searchData.getSize());
 		}
 		searchData.setRemoteAddress(request.getRemoteAddr());
 		searchData.setUser(apiCaller);
-		if (!(type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(AUTO_COMPLETE))) {
-			// searchData.setRestricted(hasUnrestrictedContentAccess());
-			searchData.setRestricted(false);
-		}
-
+		searchData.setRestricted(false);
+		
 		// Set Default Values
 		for (SearchInputType searchInputType : SearchInputType.values()) {
 			if (searchData.getParameters().getObject(searchInputType.getName()) == null) {
@@ -263,13 +189,6 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		if (excludeAttributes != null) {
 			excludeAttributeArray = excludeAttributes.split("\\s*,\\s*");
 		}
-		if (includeCIMetaData == true) {
-			excludeAttributeArray = (String[]) ArrayUtils.addAll(COLLECTION_ITEM_EXCLUDES, excludeAttributeArray);
-		}
-
-		payloadObject.put("pageSize", pageSize);
-		payloadObject.put("pageNum", pageNum);
-		payloadObject.put("startAt", startAt);
 
 		request.setAttribute("action", "search");
 		try {
@@ -277,10 +196,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
 			searchResponse.setExecutionTime(System.currentTimeMillis() - start);
 
-			payloadObject.put("resultSize", searchResponse.getResultCount());
-			payloadObject.put("hitCount", searchResponse.getTotalHitCount());
-			payloadObject.put("searchExecutionTime", searchResponse.getExecutionTime());
-			SessionContextSupport.putLogParameter("payLoadObject", payloadObject);
+			setEventLogObject(request, searchData, searchResponse);
 
 			if (type.equalsIgnoreCase(RESOURCE)) {
 				if (!userDetails) {
@@ -303,9 +219,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 					resultsJSON = resultsJSON.substring(0, resultsJSON.length() - 1) + " , \"executionTime\" : " + searchResponse.getExecutionTime() + "}";
 				}
 				return toModelAndView(resultsJSON);
-			} else if (type.equalsIgnoreCase(TYPE_LIBRARY)) {
-				return toModelAndView(searchResponse.getSearchResults().toString());
-			} else if (type.equalsIgnoreCase(TYPE_ATTRIBUTION) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(TYPE_PUBLISHER) || type.equalsIgnoreCase(TYPE_AGGREGATOR) || type.equalsIgnoreCase(KEYWORD_COMPETENCY)) {
+			} else if (type.equalsIgnoreCase(KEYWORD_COMPETENCY)) {
 				return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
 			} else if (CUL_MATCH.matcher(type).matches()) {
 				return toModelAndView(serialize(searchResponse, JSON, excludeAttributeArray, true, true));
@@ -315,6 +229,25 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			response.setStatus(searchException.getStatus().value());
 			return toModelAndView(searchException.getMessage());
 		}
+	}
+
+	private void processParameters(boolean disableSpellCheck, SearchData searchData, MapWrapper<Object> searchDataMap) {
+		searchDataMap.put("allowDuplicates", true);
+		if (searchDataMap.containsKey(FLT_STANDARD) || searchDataMap.containsKey(FLT_STANDARD_DISPLAY) ) {
+			searchData.setTaxFilterType(TYPE_STANDARD);
+		}
+		if (searchDataMap.containsKey(FLT_COURSE)) {
+			searchData.setTaxFilterType(TYPE_COURSE);
+		}
+		if (searchDataMap.containsKey(FLT_DOMAIN)) {
+			searchData.setTaxFilterType(DOMAIN);
+		}
+		if (searchDataMap.containsKey(AGG_BY)) {
+			searchDataMap.put("aggBy.field", searchDataMap.getString(AGG_BY));
+			searchDataMap.remove(AGG_BY);
+		}
+		// client controlled value to enable / disable spell check.
+		searchDataMap.put("disableSpellCheck", disableSpellCheck);
 	}
  
 	private String checkQueryValidity(String query, Map<String, Object> parameterMap) {
@@ -382,10 +315,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		searchData.setUserTenantId(((UserGroupSupport) request.getAttribute(TENANT)).getTenantId());
 		searchData.setUserTenantRootId(((UserGroupSupport) request.getAttribute(TENANT)).getTenantRoot());
 
-		if (type.equalsIgnoreCase(TYPE_AGGREGATOR)) {
-			searchData.setType(type);
-			searchData.setQueryString(searchData.getQueryString() + STAR);
-		} else if (type.equalsIgnoreCase(TYPE_PUBLISHER) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(KEYWORD)) {
+		if (type.equalsIgnoreCase(TYPE_PUBLISHER) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(KEYWORD)) {
 			String expandedQuery = searchData.getQueryString().replace("\"", EMPTY_STRING).replace(" ", "_").replaceAll("([^a-z0-9A-Z_])", "\\\\$1");
 			if (expandedQuery == EMPTY_STRING) {
 				expandedQuery = STAR;
@@ -426,7 +356,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 
 			setEventLogObject(request, searchData, searchResponse);
 
-			if (type.equalsIgnoreCase(SearchHandlerType.AUTOCOMPLETE_KEYWORD.name()) || type.equalsIgnoreCase(TYPE_ATTRIBUTION) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(TYPE_PUBLISHER) || type.equalsIgnoreCase(TYPE_AGGREGATOR)) {
+			if (type.equalsIgnoreCase(SearchHandlerType.AUTOCOMPLETE_KEYWORD.name()) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(TYPE_PUBLISHER)) {
 				return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
 			}
 			return toModelAndView(serialize(searchResponse, JSON, excludeAttributeArray, true, false));
@@ -447,6 +377,8 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			session.put(EventConstants.APP_ID, request.getAttribute(EventConstants.APP_ID));
 			session.put(EventConstants.TENANT_ID, searchData.getUserTenantId());
 			session.put(EventConstants.TENANT_ROOT, searchData.getUserTenantRootId());
+			session.put(EventConstants.API_KEY, null);
+			session.put(SEARCH_ORGANIZATION_UID, null);
 		}
 		SessionContextSupport.putLogParameter(EventConstants.SESSION, session);
 		payloadObject.put(EventConstants.PAGE_SIZE, searchData.getSize());

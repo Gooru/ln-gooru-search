@@ -1,5 +1,8 @@
 package org.ednovo.gooru.controllers.api.v3;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -178,8 +181,8 @@ public class SuggestV3RestController extends BaseController {
 		} else {
 			request.setAttribute(SEARCH_TYPE, suggestData.getType());
 		}
-		JSONObject payloadObject = new JSONObject();
-		JSONObject session = new JSONObject();
+		Map<String, Object> payloadObject = new HashMap<>();
+		Map<String, Object> session = new HashMap<>();
 		SessionContextSupport.putLogParameter(EventConstants.EVENT_NAME, EventConstants.ITEM_DOT_SUGGEST);
 		payloadObject.put(EventConstants.TEXT, suggestData.getOriginalQuery());
 		if (suggestData.getSessionToken() != null) {

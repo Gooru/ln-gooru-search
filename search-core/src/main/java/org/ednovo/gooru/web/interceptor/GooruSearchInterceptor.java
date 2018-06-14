@@ -1,6 +1,7 @@
 package org.ednovo.gooru.web.interceptor;
 
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
@@ -15,7 +16,6 @@ import org.ednovo.gooru.search.es.exception.UnauthorizedException;
 import org.ednovo.gooru.search.es.model.SessionContextSupport;
 import org.ednovo.gooru.search.es.model.User;
 import org.ednovo.gooru.search.model.GooruAuthenticationToken;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,9 +96,9 @@ public class GooruSearchInterceptor extends HandlerInterceptorAdapter {
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
 		Long endTime = System.currentTimeMillis();
-		JSONObject payloadObject = SessionContextSupport.getLog().get("payLoadObject") == null ? new JSONObject() : (JSONObject) SessionContextSupport.getLog().get("payLoadObject");
+		Map<String, Object> payloadObject = SessionContextSupport.getLog().get("payLoadObject") == null ? new HashMap<>() : (Map<String, Object>) SessionContextSupport.getLog().get("payLoadObject");
 
-		JSONObject filter = new JSONObject();
+		Map<String, Object> filter = new HashMap<>();
 		Enumeration<?> filterParamenters = request.getParameterNames();
 		while (filterParamenters.hasMoreElements()) {
 			String filterKeys = new String();
@@ -114,14 +114,11 @@ public class GooruSearchInterceptor extends HandlerInterceptorAdapter {
 				}
 			}
 		}
-		try {
-			if (request.getAttribute("type") != null) {
-				payloadObject.put("itemType", request.getAttribute("type"));
-			}
-			payloadObject.put("filters", filter);
-		} catch (JSONException e1) {
-			e1.printStackTrace();
+		if (request.getAttribute("type") != null) {
+			payloadObject.put("itemType", request.getAttribute("type"));
 		}
+		payloadObject.put("filters", filter);
+
 		SessionContextSupport.putLogParameter("payLoadObject", payloadObject);
 		SessionContextSupport.putLogParameter("endTime", endTime);
 		Long startTime = SessionContextSupport.getLog() != null ? (Long) SessionContextSupport.getLog().get("startTime") : 0;

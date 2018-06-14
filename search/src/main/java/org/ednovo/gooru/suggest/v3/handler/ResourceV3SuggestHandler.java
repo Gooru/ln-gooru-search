@@ -114,7 +114,8 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 			public SuggestResponse<Object> call() throws Exception {
 				try {
 					String queryString = "*";
-					suggestData.putFilter("&^statistics.statusIsBroken", 0);
+					suggestData.putFilter(FLT_STATUS_BROKEN, 0);
+					suggestData.putFilter(FLT_PUBLISHER_QUALITY_INDICATOR, "3,4,5");
 
 					if (contextType.equalsIgnoreCase(RESOURCE_STUDY) && resourceData != null) {
 
