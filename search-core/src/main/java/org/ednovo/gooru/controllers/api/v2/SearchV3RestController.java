@@ -20,6 +20,7 @@ import org.ednovo.gooru.search.es.handler.SearchHandler;
 import org.ednovo.gooru.search.es.handler.SearchHandlerType;
 import org.ednovo.gooru.search.es.model.MapWrapper;
 import org.ednovo.gooru.search.es.model.SearchData;
+import org.ednovo.gooru.search.es.model.SearchRequestBody;
 import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.model.SessionContextSupport;
 import org.ednovo.gooru.search.es.model.User;
@@ -35,6 +36,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -53,7 +55,7 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 	protected static final Logger logger = LoggerFactory.getLogger(SearchV3RestController.class);
 
 	@SuppressWarnings("unchecked")
-	@RequestMapping(method = {RequestMethod.GET}, value = "/{type}")
+	@RequestMapping(method = {RequestMethod.POST}, value = "/{type}")
 	public ModelAndView search(HttpServletRequest request, HttpServletResponse response, 
 			@RequestParam(required = false) String sessionToken,
 			@RequestParam(defaultValue = "8", value="length") Integer pageSize, 
@@ -65,7 +67,8 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 			@RequestParam(required = false, defaultValue= "false") boolean userDetails, 
 			@PathVariable String type, 
 			@RequestParam(required = false, defaultValue= "true") boolean isCrosswalk,
-			@RequestParam(required = false, defaultValue = "false") boolean disableSpellCheck) throws Exception {
+			@RequestParam(required = false, defaultValue = "false") boolean disableSpellCheck, 
+			@RequestBody(required = false) SearchRequestBody searchRequestPayload) throws Exception {
 
 		SearchData searchData = new SearchData();
 		long start = System.currentTimeMillis();
@@ -86,13 +89,16 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 		}
 		
 		User apiCaller = (User) request.getAttribute(USER);
-		
+        
 		// Process Parameters
 		MapWrapper<Object> searchDataMap = new MapWrapper<Object>(request.getParameterMap());
 		processParameters(disableSpellCheck, searchData, searchDataMap);
 		searchData.setParameters(searchDataMap);
-		
-        // Set content cdn url 
+        
+		// Set Scope
+		processRequestBody(searchRequestPayload, searchData);
+        
+		// Set content cdn url
 		String contentCdnUrl = (String) request.getAttribute(Constants.CONTENT_CDN_URL);
 		searchData.setContentCdnUrl(contentCdnUrl);
 
@@ -113,10 +119,8 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 		}
 		searchData.setOriginalQuery(query);
 		searchData.setQueryString(query);
-		searchData.setPretty(pretty);
 		searchData.setQueryType(SINGLE);
 		searchData.setSessionToken(sessionToken);
-		searchData.setCrosswalk(isCrosswalk);
 
 		if (type.equalsIgnoreCase(TYPE_STANDARD) || type.equalsIgnoreCase(STANDARD_CODE)) {
 			if (type.equalsIgnoreCase(TYPE_STANDARD)) {
@@ -167,9 +171,6 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 		}
 
 		searchData.setType(type);
-		searchData.setFrom(startAt > 0 ? startAt : 0);
-		searchData.setPageNum(pageNum > 0 ? pageNum : 1);
-		searchData.setSize(pageSize >= 0 ? pageSize : 8);
 
 		if (searchData.getFrom() < 1) {
 			searchData.setFrom((searchData.getPageNum() - 1) * searchData.getSize());
@@ -228,6 +229,24 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 		} catch (SearchException searchException) {
 			response.setStatus(searchException.getStatus().value());
 			return toModelAndView(searchException.getMessage());
+		}
+	}
+
+	private void processRequestBody(SearchRequestBody requestBody, SearchData searchData) {
+		if (requestBody != null) {
+			searchData.setScope(requestBody.getScope());
+			searchData.setPretty(requestBody.getPretty());
+			searchData.setCrosswalk(requestBody.getIsCrosswalk());
+			searchData.setFrom(requestBody.getStartAt() > 0 ? requestBody.getStartAt() : 0);
+			searchData.setPageNum(requestBody.getPageNum() > 0 ? requestBody.getPageNum() : 1);
+			searchData.setSize(requestBody.getPageSize() >= 0 ? requestBody.getPageSize() : 8);
+			if (requestBody.getFilters() != null) {
+				MapWrapper<Object> searchDataMap = searchData.getParameters();
+				requestBody.getFilters().forEach((k, v) -> {
+					searchDataMap.put(k, v);
+				});
+				searchData.setParameters(searchDataMap);
+			}
 		}
 	}
 
@@ -390,5 +409,5 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 		SessionContextSupport.putLogParameter(EventConstants.PAYLOAD_OBJECT, payloadObject);
 		request.setAttribute(EventConstants.ACTION, SEARCH);
 	}
-	
+
 }

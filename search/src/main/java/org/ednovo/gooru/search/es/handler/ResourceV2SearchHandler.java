@@ -16,6 +16,7 @@ import static org.ednovo.gooru.search.es.processor.SearchProcessorType.ResourceF
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.SubjectFacetFilter;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.TaxonomyQueryExpansion;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.TenantFilterConstruction;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.ScopeFilterConstruction;
 
 import java.util.Map;
 
@@ -33,7 +34,7 @@ public class ResourceV2SearchHandler extends SearchHandler<SearchData, Map<Strin
 
 	private static final SearchProcessorType[][] searchProcessorTypes = new SearchProcessorType[][] {
 			{ BlackListQueryValidation }, { FilterDetection }, { LimitValidation }, { TaxonomyQueryExpansion }, { DictionaryQueryExpansion }, { TenantFilterConstruction },
-			 { ResourceFilterConstruction }, {SubjectFacetFilter}, { EsDslQueryBuild }, { EsSuggestDslQueryBuild },{ FacetFilterConstruction }, { Elasticsearch },
+			 { ScopeFilterConstruction },{ ResourceFilterConstruction }, {SubjectFacetFilter}, { EsDslQueryBuild }, { EsSuggestDslQueryBuild },{ FacetFilterConstruction }, { Elasticsearch },
 			{ ResourceDeserializer } };
 
 	@Override

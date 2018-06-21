@@ -550,7 +550,10 @@ public interface Constants {
 	public static final String COLLECTIONS = "collections";
 	public static final String ASSESSMENTS = "assessments";
 	public static final String RESOURCES = "resources";
-	public static final String DOMAIN = "domain";
-	public static final String[] START_WITH_BOOLEAN_OPERATORS = new String[] { "AND NOT ", "OR NOT ", "NOT AND ", "NOT OR ", "OR ", "AND " };
-	public static final String[] END_WITH_BOOLEAN_OPERATORS = new String[] { " AND NOT", " OR NOT", " NOT AND", " NOT OR", " OR", " AND" };
+    public static final String DOMAIN = "domain";
+    public static final String[] START_WITH_BOOLEAN_OPERATORS = new String[] { "AND NOT ", "OR NOT ", "NOT AND ", "NOT OR ", "OR ", "AND " };
+    public static final String[] END_WITH_BOOLEAN_OPERATORS = new String[] { " AND NOT", " OR NOT", " NOT AND", " NOT OR", " OR", " AND" };
+    Pattern SCOPE_MYCONTENT_LIBRARY_MATCH = Pattern.compile("my-content|tenant-library|subtenant-library|library|course|gooru-fc");
+    public static final String LIBRARY = "library";
+
 }

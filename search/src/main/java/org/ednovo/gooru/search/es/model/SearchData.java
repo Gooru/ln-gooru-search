@@ -131,6 +131,8 @@ public class SearchData implements Serializable {
 	
 	private boolean isAdmin = false;
 	
+	private Scope scope;
+
 	public boolean isShowCanonicalOnly() {
 		return showCanonicalOnly;
 	}
@@ -579,5 +581,13 @@ public class SearchData implements Serializable {
 	public void setAdmin(boolean isAdmin) {
 		this.isAdmin = isAdmin;
 	}
+
+    public Scope getScope() {
+        return scope;
+    }
+
+    public void setScope(Scope scope) {
+        this.scope = scope;
+    }
 
 }
