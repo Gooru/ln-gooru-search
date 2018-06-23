@@ -37,10 +37,14 @@ public class ScopeFilterConstructionProcessor extends FilterConstructionProcesso
             searchData.putFilter("&^creator.userId", searchData.getUser().getGooruUId());
             break;
         case "tenant-library":
-            searchData.putFilter("&^tenant.tenantId", searchData.getUserTenantRootId());
+            searchData.putFilter("&^tenant.tenantId", (searchData.getUserTenantRootId() != null) ? searchData.getUserTenantRootId() : searchData.getUserTenantId());
             break;
         case "subtenant-library":
-            searchData.putFilter("&^tenant.tenantRootId", searchData.getUserTenantRootId());
+            if(searchData.getUserTenantRootId() != null) {
+            	searchData.putFilter("&^tenant.tenantRootId", searchData.getUserTenantRootId());
+            } else {
+                searchData.putFilter("&^tenant.tenantId", searchData.getUserTenantId());
+            }
             break;
         case "library":
             break;

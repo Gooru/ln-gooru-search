@@ -94,7 +94,12 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 		MapWrapper<Object> searchDataMap = new MapWrapper<Object>(request.getParameterMap());
 		processParameters(disableSpellCheck, searchData, searchDataMap);
 		searchData.setParameters(searchDataMap);
-        
+		searchData.setFrom(startAt > 0 ? startAt : 0);
+ 		searchData.setPageNum(pageNum > 0 ? pageNum : 1);
+ 		searchData.setSize(pageSize >= 0 ? pageSize : 8);
+ 		searchData.setCrosswalk(isCrosswalk);
+ 		searchData.setPretty(pretty);
+ 		
 		// Set Scope
 		processRequestBody(searchRequestPayload, searchData);
         
@@ -171,7 +176,7 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 		}
 
 		searchData.setType(type);
-
+ 		
 		if (searchData.getFrom() < 1) {
 			searchData.setFrom((searchData.getPageNum() - 1) * searchData.getSize());
 		}
@@ -236,10 +241,10 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 		if (requestBody != null) {
 			searchData.setScope(requestBody.getScope());
 			searchData.setPretty(requestBody.getPretty());
-			searchData.setCrosswalk(requestBody.getIsCrosswalk());
-			searchData.setFrom(requestBody.getStartAt() > 0 ? requestBody.getStartAt() : 0);
-			searchData.setPageNum(requestBody.getPageNum() > 0 ? requestBody.getPageNum() : 1);
-			searchData.setSize(requestBody.getPageSize() >= 0 ? requestBody.getPageSize() : 8);
+			searchData.setCrosswalk(!searchData.isCrosswalk() ? searchData.isCrosswalk() : requestBody.getIsCrosswalk());
+			searchData.setFrom(requestBody.getStartAt() > 0 ? requestBody.getStartAt() : searchData.getFrom());
+			searchData.setPageNum(requestBody.getPageNum() > 0 ? requestBody.getPageNum() : searchData.getPageNum());
+			searchData.setSize(requestBody.getPageSize() >= 0 ? requestBody.getPageSize() : searchData.getSize());
 			if (requestBody.getFilters() != null) {
 				MapWrapper<Object> searchDataMap = searchData.getParameters();
 				requestBody.getFilters().forEach((k, v) -> {
