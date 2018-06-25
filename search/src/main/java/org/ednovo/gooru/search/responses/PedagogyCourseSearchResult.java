@@ -1,23 +1,19 @@
-package org.ednovo.gooru.search.domain.service;
+package org.ednovo.gooru.search.responses;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Map;
 
-import org.ednovo.gooru.search.es.model.License;
 import org.ednovo.gooru.search.es.model.UserV2;
-
-public class CourseSearchResult extends SearchResult implements Serializable {
+/**
+ * @author Renuka
+ * 
+ */
+public class PedagogyCourseSearchResult extends PedagogySearchResult implements Serializable {
 
 	/**
 	* 
 	*/
 	private static final long serialVersionUID = 6280104303486215659L;
-
-	private String lastModified;
-
-	private String addDate;
-
-	private String lastModifiedBy;
 
 	private UserV2 creator;
 
@@ -25,19 +21,13 @@ public class CourseSearchResult extends SearchResult implements Serializable {
 
 	private UserV2 originalCreator;
 
-	private License license;
-
-	private boolean visibleOnProfile;
-
 	private Integer unitCount;
 
 	private Integer courseRemixCount;
 
 	private Long viewCount;
 
-	private String subjectBucket;
-
-	private Integer sequence;
+	private Map<String, Object> taxonomy;
 
 	private Integer collaboratorCount;
 
@@ -45,19 +35,9 @@ public class CourseSearchResult extends SearchResult implements Serializable {
 
 	private String description;
 
-	private Integer subjectSequence;
-
 	private String format;
 
-	private List<String> unitIds;
-
-	private List<String> lessonIds;
-
-	private List<String> collectionIds;
-
 	private Long lessonCount;
-
-	private Long containingCollectionCount;
 
 	private Boolean isFeatured;
 
@@ -71,38 +51,14 @@ public class CourseSearchResult extends SearchResult implements Serializable {
 
 	private Long usedByStudentCount;
 
+	private Map<String, Object> taxonomyEquivalentCompetencies;
+
 	private Double efficacy;
 	
 	private Double engagement;
 	
 	private Double relevance;
-
-	private List<String> audience;
-
-	public String getLastModified() {
-		return lastModified;
-	}
-
-	public void setLastModified(String lastModified) {
-		this.lastModified = lastModified;
-	}
-
-	public String getAddDate() {
-		return addDate;
-	}
-
-	public void setAddDate(String addDate) {
-		this.addDate = addDate;
-	}
-
-	public String getLastModifiedBy() {
-		return lastModifiedBy;
-	}
-
-	public void setLastModifiedBy(String lastModifiedBy) {
-		this.lastModifiedBy = lastModifiedBy;
-	}
-
+	
 	public UserV2 getCreator() {
 		return creator;
 	}
@@ -125,22 +81,6 @@ public class CourseSearchResult extends SearchResult implements Serializable {
 
 	public void setOriginalCreator(UserV2 originalCreator) {
 		this.originalCreator = originalCreator;
-	}
-
-	public License getLicense() {
-		return license;
-	}
-
-	public void setLicense(License license) {
-		this.license = license;
-	}
-
-	public boolean isVisibleOnProfile() {
-		return visibleOnProfile;
-	}
-
-	public void setVisibleOnProfile(boolean visibleOnProfile) {
-		this.visibleOnProfile = visibleOnProfile;
 	}
 
 	public Integer getUnitCount() {
@@ -167,22 +107,14 @@ public class CourseSearchResult extends SearchResult implements Serializable {
 		this.viewCount = viewCount;
 	}
 
-	public String getSubjectBucket() {
-		return subjectBucket;
+	public Map<String, Object> getTaxonomy() {
+		return taxonomy;
 	}
 
-	public void setSubjectBucket(String subjectBucket) {
-		this.subjectBucket = subjectBucket;
+	public void setTaxonomy(Map<String, Object> taxonomy) {
+		this.taxonomy = taxonomy;
 	}
 
-	public Integer getSequence() {
-		return sequence;
-	}
-
-	public void setSequence(Integer sequence) {
-		this.sequence = sequence;
-	}
-	
 	public Integer getCollaboratorCount() {
 		return collaboratorCount;
 	}
@@ -198,21 +130,13 @@ public class CourseSearchResult extends SearchResult implements Serializable {
 	public void setThumbnail(String thumbnail) {
 		this.thumbnail = thumbnail;
 	}
-
+	
 	public String getDescription() {
 		return description;
 	}
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public Integer getSubjectSequence() {
-		return subjectSequence;
-	}
-
-	public void setSubjectSequence(Integer subjectSequence) {
-		this.subjectSequence = subjectSequence;
 	}
 
 	public String getFormat() {
@@ -223,44 +147,12 @@ public class CourseSearchResult extends SearchResult implements Serializable {
 		this.format = format;
 	}
 
-	public List<String> getUnitIds() {
-		return unitIds;
-	}
-
-	public void setUnitIds(List<String> unitIds) {
-		this.unitIds = unitIds;
-	}
-
-	public List<String> getLessonIds() {
-		return lessonIds;
-	}
-
-	public void setLessonIds(List<String> lessonIds) {
-		this.lessonIds = lessonIds;
-	}
-
-	public List<String> getCollectionIds() {
-		return collectionIds;
-	}
-
-	public void setCollectionIds(List<String> collectionIds) {
-		this.collectionIds = collectionIds;
-	}
-
 	public Long getLessonCount() {
 		return lessonCount;
 	}
 
 	public void setLessonCount(Long lessonCount) {
 		this.lessonCount = lessonCount;
-	}
-
-	public Long getContainingCollectionCount() {
-		return containingCollectionCount;
-	}
-
-	public void setContainingCollectionCount(Long containingCollectionCount) {
-		this.containingCollectionCount = containingCollectionCount;
 	}
 
 	public Boolean getIsFeatured() {
@@ -311,6 +203,14 @@ public class CourseSearchResult extends SearchResult implements Serializable {
 		this.usedByStudentCount = usedByStudentCount;
 	}
 
+	public Map<String, Object> getTaxonomyEquivalentCompetencies() {
+		return taxonomyEquivalentCompetencies;
+	}
+
+	public void setTaxonomyEquivalentCompetencies(Map<String, Object> taxonomyEquivalentCompetencies) {
+		this.taxonomyEquivalentCompetencies = taxonomyEquivalentCompetencies;
+	}
+
 	public Double getEfficacy() {
 		return efficacy;
 	}
@@ -334,13 +234,4 @@ public class CourseSearchResult extends SearchResult implements Serializable {
 	public void setRelevance(Double relevance) {
 		this.relevance = relevance;
 	}
-
-	public List<String> getAudience() {
-		return audience;
-	}
-
-	public void setAudience(List<String> audience) {
-		this.audience = audience;
-	}
-
 }

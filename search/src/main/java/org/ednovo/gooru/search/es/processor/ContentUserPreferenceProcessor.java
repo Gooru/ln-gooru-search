@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.model.SearchData;
-import org.ednovo.gooru.search.es.model.SearchResponse;
+import org.ednovo.gooru.search.responses.SearchResponse;
 import org.springframework.stereotype.Component;
 
 /**

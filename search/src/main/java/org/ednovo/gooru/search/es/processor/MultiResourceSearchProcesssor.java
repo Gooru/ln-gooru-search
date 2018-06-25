@@ -9,7 +9,7 @@ import static org.ednovo.gooru.search.es.constant.SearchSettingType.S_ES_POINT_U
 import org.ednovo.gooru.search.es.constant.SearchType;
 import org.ednovo.gooru.search.es.exception.SearchException;
 import org.ednovo.gooru.search.es.model.SearchData;
-import org.ednovo.gooru.search.es.model.SearchResponse;
+import org.ednovo.gooru.search.responses.SearchResponse;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;

@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.ednovo.gooru.search.domain.service.PedagogyContentSearchResult;
-import org.ednovo.gooru.search.domain.service.PedagogyQuestion;
 import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.model.Answer;
 import org.ednovo.gooru.search.es.model.Hint;
@@ -17,6 +15,8 @@ import org.ednovo.gooru.search.es.model.MapWrapper;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.UserV2;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
+import org.ednovo.gooru.search.responses.PedagogyContentSearchResult;
+import org.ednovo.gooru.search.responses.PedagogyQuestion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

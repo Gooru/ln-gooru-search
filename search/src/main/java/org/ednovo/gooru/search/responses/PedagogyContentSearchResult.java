@@ -1,4 +1,4 @@
-package org.ednovo.gooru.search.domain.service;
+package org.ednovo.gooru.search.responses;
 
 import java.io.Serializable;
 import java.util.List;

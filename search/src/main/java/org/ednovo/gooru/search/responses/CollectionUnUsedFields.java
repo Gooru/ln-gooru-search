@@ -1,4 +1,4 @@
-package org.ednovo.gooru.search.domain.service;
+package org.ednovo.gooru.search.responses;
 
 import java.util.List;
 import java.util.Map;

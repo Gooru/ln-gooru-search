@@ -1,9 +1,10 @@
-package org.ednovo.gooru.search.domain.service;
+package org.ednovo.gooru.search.responses;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
-public class PedagogySearchResult implements Serializable {
+public class SearchResult implements Serializable {
 
 	private static final long serialVersionUID = 6586694154253184566L;
 
@@ -17,9 +18,7 @@ public class PedagogySearchResult implements Serializable {
 
 	private Map<String, Object> taxonomy;
 
-	private Map<String, Object> taxonomyEquivalentCompetencies;
-
-	private Boolean isFeatured = false;
+	private List<Map<String, Object>> taxonomyEquivalentCompetencies;
 
 	public String getTitle() {
 		return title;
@@ -61,20 +60,12 @@ public class PedagogySearchResult implements Serializable {
 		this.taxonomy = taxonomy;
 	}
 
-	public Map<String, Object> getTaxonomyEquivalentCompetencies() {
+	public List<Map<String, Object>> getTaxonomyEquivalentCompetencies() {
 		return taxonomyEquivalentCompetencies;
 	}
 
-	public void setTaxonomyEquivalentCompetencies(Map<String, Object> taxonomyEquivalentCompetencies) {
+	public void setTaxonomyEquivalentCompetencies(List<Map<String, Object>> taxonomyEquivalentCompetencies) {
 		this.taxonomyEquivalentCompetencies = taxonomyEquivalentCompetencies;
-	}
-
-	public Boolean getIsFeatured() {
-		return isFeatured;
-	}
-
-	public void setIsFeatured(Boolean isFeatured) {
-		this.isFeatured = isFeatured;
 	}
 
 }

@@ -1,4 +1,4 @@
-package org.ednovo.gooru.search.domain.service;
+package org.ednovo.gooru.search.responses;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -8,12 +8,12 @@ import org.ednovo.gooru.search.es.model.UserV2;
  * @author Renuka
  * 
  */
-public class PedagogyCourseSearchResult extends PedagogySearchResult implements Serializable {
+public class PedagogyUnitSearchResult extends PedagogySearchResult implements Serializable {
 
 	/**
-	* 
-	*/
-	private static final long serialVersionUID = 6280104303486215659L;
+	 * 
+	 */
+	private static final long serialVersionUID = 6280104303486215679L;
 
 	private UserV2 creator;
 
@@ -21,36 +21,24 @@ public class PedagogyCourseSearchResult extends PedagogySearchResult implements 
 
 	private UserV2 originalCreator;
 
-	private Integer unitCount;
-
-	private Integer courseRemixCount;
-
-	private Long viewCount;
-
 	private Map<String, Object> taxonomy;
-
-	private Integer collaboratorCount;
-
-	private String thumbnail;
-
-	private String description;
-
+	
 	private String format;
 
-	private Long lessonCount;
-
+	private Map<String, Object> course;
+	
+	private Integer lessonCount;
+	
 	private Boolean isFeatured;
 
-	private Long collectionCount;
-
-	private Long assessmentCount;
-
-	private Long externalAssessmentCount;
+	private Integer collectionCount;
 	
-	private Long remixedInClassCount;
+	private Integer assessmentCount;
 
-	private Long usedByStudentCount;
+	private Integer externalAssessmentCount;
 
+	private Long viewCount;
+	
 	private Map<String, Object> taxonomyEquivalentCompetencies;
 
 	private Double efficacy;
@@ -58,7 +46,7 @@ public class PedagogyCourseSearchResult extends PedagogySearchResult implements 
 	private Double engagement;
 	
 	private Double relevance;
-	
+
 	public UserV2 getCreator() {
 		return creator;
 	}
@@ -83,30 +71,6 @@ public class PedagogyCourseSearchResult extends PedagogySearchResult implements 
 		this.originalCreator = originalCreator;
 	}
 
-	public Integer getUnitCount() {
-		return unitCount;
-	}
-
-	public void setUnitCount(Integer unitCount) {
-		this.unitCount = unitCount;
-	}
-
-	public Integer getCourseRemixCount() {
-		return courseRemixCount;
-	}
-
-	public void setCourseRemixCount(Integer courseRemixCount) {
-		this.courseRemixCount = courseRemixCount;
-	}
-
-	public Long getViewCount() {
-		return viewCount;
-	}
-
-	public void setViewCount(Long viewCount) {
-		this.viewCount = viewCount;
-	}
-
 	public Map<String, Object> getTaxonomy() {
 		return taxonomy;
 	}
@@ -115,28 +79,12 @@ public class PedagogyCourseSearchResult extends PedagogySearchResult implements 
 		this.taxonomy = taxonomy;
 	}
 
-	public Integer getCollaboratorCount() {
-		return collaboratorCount;
+	public Map<String, Object> getCourse() {
+		return course;
 	}
 
-	public void setCollaboratorCount(Integer collaboratorCount) {
-		this.collaboratorCount = collaboratorCount;
-	}
-
-	public String getThumbnail() {
-		return thumbnail;
-	}
-
-	public void setThumbnail(String thumbnail) {
-		this.thumbnail = thumbnail;
-	}
-	
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
+	public void setCourse(Map<String, Object> course) {
+		this.course = course;
 	}
 
 	public String getFormat() {
@@ -147,11 +95,11 @@ public class PedagogyCourseSearchResult extends PedagogySearchResult implements 
 		this.format = format;
 	}
 
-	public Long getLessonCount() {
+	public Integer getLessonCount() {
 		return lessonCount;
 	}
 
-	public void setLessonCount(Long lessonCount) {
+	public void setLessonCount(Integer lessonCount) {
 		this.lessonCount = lessonCount;
 	}
 
@@ -163,44 +111,36 @@ public class PedagogyCourseSearchResult extends PedagogySearchResult implements 
 		this.isFeatured = isFeatured;
 	}
 
-	public Long getCollectionCount() {
+	public Integer getCollectionCount() {
 		return collectionCount;
 	}
 
-	public void setCollectionCount(Long collectionCount) {
+	public void setCollectionCount(Integer collectionCount) {
 		this.collectionCount = collectionCount;
 	}
 
-	public Long getAssessmentCount() {
+	public Integer getAssessmentCount() {
 		return assessmentCount;
 	}
 
-	public void setAssessmentCount(Long assessmentCount) {
+	public void setAssessmentCount(Integer assessmentCount) {
 		this.assessmentCount = assessmentCount;
 	}
 
-	public Long getExternalAssessmentCount() {
+	public Integer getExternalAssessmentCount() {
 		return externalAssessmentCount;
 	}
 
-	public void setExternalAssessmentCount(Long externalAssessmentCount) {
+	public void setExternalAssessmentCount(Integer externalAssessmentCount) {
 		this.externalAssessmentCount = externalAssessmentCount;
 	}
 
-	public Long getRemixedInClassCount() {
-		return remixedInClassCount;
+	public Long getViewCount() {
+		return viewCount;
 	}
 
-	public void setRemixedInClassCount(Long remixedInClassCount) {
-		this.remixedInClassCount = remixedInClassCount;
-	}
-
-	public Long getUsedByStudentCount() {
-		return usedByStudentCount;
-	}
-
-	public void setUsedByStudentCount(Long usedByStudentCount) {
-		this.usedByStudentCount = usedByStudentCount;
+	public void setViewCount(Long viewCount) {
+		this.viewCount = viewCount;
 	}
 
 	public Map<String, Object> getTaxonomyEquivalentCompetencies() {

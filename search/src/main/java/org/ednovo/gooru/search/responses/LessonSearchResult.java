@@ -1,34 +1,38 @@
-package org.ednovo.gooru.search.domain.service;
+package org.ednovo.gooru.search.responses;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 import org.ednovo.gooru.search.es.model.UserV2;
-/**
- * @author Renuka
- * 
- */
-public class PedagogyUnitSearchResult extends PedagogySearchResult implements Serializable {
+
+public class LessonSearchResult extends SearchResult implements Serializable {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 6280104303486215679L;
+	private static final long serialVersionUID = 6280104303486215669L;
+
+	private String lastModified;
+
+	private String addDate;
+
+	private String lastModifiedBy;
 
 	private UserV2 creator;
 
 	private UserV2 owner;
 
 	private UserV2 originalCreator;
-
-	private Map<String, Object> taxonomy;
 	
 	private String format;
 
 	private Map<String, Object> course;
+
+	private Map<String, Object> unit;
 	
-	private Integer lessonCount;
-	
+	private List<String> collectionIds;
+
 	private Boolean isFeatured;
 
 	private Integer collectionCount;
@@ -36,16 +40,40 @@ public class PedagogyUnitSearchResult extends PedagogySearchResult implements Se
 	private Integer assessmentCount;
 
 	private Integer externalAssessmentCount;
+	
+	private Integer containingCollectionCount;
 
 	private Long viewCount;
-	
-	private Map<String, Object> taxonomyEquivalentCompetencies;
 
 	private Double efficacy;
 	
 	private Double engagement;
 	
 	private Double relevance;
+
+	public String getLastModified() {
+		return lastModified;
+	}
+
+	public void setLastModified(String lastModified) {
+		this.lastModified = lastModified;
+	}
+
+	public String getAddDate() {
+		return addDate;
+	}
+
+	public void setAddDate(String addDate) {
+		this.addDate = addDate;
+	}
+
+	public String getLastModifiedBy() {
+		return lastModifiedBy;
+	}
+
+	public void setLastModifiedBy(String lastModifiedBy) {
+		this.lastModifiedBy = lastModifiedBy;
+	}
 
 	public UserV2 getCreator() {
 		return creator;
@@ -70,15 +98,15 @@ public class PedagogyUnitSearchResult extends PedagogySearchResult implements Se
 	public void setOriginalCreator(UserV2 originalCreator) {
 		this.originalCreator = originalCreator;
 	}
-
-	public Map<String, Object> getTaxonomy() {
-		return taxonomy;
+	
+	public String getFormat() {
+		return format;
 	}
 
-	public void setTaxonomy(Map<String, Object> taxonomy) {
-		this.taxonomy = taxonomy;
+	public void setFormat(String format) {
+		this.format = format;
 	}
-
+	
 	public Map<String, Object> getCourse() {
 		return course;
 	}
@@ -87,20 +115,20 @@ public class PedagogyUnitSearchResult extends PedagogySearchResult implements Se
 		this.course = course;
 	}
 
-	public String getFormat() {
-		return format;
+	public Map<String, Object> getUnit() {
+		return unit;
 	}
 
-	public void setFormat(String format) {
-		this.format = format;
+	public void setUnit(Map<String, Object> unit) {
+		this.unit = unit;
 	}
 
-	public Integer getLessonCount() {
-		return lessonCount;
+	public List<String> getCollectionIds() {
+		return collectionIds;
 	}
 
-	public void setLessonCount(Integer lessonCount) {
-		this.lessonCount = lessonCount;
+	public void setCollectionIds(List<String> collectionIds) {
+		this.collectionIds = collectionIds;
 	}
 
 	public Boolean getIsFeatured() {
@@ -135,20 +163,20 @@ public class PedagogyUnitSearchResult extends PedagogySearchResult implements Se
 		this.externalAssessmentCount = externalAssessmentCount;
 	}
 
+	public Integer getContainingCollectionCount() {
+		return containingCollectionCount;
+	}
+
+	public void setContainingCollectionCount(Integer containingCollectionCount) {
+		this.containingCollectionCount = containingCollectionCount;
+	}
+
 	public Long getViewCount() {
 		return viewCount;
 	}
 
 	public void setViewCount(Long viewCount) {
 		this.viewCount = viewCount;
-	}
-
-	public Map<String, Object> getTaxonomyEquivalentCompetencies() {
-		return taxonomyEquivalentCompetencies;
-	}
-
-	public void setTaxonomyEquivalentCompetencies(Map<String, Object> taxonomyEquivalentCompetencies) {
-		this.taxonomyEquivalentCompetencies = taxonomyEquivalentCompetencies;
 	}
 
 	public Double getEfficacy() {
@@ -174,4 +202,5 @@ public class PedagogyUnitSearchResult extends PedagogySearchResult implements Se
 	public void setRelevance(Double relevance) {
 		this.relevance = relevance;
 	}
+	
 }

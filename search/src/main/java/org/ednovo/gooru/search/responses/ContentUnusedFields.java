@@ -1,10 +1,8 @@
-package org.ednovo.gooru.search.es.model;
+package org.ednovo.gooru.search.responses;
 
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
-
-import org.ednovo.gooru.search.domain.service.SearchResult;
 
 public class ContentUnusedFields extends SearchResult implements Serializable {
 

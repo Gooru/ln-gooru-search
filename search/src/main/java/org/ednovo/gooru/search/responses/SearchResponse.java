@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.ednovo.gooru.search.es.model;
+package org.ednovo.gooru.search.responses;
 
 import java.io.Serializable;
 import java.util.List;
