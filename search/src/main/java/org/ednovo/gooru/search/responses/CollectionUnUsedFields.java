@@ -20,9 +20,9 @@ public class CollectionUnUsedFields extends SearchResult {
 	private String taxonomySkills;
 	private Integer numberOfResources;
 	private Map<String, Object> thumbnails;
-  private String description;
+    private String description;
 	private String languageObjective;
-	private Integer isFeatured;
+	private Boolean isFeatured;
 	
 	public String getAssetURI() {
 		return assetURI;
@@ -126,10 +126,10 @@ public class CollectionUnUsedFields extends SearchResult {
   public void setDescription(String description) {
     this.description = description;
   }
-  public Integer getIsFeatured() {
+  public Boolean getIsFeatured() {
     return isFeatured;
   }
-  public void setIsFeatured(Integer isFeatured) {
+  public void setIsFeatured(Boolean isFeatured) {
     this.isFeatured = isFeatured;
   }
 

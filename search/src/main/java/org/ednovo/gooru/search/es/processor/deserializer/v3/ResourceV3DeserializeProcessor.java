@@ -1,0 +1,341 @@
+
+package org.ednovo.gooru.search.es.processor.deserializer.v3;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+import org.ednovo.gooru.search.es.constant.IndexFields;
+import org.ednovo.gooru.search.es.model.Answer;
+import org.ednovo.gooru.search.es.model.Hint;
+import org.ednovo.gooru.search.es.model.MapWrapper;
+import org.ednovo.gooru.search.es.model.QuestionV3;
+import org.ednovo.gooru.search.es.model.SearchData;
+import org.ednovo.gooru.search.es.processor.SearchProcessorType;
+import org.ednovo.gooru.search.responses.v3.ContentSearchResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+/**
+ * @author SearchTeam
+ *
+ */
+@Component
+public class ResourceV3DeserializeProcessor extends DeserializeV3Processor<List<ContentSearchResult>, ContentSearchResult> {
+
+	protected static final Logger logger = LoggerFactory.getLogger(ResourceV3DeserializeProcessor.class);
+	protected static final String UN_RESTRICTED_SEARCH = "unrestrictedSearch";
+	protected static final String ALLOW_DUPLICATES = "allowDuplicates";
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<ContentSearchResult> deserialize(Map<String, Object> model, SearchData searchData, List<ContentSearchResult> output) {
+		output = new ArrayList<ContentSearchResult>();
+		Set<String> contentUrls = new HashSet<String>();
+		Set<String> contentTitles = new HashSet<String>();
+		if (model != null && model.get(SEARCH_HITS) != null && !((List<Map<String, Object>>) ((Map<String, Object>) model.get(SEARCH_HITS)).get(SEARCH_HITS)).isEmpty()) {
+			List<Map<String, Object>> hits = (List<Map<String, Object>>) ((Map<String, Object>) model.get(SEARCH_HITS)).get(SEARCH_HITS);
+			List<String> resourceIds = new ArrayList<String>();
+			float minScore = 0;
+			int lessScoreResourceCount = 0;
+			StringBuilder lessScoreResourceGooruOid = new StringBuilder();
+			if (hits.size() > 0) {
+				String configName = "S_RESOURCE_QUERY_MINSCORE_CATEGORY_" + (((Map<String, Object>) hits.get(0).get(SEARCH_SOURCE)).get(SEARCH_CATEGORY) + "").toUpperCase();
+				minScore = getCategorySettingAsFloat(configName);
+			}
+			// FIX ME enable for resource format
+			/*
+			 * if (hits.size() > 0) { String configName = "S_RESOURCE_QUERY_MINSCORE_RESOURCE_FORMAT_" + (((Map<String,Object>) hits.get(0).get("fields")).get("resourceFormat") +"").toUpperCase();
+			 * minScore = getResourceFormatSettingAsFloat(configName); }
+			 */
+
+			for (Map<String, Object> searchHit : hits) {
+				if (searchHit.get(IndexFields._SOURCE) == null) {
+					// FIXME, Can this happen?
+					continue;
+				}
+				Map<String, Object> fields = (Map<String, Object>) searchHit.get(IndexFields._SOURCE);
+				String resultUId = java.util.UUID.randomUUID().toString();
+				// Check for Duplicates
+				String url = (String) fields.get(IndexFields.URL);
+				String title = (String) fields.get(IndexFields.TITLE);
+				if (((String) fields.get(IndexFields.CONTENT_FORMAT)) != null && fields.get(IndexFields.CONTENT_FORMAT).equals(ContentFormat.QUESTION.getContentFormat())) {
+					Map<String, Object> questionMap = (Map<String, Object>) fields.get(IndexFields.QUESTION);
+					if (questionMap != null) {
+						title = (String) (questionMap.get(IndexFields.QUESTION));
+					}
+				}
+				MapWrapper<Object> parameters = searchData.getParameters();
+				if (parameters != null && parameters.getBoolean(ALLOW_DUPLICATES) != null && !parameters.getBoolean(ALLOW_DUPLICATES)) {
+					if (StringUtils.isNotBlank(url)) {
+						if (StringUtils.contains(url, "http://www.youtube.com")) {
+							url = url.split("&")[0];
+						}
+						if (contentUrls.contains(url)) {
+							continue;
+						}
+					}
+					if (StringUtils.isBlank(title) || contentTitles.contains(title.toLowerCase())) {
+						continue;
+					}
+					contentUrls.add(url);
+					contentTitles.add(title.toLowerCase());
+					// check the resource has less than the minScore640
+					if (!parameters.getBoolean(UN_RESTRICTED_SEARCH) && (Double) searchHit.get(IndexFields._SCORE) < minScore) {
+						lessScoreResourceCount++;
+						lessScoreResourceGooruOid.append(fields.get(IndexFields.ID) + " , ");
+						if (output.size() > 4) {
+							continue;
+						}
+					}
+				}
+				ContentSearchResult resource = collect(fields, searchData, null);
+				resourceIds.add(resource.getId());
+				resource.setResultUId(resultUId);
+				output.add(resource);
+			}
+			searchData.setResourceGooruOIds(resourceIds);
+			if (lessScoreResourceCount > 0) {
+				logger.debug("Minimum score resources: total = " + lessScoreResourceCount + " - keyword = " + searchData.getQueryString() + " -  gooruOId = " + lessScoreResourceGooruOid + "");
+			}
+		}
+		return output;
+	}
+
+	@Override
+	protected SearchProcessorType getType() {
+		return SearchProcessorType.ResourceV3Deserializer;
+	}
+
+	@Override
+	ContentSearchResult collect(Map<String, Object> model, SearchData input, ContentSearchResult resource) {
+		return deserializeToResource(model, input);
+	}
+
+	@SuppressWarnings({ "unchecked", "unused" })
+	private ContentSearchResult deserializeToResource(Map<String, Object> dataMap, SearchData input) {
+		String contentFormat = (String) dataMap.get(IndexFields.CONTENT_FORMAT);
+		String contentSubFormat = (String) dataMap.get(IndexFields.CONTENT_SUB_FORMAT);
+
+		ContentSearchResult resource = null;
+
+		if (contentFormat != null && contentFormat.equalsIgnoreCase(ContentFormat.QUESTION.getContentFormat())) {
+			QuestionV3 question = convertToQuestion(dataMap);
+			resource = question;
+		} else {
+			resource = new ContentSearchResult();
+		}
+		
+		resource.setContentFormat(contentFormat);
+		resource.setContentSubFormat(contentSubFormat);
+		resource.setTitle(StringUtils.defaultString((String) dataMap.get(IndexFields.TITLE), EMPTY_STRING));
+		resource.setUrl((String) dataMap.get(IndexFields.URL));
+		resource.setThumbnail((String) dataMap.get(IndexFields.THUMBNAIL));
+		resource.setId((String) dataMap.get(IndexFields.ID));
+		resource.setResultUId(java.util.UUID.randomUUID().toString());
+		resource.setDescription((String) dataMap.get(IndexFields.DESCRIPTION));
+		String publishStatus = (String) dataMap.get(IndexFields.PUBLISH_STATUS);
+		resource.setPublishStatus(publishStatus);
+
+		// Set metadata
+		if (dataMap.get(IndexFields.METADATA) != null) {
+			Map<String, List<String>> metadata = (Map<String, List<String>>) dataMap.get(IndexFields.METADATA);
+			if (metadata != null) {
+				// depth of knowledge
+				if (contentFormat != null && contentFormat.equalsIgnoreCase(SEARCH_QUESTION)) {
+					List<String> depthOfKnowledge = metadata.get(IndexFields.DEPTH_OF_KNOWLEDGE);
+					if (depthOfKnowledge != null) {
+						resource.setDepthOfKnowledges(depthOfKnowledge);
+					}
+				}
+				
+				// educationl use
+				List<String> educationalUse = metadata.get(IndexFields.EDUCATIONAL_USE);
+				if (educationalUse != null) {
+					resource.setEducationalUse(educationalUse);
+				}
+				
+				// moments of learning
+				if (contentFormat != null && !contentFormat.equalsIgnoreCase(SEARCH_QUESTION)) {
+					List<String> momentsOflearning = metadata.get(IndexFields.MOMENTS_OF_LEARNING);
+					if (momentsOflearning != null) {
+						resource.setMomentsOfLearning(momentsOflearning);
+					}
+				}
+				
+				// 21st century skill
+				List<String> twentyOneCenturySkills = metadata.get(IndexFields.TWENTY_ONE_CENTURY_SKILL);
+				if (twentyOneCenturySkills != null && !twentyOneCenturySkills.isEmpty()) {
+					resource.setTwentyOneCenturySkills(twentyOneCenturySkills);
+				}
+
+				List<String> grade = metadata.get(IndexFields.GRADE);
+				if(grade != null && grade.size() > 0){
+					resource.setGrade(String.join(COMMA, grade));
+				}
+			}
+		}
+
+		// set creator
+		if (dataMap.get(IndexFields.CREATOR) != null) {
+			resource.setCreator(setUser((Map<String, Object>) dataMap.get(IndexFields.CREATOR)));
+		}
+
+		// set original creator
+		if (dataMap.get(IndexFields.ORIGINAL_CREATOR) != null) {
+			resource.setOriginalCreator(setUser((Map<String, Object>) dataMap.get(IndexFields.ORIGINAL_CREATOR)));
+		}
+
+		Date date = null;
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		try {
+			date = simpleDateFormat.parse((String) dataMap.get(IndexFields.UPDATED_AT) + "");
+			String s = simpleDateFormat.format(date);
+		} catch (Exception e) {
+			logger.error("lastModified field error: " + e);
+		}
+		resource.setLastModified(date);
+		if (dataMap.get(IndexFields.UPDATED_AT) instanceof Long) {
+			Long lastModified = (Long) dataMap.get(IndexFields.UPDATED_AT);
+			resource.setLastModifiedString(lastModified.toString());
+		} else {
+			resource.setLastModifiedString((String) dataMap.get(IndexFields.UPDATED_AT));
+		}
+		try {
+			resource.setCreatedAt(simpleDateFormat.parse((String) dataMap.get(IndexFields.CREATED_AT)));
+		} catch (Exception e) {
+			LOG.debug("Error while parsing date", (String) dataMap.get(IndexFields.CREATED_AT));
+		}
+
+		Map<String, Object> statisticsMap = (Map<String, Object>) dataMap.get(IndexFields.STATISTICS);
+		boolean hasFrameBreaker = false;
+		if (statisticsMap != null) {
+			if (statisticsMap.get(IndexFields.VIEWS_COUNT) != null) {
+				resource.setViewCount(statisticsMap.get(IndexFields.VIEWS_COUNT) != null ? ((Number) statisticsMap.get(IndexFields.VIEWS_COUNT)).longValue() : 0L);
+			}
+
+			try {
+				if (statisticsMap.containsKey(IndexFields.HAS_FRAMEBREAKER) && ((Boolean) statisticsMap.get(IndexFields.HAS_FRAMEBREAKER))) {
+					hasFrameBreaker = true;
+				}
+			} catch (Exception e) {
+				if (((Integer) statisticsMap.get(IndexFields.HAS_FRAMEBREAKER)) != null && ((Integer) statisticsMap.get(IndexFields.HAS_FRAMEBREAKER)) == 1) {
+					hasFrameBreaker = true;
+				}
+			}
+			resource.setHasFrameBreaker(hasFrameBreaker);
+			Integer collectionCount = 0;
+			if (statisticsMap.get(IndexFields.USED_IN_COLLECTION_COUNT) != null) {
+				collectionCount = (Integer) statisticsMap.get(IndexFields.USED_IN_COLLECTION_COUNT);
+			}
+			resource.setUsedInCollectionCount(collectionCount);
+			resource.setEfficacy((statisticsMap.get(IndexFields.EFFICACY) != null) ? ((Number) statisticsMap.get(IndexFields.EFFICACY)).doubleValue() : 0.5);
+			resource.setEngagement((statisticsMap.get(IndexFields.ENGAGEMENT) != null) ? ((Number) statisticsMap.get(IndexFields.ENGAGEMENT)).doubleValue() : 0.5);
+			resource.setRelevance((statisticsMap.get(IndexFields.RELEVANCE) != null) ? ((Number) statisticsMap.get(IndexFields.RELEVANCE)).doubleValue() : 0.5);
+			resource.setRemixedInCollectionCount((statisticsMap.get(IndexFields.COLLECTION_COUNT) != null) ? ((Number) statisticsMap.get(IndexFields.COLLECTION_COUNT)).longValue() : 0);
+			resource.setRemixedInAssessmentCount((statisticsMap.get(IndexFields.ASSESSMENT_COUNT) != null) ? ((Number) statisticsMap.get(IndexFields.ASSESSMENT_COUNT)).longValue() : 0);
+			resource.setRemixedInExternalAssessmentCount((statisticsMap.get(IndexFields.EXTERNAL_ASSESSMENT_COUNT) != null) ? ((Number) statisticsMap.get(IndexFields.EXTERNAL_ASSESSMENT_COUNT)).longValue() : 0);
+		}
+
+		Map<String, Object> taxonomyMap = (Map<String, Object>) dataMap.get(IndexFields.TAXONOMY);
+		if (taxonomyMap != null) {
+			Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
+			if (input.isCrosswalk()) {
+				if (input.getTaxFilterType() != null && TAX_FILTERS.matcher(input.getTaxFilterType()).matches()) {
+					setCrosswalkData(input, resource, taxonomyMap);
+				} else if (input.getUserTaxonomyPreference() != null) {
+					long start = System.currentTimeMillis();
+					taxonomySetAsMap = transformTaxonomy(taxonomyMap, input);
+					logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
+				}
+			}
+			resource.setTaxonomy(taxonomySetAsMap);		
+		}
+
+		if (dataMap.get(IndexFields.COLLECTION_TITLES) != null) {
+			resource.setCollectionTitles((List<String>) dataMap.get(IndexFields.COLLECTION_TITLES));
+		}
+		if (dataMap.get(IndexFields.COLLECTION_IDS) != null) {
+			resource.setCollectionIds((List<String>) dataMap.get(IndexFields.COLLECTION_IDS));
+		}
+		
+		Map<String, Object> courseMap = (Map<String, Object>) dataMap.get(IndexFields.COURSE);
+		if (courseMap != null && !courseMap.isEmpty()) {
+			resource.setCourse(courseMap);
+		}
+
+		Map<String, Object> licenseMap = (Map<String, Object>) dataMap.get(IndexFields.LICENSE);
+		if (licenseMap != null && !licenseMap.isEmpty()) {
+			Map<String, Object> licenseAsMap = new HashMap<>();
+			licenseAsMap.put(IndexFields.CODE, licenseMap.get(IndexFields.CODE));
+			licenseAsMap.put(IndexFields.ICON, licenseMap.get(IndexFields.ICON));
+			licenseAsMap.put(IndexFields.NAME, licenseMap.get(IndexFields.NAME));
+			licenseAsMap.put(IndexFields.URL, licenseMap.get(IndexFields.URL));
+			resource.setLicense(licenseAsMap);
+		}
+	
+		Map<String, Object> infoMap = (Map<String, Object>) dataMap.get(IndexFields.INFO);
+		if (infoMap != null) {
+			if (infoMap.containsKey(IndexFields.PUBLISHER) && infoMap.get(IndexFields.PUBLISHER) != null) {
+				List<String> infoPublisher = (List<String>) infoMap.get(IndexFields.PUBLISHER);
+				resource.setPublisher(infoPublisher);
+			}
+		}
+		resource.setInfo(infoMap);
+
+		Boolean isCopyrightOwner = dataMap.get(IndexFields.IS_COPYRIGHT_OWNER) == null ? false : (Boolean)dataMap.get(IndexFields.IS_COPYRIGHT_OWNER);
+		if (resource.getPublisher() == null || resource.getPublisher().isEmpty()) {
+			List<String> publisher = new ArrayList<>();
+			if (isCopyrightOwner) {
+				if (resource.getCreator() != null && resource.getCreator().getUsernameDisplay() != null) publisher.add(resource.getCreator().getUsernameDisplay());
+			} else if (dataMap.containsKey(IndexFields.COPYRIGHT_OWNER_LIST) && ((List<String>) dataMap.get(IndexFields.COPYRIGHT_OWNER_LIST)).size() > 0) {
+				publisher = (List<String>) dataMap.get(IndexFields.COPYRIGHT_OWNER_LIST);
+			}
+			resource.setPublisher((publisher != null && publisher.size() > 0) ? publisher : null);
+		}
+		return resource;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private QuestionV3 convertToQuestion(Map<String, Object> source) {
+		QuestionV3 question = new QuestionV3();
+		Map<String, Object> questionMap = (Map<String, Object>) (source.get(IndexFields.QUESTION));
+		question.setId((String) source.get(IndexFields.ID));
+		question.setQuestionText((String) source.get(IndexFields.TITLE));
+		question.setTypeName((String) source.get(IndexFields.CONTENT_SUB_FORMAT));
+		if (questionMap != null) {
+			question.setExplanation((String) questionMap.get(IndexFields.EXPLANATION));
+
+			Set<Answer> answers = new HashSet<Answer>();
+			Map<String, Object> answerMap = (Map<String, Object>) (questionMap.get(IndexFields.ANSWER));
+			if ((answerMap != null) && (answerMap.get(IndexFields.ANSWER_TEXT) != null)) {
+				String[] answersText = ((String) answerMap.get(IndexFields.ANSWER_TEXT)).split(" ~~ ");
+				for (String text : answersText) {
+					Answer answer = new Answer();
+					answer.setAnswerText(text);
+					answers.add(answer);
+				}
+			}
+			Map<String, Object> hintMap = (Map<String, Object>) (source.get(IndexFields.HINTS));
+			Set<Hint> hints = new HashSet<Hint>();
+			if ((hintMap != null) && (hintMap.get(IndexFields.HINT_TEXT) != null)) {
+				String[] hintsText = ((String) hintMap.get(IndexFields.HINT_TEXT)).split(" ~~ ");
+				for (String text : hintsText) {
+					Hint hint = new Hint();
+					hint.setHintText(text);
+					hints.add(hint);
+				}
+			}
+			question.setAnswers(answers);
+			question.setHints(hints);
+		}
+		return question;
+	}
+}

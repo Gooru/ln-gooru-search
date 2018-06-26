@@ -1,62 +1,103 @@
-package org.ednovo.gooru.search.responses;
+package org.ednovo.gooru.search.responses.v3;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.List;
 
+import org.ednovo.gooru.search.es.model.License;
 import org.ednovo.gooru.search.es.model.UserV2;
-/**
- * @author Renuka
- * 
- */
-public class PedagogyCourseSearchResult extends PedagogySearchResult implements Serializable {
+import org.ednovo.gooru.search.responses.SearchResult;
+
+public class CourseSearchResult extends SearchResult implements Serializable {
 
 	/**
 	* 
 	*/
 	private static final long serialVersionUID = 6280104303486215659L;
 
-	private UserV2 creator;
-
-	private UserV2 owner;
-
-	private UserV2 originalCreator;
-
-	private Integer unitCount;
-
-	private Integer courseRemixCount;
-
-	private Long viewCount;
-
-	private Map<String, Object> taxonomy;
-
-	private Integer collaboratorCount;
-
-	private String thumbnail;
-
-	private String description;
-
-	private String format;
-
-	private Long lessonCount;
-
-	private Long collectionCount;
+	private String createdAt;
 
 	private Long assessmentCount;
 
+	private List<String> audience;
+
+	private Integer collaboratorCount;
+
+	private Long collectionCount;
+
+	private List<String> collectionIds;
+
+	private Integer courseRemixCount;
+
+	private UserV2 creator;
+
+	private String description;
+
 	private Long externalAssessmentCount;
-	
+
+	private String contentFormat;
+
+	private String lastModified;
+
+	private String lastModifiedBy;
+
+	private Long lessonCount;
+
+	private List<String> lessonIds;
+
+	private License license;
+
+	private UserV2 originalCreator;
+
+	private UserV2 owner;
+
 	private Long remixedInClassCount;
+
+	private Integer sequence;
+
+	private String subjectBucket;
+
+	private Integer subjectSequence;
+
+	private String thumbnail;
+
+	private Integer unitCount;
+
+	private List<String> unitIds;
 
 	private Long usedByStudentCount;
 
-	private Map<String, Object> taxonomyEquivalentCompetencies;
+	private Long viewCount;
 
 	private Double efficacy;
 	
 	private Double engagement;
 	
 	private Double relevance;
-	
+
+	public String getLastModified() {
+		return lastModified;
+	}
+
+	public void setLastModified(String lastModified) {
+		this.lastModified = lastModified;
+	}
+
+	public String getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(String createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public String getLastModifiedBy() {
+		return lastModifiedBy;
+	}
+
+	public void setLastModifiedBy(String lastModifiedBy) {
+		this.lastModifiedBy = lastModifiedBy;
+	}
+
 	public UserV2 getCreator() {
 		return creator;
 	}
@@ -79,6 +120,14 @@ public class PedagogyCourseSearchResult extends PedagogySearchResult implements 
 
 	public void setOriginalCreator(UserV2 originalCreator) {
 		this.originalCreator = originalCreator;
+	}
+
+	public License getLicense() {
+		return license;
+	}
+
+	public void setLicense(License license) {
+		this.license = license;
 	}
 
 	public Integer getUnitCount() {
@@ -105,14 +154,22 @@ public class PedagogyCourseSearchResult extends PedagogySearchResult implements 
 		this.viewCount = viewCount;
 	}
 
-	public Map<String, Object> getTaxonomy() {
-		return taxonomy;
+	public String getSubjectBucket() {
+		return subjectBucket;
 	}
 
-	public void setTaxonomy(Map<String, Object> taxonomy) {
-		this.taxonomy = taxonomy;
+	public void setSubjectBucket(String subjectBucket) {
+		this.subjectBucket = subjectBucket;
 	}
 
+	public Integer getSequence() {
+		return sequence;
+	}
+
+	public void setSequence(Integer sequence) {
+		this.sequence = sequence;
+	}
+	
 	public Integer getCollaboratorCount() {
 		return collaboratorCount;
 	}
@@ -128,7 +185,7 @@ public class PedagogyCourseSearchResult extends PedagogySearchResult implements 
 	public void setThumbnail(String thumbnail) {
 		this.thumbnail = thumbnail;
 	}
-	
+
 	public String getDescription() {
 		return description;
 	}
@@ -137,12 +194,44 @@ public class PedagogyCourseSearchResult extends PedagogySearchResult implements 
 		this.description = description;
 	}
 
-	public String getFormat() {
-		return format;
+	public Integer getSubjectSequence() {
+		return subjectSequence;
 	}
 
-	public void setFormat(String format) {
-		this.format = format;
+	public void setSubjectSequence(Integer subjectSequence) {
+		this.subjectSequence = subjectSequence;
+	}
+
+	public String getContentFormat() {
+		return contentFormat;
+	}
+
+	public void setContentFormat(String contentFormat) {
+		this.contentFormat = contentFormat;
+	}
+
+	public List<String> getUnitIds() {
+		return unitIds;
+	}
+
+	public void setUnitIds(List<String> unitIds) {
+		this.unitIds = unitIds;
+	}
+
+	public List<String> getLessonIds() {
+		return lessonIds;
+	}
+
+	public void setLessonIds(List<String> lessonIds) {
+		this.lessonIds = lessonIds;
+	}
+
+	public List<String> getCollectionIds() {
+		return collectionIds;
+	}
+
+	public void setCollectionIds(List<String> collectionIds) {
+		this.collectionIds = collectionIds;
 	}
 
 	public Long getLessonCount() {
@@ -193,14 +282,6 @@ public class PedagogyCourseSearchResult extends PedagogySearchResult implements 
 		this.usedByStudentCount = usedByStudentCount;
 	}
 
-	public Map<String, Object> getTaxonomyEquivalentCompetencies() {
-		return taxonomyEquivalentCompetencies;
-	}
-
-	public void setTaxonomyEquivalentCompetencies(Map<String, Object> taxonomyEquivalentCompetencies) {
-		this.taxonomyEquivalentCompetencies = taxonomyEquivalentCompetencies;
-	}
-
 	public Double getEfficacy() {
 		return efficacy;
 	}
@@ -224,4 +305,13 @@ public class PedagogyCourseSearchResult extends PedagogySearchResult implements 
 	public void setRelevance(Double relevance) {
 		this.relevance = relevance;
 	}
+
+	public List<String> getAudience() {
+		return audience;
+	}
+
+	public void setAudience(List<String> audience) {
+		this.audience = audience;
+	}
+
 }

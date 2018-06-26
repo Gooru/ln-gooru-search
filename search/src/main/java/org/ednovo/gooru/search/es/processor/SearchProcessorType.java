@@ -163,7 +163,19 @@ public enum SearchProcessorType {
 	
 	GutDeserializer(),
     
-    ScopeFilterConstruction();
+    ScopeFilterConstruction(),
+
+	ResourceV3Deserializer(),
+
+	SCollectionV3Deserializer(),
+
+	RubricV3DeserializeProcessor(),
+
+	CourseV3DeserializeProcessor(),
+
+	UnitV3DeserializeProcessor(),
+
+	LessonV3DeserializeProcessor();
 
 	private SearchProcessorType() {
 	}

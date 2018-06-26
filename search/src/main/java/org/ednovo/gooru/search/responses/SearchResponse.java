@@ -24,8 +24,8 @@ public class SearchResponse<R> implements Serializable {
 
 	private Integer resultCount;
 
-	private Long executionTime;
-
+	private Long executionTime; 
+	
 	private Map<String, Object> query;
 
 	private Map<String, Object> stats;
@@ -65,14 +65,14 @@ public class SearchResponse<R> implements Serializable {
 	}
 
 	public Long getExecutionTime() {
-		return executionTime;
-	}
+        return executionTime;
+    }
 
-	public void setExecutionTime(Long executionTime) {
-		this.executionTime = executionTime;
-	}
+    public void setExecutionTime(Long executionTime) {
+        this.executionTime = executionTime;
+    }
 
-	public Map<String, Object> getQuery() {
+    public Map<String, Object> getQuery() {
 		return query;
 	}
 

@@ -198,9 +198,8 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 
 		request.setAttribute("action", "search");
 		try {
-			SearchResponse<Object> searchResponse = SearchHandler.getSearcher(type.toUpperCase()).search(searchData);
+			SearchResponse<Object> searchResponse = SearchHandler.getSearcher(type.toUpperCase() + _V3.toUpperCase()).search(searchData);
 			logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
-			searchResponse.setExecutionTime(System.currentTimeMillis() - start);
 
 			setEventLogObject(request, searchData, searchResponse);
 
@@ -230,7 +229,7 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 			} else if (CUL_MATCH.matcher(type).matches()) {
 				return toModelAndView(serialize(searchResponse, JSON, excludeAttributeArray, true, true));
 			}
-			return toModelAndView(serialize(searchResponse, JSON, excludeAttributeArray, true, false));
+			return toModelAndView(serialize(searchResponse, JSON, excludeAttributeArray, true, true));
 		} catch (SearchException searchException) {
 			response.setStatus(searchException.getStatus().value());
 			return toModelAndView(searchException.getMessage());
@@ -239,6 +238,7 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 
 	private void processRequestBody(SearchRequestBody requestBody, SearchData searchData) {
 		if (requestBody != null) {
+			logger.info("Search Request Payload : {}", requestBody.toString());
 			searchData.setScope(requestBody.getScope());
 			searchData.setPretty(requestBody.getPretty());
 			searchData.setCrosswalk(!searchData.isCrosswalk() ? searchData.isCrosswalk() : requestBody.getIsCrosswalk());

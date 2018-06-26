@@ -1,7 +1,7 @@
 /**
  *
  */
-package org.ednovo.gooru.search.es.processor.deserializer;
+package org.ednovo.gooru.search.es.processor.deserializer.pedagogy;
 
 import java.util.HashMap;
 import java.util.List;

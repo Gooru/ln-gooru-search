@@ -1,0 +1,43 @@
+package org.ednovo.gooru.search.es.handler.v3;
+
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.BlackListQueryValidation;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.CourseV3DeserializeProcessor;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.CourseFilterConstruction;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.DictionaryQueryExpansion;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.Elasticsearch;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.EsDslQueryBuild;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.LimitValidation;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.ScopeFilterConstruction;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.TenantFilterConstruction;
+
+import java.util.Map;
+
+import org.ednovo.gooru.search.es.constant.EsIndex;
+import org.ednovo.gooru.search.es.handler.SearchHandler;
+import org.ednovo.gooru.search.es.handler.SearchHandlerType;
+import org.ednovo.gooru.search.es.model.SearchData;
+import org.ednovo.gooru.search.es.processor.SearchProcessorType;
+import org.springframework.stereotype.Component;
+
+@Component
+public class CourseV3SearchHandler extends SearchHandler<SearchData, Map<String, Object>> {
+
+	private static final SearchProcessorType[][] searchProcessorTypes = new SearchProcessorType[][] { { BlackListQueryValidation }, { LimitValidation }, { DictionaryQueryExpansion },
+			{ TenantFilterConstruction }, { ScopeFilterConstruction }, { CourseFilterConstruction }, { EsDslQueryBuild }, { Elasticsearch }, { CourseV3DeserializeProcessor } };
+
+	@Override
+	protected SearchProcessorType[][] getProcessorTypeChain() {
+		return searchProcessorTypes;
+	}
+
+	@Override
+	protected SearchHandlerType getType() {
+		return SearchHandlerType.COURSE_V3;
+	}
+
+	@Override
+	protected EsIndex getIndexType() {
+		return EsIndex.COURSE;
+	}
+
+}

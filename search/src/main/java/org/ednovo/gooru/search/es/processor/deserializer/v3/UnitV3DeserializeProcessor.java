@@ -1,4 +1,4 @@
-package org.ednovo.gooru.search.es.processor.deserializer;
+package org.ednovo.gooru.search.es.processor.deserializer.v3;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,26 +7,26 @@ import java.util.Map;
 import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
-import org.ednovo.gooru.search.responses.PedagogyUnitSearchResult;
+import org.ednovo.gooru.search.responses.v3.UnitSearchResult;
 import org.springframework.stereotype.Component;
 /**
  * @author Renuka
  * 
  */
 @Component
-public class PedagogyUnitDeserializeProcessor extends PedagogyDeserializeProcessor<List<PedagogyUnitSearchResult>, PedagogyUnitSearchResult> {
+public class UnitV3DeserializeProcessor extends DeserializeV3Processor<List<UnitSearchResult>, UnitSearchResult> {
 
 	@Override
 	protected SearchProcessorType getType() {
-		return SearchProcessorType.PedagogyUnitDeserializer;
+		return SearchProcessorType.UnitV3DeserializeProcessor;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	List<PedagogyUnitSearchResult> deserialize(Map<String, Object> model, SearchData input, List<PedagogyUnitSearchResult> output) {
+	List<UnitSearchResult> deserialize(Map<String, Object> model, SearchData input, List<UnitSearchResult> output) {
 		Map<String, Object> hitsMap = (Map<String, Object>) model.get(SEARCH_HITS);
 		List<Map<String, Object>> hits = (List<Map<String, Object>>) (hitsMap).get(SEARCH_HITS);
-		output = new ArrayList<PedagogyUnitSearchResult>();
+		output = new ArrayList<UnitSearchResult>();
 		for (Map<String, Object> hit : hits) {
 			Map<String, Object> fields = (Map<String, Object>) hit.get(SEARCH_SOURCE);
 			output.add(collect(fields, input, null));
@@ -37,14 +37,17 @@ public class PedagogyUnitDeserializeProcessor extends PedagogyDeserializeProcess
 
 	@SuppressWarnings("unchecked")
 	@Override
-	PedagogyUnitSearchResult collect(Map<String, Object> model, SearchData input, PedagogyUnitSearchResult unitResult) {
+	UnitSearchResult collect(Map<String, Object> model, SearchData input, UnitSearchResult unitResult) {
 		if(unitResult == null){
-			unitResult = new PedagogyUnitSearchResult();
+			unitResult = new UnitSearchResult();
 		}
 		unitResult.setId((String) model.get(IndexFields.ID));
 		unitResult.setTitle((String) model.get(IndexFields.TITLE));
 		unitResult.setPublishStatus((String) model.get(IndexFields.PUBLISH_STATUS));
-        unitResult.setFormat((String) model.get(IndexFields.CONTENT_FORMAT));
+		unitResult.setLastModified((String) model.get(IndexFields.UPDATED_AT));
+		unitResult.setCreatedAt((String) model.get(IndexFields.CREATED_AT));
+        unitResult.setLastModifiedBy((String) model.get(IndexFields.MODIFIER_ID));
+        unitResult.setContentFormat((String) model.get(IndexFields.CONTENT_FORMAT));
 
         // set counts
         if(model.get(IndexFields.STATISTICS) != null){
@@ -57,7 +60,7 @@ public class PedagogyUnitDeserializeProcessor extends PedagogyDeserializeProcess
         	unitResult.setEfficacy((statistics.get(IndexFields.EFFICACY) != null) ? ((Number) statistics.get(IndexFields.EFFICACY)).doubleValue() : 0.5);
         	unitResult.setEngagement((statistics.get(IndexFields.ENGAGEMENT) != null) ? ((Number) statistics.get(IndexFields.ENGAGEMENT)).doubleValue() : 0.5);
         	unitResult.setRelevance((statistics.get(IndexFields.RELEVANCE) != null) ? ((Number) statistics.get(IndexFields.RELEVANCE)).doubleValue() : 0.5);
-		
+    	
 			long viewsCount = 0L;
 			if (statistics.get(IndexFields.VIEWS_COUNT) != null) {
 				viewsCount = ((Number) statistics.get(IndexFields.VIEWS_COUNT)).longValue();
@@ -82,15 +85,23 @@ public class PedagogyUnitDeserializeProcessor extends PedagogyDeserializeProcess
 
 		// set original creator 
 		if(model.get(IndexFields.ORIGINAL_CREATOR) != null){
-			unitResult.setOriginalCreator(setUser((Map<String, Object>) model.get(IndexFields.ORIGINAL_CREATOR)));
+			unitResult.setOrginalCreator(setUser((Map<String, Object>) model.get(IndexFields.ORIGINAL_CREATOR)));
 		}
 
 		// set taxonomy
 		Map<String, Object> taxonomyMap = (Map<String, Object>) model.get(IndexFields.TAXONOMY);
 		if (taxonomyMap != null) {
-			long start = System.currentTimeMillis();
-			setTaxonomy(taxonomyMap, input, unitResult);
-			logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
+			Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
+			if (input.isCrosswalk()) {
+				if (input.getTaxFilterType() != null && TAX_FILTERS.matcher(input.getTaxFilterType()).matches()) {
+					setCrosswalkData(input, unitResult, taxonomyMap);
+				} else if (input.getUserTaxonomyPreference() != null) {
+					long start = System.currentTimeMillis();
+					taxonomySetAsMap = transformTaxonomy(taxonomyMap, input);
+					logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
+				}
+			}
+			unitResult.setTaxonomy(taxonomySetAsMap);
 		}
  		return unitResult;
 	}

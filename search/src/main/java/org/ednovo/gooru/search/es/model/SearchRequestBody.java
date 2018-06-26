@@ -136,4 +136,13 @@ public class SearchRequestBody implements Serializable {
         this.filters = filters;
     }
 
+    @Override
+    public String toString() {
+        return "SearchRequestBody{" +
+                "pageSize='" + getPageSize() + '\'' +
+                ", pretty='" + getPretty() + '\'' +
+                ", scope='" + getScope().toString() + '\'' +
+                ", pageNum='" + getPageNum() + '\'' +
+                '}';
+    }
 }

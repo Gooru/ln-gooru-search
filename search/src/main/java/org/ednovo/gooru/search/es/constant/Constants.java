@@ -555,5 +555,6 @@ public interface Constants {
     public static final String[] END_WITH_BOOLEAN_OPERATORS = new String[] { " AND NOT", " OR NOT", " NOT AND", " NOT OR", " OR", " AND" };
     Pattern SCOPE_MYCONTENT_LIBRARY_MATCH = Pattern.compile("my-content|tenant-library|subtenant-library|library|course|gooru-fc");
     public static final String LIBRARY = "library";
+    public static final String _V3 = "_v3";
 
 }
