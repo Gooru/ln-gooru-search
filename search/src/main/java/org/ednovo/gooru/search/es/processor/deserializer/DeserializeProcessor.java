@@ -85,7 +85,7 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 			}*/
 
 		} catch (Exception e) {
-			LOG.error("Search Error", e);
+			logger.error("Search Error", e);
 			throw new SearchException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}

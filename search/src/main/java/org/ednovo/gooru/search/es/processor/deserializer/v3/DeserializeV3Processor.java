@@ -77,7 +77,7 @@ public abstract class DeserializeV3Processor<O, S> extends SearchProcessor<Searc
 			}
 
 		} catch (Exception e) {
-			LOG.error("Search Error", e);
+			logger.error("Search Error", e);
 			throw new SearchException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}
@@ -88,7 +88,7 @@ public abstract class DeserializeV3Processor<O, S> extends SearchProcessor<Searc
 		if (taxonomySetAsMap == null) {
 			return taxonomyMap;
 		}
-		List<Map<String, String>> txCurriculumInfoAsList = new ArrayList<>();
+		Map<String, Object> finalConvertedMap = new HashMap<>();
 		JSONObject standardPrefs = input.getUserTaxonomyPreference();
 		List<String> leafInternalCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_INTERNAL_CODES);
 		if (leafInternalCodes != null) {
@@ -100,12 +100,12 @@ public abstract class DeserializeV3Processor<O, S> extends SearchProcessor<Searc
 					String id = code.get(IndexFields.ID);
 					List<Map<String, String>> crosswalkCodes = null;
 					crosswalkCodes = deserializeCrosswalkResponse(crosswalkResponse, id, crosswalkCodes);
-					transformToPreferredCode(txCurriculumInfoAsList, standardPrefs, code, crosswalkCodes);
+					transformToPreferredCode(finalConvertedMap, standardPrefs, code, crosswalkCodes);
 				});
-				curriculumAsMap.put(IndexFields.CURRICULUM_INFO, txCurriculumInfoAsList);
-				taxonomySetAsMap.put(IndexFields.CURRICULUM, curriculumAsMap);
+				taxonomySetAsMap.put(IndexFields.TAXONOMY_SET, finalConvertedMap);
 			}
 		}
+		taxonomySetAsMap.remove(IndexFields.CURRICULUM);
 		return taxonomySetAsMap;
 	}
 
@@ -127,8 +127,8 @@ public abstract class DeserializeV3Processor<O, S> extends SearchProcessor<Searc
 		}
 		return crosswalkResult;
 	}
-	
-	private void transformToPreferredCode(List<Map<String, String>> txCurriculumInfoAsList, JSONObject standardPrefs, Map<String, String> codeAsMap, List<Map<String, String>> crosswalkCodes) {
+
+	private void transformToPreferredCode(Map<String, Object> finalConvertedMap, JSONObject standardPrefs, Map<String, String> codeAsMap, List<Map<String, String>> crosswalkCodes) {
 		String internalCode = codeAsMap.get(IndexFields.ID);
 		final String subject = getSubjectFromCodeId(internalCode);
 		String framework = null;
@@ -143,10 +143,14 @@ public abstract class DeserializeV3Processor<O, S> extends SearchProcessor<Searc
 							}
 							crosswalk.put(LEAF_INTERNAL_CODE, internalCode);
 							crosswalk.put(IndexFields.PARENT_TITLE, codeAsMap.get(IndexFields.PARENT_TITLE));
-							txCurriculumInfoAsList.add(crosswalk);
+							String crosswalkId = crosswalk.get(IndexFields.ID);
+							crosswalk.remove(IndexFields.ID);
+							finalConvertedMap.put(crosswalkId, crosswalk);
 						}
 					} else if (internalCode.startsWith(framework + DOT)) {
-						txCurriculumInfoAsList.add(codeAsMap);
+						String codeId = codeAsMap.get(IndexFields.ID);
+						codeAsMap.remove(IndexFields.ID);
+						finalConvertedMap.put(codeId, codeAsMap);
 					}
 				}
 			}
@@ -155,6 +159,25 @@ public abstract class DeserializeV3Processor<O, S> extends SearchProcessor<Searc
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	protected void cleanUpTaxonomyCurriculumObject(Map<String, Object> taxonomySetAsMap) {
+		Map<String, Object> curriculumAsMap = ((Map<String, Object>) taxonomySetAsMap.get(IndexFields.CURRICULUM));
+		if (curriculumAsMap != null && !curriculumAsMap.isEmpty()) {
+			curriculumAsMap.remove("curriculumCode");
+			curriculumAsMap.remove("curriculumDesc");
+			curriculumAsMap.remove("curriculumName");
+			List<Map<String, String>> curriculumInfoAsList = (List<Map<String, String>>) curriculumAsMap.get(IndexFields.CURRICULUM_INFO);
+			Map<String, Object> finalConvertedMap = new HashMap<>();
+			curriculumInfoAsList.forEach(codeAsMap -> {
+				String codeId = codeAsMap.get(IndexFields.ID);
+				codeAsMap.remove(IndexFields.ID);
+				finalConvertedMap.put(codeId, codeAsMap);
+			});
+			taxonomySetAsMap.put(IndexFields.TAXONOMY_SET, finalConvertedMap);
+			curriculumAsMap.remove(IndexFields.CURRICULUM_INFO);
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
 	protected List<Map<String, Object>> searchCrosswalk(SearchData input, List<String> leafInternalCodes) {
 		List<Map<String, Object>> searchResponse = null;

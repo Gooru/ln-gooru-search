@@ -179,6 +179,7 @@ public class CollectionV3DeserializeProcessor extends DeserializeV3Processor<Lis
 					logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
 				}
 			}
+			if (!taxonomySetAsMap.containsKey(IndexFields.TAXONOMY_SET)) cleanUpTaxonomyCurriculumObject(taxonomySetAsMap);
 			output.setTaxonomy(taxonomySetAsMap);			
 		}
 

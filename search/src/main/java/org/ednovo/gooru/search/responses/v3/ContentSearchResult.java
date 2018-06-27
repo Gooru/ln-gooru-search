@@ -42,8 +42,6 @@ public class ContentSearchResult extends SearchResult implements Serializable {
 
 	private List<String> educationalUse;
 
-	private List<String> momentsOfLearning;
-
 	private List<String> publisher;
 
 	private String resultUId;
@@ -196,14 +194,6 @@ public class ContentSearchResult extends SearchResult implements Serializable {
 
     public void setEducationalUse(List<String> educationalUse) {
         this.educationalUse = educationalUse;
-    }
-
-    public List<String> getMomentsOfLearning() {
-        return momentsOfLearning;
-    }
-
-    public void setMomentsOfLearning(List<String> momentsOfLearning) {
-        this.momentsOfLearning = momentsOfLearning;
     }
 
     public List<String> getPublisher() {

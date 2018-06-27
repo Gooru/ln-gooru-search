@@ -108,6 +108,7 @@ public class RubricV3DeserializeProcessor extends DeserializeV3Processor<List<Ru
 					logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
 				}
 			}
+			if (!taxonomySetAsMap.containsKey(IndexFields.TAXONOMY_SET)) cleanUpTaxonomyCurriculumObject(taxonomySetAsMap);
 			output.setTaxonomy(taxonomySetAsMap);		
 		}
 		

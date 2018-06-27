@@ -148,6 +148,7 @@ public class CourseV3DeserializeProcessor extends DeserializeV3Processor<List<Co
 					logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
 				}
 			}
+			if (!taxonomySetAsMap.containsKey(IndexFields.TAXONOMY_SET)) cleanUpTaxonomyCurriculumObject(taxonomySetAsMap);
 			courseResult.setTaxonomy(taxonomySetAsMap);
 		}
 

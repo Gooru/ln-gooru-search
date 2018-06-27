@@ -101,6 +101,7 @@ public class UnitV3DeserializeProcessor extends DeserializeV3Processor<List<Unit
 					logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
 				}
 			}
+			if (!taxonomySetAsMap.containsKey(IndexFields.TAXONOMY_SET)) cleanUpTaxonomyCurriculumObject(taxonomySetAsMap);
 			unitResult.setTaxonomy(taxonomySetAsMap);
 		}
  		return unitResult;

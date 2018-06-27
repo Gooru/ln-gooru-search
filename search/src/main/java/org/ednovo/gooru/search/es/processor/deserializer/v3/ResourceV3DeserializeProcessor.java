@@ -46,15 +46,11 @@ public class ResourceV3DeserializeProcessor extends DeserializeV3Processor<List<
 			float minScore = 0;
 			int lessScoreResourceCount = 0;
 			StringBuilder lessScoreResourceGooruOid = new StringBuilder();
-			if (hits.size() > 0) {
-				String configName = "S_RESOURCE_QUERY_MINSCORE_CATEGORY_" + (((Map<String, Object>) hits.get(0).get(SEARCH_SOURCE)).get(SEARCH_CATEGORY) + "").toUpperCase();
-				minScore = getCategorySettingAsFloat(configName);
-			}
-			// FIX ME enable for resource format
-			/*
-			 * if (hits.size() > 0) { String configName = "S_RESOURCE_QUERY_MINSCORE_RESOURCE_FORMAT_" + (((Map<String,Object>) hits.get(0).get("fields")).get("resourceFormat") +"").toUpperCase();
-			 * minScore = getResourceFormatSettingAsFloat(configName); }
-			 */
+
+			/*if (hits.size() > 0) {
+				String configName = "S_RESOURCE_QUERY_MINSCORE_RESOURCE_FORMAT_" + (((Map<String, Object>) hits.get(0).get("fields")).get("resourceFormat") + "").toUpperCase();
+				minScore = getResourceFormatSettingAsFloat(configName);
+			}*/
 
 			for (Map<String, Object> searchHit : hits) {
 				if (searchHit.get(IndexFields._SOURCE) == null) {
@@ -162,14 +158,6 @@ public class ResourceV3DeserializeProcessor extends DeserializeV3Processor<List<
 					resource.setEducationalUse(educationalUse);
 				}
 				
-				// moments of learning
-				if (contentFormat != null && !contentFormat.equalsIgnoreCase(SEARCH_QUESTION)) {
-					List<String> momentsOflearning = metadata.get(IndexFields.MOMENTS_OF_LEARNING);
-					if (momentsOflearning != null) {
-						resource.setMomentsOfLearning(momentsOflearning);
-					}
-				}
-				
 				// 21st century skill
 				List<String> twentyOneCenturySkills = metadata.get(IndexFields.TWENTY_ONE_CENTURY_SKILL);
 				if (twentyOneCenturySkills != null && !twentyOneCenturySkills.isEmpty()) {
@@ -211,7 +199,7 @@ public class ResourceV3DeserializeProcessor extends DeserializeV3Processor<List<
 		try {
 			resource.setCreatedAt(simpleDateFormat.parse((String) dataMap.get(IndexFields.CREATED_AT)));
 		} catch (Exception e) {
-			LOG.debug("Error while parsing date", (String) dataMap.get(IndexFields.CREATED_AT));
+			logger.debug("Error while parsing date", (String) dataMap.get(IndexFields.CREATED_AT));
 		}
 
 		Map<String, Object> statisticsMap = (Map<String, Object>) dataMap.get(IndexFields.STATISTICS);
@@ -256,6 +244,7 @@ public class ResourceV3DeserializeProcessor extends DeserializeV3Processor<List<
 					logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
 				}
 			}
+			if (!taxonomySetAsMap.containsKey(IndexFields.TAXONOMY_SET)) cleanUpTaxonomyCurriculumObject(taxonomySetAsMap);
 			resource.setTaxonomy(taxonomySetAsMap);		
 		}
 

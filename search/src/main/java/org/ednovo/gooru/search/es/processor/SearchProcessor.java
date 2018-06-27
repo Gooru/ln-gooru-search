@@ -34,8 +34,6 @@ public abstract class SearchProcessor<I extends SearchData, O extends Object> im
 
 	protected static final ObjectMapper SERIAILIZER = new ObjectMapper();
 
-	protected static final Logger LOG = LoggerFactory.getLogger(SearchProcessor.class);
-
 	private boolean isTransactional = false;
 
 	private boolean isSessionInfoRequired = false;
