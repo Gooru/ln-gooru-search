@@ -40,6 +40,6 @@ public class Scope implements Serializable {
 
 	@Override
 	public String toString() {
-		return "{key='" + getKey() + '\'' + ", targetNames='" + getTargetNames() + '\'' + '}';
+		return "{\"key\":\"" + getKey() + '\"' + ", \"targetNames\":" + getTargetNames() + '}';
 	}
 }

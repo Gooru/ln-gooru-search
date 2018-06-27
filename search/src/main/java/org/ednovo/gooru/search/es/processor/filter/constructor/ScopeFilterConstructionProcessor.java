@@ -46,7 +46,7 @@ public class ScopeFilterConstructionProcessor extends FilterConstructionProcesso
 				searchData.putFilter("&^tenant.tenantId", searchData.getUserTenantId());
 			}
 			break;
-		case "gooru-fc":
+		case "open-featured":
 			String key = "course.id";
 			if (searchData.getType().equalsIgnoreCase(TYPE_COURSE + _V3))
 				key = IndexFields.ID;
@@ -55,38 +55,36 @@ public class ScopeFilterConstructionProcessor extends FilterConstructionProcesso
 				if (!courses.isEmpty()) searchData.putFilter("&^" + key, StringUtils.join(courses, COMMA));
 			}
 			break;
-		case "library":
+		case "open-library":
 			break;
-		case "gooru":
+		case "open-all":
 			searchData.putFilter("&^publishStatus", "published");
 			break;
-		case "course":
+		case "tenant-content":
 			break;
-		case "signature-content":
+		case "subtenant-content":
+			break;
+		case "course":
 			break;
 		default:
 			LOG.info("Invalid Scope : {}", target);
 		}
 
+		if (target.contains(LIBRARY)) {
+			searchData.putFilter("&^statistics.isLibraryContent", true);
+		}
+		
 		if (SCOPE_MYCONTENT_LIBRARY_MATCH.matcher(target).matches()) {
 			searchData.putFilter("&^publishStatus", "published,unpublished");
 			if (scope.getIdList() != null && !scope.getIdList().isEmpty()) {
 				String idKey = "course.id";
-				if (target.contains(LIBRARY)) {
-					searchData.putFilter("&^statistics.isLibraryContent", true);
-					idKey = "library.id";
-				} else if (searchData.getType().equalsIgnoreCase(TYPE_COURSE + _V3) || target.equalsIgnoreCase("my-content")) {
-					idKey = IndexFields.ID;
-				}
+				if (target.contains(LIBRARY)) idKey = "library.id"; 
+				else if (searchData.getType().equalsIgnoreCase(TYPE_COURSE + _V3) || target.equalsIgnoreCase("my-content")) idKey = IndexFields.ID;
 				searchData.putFilter("&^" + idKey, StringUtils.join(scope.getIdList(), COMMA));
 			} else if (scope.getTargetNames() != null && !scope.getTargetNames().isEmpty()) {
 				String titleKey = "courseTitleLowercase";
-				if (target.contains(LIBRARY)) {
-					searchData.putFilter("&^statistics.isLibraryContent", true);
-					titleKey = "libraryShortName";
-				} else if (searchData.getType().equalsIgnoreCase(TYPE_COURSE + _V3) || target.equalsIgnoreCase("my-content")) {
-					titleKey = "titleLowercase";
-				}
+				if (target.contains(LIBRARY)) titleKey = "libraryShortName";
+				else if (searchData.getType().equalsIgnoreCase(TYPE_COURSE + _V3) || target.equalsIgnoreCase("my-content")) titleKey = "titleLowercase";
 				searchData.putFilter("&^" + titleKey, StringUtils.join(scope.getTargetNames(), COMMA));
 			}
 		}

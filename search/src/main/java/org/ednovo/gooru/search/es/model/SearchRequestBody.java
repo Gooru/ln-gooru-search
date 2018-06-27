@@ -138,11 +138,11 @@ public class SearchRequestBody implements Serializable {
 
     @Override
     public String toString() {
-        return "SearchRequestBody{" +
-                "pageSize='" + getPageSize() + '\'' +
-                ", pretty='" + getPretty() + '\'' +
-                ", scope='" + getScope().toString() + '\'' +
-                ", pageNum='" + getPageNum() + '\'' +
+        return "{" +
+                "\"pageSize\":\"" + getPageSize() + '\"' +
+                ", \"pretty\":\"" + getPretty() + '\"' +
+                ", \"scope\":" + getScope().toString() +
+                ", \"pageNum\"=\"" + getPageNum() + '\"' +
                 '}';
     }
 }

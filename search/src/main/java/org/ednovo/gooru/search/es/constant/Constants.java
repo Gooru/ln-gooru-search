@@ -553,7 +553,7 @@ public interface Constants {
     public static final String DOMAIN = "domain";
     public static final String[] START_WITH_BOOLEAN_OPERATORS = new String[] { "AND NOT ", "OR NOT ", "NOT AND ", "NOT OR ", "OR ", "AND " };
     public static final String[] END_WITH_BOOLEAN_OPERATORS = new String[] { " AND NOT", " OR NOT", " NOT AND", " NOT OR", " OR", " AND" };
-    Pattern SCOPE_MYCONTENT_LIBRARY_MATCH = Pattern.compile("my-content|tenant-library|subtenant-library|library|course|gooru-fc");
+    Pattern SCOPE_MYCONTENT_LIBRARY_MATCH = Pattern.compile("my-content|tenant-library|subtenant-library|open-library|course|open-featured");
     public static final String LIBRARY = "library";
     public static final String _V3 = "_v3";
 

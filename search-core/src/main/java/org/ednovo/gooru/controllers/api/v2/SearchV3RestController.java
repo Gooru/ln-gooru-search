@@ -240,7 +240,7 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 		if (requestBody != null) {
 			logger.info("Search Request Payload : {}", requestBody.toString());
 			searchData.setScope(requestBody.getScope());
-			searchData.setPretty(requestBody.getPretty());
+			searchData.setPretty(searchData.getPretty().equalsIgnoreCase("1") ? searchData.getPretty() : requestBody.getPretty());
 			searchData.setCrosswalk(!searchData.isCrosswalk() ? searchData.isCrosswalk() : requestBody.getIsCrosswalk());
 			searchData.setFrom(requestBody.getStartAt() > 0 ? requestBody.getStartAt() : searchData.getFrom());
 			searchData.setPageNum(requestBody.getPageNum() > 0 ? requestBody.getPageNum() : searchData.getPageNum());
