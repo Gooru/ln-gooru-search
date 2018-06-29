@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.ednovo.gooru.search.es.exception.SearchException;
 import org.ednovo.gooru.search.es.model.SearchData;
-import org.ednovo.gooru.search.es.model.SearchResponse;
+import org.ednovo.gooru.search.responses.SearchResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 

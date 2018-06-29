@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.ednovo.gooru.search.es.model.SuggestResponse;
+import org.ednovo.gooru.search.responses.SuggestResponse;
 import org.ednovo.gooru.suggest.v3.data.provider.model.CollectionDataProviderCriteria;
 import org.ednovo.gooru.suggest.v3.data.provider.model.LessonDataProviderCriteria;
 import org.ednovo.gooru.suggest.v3.data.provider.model.ResourceDataProviderCriteria;

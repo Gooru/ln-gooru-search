@@ -8,9 +8,9 @@ import java.util.Map;
 
 import org.ednovo.gooru.search.es.exception.SearchException;
 import org.ednovo.gooru.search.es.model.SearchData;
-import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.processor.SearchProcessor;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
+import org.ednovo.gooru.search.responses.SearchResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +34,7 @@ public class HitsDeserializeProcessor extends SearchProcessor<SearchData, List<M
 				response.setSearchResults((List<Map<String, Object>>) (((Map<String,Object>)result.get(SEARCH_HITS)).get(SEARCH_HITS)));
 			}
 		} catch (Exception e) {
-			LOG.error("Search Error", e);
+			logger.error("Search Error", e);
 			throw new SearchException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}

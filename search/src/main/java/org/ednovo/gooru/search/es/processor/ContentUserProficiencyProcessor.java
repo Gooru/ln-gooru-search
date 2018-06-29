@@ -3,8 +3,8 @@
  */
 package org.ednovo.gooru.search.es.processor;
 
-import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.model.SuggestData;
+import org.ednovo.gooru.search.responses.SearchResponse;
 import org.springframework.stereotype.Component;
 
 /**

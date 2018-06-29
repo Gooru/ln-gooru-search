@@ -13,9 +13,9 @@ import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.handler.SearchHandler;
 import org.ednovo.gooru.search.es.handler.SearchHandlerType;
 import org.ednovo.gooru.search.es.model.SearchData;
-import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
 import org.ednovo.gooru.search.es.service.SearchSettingService;
+import org.ednovo.gooru.search.responses.SearchResponse;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -40,14 +40,14 @@ public class TenantFilterConstructionProcessor extends FilterConstructionProcess
 		if (searchData.getFilters() != null && searchData.getFilters().containsKey(FLT_COURSE_TYPE)) {
 			setTenantDetails(searchData.getUserTenantId(), searchData);
 			if (searchData.getFeaturedCourseTenantPreference() == null && searchData.getParentTenantFCVisibility() != null) {
-				LOG.debug("Using parent tenant's FC_visibility setting");
+				logger.debug("Using parent tenant's FC_visibility setting");
 				searchData.setFeaturedCourseTenantPreference(searchData.getParentTenantFCVisibility());
 			}
 			if (searchData.getFeaturedCourseTenantPreference() == null && searchData.getParentTenantFCVisibility() == null) {
-				LOG.info("FC visibility not set for user tenant and its parent tenant, setting 'global' as default");
+				logger.info("FC visibility not set for user tenant and its parent tenant, setting 'global' as default");
 				searchData.setFeaturedCourseTenantPreference(SearchSettingService.getByName(DEFAULT_FC_VISIBILITY));
 			}
-			LOG.debug("FC visibility : {}", searchData.getFeaturedCourseTenantPreference());
+			logger.debug("FC visibility : {}", searchData.getFeaturedCourseTenantPreference());
 			if(searchData.getFeaturedCourseTenantPreference() != null) processTenantPreferenceSetting(searchData);
 		}
 	}

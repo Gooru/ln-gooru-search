@@ -5,9 +5,9 @@ package org.ednovo.gooru.search.es.processor.filter.constructor;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.model.SearchData;
-import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
 import org.ednovo.gooru.search.es.processor.util.GradeUtils;
+import org.ednovo.gooru.search.responses.SearchResponse;
 import org.springframework.stereotype.Component;
 
 /**

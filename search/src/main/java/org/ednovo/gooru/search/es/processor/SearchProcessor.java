@@ -17,8 +17,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.SearchSettingType;
 import org.ednovo.gooru.search.es.model.SearchData;
-import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.service.SearchSettingService;
+import org.ednovo.gooru.search.responses.SearchResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +33,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public abstract class SearchProcessor<I extends SearchData, O extends Object> implements Constants {
 
 	protected static final ObjectMapper SERIAILIZER = new ObjectMapper();
-
-	protected static final Logger LOG = LoggerFactory.getLogger(SearchProcessor.class);
 
 	private boolean isTransactional = false;
 

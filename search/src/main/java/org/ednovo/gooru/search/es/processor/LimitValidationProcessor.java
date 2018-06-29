@@ -8,11 +8,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.ednovo.gooru.search.es.model.SearchData;
-import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.model.SessionContextSupport;
 import org.ednovo.gooru.search.es.processor.util.JsonDeserializer;
 import org.ednovo.gooru.search.es.processor.util.JsonSerializer;
 import org.ednovo.gooru.search.es.service.RedisClient;
+import org.ednovo.gooru.search.responses.SearchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;

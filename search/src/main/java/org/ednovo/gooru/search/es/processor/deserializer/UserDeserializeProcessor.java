@@ -8,9 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.ednovo.gooru.search.domain.service.UserSearchResult;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
+import org.ednovo.gooru.search.responses.UserSearchResult;
 import org.springframework.stereotype.Component;
 
 /**

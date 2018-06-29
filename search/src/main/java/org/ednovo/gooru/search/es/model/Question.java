@@ -2,6 +2,8 @@ package org.ednovo.gooru.search.es.model;
 
 import java.util.Set;
 
+import org.ednovo.gooru.search.responses.ContentSearchResult;
+
 public class Question extends ContentSearchResult {
 	
 	private static final long serialVersionUID = -5780952748437855414L;

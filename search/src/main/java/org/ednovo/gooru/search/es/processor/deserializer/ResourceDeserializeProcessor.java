@@ -14,13 +14,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.constant.SearchFilterConstants;
 import org.ednovo.gooru.search.es.model.Answer;
-import org.ednovo.gooru.search.es.model.ContentSearchResult;
 import org.ednovo.gooru.search.es.model.Hint;
 import org.ednovo.gooru.search.es.model.MapWrapper;
 import org.ednovo.gooru.search.es.model.Question;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.User;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
+import org.ednovo.gooru.search.responses.ContentSearchResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -248,7 +248,7 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 		try {
 			resource.setAddDate(simpleDateFormat.parse((String) dataMap.get(IndexFields.CREATED_AT)));
 		} catch (Exception e) {
-			LOG.debug("Error while parsing date", (String) dataMap.get(IndexFields.CREATED_AT));
+			logger.debug("Error while parsing date", (String) dataMap.get(IndexFields.CREATED_AT));
 		}
 
 		Map<String, Object> statisticsMap = (Map<String, Object>) dataMap.get(IndexFields.STATISTICS);

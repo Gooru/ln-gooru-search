@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.ednovo.gooru.search.domain.service.LessonSearchResult;
 import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.UserV2;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
+import org.ednovo.gooru.search.responses.LessonSearchResult;
 import org.springframework.stereotype.Component;
 /**
  * @author Renuka

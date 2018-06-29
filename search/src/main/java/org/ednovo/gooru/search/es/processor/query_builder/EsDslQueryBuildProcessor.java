@@ -15,11 +15,11 @@ import org.ednovo.gooru.search.es.filter.Query;
 import org.ednovo.gooru.search.es.filter.QueryString;
 import org.ednovo.gooru.search.es.model.MapWrapper;
 import org.ednovo.gooru.search.es.model.SearchData;
-import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.processor.SearchProcessor;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
 import org.ednovo.gooru.search.es.processor.util.FilterBuilderUtils;
 import org.ednovo.gooru.search.es.service.SearchSettingService;
+import org.ednovo.gooru.search.responses.SearchResponse;
 import org.springframework.stereotype.Component;
 
 /**

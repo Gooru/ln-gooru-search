@@ -18,4 +18,6 @@ public interface AuthResponseHolder {
 	JSONObject getTenant() throws JSONException;
 
 	String getPartnerId() throws JSONException;
+
+	String getUserCDN() throws JSONException;
 }

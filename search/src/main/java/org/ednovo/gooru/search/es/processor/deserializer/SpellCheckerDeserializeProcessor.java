@@ -6,9 +6,9 @@ import java.util.Map;
 
 import org.ednovo.gooru.search.es.constant.SearchSettingType;
 import org.ednovo.gooru.search.es.model.SearchData;
-import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.processor.SearchProcessor;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
+import org.ednovo.gooru.search.responses.SearchResponse;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -27,7 +27,7 @@ public class SpellCheckerDeserializeProcessor extends SearchProcessor<SearchData
     try {
       Double scoreThreshold = getScoreThreshold();
       Integer frequencyThreshold = getFrequencyThreshold();
-      LOG.info("SpellChecker deserializer processor, score threshold=" + scoreThreshold.toString() + ", frequency threshold=" + frequencyThreshold.toString());
+      logger.info("SpellChecker deserializer processor, score threshold=" + scoreThreshold.toString() + ", frequency threshold=" + frequencyThreshold.toString());
       result = SERIAILIZER.readValue(searchData.getSearchResultText(), new TypeReference<Map<String, Object>>() { });
       Map suggest = (Map) result.get(SUGGEST);
       if (suggest != null) {
@@ -62,7 +62,7 @@ public class SpellCheckerDeserializeProcessor extends SearchProcessor<SearchData
         }
       }
     } catch (Exception e) {
-      LOG.error("SpellChecker deserializer processor encountered an exception ", e);
+    	logger.error("SpellChecker deserializer processor encountered an exception ", e);
     }
 
   }
@@ -73,7 +73,7 @@ public class SpellCheckerDeserializeProcessor extends SearchProcessor<SearchData
       String scoreThresholdString = getSetting(SearchSettingType.S_RESOURCE_QUERY_SPELLCHECKER_SCORE_THRESHOLD);
       scoreThreshold = Double.valueOf(scoreThresholdString);
     } catch (Exception e) {
-      LOG.error("SpellChecker deserializer processor encountered an exception while parsing score threshold ", e);
+    	logger.error("SpellChecker deserializer processor encountered an exception while parsing score threshold ", e);
     }
     return scoreThreshold;
   }
@@ -84,7 +84,7 @@ public class SpellCheckerDeserializeProcessor extends SearchProcessor<SearchData
       String frequencyThresholdString = getSetting(SearchSettingType.S_RESOURCE_QUERY_SPELLCHECKER_FREQ_THRESHOLD);
       frequencyThreshold = Integer.valueOf(frequencyThresholdString);
     } catch (Exception e) {
-      LOG.error("SpellChecker deserializer processor encountered an exception while parsing frequency threshold ", e);
+    	logger.error("SpellChecker deserializer processor encountered an exception while parsing frequency threshold ", e);
     }
     return frequencyThreshold;
   }
@@ -97,7 +97,7 @@ public class SpellCheckerDeserializeProcessor extends SearchProcessor<SearchData
         topOptionText = topOptionText.replaceAll("[^a-zA-Z0-9]", "");
       }
     } catch (Exception e) {
-      LOG.error("SpellChecker deserializer processor encountered an exception while removing special chars", e);
+    	logger.error("SpellChecker deserializer processor encountered an exception while removing special chars", e);
     }
     return topOptionText;
   }

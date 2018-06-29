@@ -386,6 +386,7 @@ public interface Constants {
 	public static final String FLT_PUBLISHER_QUALITY_INDICATOR = "&^statistics.publisherQualityIndicator";
 
 	public static final String CONTENT_CDN_URL = "contentCDN";
+	public static final String USER_CDN_URL = "userCDN";
 	public static final String USER_PREFERENCES = "userPreferences";
 
 	public static final String SEARCH_REQ_20 = "2.0";
@@ -550,7 +551,11 @@ public interface Constants {
 	public static final String COLLECTIONS = "collections";
 	public static final String ASSESSMENTS = "assessments";
 	public static final String RESOURCES = "resources";
-	public static final String DOMAIN = "domain";
-	public static final String[] START_WITH_BOOLEAN_OPERATORS = new String[] { "AND NOT ", "OR NOT ", "NOT AND ", "NOT OR ", "OR ", "AND " };
-	public static final String[] END_WITH_BOOLEAN_OPERATORS = new String[] { " AND NOT", " OR NOT", " NOT AND", " NOT OR", " OR", " AND" };
+    public static final String DOMAIN = "domain";
+    public static final String[] START_WITH_BOOLEAN_OPERATORS = new String[] { "AND NOT ", "OR NOT ", "NOT AND ", "NOT OR ", "OR ", "AND " };
+    public static final String[] END_WITH_BOOLEAN_OPERATORS = new String[] { " AND NOT", " OR NOT", " NOT AND", " NOT OR", " OR", " AND" };
+    Pattern SCOPE_MYCONTENT_LIBRARY_MATCH = Pattern.compile("my-content|tenant-library|subtenant-library|open-library|course|open-featured");
+    public static final String LIBRARY = "library";
+    public static final String _V3 = "_v3";
+    public static final String HOT_SPOT_IMAGE_QUESTION = "hot_spot_image_question";
 }

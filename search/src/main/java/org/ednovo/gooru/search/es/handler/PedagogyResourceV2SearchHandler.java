@@ -13,6 +13,7 @@ import static org.ednovo.gooru.search.es.processor.SearchProcessorType.LimitVali
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.PedagogyResourceDeserializer;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.ResourceEsDslQueryBuild;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.ResourceFilterConstruction;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.ScopeFilterConstruction;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.SubjectFacetFilter;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.TaxonomyQueryExpansion;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.TenantFilterConstruction;
@@ -32,7 +33,7 @@ import org.springframework.stereotype.Component;
 public class PedagogyResourceV2SearchHandler extends SearchHandler<SearchData, Map<String, Object>> {
 
 	private static final SearchProcessorType[][] searchProcessorTypes = new SearchProcessorType[][] { { BlackListQueryValidation }, { FilterDetection }, { LimitValidation },
-			{ TaxonomyQueryExpansion }, { DictionaryQueryExpansion }, { TenantFilterConstruction }, { ResourceFilterConstruction }, { SubjectFacetFilter }, { ResourceEsDslQueryBuild },
+			{ TaxonomyQueryExpansion }, { DictionaryQueryExpansion }, { TenantFilterConstruction }, { ScopeFilterConstruction }, { ResourceFilterConstruction }, { SubjectFacetFilter }, { ResourceEsDslQueryBuild },
 			{ EsSuggestDslQueryBuild }, { FacetFilterConstruction }, { Elasticsearch }, { PedagogyResourceDeserializer } };
 
 	@Override

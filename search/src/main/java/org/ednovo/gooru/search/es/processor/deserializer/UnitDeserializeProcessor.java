@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.ednovo.gooru.search.domain.service.UnitSearchResult;
 import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.UserV2;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
+import org.ednovo.gooru.search.responses.UnitSearchResult;
 import org.springframework.stereotype.Component;
 /**
  * @author Renuka
@@ -87,7 +87,7 @@ public class UnitDeserializeProcessor extends DeserializeProcessor<List<UnitSear
 
 		// set original creator 
 		if(model.get(IndexFields.ORIGINAL_CREATOR) != null){
-			unitResult.setOrginalCreator(setUser((Map<String, Object>) model.get(IndexFields.ORIGINAL_CREATOR)));
+			unitResult.setOriginalCreator(setUser((Map<String, Object>) model.get(IndexFields.ORIGINAL_CREATOR)));
 		}
 
 		// set taxonomy

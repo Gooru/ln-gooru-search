@@ -18,6 +18,7 @@ class AuthPrefsMessageBusJsonResponseHolder implements AuthPrefsResponseHolder {
 	public static final String MSG_APP_ID = "app_id";
 	public static final String MSG_CDN_URLS = "cdn_urls";
 	public static final String MSG_CONTENT_CDN_URL = "content_cdn_url";
+	public static final String MSG_USER_CDN_URL = "user_cdn_url";
 	public static final String MSG_TENANT = "tenant";
 	private static final String MSG_PARTNER_ID = "partner_id";
 
@@ -80,6 +81,16 @@ class AuthPrefsMessageBusJsonResponseHolder implements AuthPrefsResponseHolder {
 			contentCDNURL = json.getString(MSG_CONTENT_CDN_URL);
 		}
 		return contentCDNURL;
+	}
+	
+	@Override
+	public String getUserCDN() throws JSONException {
+		String userCDNURL = null;
+		JSONObject json = message.getJSONObject(MSG_CDN_URLS);
+		if (json != null) {
+			userCDNURL = json.getString(MSG_USER_CDN_URL);
+		}
+		return userCDNURL;
 	}
 
 	@Override

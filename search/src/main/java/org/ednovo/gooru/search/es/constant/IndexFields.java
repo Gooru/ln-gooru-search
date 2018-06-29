@@ -78,6 +78,7 @@ public class IndexFields {
 	public static final String COPYRIGHT_OWNER_LIST = "copyrightOwnerList";
 	public static final String TWENTY_ONE_CENTURY_SKILL = "21CenturySkills";
 	public static final String PREREQUISITES = "prerequisites";
+	public static final String LANGUAGE = "language";
 
 	// course fields 
 	public static final String COURSE_REMIXCOUNT = "courseRemixCount";

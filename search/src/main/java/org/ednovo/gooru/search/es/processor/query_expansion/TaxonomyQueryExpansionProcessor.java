@@ -12,9 +12,9 @@ import org.ednovo.gooru.search.es.filter.MultiMatchQuery;
 import org.ednovo.gooru.search.es.handler.SearchHandler;
 import org.ednovo.gooru.search.es.handler.SearchHandlerType;
 import org.ednovo.gooru.search.es.model.SearchData;
-import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.processor.SearchProcessor;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
+import org.ednovo.gooru.search.responses.SearchResponse;
 import org.springframework.stereotype.Component;
 
 /**

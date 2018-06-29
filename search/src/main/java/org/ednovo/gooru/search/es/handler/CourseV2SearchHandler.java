@@ -4,6 +4,7 @@ import static org.ednovo.gooru.search.es.processor.SearchProcessorType.BlackList
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.Elasticsearch;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.EsDslQueryBuild;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.LimitValidation;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.ScopeFilterConstruction;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.TenantFilterConstruction;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.CourseDeserializeProcessor;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.CourseFilterConstruction;
@@ -20,7 +21,7 @@ import org.springframework.stereotype.Component;
 public class CourseV2SearchHandler extends SearchHandler<SearchData, Map<String, Object>> {
 
 	private static final SearchProcessorType[][] searchProcessorTypes = new SearchProcessorType[][] { { BlackListQueryValidation }, { LimitValidation }, { DictionaryQueryExpansion },
-			{ TenantFilterConstruction }, { CourseFilterConstruction }, { EsDslQueryBuild }, { Elasticsearch }, { CourseDeserializeProcessor } };
+			{ TenantFilterConstruction }, { ScopeFilterConstruction }, { CourseFilterConstruction }, { EsDslQueryBuild }, { Elasticsearch }, { CourseDeserializeProcessor } };
 
 	@Override
 	protected SearchProcessorType[][] getProcessorTypeChain() {
