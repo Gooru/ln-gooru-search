@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import org.ednovo.gooru.search.es.model.UserV2;
 import org.ednovo.gooru.search.responses.SearchResult;
 
 public class LessonSearchResult extends SearchResult implements Serializable {
@@ -20,11 +19,11 @@ public class LessonSearchResult extends SearchResult implements Serializable {
 
 	private String lastModifiedBy;
 
-	private UserV2 creator;
+	private UserV3 creator;
 
-	private UserV2 owner;
+	private UserV3 owner;
 
-	private UserV2 originalCreator;
+	private UserV3 originalCreator;
 	
 	private String contentFormat;
 
@@ -72,27 +71,27 @@ public class LessonSearchResult extends SearchResult implements Serializable {
 		this.lastModifiedBy = lastModifiedBy;
 	}
 
-	public UserV2 getCreator() {
+	public UserV3 getCreator() {
 		return creator;
 	}
 
-	public void setCreator(UserV2 creator) {
+	public void setCreator(UserV3 creator) {
 		this.creator = creator;
 	}
 
-	public UserV2 getOwner() {
+	public UserV3 getOwner() {
 		return owner;
 	}
 
-	public void setOwner(UserV2 owner) {
+	public void setOwner(UserV3 owner) {
 		this.owner = owner;
 	}
 
-	public UserV2 getOriginalCreator() {
+	public UserV3 getOriginalCreator() {
 		return originalCreator;
 	}
 
-	public void setOriginalCreator(UserV2 originalCreator) {
+	public void setOriginalCreator(UserV3 originalCreator) {
 		this.originalCreator = originalCreator;
 	}
 	

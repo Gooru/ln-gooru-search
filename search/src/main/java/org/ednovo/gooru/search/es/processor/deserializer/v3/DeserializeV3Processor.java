@@ -3,7 +3,6 @@
  */
 package org.ednovo.gooru.search.es.processor.deserializer.v3;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,12 +14,10 @@ import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.exception.SearchException;
 import org.ednovo.gooru.search.es.handler.SearchHandler;
 import org.ednovo.gooru.search.es.handler.SearchHandlerType;
-import org.ednovo.gooru.search.es.model.Code;
 import org.ednovo.gooru.search.es.model.SearchData;
-import org.ednovo.gooru.search.es.model.UserV2;
 import org.ednovo.gooru.search.es.processor.SearchProcessor;
 import org.ednovo.gooru.search.responses.SearchResponse;
-import org.ednovo.gooru.search.responses.SearchResult;
+import org.ednovo.gooru.search.responses.v3.UserV3;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
@@ -45,28 +42,20 @@ public abstract class DeserializeV3Processor<O, S> extends SearchProcessor<Searc
 			Map<String, Object> responseAsMap = (Map<String, Object>) SERIAILIZER.readValue(searchData.getSearchResultText(),
 					new TypeReference<Map<String, Object>>() {});
 			O searchResult = deserialize(responseAsMap, searchData, null);
-			if(!searchData.isAggregationRequest()) response.setSearchResults(searchResult);			
+			if(!searchData.isAggregationRequest()) response.setResults(searchResult);			
 			if (responseAsMap.get(SEARCH_HITS) != null) {
 				Map<String, Object> hit = (Map<String, Object>) responseAsMap.get(SEARCH_HITS);
 				if (((List<Map<String, Object>>) (hit).get(SEARCH_HITS)) != null) {
 					List<Map<String, Object>> hits = (List<Map<String, Object>>) (hit).get(SEARCH_HITS);
 					Map<String, Object> stats = new HashMap<String, Object>(3);
-					stats.put("totalHitCount", ((Integer) hit.get(SEARCH_TOTAL)).longValue());
+					stats.put("total", ((Integer) hit.get(SEARCH_TOTAL)).longValue());
 					if (!searchData.isAggregationRequest()) {
-						stats.put("pageSize", searchData.getSize());
-						stats.put("pageNumber", searchData.getPageNum());
-						stats.put("resultCount", hits.size());
+						stats.put("max", searchData.getSize());
+						stats.put("offset", searchData.getFrom());
+						stats.put("count", hits.size());
 					}
 					response.setStats(stats);
-
-					Map<String, Object> query = new HashMap<String, Object>(4);
-					query.put("userQueryString", searchData.getUserQueryString());
-					query.put("rewrittenQueryString", searchData.getQueryString());
-					if (searchData.getSpellCheckQueryString() != null && !searchData.getSpellCheckQueryString().isEmpty()) {
-						query.put("current", searchData.getSpellCheckQueryString());
-						query.put("rewriteType", SPELLCHECKER);
-					}
-					response.setQuery(query);
+					response.setQuery(searchData.getUserQueryString());
 				}
 			} 
 		   	if (searchData.isAggregationRequest() && responseAsMap.get("aggregations") != null) {
@@ -110,6 +99,22 @@ public abstract class DeserializeV3Processor<O, S> extends SearchProcessor<Searc
 	}
 
 	@SuppressWarnings("unchecked")
+	protected List<Map<String, Object>> searchCrosswalk(SearchData input, List<String> leafInternalCodes) {
+		List<Map<String, Object>> searchResponse = null;
+		SearchData crosswalkRequest = new SearchData();
+		crosswalkRequest.setPretty(input.getPretty());
+		crosswalkRequest.setIndexType(EsIndex.CROSSWALK);
+		crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CROSSWALK_CODES + DOT + IndexFields.ID, (StringUtils.join(leafInternalCodes,",")));
+		crosswalkRequest.setQueryString(STAR);
+		try {
+			searchResponse = (List<Map<String, Object>>) SearchHandler.getSearcher(SearchHandlerType.CROSSWALK.name()).search(crosswalkRequest).getSearchResults();
+		} catch (Exception e) { 
+			logger.error("No matching crosswalk for codes : {} : Exception : {}", leafInternalCodes, e.getMessage());
+		}
+		return searchResponse;
+	}
+
+	@SuppressWarnings("unchecked")
 	protected List<Map<String, String>> deserializeCrosswalkResponse(List<Map<String, Object>> crosswalkResponses, String id, List<Map<String, String>> crosswalkResult) {
 		if (crosswalkResponses != null && !crosswalkResponses.isEmpty()) {
 			for (Map<String, Object> response : crosswalkResponses) {
@@ -141,15 +146,15 @@ public abstract class DeserializeV3Processor<O, S> extends SearchProcessor<Searc
 							if (!crosswalk.get(IndexFields.FRAMEWORK_CODE).equalsIgnoreCase(framework)) {
 								continue;
 							}
-							crosswalk.put(LEAF_INTERNAL_CODE, internalCode);
-							crosswalk.put(IndexFields.PARENT_TITLE, codeAsMap.get(IndexFields.PARENT_TITLE));
 							String crosswalkId = crosswalk.get(IndexFields.ID);
 							crosswalk.remove(IndexFields.ID);
+							if(crosswalk.containsKey(IndexFields.PARENT_TITLE)) crosswalk.remove(IndexFields.PARENT_TITLE);
 							finalConvertedMap.put(crosswalkId, crosswalk);
 						}
 					} else if (internalCode.startsWith(framework + DOT)) {
 						String codeId = codeAsMap.get(IndexFields.ID);
 						codeAsMap.remove(IndexFields.ID);
+						if(codeAsMap.containsKey(IndexFields.PARENT_TITLE)) codeAsMap.remove(IndexFields.PARENT_TITLE);
 						finalConvertedMap.put(codeId, codeAsMap);
 					}
 				}
@@ -158,7 +163,23 @@ public abstract class DeserializeV3Processor<O, S> extends SearchProcessor<Searc
 			logger.error("JsonException during taxonomy tranformation!", e.getMessage());
 		}
 	}
+	
+	private String getSubjectFromCodeId(String codeId) {
+		return codeId.contains(HYPHEN) ? codeId.substring((codeId.indexOf(DOT) + 1), codeId.indexOf(HYPHEN)) : null;
+	}
 
+	protected UserV3 setUser(Map<String, Object> userData, SearchData input){
+		UserV3 user = null;
+		if (userData != null && !userData.isEmpty()) {
+			user = new UserV3();
+			user.setFirstName((String) userData.get(IndexFields.FIRST_NAME));
+			user.setLastName((String) userData.get(IndexFields.LAST_NAME));
+			user.setUsername((String) userData.get(IndexFields.USERNAME));
+			if (userData.get(IndexFields.PROFILE_IMAGE) != null) user.setProfileImageUrl("http:" + input.getUserCdnUrl() + (String) userData.get(IndexFields.PROFILE_IMAGE));
+		}
+		return user;
+	}
+	
 	@SuppressWarnings("unchecked")
 	protected void cleanUpTaxonomyCurriculumObject(Map<String, Object> taxonomySetAsMap) {
 		Map<String, Object> curriculumAsMap = ((Map<String, Object>) taxonomySetAsMap.get(IndexFields.CURRICULUM));
@@ -176,88 +197,5 @@ public abstract class DeserializeV3Processor<O, S> extends SearchProcessor<Searc
 			taxonomySetAsMap.put(IndexFields.TAXONOMY_SET, finalConvertedMap);
 			curriculumAsMap.remove(IndexFields.CURRICULUM_INFO);
 		}
-	}
-	
-	@SuppressWarnings("unchecked")
-	protected List<Map<String, Object>> searchCrosswalk(SearchData input, List<String> leafInternalCodes) {
-		List<Map<String, Object>> searchResponse = null;
-		SearchData crosswalkRequest = new SearchData();
-		crosswalkRequest.setPretty(input.getPretty());
-		crosswalkRequest.setIndexType(EsIndex.CROSSWALK);
-		crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CROSSWALK_CODES + DOT + IndexFields.ID, (StringUtils.join(leafInternalCodes,",")));
-		crosswalkRequest.setQueryString(STAR);
-		try {
-			searchResponse = (List<Map<String, Object>>) SearchHandler.getSearcher(SearchHandlerType.CROSSWALK.name()).search(crosswalkRequest).getSearchResults();
-		} catch (Exception e) { 
-			logger.error("No matching crosswalk for codes : {} : Exception : {}", leafInternalCodes, e.getMessage());
-		}
-		return searchResponse;
-	}
-
-	private String getSubjectFromCodeId(String codeId) {
-		return codeId.contains(HYPHEN) ? codeId.substring((codeId.indexOf(DOT) + 1), codeId.indexOf(HYPHEN)) : null;
-	}
-
-	@SuppressWarnings("unchecked")
-	protected void setCrosswalkData(SearchData input, SearchResult resource, Map<String, Object> taxonomyMap) {
-		String fltStandard = null;
-		String fltStandardDisplay = null;
-		if(input.getFilters().containsKey(AMPERSAND_EQ_INTERNAL_CODE)) fltStandard = input.getFilters().get(AMPERSAND_EQ_INTERNAL_CODE).toString();
-		if(input.getFilters().containsKey(AMPERSAND_EQ_DISPLAY_CODE)) fltStandardDisplay = input.getFilters().get(AMPERSAND_EQ_DISPLAY_CODE).toString();
-		Boolean isCrosswalked = false;
-		List<String> leafInternalCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_INTERNAL_CODES);
-		List<String> leafDisplayCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_DISPLAY_CODES);
-		List<Map<String, Object>> equivalentCompetencies = new ArrayList<>();
-		fetchCrosswalks(input, leafInternalCodes, equivalentCompetencies);
-	
-		if (!(leafInternalCodes != null && leafInternalCodes.size() > 0 && fltStandard != null && leafInternalCodes.contains(fltStandard.toUpperCase()))
-				&& !(leafDisplayCodes != null && leafDisplayCodes.size() > 0 && fltStandardDisplay != null && leafDisplayCodes.contains(fltStandardDisplay.toUpperCase()))) {
-			isCrosswalked = true;
-		}
-		resource.setIsCrosswalked(isCrosswalked);
-		if (equivalentCompetencies.size() > 0) resource.setTaxonomyEquivalentCompetencies(equivalentCompetencies);
-	}
-
-	protected void fetchCrosswalks(SearchData input, List<String> leafInternalCodes, List<Map<String, Object>> equivalentCompetencies) {
-		List<Map<String, Object>> crosswalkResponses = searchCrosswalk(input, leafInternalCodes);
-		if (crosswalkResponses != null && !crosswalkResponses.isEmpty()) {
-			leafInternalCodes.forEach(leafInternalCode -> {
-				Map<String, Object> crosswalksAsMap = new HashMap<>();
-				crosswalksAsMap.put(IndexFields.ID, leafInternalCode);
-				List<Map<String, String>> crosswalkCodes = null;
-				crosswalkCodes = deserializeCrosswalkResponse(crosswalkResponses, leafInternalCode, crosswalkCodes);
-				crosswalksAsMap.put(IndexFields.CROSSWALK_CODES, crosswalkCodes);
-				if (crosswalkCodes != null && crosswalkCodes.size() > 0) equivalentCompetencies.add(crosswalksAsMap);
-			});
-		}
-	}
-	
-	@SuppressWarnings("unchecked")
-	protected String getTaxonomyMetadataLabel(List<Code> taxonomyMetadatas) {
-		if (taxonomyMetadatas != null) {
-			String label = "";
-			for (int i = 0; i < taxonomyMetadatas.size(); i++) {
-				if (label.length() > 0) {
-					label += ",";
-				}
-				Map<String, String> taxonomyMetadata = (Map<String, String>) taxonomyMetadatas.get(i);
-				label += taxonomyMetadata.get(IndexFields.LABEL);
-			}
-			return label;
-		}
-		return null;
-	}
-
-	protected UserV2 setUser(Map<String, Object> userData){
-		UserV2 user = null;
-		if (userData != null && !userData.isEmpty()) {
-			user = new UserV2();
-			user.setFirstname((String) userData.get(IndexFields.FIRST_NAME));
-			user.setLastname((String) userData.get(IndexFields.LAST_NAME));
-			user.setUsernameDisplay((String) userData.get(IndexFields.USERNAME));
-			user.setId((String) userData.get(IndexFields.USER_ID));
-			user.setProfileImage((String) userData.get(IndexFields.PROFILE_IMAGE));
-		}
-		return user;
 	}
 }

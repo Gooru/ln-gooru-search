@@ -30,7 +30,7 @@ public class MapDeserializeProcessor extends SearchProcessor<SearchData, Map<Str
 			response.setSearchResults((Map<String, Object>) SERIAILIZER.readValue(searchData.getSearchResultText(), new TypeReference<Map<String, Object>>() {
 			}));
 		} catch (Exception e) {
-			LOG.error("Search Error", e);
+			logger.error("Search Error", e);
 			throw new SearchException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}

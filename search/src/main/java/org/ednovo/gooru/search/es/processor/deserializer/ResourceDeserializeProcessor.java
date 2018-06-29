@@ -248,7 +248,7 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 		try {
 			resource.setAddDate(simpleDateFormat.parse((String) dataMap.get(IndexFields.CREATED_AT)));
 		} catch (Exception e) {
-			LOG.debug("Error while parsing date", (String) dataMap.get(IndexFields.CREATED_AT));
+			logger.debug("Error while parsing date", (String) dataMap.get(IndexFields.CREATED_AT));
 		}
 
 		Map<String, Object> statisticsMap = (Map<String, Object>) dataMap.get(IndexFields.STATISTICS);

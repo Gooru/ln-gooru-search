@@ -75,31 +75,27 @@ public class UnitV3DeserializeProcessor extends DeserializeV3Processor<List<Unit
 		
 		// set creator
 		if(model.get(IndexFields.CREATOR) != null){
-			unitResult.setCreator(setUser((Map<String, Object>) model.get(IndexFields.CREATOR)));
+			unitResult.setCreator(setUser((Map<String, Object>) model.get(IndexFields.CREATOR), input));
 		}
 
 		// set owner
 		if(model.get(IndexFields.OWNER) != null){
-			unitResult.setOwner(setUser((Map<String, Object>) model.get(IndexFields.OWNER)));
+			unitResult.setOwner(setUser((Map<String, Object>) model.get(IndexFields.OWNER), input));
 		}
 
 		// set original creator 
 		if(model.get(IndexFields.ORIGINAL_CREATOR) != null){
-			unitResult.setOrginalCreator(setUser((Map<String, Object>) model.get(IndexFields.ORIGINAL_CREATOR)));
+			unitResult.setOriginalCreator(setUser((Map<String, Object>) model.get(IndexFields.ORIGINAL_CREATOR), input));
 		}
 
 		// set taxonomy
 		Map<String, Object> taxonomyMap = (Map<String, Object>) model.get(IndexFields.TAXONOMY);
 		if (taxonomyMap != null) {
 			Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
-			if (input.isCrosswalk()) {
-				if (input.getTaxFilterType() != null && TAX_FILTERS.matcher(input.getTaxFilterType()).matches()) {
-					setCrosswalkData(input, unitResult, taxonomyMap);
-				} else if (input.getUserTaxonomyPreference() != null) {
-					long start = System.currentTimeMillis();
-					taxonomySetAsMap = transformTaxonomy(taxonomyMap, input);
-					logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
-				}
+			if (input.isCrosswalk() && input.getUserTaxonomyPreference() != null) {
+				long start = System.currentTimeMillis();
+				taxonomySetAsMap = transformTaxonomy(taxonomyMap, input);
+				logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
 			}
 			if (!taxonomySetAsMap.containsKey(IndexFields.TAXONOMY_SET)) cleanUpTaxonomyCurriculumObject(taxonomySetAsMap);
 			unitResult.setTaxonomy(taxonomySetAsMap);

@@ -69,7 +69,7 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 						query.put("current", searchData.getSpellCheckQueryString());
 						query.put("rewriteType", SPELLCHECKER);
 					}
-					response.setQuery(query);
+					response.setSearchQuery(query);
 
 					// response.setSpellCheckQueryString(searchData.getSpellCheckQueryString());
 				}

@@ -79,31 +79,27 @@ public class LessonV3DeserializeProcessor extends DeserializeV3Processor<List<Le
 
 		// set creator
 		if(model.get(IndexFields.CREATOR) != null){
-			lessonResult.setCreator(setUser((Map<String, Object>) model.get(IndexFields.CREATOR)));
+			lessonResult.setCreator(setUser((Map<String, Object>) model.get(IndexFields.CREATOR), input));
 		}
 
 		// set owner
 		if(model.get(IndexFields.OWNER) != null){
-			lessonResult.setOwner(setUser((Map<String, Object>) model.get(IndexFields.OWNER)));
+			lessonResult.setOwner(setUser((Map<String, Object>) model.get(IndexFields.OWNER), input));
 		}
 
 		// set original creator 
 		if(model.get(IndexFields.ORIGINAL_CREATOR) != null){
-			lessonResult.setOriginalCreator(setUser((Map<String, Object>) model.get(IndexFields.ORIGINAL_CREATOR)));
+			lessonResult.setOriginalCreator(setUser((Map<String, Object>) model.get(IndexFields.ORIGINAL_CREATOR), input));
 		}
 
 		// set taxonomy
 		Map<String, Object> taxonomyMap = (Map<String, Object>) model.get(IndexFields.TAXONOMY);
 		if (taxonomyMap != null) {
 			Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
-			if (input.isCrosswalk()) {
-				if (input.getTaxFilterType() != null && TAX_FILTERS.matcher(input.getTaxFilterType()).matches()) {
-					setCrosswalkData(input, lessonResult, taxonomyMap);
-				} else if (input.getUserTaxonomyPreference() != null) {
-					long start = System.currentTimeMillis();
-					taxonomySetAsMap = transformTaxonomy(taxonomyMap, input);
-					logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
-				}
+			if (input.isCrosswalk() && input.getUserTaxonomyPreference() != null) {
+				long start = System.currentTimeMillis();
+				taxonomySetAsMap = transformTaxonomy(taxonomyMap, input);
+				logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
 			}
 			if (!taxonomySetAsMap.containsKey(IndexFields.TAXONOMY_SET)) cleanUpTaxonomyCurriculumObject(taxonomySetAsMap);
 			lessonResult.setTaxonomy(taxonomySetAsMap);

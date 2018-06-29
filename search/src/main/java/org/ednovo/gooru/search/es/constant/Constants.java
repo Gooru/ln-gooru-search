@@ -386,6 +386,7 @@ public interface Constants {
 	public static final String FLT_PUBLISHER_QUALITY_INDICATOR = "&^statistics.publisherQualityIndicator";
 
 	public static final String CONTENT_CDN_URL = "contentCDN";
+	public static final String USER_CDN_URL = "userCDN";
 	public static final String USER_PREFERENCES = "userPreferences";
 
 	public static final String SEARCH_REQ_20 = "2.0";
@@ -556,5 +557,5 @@ public interface Constants {
     Pattern SCOPE_MYCONTENT_LIBRARY_MATCH = Pattern.compile("my-content|tenant-library|subtenant-library|open-library|course|open-featured");
     public static final String LIBRARY = "library";
     public static final String _V3 = "_v3";
-
+    public static final String HOT_SPOT_IMAGE_QUESTION = "hot_spot_image_question";
 }

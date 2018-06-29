@@ -37,7 +37,7 @@ public class MultiResourceSearchProcesssor extends SearchProcessor<SearchData, O
 			searchData.setSearchResultText(responseRep.getText());
 			
 		} catch (Exception e) {
-			LOG.error("Search Error", e);
+			logger.error("Search Error", e);
 			throw new SearchException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}

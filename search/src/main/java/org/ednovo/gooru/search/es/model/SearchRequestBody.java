@@ -141,7 +141,7 @@ public class SearchRequestBody implements Serializable {
         return "{" +
                 "\"pageSize\":\"" + getPageSize() + '\"' +
                 ", \"pretty\":\"" + getPretty() + '\"' +
-                ", \"scope\":" + getScope().toString() +
+                ", \"scope\":" + (getScope() != null ? getScope().toString() : "\"null\"") +
                 ", \"pageNum\"=\"" + getPageNum() + '\"' +
                 '}';
     }

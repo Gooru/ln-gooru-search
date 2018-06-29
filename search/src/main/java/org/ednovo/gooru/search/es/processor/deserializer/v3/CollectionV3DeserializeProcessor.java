@@ -87,18 +87,18 @@ public class CollectionV3DeserializeProcessor extends DeserializeV3Processor<Lis
 		}
 		
 		// set creator
-		if(model.get(IndexFields.CREATOR) != null){
-			output.setCreator(setUser((Map<String, Object>) model.get(IndexFields.CREATOR)));
+		if (model.get(IndexFields.CREATOR) != null) {
+			output.setCreator(setUser((Map<String, Object>) model.get(IndexFields.CREATOR), searchData));
 		}
 
 		// set owner
-		if(model.get(IndexFields.OWNER) != null){
-			output.setOwner(setUser((Map<String, Object>) model.get(IndexFields.OWNER)));
+		if (model.get(IndexFields.OWNER) != null) {
+			output.setOwner(setUser((Map<String, Object>) model.get(IndexFields.OWNER), searchData));
 		}
 
 		// set original creator 
-		if(model.get(IndexFields.ORIGINAL_CREATOR) != null){
-			output.setOriginalCreator(setUser((Map<String, Object>) model.get(IndexFields.ORIGINAL_CREATOR)));
+		if (model.get(IndexFields.ORIGINAL_CREATOR) != null) {
+			output.setOriginalCreator(setUser((Map<String, Object>) model.get(IndexFields.ORIGINAL_CREATOR), searchData));
 		}
 
 		if (model.get(IndexFields.MODIFIER_ID) != null) {
@@ -170,14 +170,10 @@ public class CollectionV3DeserializeProcessor extends DeserializeV3Processor<Lis
 		Map<String, Object> taxonomyMap = (Map<String, Object>) model.get(IndexFields.TAXONOMY);
 		if (taxonomyMap != null) {
 			Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
-			if (searchData.isCrosswalk()) {
-				if (searchData.getTaxFilterType() != null && TAX_FILTERS.matcher(searchData.getTaxFilterType()).matches()) {
-					setCrosswalkData(searchData, output, taxonomyMap);
-				} else if (searchData.getUserTaxonomyPreference() != null) {
-					long start = System.currentTimeMillis();
-					taxonomySetAsMap = transformTaxonomy(taxonomyMap, searchData);
-					logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
-				}
+			if (searchData.isCrosswalk() && searchData.getUserTaxonomyPreference() != null) {
+				long start = System.currentTimeMillis();
+				taxonomySetAsMap = transformTaxonomy(taxonomyMap, searchData);
+				logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
 			}
 			if (!taxonomySetAsMap.containsKey(IndexFields.TAXONOMY_SET)) cleanUpTaxonomyCurriculumObject(taxonomySetAsMap);
 			output.setTaxonomy(taxonomySetAsMap);			

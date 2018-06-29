@@ -67,7 +67,7 @@ public class ScopeFilterConstructionProcessor extends FilterConstructionProcesso
 		case "course":
 			break;
 		default:
-			LOG.info("Invalid Scope : {}", target);
+			logger.info("Invalid Scope : {}", target);
 		}
 
 		if (target.contains(LIBRARY)) {

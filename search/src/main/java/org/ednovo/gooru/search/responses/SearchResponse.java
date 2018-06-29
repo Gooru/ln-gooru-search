@@ -26,11 +26,15 @@ public class SearchResponse<R> implements Serializable {
 
 	private Long executionTime; 
 	
-	private Map<String, Object> query;
-
+	private Map<String, Object> searchQuery;
+	
 	private Map<String, Object> stats;
 
 	private List<Map<String, Object>> aggregations;
+
+	private R results;
+
+	private String query;
 
 	public R getSearchResults() {
 		return searchResults;
@@ -46,6 +50,14 @@ public class SearchResponse<R> implements Serializable {
 
 	public void setAggregations(List<Map<String, Object>> aggregations) {
 		this.aggregations = aggregations;
+	}
+
+	public R getResults() {
+		return results;
+	}
+
+	public void setResults(R results) {
+		this.results = results;
 	}
 
 	public Long getTotalHitCount() {
@@ -72,20 +84,28 @@ public class SearchResponse<R> implements Serializable {
         this.executionTime = executionTime;
     }
 
-    public Map<String, Object> getQuery() {
-		return query;
+	public Map<String, Object> getSearchQuery() {
+		return searchQuery;
+	}
+
+	public void setSearchQuery(Map<String, Object> searchQuery) {
+		this.searchQuery = searchQuery;
 	}
 
 	public Map<String, Object> getStats() {
 		return stats;
 	}
-
-	public void setQuery(Map<String, Object> query) {
-		this.query = query;
-	}
-
+	
 	public void setStats(Map<String, Object> stats) {
 		this.stats = stats;
+	}
+
+	public String getQuery() {
+		return query;
+	}
+
+	public void setQuery(String query) {
+		this.query = query;
 	}
 
 }

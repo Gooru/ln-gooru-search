@@ -38,7 +38,7 @@ public class FacetDeserializeProcessor extends SearchProcessor<SearchData, List<
 				}
 			}
 		} catch (Exception e) {
-			LOG.error("Search Error", e);
+			logger.error("Search Error", e);
 			throw new SearchException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}

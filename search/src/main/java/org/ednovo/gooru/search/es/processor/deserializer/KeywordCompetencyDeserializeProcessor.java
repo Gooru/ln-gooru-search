@@ -33,7 +33,7 @@ public class KeywordCompetencyDeserializeProcessor extends DeserializeProcessor<
 					ids.add(id);
 				}
 			}
-			LOG.info("Matched Ids : {} GutCodes : {}", ids, gutCodes);
+			logger.info("Matched Ids : {} GutCodes : {}", ids, gutCodes);
 			if (gutCodes != null && gutCodes.size() > 0) {
 				output.setGutCodes(gutCodes.stream().collect(Collectors.toList()));
 			}

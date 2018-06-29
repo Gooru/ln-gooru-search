@@ -56,7 +56,7 @@ public abstract class PedagogyDeserializeProcessor<O, S> extends SearchProcessor
 					Map<String, Object> query = new HashMap<String, Object>(4);
 					query.put("userQueryString", searchData.getUserQueryString());
 					query.put("rewrittenQueryString", searchData.getQueryString());
-					response.setQuery(query);
+					response.setSearchQuery(query);
 					response.setStats(stats);
 				}
 			}
@@ -144,7 +144,7 @@ public abstract class PedagogyDeserializeProcessor<O, S> extends SearchProcessor
 		SearchData crosswalkRequest = new SearchData();
 		crosswalkRequest.setPretty(input.getPretty());
 		crosswalkRequest.setIndexType(EsIndex.CROSSWALK);
-		crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CROSSWALK_CODES + DOT + IndexFields.ID, (StringUtils.join(leafInternalCodes, ",")));
+		crosswalkRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CROSSWALK_CODES + DOT + IndexFields.ID, (StringUtils.join(leafInternalCodes, COMMA)));
 		crosswalkRequest.setQueryString(STAR);
 		List<Map<String, Object>> searchResponse = (List<Map<String, Object>>) SearchHandler.getSearcher(SearchHandlerType.CROSSWALK.name()).search(crosswalkRequest).getSearchResults();
 		return searchResponse;

@@ -34,7 +34,7 @@ public class HitsDeserializeProcessor extends SearchProcessor<SearchData, List<M
 				response.setSearchResults((List<Map<String, Object>>) (((Map<String,Object>)result.get(SEARCH_HITS)).get(SEARCH_HITS)));
 			}
 		} catch (Exception e) {
-			LOG.error("Search Error", e);
+			logger.error("Search Error", e);
 			throw new SearchException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}

@@ -87,26 +87,22 @@ public class RubricV3DeserializeProcessor extends DeserializeV3Processor<List<Ru
 
 		// set creator
 		if (model.get(IndexFields.CREATOR) != null) {
-			output.setCreator(setUser((Map<String, Object>) model.get(IndexFields.CREATOR)));
+			output.setCreator(setUser((Map<String, Object>) model.get(IndexFields.CREATOR), input));
 		}
 
 		// set original creator
 		if (model.get(IndexFields.ORIGINAL_CREATOR) != null) {
-			output.setOriginalCreator(setUser((Map<String, Object>) model.get(IndexFields.ORIGINAL_CREATOR)));
+			output.setOriginalCreator(setUser((Map<String, Object>) model.get(IndexFields.ORIGINAL_CREATOR), input));
 		}
 
 		// set taxonomy
 		Map<String, Object> taxonomyMap = (Map<String, Object>) model.get(IndexFields.TAXONOMY);
 		if (taxonomyMap != null) {
 			Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
-			if (input.isCrosswalk()) {
-				if (input.getTaxFilterType() != null && TAX_FILTERS.matcher(input.getTaxFilterType()).matches()) {
-					setCrosswalkData(input, output, taxonomyMap);
-				} else if (input.getUserTaxonomyPreference() != null) {
-					long start = System.currentTimeMillis();
-					taxonomySetAsMap = transformTaxonomy(taxonomyMap, input);
-					logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
-				}
+			if (input.isCrosswalk() && input.getUserTaxonomyPreference() != null) {
+				long start = System.currentTimeMillis();
+				taxonomySetAsMap = transformTaxonomy(taxonomyMap, input);
+				logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
 			}
 			if (!taxonomySetAsMap.containsKey(IndexFields.TAXONOMY_SET)) cleanUpTaxonomyCurriculumObject(taxonomySetAsMap);
 			output.setTaxonomy(taxonomySetAsMap);		

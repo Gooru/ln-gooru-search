@@ -11,7 +11,6 @@ public class Scope implements Serializable {
     private String key;
     private List<String> idList;
     private List<String> targetNames;
-    private List<String> titles;
 
     public String getKey() {
         return key;
@@ -30,12 +29,6 @@ public class Scope implements Serializable {
 	}
 	public void setTargetNames(List<String> targetNames) {
 		this.targetNames = targetNames;
-	}
-	public List<String> getTitles() {
-		return titles;
-	}
-	public void setTitles(List<String> titles) {
-		this.titles = titles;
 	}
 
 	@Override

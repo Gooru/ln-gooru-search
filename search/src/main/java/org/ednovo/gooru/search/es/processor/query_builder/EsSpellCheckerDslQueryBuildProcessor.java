@@ -44,7 +44,7 @@ public class EsSpellCheckerDslQueryBuildProcessor extends SearchProcessor<Search
         searchData.getQueryDsl().put(SUGGEST, suggestStringQuery);
       }
     } catch (Exception e) {
-      LOG.error("SpellChecker query builder encountered an exception: ", e);
+    	logger.error("SpellChecker query builder encountered an exception: ", e);
     }
   }
 

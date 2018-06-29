@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.ednovo.gooru.search.es.model.License;
-import org.ednovo.gooru.search.es.model.UserV2;
 import org.ednovo.gooru.search.responses.SearchResult;
 
 public class CollectionSearchResult extends SearchResult implements Serializable {
@@ -21,15 +20,15 @@ public class CollectionSearchResult extends SearchResult implements Serializable
     private List<String> collaboratorIds;
     private String contentFormat;
     private Map<String, Object> course;
-    private UserV2 creator;
+    private UserV3 creator;
     private List<String> depthOfknowledge;
     private String grade;
     private String learningObjective;
     private String lastModified;
     private String lastModifiedBy;
     private License license;
-    private UserV2 originalCreator;
-    private UserV2 owner;
+    private UserV3 originalCreator;
+    private UserV3 owner;
     private Integer questionCount;
     private Long remixedInCourseCount;
     private Integer resourceCount;
@@ -91,11 +90,11 @@ public class CollectionSearchResult extends SearchResult implements Serializable
         this.course = course;
     }
 
-    public UserV2 getCreator() {
+    public UserV3 getCreator() {
         return creator;
     }
 
-    public void setCreator(UserV2 creator) {
+    public void setCreator(UserV3 creator) {
         this.creator = creator;
     }
 
@@ -147,19 +146,19 @@ public class CollectionSearchResult extends SearchResult implements Serializable
         this.license = license;
     }
 
-    public UserV2 getOriginalCreator() {
+    public UserV3 getOriginalCreator() {
         return originalCreator;
     }
 
-    public void setOriginalCreator(UserV2 originalCreator) {
+    public void setOriginalCreator(UserV3 originalCreator) {
         this.originalCreator = originalCreator;
     }
 
-    public UserV2 getOwner() {
+    public UserV3 getOwner() {
         return owner;
     }
 
-    public void setOwner(UserV2 owner) {
+    public void setOwner(UserV3 owner) {
         this.owner = owner;
     }
 
