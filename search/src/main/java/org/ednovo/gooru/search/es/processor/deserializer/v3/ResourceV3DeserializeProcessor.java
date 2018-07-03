@@ -3,6 +3,7 @@ package org.ednovo.gooru.search.es.processor.deserializer.v3;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -146,23 +147,24 @@ public class ResourceV3DeserializeProcessor extends DeserializeV3Processor<List<
 		metadata.setCurated(publishStatus.equalsIgnoreCase(PublishedStatus.PUBLISHED.name()) ? true : false);
 
 		if (dataMap.get(IndexFields.METADATA) != null) {
-			Map<String, List<String>> contentMeta = (Map<String, List<String>>) dataMap.get(IndexFields.METADATA);
+			Map<String, Object> contentMeta = (Map<String, Object>) dataMap.get(IndexFields.METADATA);
 			if (contentMeta != null) {
 				// depth of knowledge
 				if (contentFormat != null && contentFormat.equalsIgnoreCase(SEARCH_QUESTION)) {
 					List<String> depthOfKnowledge = new ArrayList<>();
 					depthOfKnowledge.add("Level 0");
-					if (contentMeta.get(IndexFields.DEPTH_OF_KNOWLEDGE) != null) depthOfKnowledge = contentMeta.get(IndexFields.DEPTH_OF_KNOWLEDGE);
-					metadata.setDok(depthOfKnowledge);
+					if (contentMeta.get(IndexFields.DEPTH_OF_KNOWLEDGE) != null) depthOfKnowledge = (List<String>) contentMeta.get(IndexFields.DEPTH_OF_KNOWLEDGE);
+					Collections.sort(depthOfKnowledge);
+					metadata.setDok(depthOfKnowledge.get(depthOfKnowledge.size() - 1));
 				}
 
 				// 21st century skill
-				List<String> twentyOneCenturySkills = contentMeta.get(IndexFields.TWENTY_ONE_CENTURY_SKILL);
+				List<Map<String, String>> twentyOneCenturySkills = (List<Map<String, String>>) contentMeta.get(IndexFields.TWENTY_ONE_CENTURY_SKILL);
 				if (twentyOneCenturySkills != null && !twentyOneCenturySkills.isEmpty()) {
 					metadata.setTwentyOneCenturySkills(twentyOneCenturySkills);
 				}
 
-				List<String> grade = contentMeta.get(IndexFields.GRADE);
+				List<String> grade = (List<String>) contentMeta.get(IndexFields.GRADE);
 				if (grade != null && grade.size() > 0) {
 					metadata.setGrade(String.join(COMMA, grade));
 				}
@@ -179,7 +181,7 @@ public class ResourceV3DeserializeProcessor extends DeserializeV3Processor<List<
 			date = SIMPLE_DATE_FORMAT.parse((String) dataMap.get(IndexFields.UPDATED_AT) + EMPTY_STRING);
 			String s = SIMPLE_DATE_FORMAT.format(date);
 		} catch (Exception e) {
-			logger.error("modifiedDate field error: " + e);
+			logger.error("modifiedAt field error: {}" , e);
 		}
 		resource.setModifiedAt(date);
 		
@@ -188,7 +190,7 @@ public class ResourceV3DeserializeProcessor extends DeserializeV3Processor<List<
 			createdDate = SIMPLE_DATE_FORMAT.parse((String) dataMap.get(IndexFields.CREATED_AT) + EMPTY_STRING);
 			String s = SIMPLE_DATE_FORMAT.format(createdDate);
 		} catch (Exception e) {
-			logger.error("createdDate field error: " + e);
+			logger.error("createdAt field error: {}" , e);
 		}
 		resource.setCreatedAt(createdDate);
 		
@@ -254,7 +256,7 @@ public class ResourceV3DeserializeProcessor extends DeserializeV3Processor<List<
 			Map<String, Object> licenseAsMap = new HashMap<>();
 			licenseAsMap.put(IndexFields.CODE, licenseMap.get(IndexFields.CODE));
 			licenseAsMap.put(IndexFields.URL, licenseMap.get(IndexFields.URL));
-			metadata.setLicense(licenseAsMap);
+			if (!licenseAsMap.isEmpty()) metadata.setLicense(licenseAsMap);
 		}
 
 		resource.setMetadata(metadata);

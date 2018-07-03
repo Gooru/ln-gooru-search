@@ -55,16 +55,12 @@ public class ScopeFilterConstructionProcessor extends FilterConstructionProcesso
 				if (!courses.isEmpty()) searchData.putFilter("&^" + key, StringUtils.join(courses, COMMA));
 			}
 			break;
-		case "open-library":
-			break;
 		case "open-all":
 			searchData.putFilter("&^publishStatus", "published");
 			break;
+		case "open-library":
 		case "tenant-content":
-			break;
 		case "subtenant-content":
-			break;
-		case "course":
 			break;
 		default:
 			logger.info("Invalid Scope : {}", target);

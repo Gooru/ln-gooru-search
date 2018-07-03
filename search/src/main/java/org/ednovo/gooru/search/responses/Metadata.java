@@ -11,7 +11,7 @@ public class Metadata {
 
 	private Map<String, Object> license;
 
-	private List<String> twentyOneCenturySkills;
+	private List<Map<String, String>> twentyOneCenturySkills;
 
 	private String grade;
 
@@ -25,7 +25,7 @@ public class Metadata {
 
 	private String language;
 	
-	private List<String> dok;
+	private String dok;
 
 	public List<String> getPublisher() {
 		return publisher;
@@ -51,11 +51,11 @@ public class Metadata {
 		this.license = license;
 	}
 
-	public List<String> getTwentyOneCenturySkills() {
+	public List<Map<String, String>> getTwentyOneCenturySkills() {
 		return twentyOneCenturySkills;
 	}
 
-	public void setTwentyOneCenturySkills(List<String> twentyOneCenturySkills) {
+	public void setTwentyOneCenturySkills(List<Map<String, String>> twentyOneCenturySkills) {
 		this.twentyOneCenturySkills = twentyOneCenturySkills;
 	}
 
@@ -107,11 +107,11 @@ public class Metadata {
 		this.language = language;
 	}
 
-	public List<String> getDok() {
+	public String getDok() {
 		return dok;
 	}
 
-	public void setDok(List<String> dok) {
+	public void setDok(String dok) {
 		this.dok = dok;
 	}
 
