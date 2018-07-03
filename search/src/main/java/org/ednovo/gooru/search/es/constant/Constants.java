@@ -529,7 +529,7 @@ public interface Constants {
 	Pattern RQCA_MATCH = Pattern.compile("resource|question|collection|assessment|scollection");
 	Pattern RQC_MATCH = Pattern.compile("resource|question|collection|scollection");
 	Pattern RESOURCE_MATCH = Pattern.compile("resource|question");
-	Pattern COLLECTION_MATCH = Pattern.compile("scollection|collection|assessment");
+	Pattern COLLECTION_MATCH = Pattern.compile("scollection|collection|assessment|collection-external|assessment-external");
 	public static final String PEDAGOGY_UNDERSCORE = "pedagogy_";
 	public static final String TOTAL_HIT_COUNT = "totalHitCount";
 	public static final String RESULT_COUNT = "resultCount";

@@ -213,12 +213,10 @@ public class ResourceV3DeserializeProcessor extends DeserializeV3Processor<List<
 		Map<String, Object> taxonomyMap = (Map<String, Object>) dataMap.get(IndexFields.TAXONOMY);
 		if (taxonomyMap != null) {
 			Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
-			if (input.isCrosswalk()) {
-				if (input.getUserTaxonomyPreference() != null) {
-					long start = System.currentTimeMillis();
-					taxonomySetAsMap = transformTaxonomy(taxonomyMap, input);
-					logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
-				}
+			if (input.isCrosswalk() && input.getUserTaxonomyPreference() != null) {
+				long start = System.currentTimeMillis();
+				taxonomySetAsMap = transformTaxonomy(taxonomyMap, input);
+				logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
 			}
 			if (taxonomySetAsMap.get(IndexFields.TAXONOMY_SET) != null && !((Map<String, Object>) taxonomySetAsMap.get(IndexFields.TAXONOMY_SET)).isEmpty()) metadata.setStandards((Map<String, Object>) taxonomySetAsMap.get(IndexFields.TAXONOMY_SET));	
 			if (taxonomySetAsMap.get(IndexFields.SUBJECT) != null && !((List<String>) taxonomySetAsMap.get(IndexFields.SUBJECT)).isEmpty()) metadata.setSubject((List<String>) taxonomySetAsMap.get(IndexFields.SUBJECT));		
