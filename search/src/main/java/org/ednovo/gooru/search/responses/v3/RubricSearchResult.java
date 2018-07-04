@@ -1,18 +1,13 @@
 package org.ednovo.gooru.search.responses.v3;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
+import java.util.Date;
 
-import org.ednovo.gooru.search.responses.SearchResult;
+import org.ednovo.gooru.search.responses.Metadata;
 
 public class RubricSearchResult extends SearchResult implements Serializable {
 
 	private static final long serialVersionUID = 5673214015280665128L;
-
-	private List<String> audience;
-
-	private List<Map<String, Object>> categories;
 
 	private String url;
 
@@ -20,34 +15,16 @@ public class RubricSearchResult extends SearchResult implements Serializable {
 
 	private String description;
 
-	private String createdAt;
+	private Date createdAt;
 
-	private String updatedAt;
-
-	private String lastModifiedBy;
-
-	private UserV3 originalCreator;
+	private Date modifiedAt;
 
 	private UserV3 creator;
 
-	private Long viewCount = 0L;
-
-	private Integer questionCount;
-
-	private String resultUId;
-
-	private String contentFormat;
+	private String format;
 		
-	private Map<String, Object> course;
-	
-	private Map<String, Object> unit;
+	private Metadata metadata;
 
-	private Map<String, Object> lesson;
-
-	private Map<String, Object> collection;
-	
-	private Map<String, Object> content;
-	
 	public String getUrl() {
 		return url;
 	}
@@ -72,36 +49,20 @@ public class RubricSearchResult extends SearchResult implements Serializable {
 		this.description = description;
 	}
 
-	public String getCreatedAt() {
+	public Date getCreatedAt() {
 		return createdAt;
 	}
 
-	public void setCreatedAt(String createdAt) {
+	public void setCreatedAt(Date createdAt) {
 		this.createdAt = createdAt;
 	}
 
-	public String getUpdatedAt() {
-		return updatedAt;
+	public Date getModifiedAt() {
+		return modifiedAt;
 	}
 
-	public void setUpdatedAt(String updatedAt) {
-		this.updatedAt = updatedAt;
-	}
-
-	public String getLastModifiedBy() {
-		return lastModifiedBy;
-	}
-
-	public void setLastModifiedBy(String lastModifiedBy) {
-		this.lastModifiedBy = lastModifiedBy;
-	}
-
-	public UserV3 getOriginalCreator() {
-		return originalCreator;
-	}
-
-	public void setOriginalCreator(UserV3 originalCreator) {
-		this.originalCreator = originalCreator;
+	public void setModifiedAt(Date modifiedAt) {
+		this.modifiedAt = modifiedAt;
 	}
 
 	public UserV3 getCreator() {
@@ -112,92 +73,20 @@ public class RubricSearchResult extends SearchResult implements Serializable {
 		this.creator = creator;
 	}
 
-	public Long getViewCount() {
-		return viewCount;
+	public String getFormat() {
+		return format;
 	}
 
-	public void setViewCount(Long viewCount) {
-		this.viewCount = viewCount;
+	public void setFormat(String format) {
+		this.format = format;
 	}
 
-	public Integer getQuestionCount() {
-		return questionCount;
+	public Metadata getMetadata() {
+		return metadata;
 	}
 
-	public void setQuestionCount(Integer questionCount) {
-		this.questionCount = questionCount;
-	}
-
-	public String getResultUId() {
-		return resultUId;
-	}
-
-	public void setResultUId(String resultUId) {
-		this.resultUId = resultUId;
-	}
-
-	public String getContentFormat() {
-		return contentFormat;
-	}
-
-	public void setContentFormat(String contentFormat) {
-		this.contentFormat = contentFormat;
-	}
-
-	public List<Map<String, Object>> getCategories() {
-		return categories;
-	}
-
-	public void setCategories(List<Map<String, Object>> categories) {
-		this.categories = categories;
-	}
-
-	public Map<String, Object> getCourse() {
-		return course;
-	}
-
-	public void setCourse(Map<String, Object> course) {
-		this.course = course;
-	}
-
-	public Map<String, Object> getUnit() {
-		return unit;
-	}
-
-	public void setUnit(Map<String, Object> unit) {
-		this.unit = unit;
-	}
-
-	public Map<String, Object> getLesson() {
-		return lesson;
-	}
-
-	public void setLesson(Map<String, Object> lesson) {
-		this.lesson = lesson;
-	}
-
-	public Map<String, Object> getCollection() {
-		return collection;
-	}
-
-	public void setCollection(Map<String, Object> collection) {
-		this.collection = collection;
-	}
-
-	public Map<String, Object> getContent() {
-		return content;
-	}
-
-	public void setContent(Map<String, Object> content) {
-		this.content = content;
-	}
-
-	public List<String> getAudience() {
-		return audience;
-	}
-
-	public void setAudience(List<String> audience) {
-		this.audience = audience;
+	public void setMetadata(Metadata metadata) {
+		this.metadata = metadata;
 	}
 
 

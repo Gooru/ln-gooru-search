@@ -405,16 +405,12 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 			session.put(EventConstants.APP_ID, request.getAttribute(EventConstants.APP_ID));
 			session.put(EventConstants.TENANT_ID, searchData.getUserTenantId());
 			session.put(EventConstants.TENANT_ROOT, searchData.getUserTenantRootId());
-			session.put(EventConstants.API_KEY, null);
-			session.put(SEARCH_ORGANIZATION_UID, null);
 		}
 		SessionContextSupport.putLogParameter(EventConstants.SESSION, session);
-		payloadObject.put(EventConstants.PAGE_SIZE, searchData.getSize());
-		payloadObject.put(EventConstants.PAGE_NUM, searchData.getPageNum());
-		payloadObject.put(EventConstants.START_AT, searchData.getFrom());
-		payloadObject.put(EventConstants.RESULT_SIZE, searchResponse.getResultCount());
-		payloadObject.put(EventConstants.HIT_COUNT, searchResponse.getTotalHitCount());
-		payloadObject.put(EventConstants.SEARCH_EXECUTION_TIME, searchResponse.getExecutionTime());
+		payloadObject.put(EventConstants.PAGE_SIZE,  searchResponse.getStats().get(EventConstants.MAX));
+		payloadObject.put(EventConstants.START_AT,  searchResponse.getStats().get(EventConstants.OFFSET));
+		payloadObject.put(EventConstants.RESULT_SIZE, searchResponse.getStats().get(EventConstants.COUNT));
+		payloadObject.put(EventConstants.HIT_COUNT, searchResponse.getStats().get(EventConstants.TOTAL));
 		SessionContextSupport.putLogParameter(EventConstants.PAYLOAD_OBJECT, payloadObject);
 		request.setAttribute(EventConstants.ACTION, SEARCH);
 	}

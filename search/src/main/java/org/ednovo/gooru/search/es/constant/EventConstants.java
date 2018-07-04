@@ -21,6 +21,11 @@ public class EventConstants {
 	public static final String SESSION = "session";
 	public static final String SESSION_TOKEN = "sessionToken";
 	public static final String ITEM_DOT_SUGGEST = "item.suggest";
+	
+	public static final String MAX = "max";
+	public static final String COUNT = "count";
+	public static final String OFFSET = "offset";
+	public static final String TOTAL = "total";
 
 }
 

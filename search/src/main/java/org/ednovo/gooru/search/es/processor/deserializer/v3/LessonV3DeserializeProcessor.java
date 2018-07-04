@@ -1,12 +1,15 @@
 package org.ednovo.gooru.search.es.processor.deserializer.v3;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
+import org.ednovo.gooru.search.es.service.SearchSettingService;
+import org.ednovo.gooru.search.responses.Metadata;
 import org.ednovo.gooru.search.responses.v3.LessonSearchResult;
 import org.springframework.stereotype.Component;
 /**
@@ -29,7 +32,7 @@ public class LessonV3DeserializeProcessor extends DeserializeV3Processor<List<Le
 		output = new ArrayList<LessonSearchResult>();
 		for (Map<String, Object> hit : hits) {
 			Map<String, Object> fields = (Map<String, Object>) hit.get(SEARCH_SOURCE);
-			output.add(collect(fields, input, null));
+			output.add(collect(fields, input));
 			
 		}
 		return output;
@@ -37,75 +40,57 @@ public class LessonV3DeserializeProcessor extends DeserializeV3Processor<List<Le
 
 	@SuppressWarnings("unchecked")
 	@Override
-	LessonSearchResult collect(Map<String, Object> model, SearchData input, LessonSearchResult lessonResult) {
-		if(lessonResult == null){
-			lessonResult = new LessonSearchResult();
+	LessonSearchResult collect(Map<String, Object> source, SearchData searchData) {
+		LessonSearchResult output = new LessonSearchResult();
+		output.setId((String) source.get(IndexFields.ID));
+		output.setTitle((String) source.get(IndexFields.TITLE));
+		Date date = null;
+		try {
+			date = SIMPLE_DATE_FORMAT.parse((String) source.get(IndexFields.UPDATED_AT) + EMPTY_STRING);
+		} catch (Exception e) {
+			logger.error("modifiedAt field error: {}", e);
 		}
-		lessonResult.setId((String) model.get(IndexFields.ID));
-		lessonResult.setTitle((String) model.get(IndexFields.TITLE));
-		lessonResult.setPublishStatus((String) model.get(IndexFields.PUBLISH_STATUS));
-		lessonResult.setLastModified((String) model.get(IndexFields.UPDATED_AT));
-		lessonResult.setCreatedAt((String) model.get(IndexFields.CREATED_AT));
-        lessonResult.setLastModifiedBy((String) model.get(IndexFields.MODIFIER_ID));
-        lessonResult.setContentFormat((String) model.get(IndexFields.CONTENT_FORMAT));
+		output.setModifiedAt(date);
 
-        // set counts
-        if(model.get(IndexFields.STATISTICS) != null){
-        	Map<String, Object> statistics = (Map<String, Object>) model.get(IndexFields.STATISTICS);
-        	lessonResult.setCollectionCount(statistics.get("collectionCount") != null ? (Integer) statistics.get("collectionCount") : 0);
-        	lessonResult.setAssessmentCount(statistics.get("assessmentCount") != null ? (Integer) statistics.get("assessmentCount") : 0);
-        	lessonResult.setExternalAssessmentCount(statistics.get("externalAssessmentCount") != null ? (Integer) statistics.get("externalAssessmentCount") : 0);
-        	lessonResult.setIsFeatured(statistics.get("isFeatured") != null ? (Boolean) statistics.get("isFeatured") : false);
-        	lessonResult.setEfficacy((statistics.get(IndexFields.EFFICACY) != null) ? ((Number) statistics.get(IndexFields.EFFICACY)).doubleValue() : 0.5);
-        	lessonResult.setEngagement((statistics.get(IndexFields.ENGAGEMENT) != null) ? ((Number) statistics.get(IndexFields.ENGAGEMENT)).doubleValue() : 0.5);
-        	lessonResult.setRelevance((statistics.get(IndexFields.RELEVANCE) != null) ? ((Number) statistics.get(IndexFields.RELEVANCE)).doubleValue() : 0.5);
-    	
-			long viewsCount = 0L;
-			if (statistics.get(IndexFields.VIEWS_COUNT) != null) {
-				viewsCount = ((Number) statistics.get(IndexFields.VIEWS_COUNT)).longValue();
-				lessonResult.setViewCount(viewsCount);
-			}
+		Date createdDate = null;
+		try {
+			createdDate = SIMPLE_DATE_FORMAT.parse((String) source.get(IndexFields.CREATED_AT) + EMPTY_STRING);
+		} catch (Exception e) {
+			logger.error("createdAt field error: {}", e);
 		}
+		output.setCreatedAt(createdDate);
 
-		// set unit
-		if (model.get(IndexFields.UNIT) != null) {
-			lessonResult.setUnit((Map<String, Object>) model.get(IndexFields.UNIT));
-		}
+		Map<String, String> course = (Map<String, String>) source.get(IndexFields.COURSE);
+		Map<String, String> unit = (Map<String, String>) source.get(IndexFields.UNIT);
+		output.setPlayerUrl(SearchSettingService.getByName(DNS_ENV) + "/content/courses/play/" + course.get(IndexFields.ID) + "?lessonId=" + output.getId() + "&unitId=" + unit.get(IndexFields.ID));
 
-		// set course
-		if (model.get(IndexFields.COURSE) != null) {
-			lessonResult.setCourse((Map<String, Object>) model.get(IndexFields.COURSE));
-		}
+		output.setPlayerUrl(SearchSettingService.getByName(DNS_ENV) + "/content/lessons/play/" + output.getId());
 
 		// set creator
-		if(model.get(IndexFields.CREATOR) != null){
-			lessonResult.setCreator(setUser((Map<String, Object>) model.get(IndexFields.CREATOR), input));
+		if(source.get(IndexFields.CREATOR) != null){
+			output.setCreator(setUser((Map<String, Object>) source.get(IndexFields.CREATOR), searchData));
 		}
 
-		// set owner
-		if(model.get(IndexFields.OWNER) != null){
-			lessonResult.setOwner(setUser((Map<String, Object>) model.get(IndexFields.OWNER), input));
-		}
-
-		// set original creator 
-		if(model.get(IndexFields.ORIGINAL_CREATOR) != null){
-			lessonResult.setOriginalCreator(setUser((Map<String, Object>) model.get(IndexFields.ORIGINAL_CREATOR), input));
-		}
+		Metadata metadata = new Metadata();
+		boolean curated = false;
+		Map<String, Object> statisticsMap = (Map<String, Object>) source.get(IndexFields.STATISTICS);
+		String publishStatus = (String) source.get(IndexFields.PUBLISH_STATUS);
+		if((publishStatus != null && publishStatus.equalsIgnoreCase(PublishedStatus.PUBLISHED.getStatus())) || (statisticsMap.containsKey(IndexFields.IS_FEATURED) && ((Boolean) statisticsMap.get(IndexFields.IS_FEATURED)))) curated = true;
+		metadata.setCurated(curated);
+		
 
 		// set taxonomy
-		Map<String, Object> taxonomyMap = (Map<String, Object>) model.get(IndexFields.TAXONOMY);
+		Map<String, Object> taxonomyMap = (Map<String, Object>) source.get(IndexFields.TAXONOMY);
 		if (taxonomyMap != null) {
-			Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
-			if (input.isCrosswalk() && input.getUserTaxonomyPreference() != null) {
+			if (searchData.isCrosswalk() && searchData.getUserTaxonomyPreference() != null) {
 				long start = System.currentTimeMillis();
-				taxonomySetAsMap = transformTaxonomy(taxonomyMap, input);
+				transformTaxonomy(taxonomyMap, searchData, metadata);
 				logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
 			}
-			if (!taxonomySetAsMap.containsKey(IndexFields.TAXONOMY_SET)) cleanUpTaxonomyCurriculumObject(taxonomySetAsMap);
-			lessonResult.setTaxonomy(taxonomySetAsMap);
 		}
-		
- 		return lessonResult;
+
+		output.setMetadata(metadata);
+ 		return output;
 	}
 
 }
