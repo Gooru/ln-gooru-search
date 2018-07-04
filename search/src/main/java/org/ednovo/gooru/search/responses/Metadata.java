@@ -21,7 +21,7 @@ public class Metadata {
 	
 	private List<String> domain;
 	
-	private Map<String, Object> standards;
+	private List<Map<String, String>> standards;
 
 	private String language;
 	
@@ -91,11 +91,11 @@ public class Metadata {
 		this.domain = domain;
 	}
 
-	public Map<String, Object> getStandards() {
+	public List<Map<String, String>> getStandards() {
 		return standards;
 	}
 
-	public void setStandards(Map<String, Object> standards) {
+	public void setStandards(List<Map<String, String>> standards) {
 		this.standards = standards;
 	}
 

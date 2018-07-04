@@ -3,6 +3,7 @@
  */
 package org.ednovo.gooru.search.es.processor.deserializer.v3;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import org.ednovo.gooru.search.es.handler.SearchHandler;
 import org.ednovo.gooru.search.es.handler.SearchHandlerType;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.processor.SearchProcessor;
+import org.ednovo.gooru.search.responses.Metadata;
 import org.ednovo.gooru.search.responses.SearchResponse;
 import org.ednovo.gooru.search.responses.v3.UserV3;
 import org.json.JSONException;
@@ -33,7 +35,7 @@ public abstract class DeserializeV3Processor<O, S> extends SearchProcessor<Searc
 
 	abstract O deserialize(Map<String, Object> model, SearchData input, O output);
 
-	abstract S collect(Map<String, Object> model, SearchData input, S output);
+	abstract S collect(Map<String, Object> model, SearchData input);
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -72,16 +74,16 @@ public abstract class DeserializeV3Processor<O, S> extends SearchProcessor<Searc
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Map<String, Object> transformTaxonomy(Map<String, Object> taxonomyMap, SearchData input) {
+	protected void transformTaxonomy(Map<String, Object> taxonomyMap, SearchData searchData, Metadata metadata) {
 		Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
 		if (taxonomySetAsMap == null) {
-			return taxonomyMap;
+			return;
 		}
-		Map<String, Object> finalConvertedMap = new HashMap<>();
-		JSONObject standardPrefs = input.getUserTaxonomyPreference();
+		List<Map<String, String>> finalConvertedMap = new ArrayList<>();
+		JSONObject standardPrefs = searchData.getUserTaxonomyPreference();
 		List<String> leafInternalCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_INTERNAL_CODES);
 		if (leafInternalCodes != null) {
-			List<Map<String, Object>> crosswalkResponse = searchCrosswalk(input, leafInternalCodes);
+			List<Map<String, Object>> crosswalkResponse = searchCrosswalk(searchData, leafInternalCodes);
 			Map<String, Object> curriculumAsMap = (Map<String, Object>) taxonomySetAsMap.get(IndexFields.CURRICULUM);
 			List<Map<String, String>> curriculumInfoAsList = (List<Map<String, String>>) curriculumAsMap.get(IndexFields.CURRICULUM_INFO);
 			if (curriculumInfoAsList != null) {
@@ -91,11 +93,12 @@ public abstract class DeserializeV3Processor<O, S> extends SearchProcessor<Searc
 					crosswalkCodes = deserializeCrosswalkResponse(crosswalkResponse, id, crosswalkCodes);
 					transformToPreferredCode(finalConvertedMap, standardPrefs, code, crosswalkCodes);
 				});
-				taxonomySetAsMap.put(IndexFields.TAXONOMY_SET, finalConvertedMap);
 			}
 		}
-		taxonomySetAsMap.remove(IndexFields.CURRICULUM);
-		return taxonomySetAsMap;
+		if (!finalConvertedMap.isEmpty()) metadata.setStandards(finalConvertedMap);	
+		if (taxonomySetAsMap.get(IndexFields.SUBJECT) != null && !((List<String>) taxonomySetAsMap.get(IndexFields.SUBJECT)).isEmpty()) metadata.setSubject((List<String>) taxonomySetAsMap.get(IndexFields.SUBJECT));		
+		if (taxonomySetAsMap.get(IndexFields.COURSE) != null && !((List<String>) taxonomySetAsMap.get(IndexFields.COURSE)).isEmpty()) metadata.setCourse((List<String>) taxonomySetAsMap.get(IndexFields.COURSE));		
+		if (taxonomySetAsMap.get(IndexFields.DOMAIN) != null && !((List<String>) taxonomySetAsMap.get(IndexFields.DOMAIN)).isEmpty()) metadata.setDomain((List<String>) taxonomySetAsMap.get(IndexFields.DOMAIN));		
 	}
 
 	@SuppressWarnings("unchecked")
@@ -133,7 +136,7 @@ public abstract class DeserializeV3Processor<O, S> extends SearchProcessor<Searc
 		return crosswalkResult;
 	}
 
-	private void transformToPreferredCode(Map<String, Object> finalConvertedMap, JSONObject standardPrefs, Map<String, String> codeAsMap, List<Map<String, String>> crosswalkCodes) {
+	private void transformToPreferredCode(List<Map<String, String>> finalConvertedMap, JSONObject standardPrefs, Map<String, String> codeAsMap, List<Map<String, String>> crosswalkCodes) {
 		String internalCode = codeAsMap.get(IndexFields.ID);
 		final String subject = getSubjectFromCodeId(internalCode);
 		String framework = null;
@@ -146,16 +149,14 @@ public abstract class DeserializeV3Processor<O, S> extends SearchProcessor<Searc
 							if (!crosswalk.get(IndexFields.FRAMEWORK_CODE).equalsIgnoreCase(framework)) {
 								continue;
 							}
-							String crosswalkId = crosswalk.get(IndexFields.ID);
 							crosswalk.remove(IndexFields.ID);
 							if(crosswalk.containsKey(IndexFields.PARENT_TITLE)) crosswalk.remove(IndexFields.PARENT_TITLE);
-							finalConvertedMap.put(crosswalkId, crosswalk);
+							finalConvertedMap.add(crosswalk);
 						}
 					} else if (internalCode.startsWith(framework + DOT)) {
-						String codeId = codeAsMap.get(IndexFields.ID);
 						codeAsMap.remove(IndexFields.ID);
 						if(codeAsMap.containsKey(IndexFields.PARENT_TITLE)) codeAsMap.remove(IndexFields.PARENT_TITLE);
-						finalConvertedMap.put(codeId, codeAsMap);
+						finalConvertedMap.add(codeAsMap);
 					}
 				}
 			}
@@ -174,7 +175,7 @@ public abstract class DeserializeV3Processor<O, S> extends SearchProcessor<Searc
 			user = new UserV3();
 			user.setFirstName((String) userData.get(IndexFields.FIRST_NAME));
 			user.setLastName((String) userData.get(IndexFields.LAST_NAME));
-			user.setUsername((String) userData.get(IndexFields.USERNAME));
+			if (RESOURCE_MATCH.matcher(input.getType()).matches()) user.setUsername((String) userData.get(IndexFields.USERNAME));
 			if (userData.get(IndexFields.PROFILE_IMAGE) != null) user.setProfileImageUrl("http:" + input.getUserCdnUrl() + (String) userData.get(IndexFields.PROFILE_IMAGE));
 		}
 		return user;

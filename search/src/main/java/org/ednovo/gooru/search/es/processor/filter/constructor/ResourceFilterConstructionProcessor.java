@@ -36,8 +36,8 @@ public class ResourceFilterConstructionProcessor extends ContentFilterConstructi
 				contentFormat = (String) searchData.getFilters().get(AMPERSAND_CONTENT_FORMAT);
 			}
 			if (contentFormat != null && contentFormat.equalsIgnoreCase(TYPE_RESOURCE))  {
-				//searchData.putFilter(FLT_PUBLISHER_QUALITY_INDICATOR, "3,4,5");
-				searchData.putFilter(AMPERSAND_AUDIENCE, AUDIENCE_ALL_STUDENTS);
+				searchData.putFilter(FLT_PUBLISHER_QUALITY_INDICATOR, "3,4,5");
+				if (!searchData.getFilters().containsKey(AMPERSAND_AUDIENCE)) searchData.putFilter(AMPERSAND_AUDIENCE, AUDIENCE_ALL_STUDENTS);
 			}
 			
 			if (searchData.getFilters().containsKey(FLT_COURSE_ID)) {

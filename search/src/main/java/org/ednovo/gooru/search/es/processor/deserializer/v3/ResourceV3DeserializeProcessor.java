@@ -1,7 +1,6 @@
 
 package org.ednovo.gooru.search.es.processor.deserializer.v3;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -35,7 +34,6 @@ public class ResourceV3DeserializeProcessor extends DeserializeV3Processor<List<
 	protected static final Logger logger = LoggerFactory.getLogger(ResourceV3DeserializeProcessor.class);
 	protected static final String UN_RESTRICTED_SEARCH = "unrestrictedSearch";
 	protected static final String ALLOW_DUPLICATES = "allowDuplicates";
-	protected static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -89,7 +87,7 @@ public class ResourceV3DeserializeProcessor extends DeserializeV3Processor<List<
 						}
 					}
 				}
-				ContentSearchResult resource = collect(fields, searchData, null);
+				ContentSearchResult resource = collect(fields, searchData);
 				resourceIds.add(resource.getId());
 				output.add(resource);
 			}
@@ -105,49 +103,45 @@ public class ResourceV3DeserializeProcessor extends DeserializeV3Processor<List<
 	protected SearchProcessorType getType() {
 		return SearchProcessorType.ResourceV3Deserializer;
 	}
-
-	@Override
-	ContentSearchResult collect(Map<String, Object> model, SearchData input, ContentSearchResult resource) {
-		return deserializeToResource(model, input);
-	}
-
+	
 	@SuppressWarnings({ "unchecked", "unused" })
-	private ContentSearchResult deserializeToResource(Map<String, Object> dataMap, SearchData input) {
-		String contentFormat = (String) dataMap.get(IndexFields.CONTENT_FORMAT);
-		String contentSubFormat = (String) dataMap.get(IndexFields.CONTENT_SUB_FORMAT);
+	@Override
+	ContentSearchResult collect(Map<String, Object> source, SearchData searchData) {
+		String contentFormat = (String) source.get(IndexFields.CONTENT_FORMAT);
+		String contentSubFormat = (String) source.get(IndexFields.CONTENT_SUB_FORMAT);
 
-		ContentSearchResult resource = null;
+		ContentSearchResult output = null;
 		if (contentFormat != null && contentFormat.equalsIgnoreCase(ContentFormat.QUESTION.getContentFormat())) {
-			QuestionV3 question = convertToQuestion(dataMap, input);
-			resource = question;
+			QuestionV3 question = convertToQuestion(source, searchData);
+			output = question;
 		} else {
-			resource = new ContentSearchResult();
+			output = new ContentSearchResult();
 		}
 		
-		resource.setFormat(contentFormat);
-		resource.setSubFormat(contentSubFormat);
-		resource.setTitle(StringUtils.defaultString((String) dataMap.get(IndexFields.TITLE), EMPTY_STRING));
-		if (dataMap.containsKey(IndexFields.URL)) {
-			String url = (String) dataMap.get(IndexFields.URL);
-			if (!url.startsWith(HTTP)) url = HTTP + COLON + input.getContentCdnUrl() + url;
-			resource.setUrl(url);
+		output.setFormat(contentFormat);
+		output.setSubFormat(contentSubFormat);
+		output.setTitle(StringUtils.defaultString((String) source.get(IndexFields.TITLE), EMPTY_STRING));
+		if (source.containsKey(IndexFields.URL)) {
+			String url = (String) source.get(IndexFields.URL);
+			if (!url.startsWith(HTTP)) url = HTTP + COLON + searchData.getContentCdnUrl() + url;
+			output.setUrl(url);
 		}
-		if (dataMap.containsKey(IndexFields.THUMBNAIL)) {
-			String thumbnail = (String) dataMap.get(IndexFields.THUMBNAIL);
-			if (!thumbnail.startsWith(HTTP)) thumbnail = HTTP + COLON + input.getContentCdnUrl() + thumbnail;
-			resource.setThumbnail(thumbnail);
+		if (source.containsKey(IndexFields.THUMBNAIL)) {
+			String thumbnail = (String) source.get(IndexFields.THUMBNAIL);
+			if (!thumbnail.startsWith(HTTP)) thumbnail = HTTP + COLON + searchData.getContentCdnUrl() + thumbnail;
+			output.setThumbnail(thumbnail);
 		}
-		resource.setId((String) dataMap.get(IndexFields.ID));
-		resource.setDescription((String) dataMap.get(IndexFields.DESCRIPTION));
-		resource.setPlayerUrl(SearchSettingService.getByName(DNS_ENV) + "/content/" + resource.getFormat() + "s/play/" + resource.getId());
+		output.setId((String) source.get(IndexFields.ID));
+		output.setDescription((String) source.get(IndexFields.DESCRIPTION));
+		output.setPlayerUrl(SearchSettingService.getByName(DNS_ENV) + "/content/" + output.getFormat() + "s/play/" + output.getId());
 		
 		// Set metadata
 		Metadata metadata = new Metadata();
-		String publishStatus = (String) dataMap.get(IndexFields.PUBLISH_STATUS);
+		String publishStatus = (String) source.get(IndexFields.PUBLISH_STATUS);
 		metadata.setCurated(publishStatus.equalsIgnoreCase(PublishedStatus.PUBLISHED.name()) ? true : false);
 
-		if (dataMap.get(IndexFields.METADATA) != null) {
-			Map<String, Object> contentMeta = (Map<String, Object>) dataMap.get(IndexFields.METADATA);
+		if (source.get(IndexFields.METADATA) != null) {
+			Map<String, Object> contentMeta = (Map<String, Object>) source.get(IndexFields.METADATA);
 			if (contentMeta != null) {
 				// depth of knowledge
 				if (contentFormat != null && contentFormat.equalsIgnoreCase(SEARCH_QUESTION)) {
@@ -172,30 +166,30 @@ public class ResourceV3DeserializeProcessor extends DeserializeV3Processor<List<
 		}
 
 		// set creator
-		if (dataMap.get(IndexFields.CREATOR) != null) {
-			resource.setCreator(setUser((Map<String, Object>) dataMap.get(IndexFields.CREATOR), input));
+		if (source.get(IndexFields.CREATOR) != null) {
+			output.setCreator(setUser((Map<String, Object>) source.get(IndexFields.CREATOR), searchData));
 		}
 
 		Date date = null;
 		try {
-			date = SIMPLE_DATE_FORMAT.parse((String) dataMap.get(IndexFields.UPDATED_AT) + EMPTY_STRING);
+			date = SIMPLE_DATE_FORMAT.parse((String) source.get(IndexFields.UPDATED_AT) + EMPTY_STRING);
 			String s = SIMPLE_DATE_FORMAT.format(date);
 		} catch (Exception e) {
 			logger.error("modifiedAt field error: {}" , e);
 		}
-		resource.setModifiedAt(date);
+		output.setModifiedAt(date);
 		
 		Date createdDate = null;
 		try {
-			createdDate = SIMPLE_DATE_FORMAT.parse((String) dataMap.get(IndexFields.CREATED_AT) + EMPTY_STRING);
+			createdDate = SIMPLE_DATE_FORMAT.parse((String) source.get(IndexFields.CREATED_AT) + EMPTY_STRING);
 			String s = SIMPLE_DATE_FORMAT.format(createdDate);
 		} catch (Exception e) {
 			logger.error("createdAt field error: {}" , e);
 		}
-		resource.setCreatedAt(createdDate);
+		output.setCreatedAt(createdDate);
 		
 		Map<String, Object> accessibilyMap = new HashMap<>();
-		Map<String, Object> statisticsMap = (Map<String, Object>) dataMap.get(IndexFields.STATISTICS);
+		Map<String, Object> statisticsMap = (Map<String, Object>) source.get(IndexFields.STATISTICS);
 		boolean hasFrameBreaker = false;
 		if (statisticsMap != null) {
 			try {
@@ -210,22 +204,16 @@ public class ResourceV3DeserializeProcessor extends DeserializeV3Processor<List<
 			accessibilyMap.put("framebreaker", hasFrameBreaker);
 		}
 
-		Map<String, Object> taxonomyMap = (Map<String, Object>) dataMap.get(IndexFields.TAXONOMY);
+		Map<String, Object> taxonomyMap = (Map<String, Object>) source.get(IndexFields.TAXONOMY);
 		if (taxonomyMap != null) {
-			Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
-			if (input.isCrosswalk() && input.getUserTaxonomyPreference() != null) {
+			if (searchData.isCrosswalk() && searchData.getUserTaxonomyPreference() != null) {
 				long start = System.currentTimeMillis();
-				taxonomySetAsMap = transformTaxonomy(taxonomyMap, input);
+				transformTaxonomy(taxonomyMap, searchData, metadata);
 				logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
 			}
-			if (taxonomySetAsMap.get(IndexFields.TAXONOMY_SET) != null && !((Map<String, Object>) taxonomySetAsMap.get(IndexFields.TAXONOMY_SET)).isEmpty()) metadata.setStandards((Map<String, Object>) taxonomySetAsMap.get(IndexFields.TAXONOMY_SET));	
-			if (taxonomySetAsMap.get(IndexFields.SUBJECT) != null && !((List<String>) taxonomySetAsMap.get(IndexFields.SUBJECT)).isEmpty()) metadata.setSubject((List<String>) taxonomySetAsMap.get(IndexFields.SUBJECT));		
-			if (taxonomySetAsMap.get(IndexFields.COURSE) != null && !((List<String>) taxonomySetAsMap.get(IndexFields.COURSE)).isEmpty()) metadata.setCourse((List<String>) taxonomySetAsMap.get(IndexFields.COURSE));		
-			if (taxonomySetAsMap.get(IndexFields.DOMAIN) != null && !((List<String>) taxonomySetAsMap.get(IndexFields.DOMAIN)).isEmpty()) metadata.setDomain((List<String>) taxonomySetAsMap.get(IndexFields.DOMAIN));		
-
 		}
 		
-		Map<String, Object> infoMap = (Map<String, Object>) dataMap.get(IndexFields.INFO);
+		Map<String, Object> infoMap = (Map<String, Object>) source.get(IndexFields.INFO);
 		if (infoMap != null) {
 			if (infoMap.containsKey(IndexFields.PUBLISHER) && infoMap.get(IndexFields.PUBLISHER) != null) {
 				List<String> infoPublisher = (List<String>) infoMap.get(IndexFields.PUBLISHER);
@@ -237,19 +225,19 @@ public class ResourceV3DeserializeProcessor extends DeserializeV3Processor<List<
 			}
 		}
 
-		Boolean isCopyrightOwner = dataMap.get(IndexFields.IS_COPYRIGHT_OWNER) == null ? false : (Boolean)dataMap.get(IndexFields.IS_COPYRIGHT_OWNER);
+		Boolean isCopyrightOwner = source.get(IndexFields.IS_COPYRIGHT_OWNER) == null ? false : (Boolean)source.get(IndexFields.IS_COPYRIGHT_OWNER);
 		if (metadata.getPublisher() == null || metadata.getPublisher().isEmpty()) {
 			List<String> publisher = new ArrayList<>();
 			if (isCopyrightOwner) {
-				if (resource.getCreator() != null && resource.getCreator().getUsername() != null) publisher.add(resource.getCreator().getUsername());
-			} else if (dataMap.containsKey(IndexFields.COPYRIGHT_OWNER_LIST) && ((List<String>) dataMap.get(IndexFields.COPYRIGHT_OWNER_LIST)).size() > 0) {
-				publisher = (List<String>) dataMap.get(IndexFields.COPYRIGHT_OWNER_LIST);
+				if (output.getCreator() != null && output.getCreator().getUsername() != null) publisher.add(output.getCreator().getUsername());
+			} else if (source.containsKey(IndexFields.COPYRIGHT_OWNER_LIST) && ((List<String>) source.get(IndexFields.COPYRIGHT_OWNER_LIST)).size() > 0) {
+				publisher = (List<String>) source.get(IndexFields.COPYRIGHT_OWNER_LIST);
 			}
 			metadata.setPublisher((publisher != null && publisher.size() > 0) ? publisher : null);
 		}
-		resource.getCreator().setUsername(null);
+		output.getCreator().setUsername(null);
 		
-		Map<String, Object> licenseMap = (Map<String, Object>) dataMap.get(IndexFields.LICENSE);
+		Map<String, Object> licenseMap = (Map<String, Object>) source.get(IndexFields.LICENSE);
 		if (licenseMap != null && !licenseMap.isEmpty()) {
 			Map<String, Object> licenseAsMap = new HashMap<>();
 			licenseAsMap.put(IndexFields.CODE, licenseMap.get(IndexFields.CODE));
@@ -257,13 +245,13 @@ public class ResourceV3DeserializeProcessor extends DeserializeV3Processor<List<
 			if (!licenseAsMap.isEmpty()) metadata.setLicense(licenseAsMap);
 		}
 
-		resource.setMetadata(metadata);
-		resource.setAccessibility(accessibilyMap);
-		return resource;
+		output.setMetadata(metadata);
+		output.setAccessibility(accessibilyMap);
+		return output;
 	}
 	
 	@SuppressWarnings("unchecked")
-	private QuestionV3 convertToQuestion(Map<String, Object> source, SearchData input) {
+	private QuestionV3 convertToQuestion(Map<String, Object> source, SearchData searchData) {
 		QuestionV3 question = new QuestionV3();
 		Map<String, Object> questionMap = (Map<String, Object>) (source.get(IndexFields.QUESTION));
 		if (questionMap != null) {
@@ -275,7 +263,7 @@ public class ResourceV3DeserializeProcessor extends DeserializeV3Processor<List<
 				String[] answersText = ((String) answerMap.get(IndexFields.ANSWER_TEXT)).split(" ~~ ");
 				for (String text : answersText) {
 					String subFormat = (String) source.get(IndexFields.CONTENT_SUB_FORMAT);
-					if (subFormat.equalsIgnoreCase(HOT_SPOT_IMAGE_QUESTION) && !text.startsWith(HTTP)) text = HTTP + COLON + input.getContentCdnUrl() + text;
+					if (subFormat.equalsIgnoreCase(HOT_SPOT_IMAGE_QUESTION) && !text.startsWith(HTTP)) text = HTTP + COLON + searchData.getContentCdnUrl() + text;
 					answers.add(text);
 				}
 			}

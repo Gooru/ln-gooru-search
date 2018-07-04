@@ -1,12 +1,14 @@
 package org.ednovo.gooru.search.es.processor.deserializer.v3;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
+import org.ednovo.gooru.search.responses.Metadata;
 import org.ednovo.gooru.search.responses.v3.RubricSearchResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,95 +32,59 @@ public class RubricV3DeserializeProcessor extends DeserializeV3Processor<List<Ru
 		output = new ArrayList<RubricSearchResult>();
 		for (Map<String, Object> hit : hits) {
 			Map<String, Object> fields = (Map<String, Object>) hit.get(SEARCH_SOURCE);
-			output.add(collect(fields, input, null));
+			output.add(collect(fields, input));
 		}
 		return output;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	RubricSearchResult collect(Map<String, Object> model, SearchData input, RubricSearchResult output) {
-		if (output == null) {
-			output = new RubricSearchResult();
-		}
-		output.setId((String) model.get(IndexFields.ID));
-		output.setTitle((String) model.get(IndexFields.TITLE));
-		output.setPublishStatus((String) model.get(IndexFields.PUBLISH_STATUS));
-		output.setUpdatedAt((String) model.get(IndexFields.UPDATED_AT));
-		output.setCreatedAt((String) model.get(IndexFields.CREATED_AT));
-		output.setLastModifiedBy((String) model.get(IndexFields.MODIFIER_ID));
-		output.setContentFormat((String) model.get(IndexFields.CONTENT_FORMAT));
+	RubricSearchResult collect(Map<String, Object> source, SearchData searchData) {
+		RubricSearchResult output = new RubricSearchResult();
+		output.setId((String) source.get(IndexFields.ID));
+		output.setTitle((String) source.get(IndexFields.TITLE));
+		output.setDescription((String) source.get(IndexFields.DESCRIPTION));
+		output.setFormat((String) source.get(IndexFields.CONTENT_FORMAT));
 
-		// set counts
-		if (model.get(IndexFields.STATISTICS) != null) {
-			Map<String, Object> statistics = (Map<String, Object>) model.get(IndexFields.STATISTICS);
-			output.setQuestionCount(statistics.get(IndexFields.QUESTION_COUNT) != null ? (Integer) statistics.get(IndexFields.QUESTION_COUNT) : 0);
-			long viewsCount = 0L;
-			if (statistics.get(IndexFields.VIEWS_COUNT) != null) {
-				viewsCount = ((Number) statistics.get(IndexFields.VIEWS_COUNT)).longValue();
-				output.setViewCount(viewsCount);
-			}
+		Date date = null;
+		try {
+			date = SIMPLE_DATE_FORMAT.parse((String) source.get(IndexFields.UPDATED_AT) + EMPTY_STRING);
+		} catch (Exception e) {
+			logger.error("modifiedAt field error: {}", e);
 		}
+		output.setModifiedAt(date);
 
-		// set course
-		if (model.get(IndexFields.COURSE) != null) {
-			output.setCourse((Map<String, Object>) model.get(IndexFields.COURSE));
+		Date createdDate = null;
+		try {
+			createdDate = SIMPLE_DATE_FORMAT.parse((String) source.get(IndexFields.CREATED_AT) + EMPTY_STRING);
+		} catch (Exception e) {
+			logger.error("createdAt field error: {}", e);
 		}
-
-		// set unit
-		if (model.get(IndexFields.UNIT) != null) {
-			output.setUnit((Map<String, Object>) model.get(IndexFields.UNIT));
-		}
-
-		// set lesson
-		if (model.get(IndexFields.LESSON) != null) {
-			output.setLesson((Map<String, Object>) model.get(IndexFields.LESSON));
-		}
-
-		// set collection
-		if (model.get(IndexFields.COLLECTION) != null) {
-			output.setCollection((Map<String, Object>) model.get(IndexFields.COLLECTION));
-		}
-
-		// set course
-		if (model.get(IndexFields.CONTENT) != null) {
-			output.setContent((Map<String, Object>) model.get(IndexFields.CONTENT));
-		}
-
+		output.setCreatedAt(createdDate);
+		
 		// set creator
-		if (model.get(IndexFields.CREATOR) != null) {
-			output.setCreator(setUser((Map<String, Object>) model.get(IndexFields.CREATOR), input));
+		if (source.get(IndexFields.CREATOR) != null) {
+			output.setCreator(setUser((Map<String, Object>) source.get(IndexFields.CREATOR), searchData));
 		}
 
-		// set original creator
-		if (model.get(IndexFields.ORIGINAL_CREATOR) != null) {
-			output.setOriginalCreator(setUser((Map<String, Object>) model.get(IndexFields.ORIGINAL_CREATOR), input));
-		}
-
+		Metadata metadata = new Metadata();
+		boolean curated = false;
+		Map<String, Object> statisticsMap = (Map<String, Object>) source.get(IndexFields.STATISTICS);
+		String publishStatus = (String) source.get(IndexFields.PUBLISH_STATUS);
+		if((publishStatus != null && publishStatus.equalsIgnoreCase(PublishedStatus.PUBLISHED.getStatus())) || (statisticsMap.containsKey(IndexFields.IS_FEATURED) && ((Boolean) statisticsMap.get(IndexFields.IS_FEATURED)))) curated = true;
+		metadata.setCurated(curated);
+		
 		// set taxonomy
-		Map<String, Object> taxonomyMap = (Map<String, Object>) model.get(IndexFields.TAXONOMY);
+		Map<String, Object> taxonomyMap = (Map<String, Object>) source.get(IndexFields.TAXONOMY);
 		if (taxonomyMap != null) {
-			Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
-			if (input.isCrosswalk() && input.getUserTaxonomyPreference() != null) {
+			if (searchData.isCrosswalk() && searchData.getUserTaxonomyPreference() != null) {
 				long start = System.currentTimeMillis();
-				taxonomySetAsMap = transformTaxonomy(taxonomyMap, input);
+				transformTaxonomy(taxonomyMap, searchData, metadata);
 				logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
 			}
-			if (!taxonomySetAsMap.containsKey(IndexFields.TAXONOMY_SET)) cleanUpTaxonomyCurriculumObject(taxonomySetAsMap);
-			output.setTaxonomy(taxonomySetAsMap);		
 		}
-		
-		// Set metadata
-		if (model.get(IndexFields.METADATA) != null) {
-			Map<String, List<String>> metadata = (Map<String, List<String>>) model.get(IndexFields.METADATA);
-			if (metadata != null) {
-				// audience
-				List<String> audience = metadata.get(IndexFields.AUDIENCE);
-				if (audience != null) {
-					output.setAudience(audience);
-				}
-			}
-		}
+
+		output.setMetadata(metadata);
 		return output;
 	}
 

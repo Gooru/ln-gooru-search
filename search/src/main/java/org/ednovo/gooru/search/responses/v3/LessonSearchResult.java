@@ -1,10 +1,9 @@
 package org.ednovo.gooru.search.responses.v3;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
+import java.util.Date;
 
-import org.ednovo.gooru.search.responses.SearchResult;
+import org.ednovo.gooru.search.responses.Metadata;
 
 public class LessonSearchResult extends SearchResult implements Serializable {
 
@@ -13,62 +12,38 @@ public class LessonSearchResult extends SearchResult implements Serializable {
 	 */
 	private static final long serialVersionUID = 6280104303486215669L;
 
-	private String lastModified;
+	private String playerUrl;
+	
+	private Date modifiedAt;
 
-	private String createdAt;
-
-	private String lastModifiedBy;
+	private Date createdAt;
 
 	private UserV3 creator;
-
-	private UserV3 owner;
-
-	private UserV3 originalCreator;
 	
-	private String contentFormat;
+	private Metadata metadata;
 
-	private Map<String, Object> course;
-
-	private Map<String, Object> unit;
-	
-	private List<String> collectionIds;
-
-	private Integer collectionCount;
-	
-	private Integer assessmentCount;
-
-	private Integer externalAssessmentCount;
-	
-	private Long viewCount;
-
-	private Double efficacy;
-	
-	private Double engagement;
-	
-	private Double relevance;
-
-	public String getLastModified() {
-		return lastModified;
+	public String getPlayerUrl() {
+		return playerUrl;
 	}
 
-	public void setLastModified(String lastModified) {
-		this.lastModified = lastModified;
+	public void setPlayerUrl(String playerUrl) {
+		this.playerUrl = playerUrl;
 	}
 
-	public String getCreatedAt() {
+	public Date getModifiedAt() {
+		return modifiedAt;
+	}
+
+	public void setModifiedAt(Date modifiedAt) {
+		this.modifiedAt = modifiedAt;
+	}
+
+	public Date getCreatedAt() {
 		return createdAt;
 	}
 
-	public void setCreatedAt(String createdAt) {
+	public void setCreatedAt(Date createdAt) {
 		this.createdAt = createdAt;
-	}
-
-	public String getLastModifiedBy() {
-		return lastModifiedBy;
-	}
-
-	public void setLastModifiedBy(String lastModifiedBy) {
-		this.lastModifiedBy = lastModifiedBy;
 	}
 
 	public UserV3 getCreator() {
@@ -79,108 +54,13 @@ public class LessonSearchResult extends SearchResult implements Serializable {
 		this.creator = creator;
 	}
 
-	public UserV3 getOwner() {
-		return owner;
+	public Metadata getMetadata() {
+		return metadata;
 	}
 
-	public void setOwner(UserV3 owner) {
-		this.owner = owner;
-	}
-
-	public UserV3 getOriginalCreator() {
-		return originalCreator;
-	}
-
-	public void setOriginalCreator(UserV3 originalCreator) {
-		this.originalCreator = originalCreator;
+	public void setMetadata(Metadata metadata) {
+		this.metadata = metadata;
 	}
 	
-	public String getContentFormat() {
-		return contentFormat;
-	}
-
-	public void setContentFormat(String contentFormat) {
-		this.contentFormat = contentFormat;
-	}
-	
-	public Map<String, Object> getCourse() {
-		return course;
-	}
-
-	public void setCourse(Map<String, Object> course) {
-		this.course = course;
-	}
-
-	public Map<String, Object> getUnit() {
-		return unit;
-	}
-
-	public void setUnit(Map<String, Object> unit) {
-		this.unit = unit;
-	}
-
-	public List<String> getCollectionIds() {
-		return collectionIds;
-	}
-
-	public void setCollectionIds(List<String> collectionIds) {
-		this.collectionIds = collectionIds;
-	}
-
-	public Integer getCollectionCount() {
-		return collectionCount;
-	}
-
-	public void setCollectionCount(Integer collectionCount) {
-		this.collectionCount = collectionCount;
-	}
-
-	public Integer getAssessmentCount() {
-		return assessmentCount;
-	}
-
-	public void setAssessmentCount(Integer assessmentCount) {
-		this.assessmentCount = assessmentCount;
-	}
-
-	public Integer getExternalAssessmentCount() {
-		return externalAssessmentCount;
-	}
-
-	public void setExternalAssessmentCount(Integer externalAssessmentCount) {
-		this.externalAssessmentCount = externalAssessmentCount;
-	}
-
-	public Long getViewCount() {
-		return viewCount;
-	}
-
-	public void setViewCount(Long viewCount) {
-		this.viewCount = viewCount;
-	}
-
-	public Double getEfficacy() {
-		return efficacy;
-	}
-
-	public void setEfficacy(Double efficacy) {
-		this.efficacy = efficacy;
-	}
-
-	public Double getEngagement() {
-		return engagement;
-	}
-
-	public void setEngagement(Double engagement) {
-		this.engagement = engagement;
-	}
-
-	public Double getRelevance() {
-		return relevance;
-	}
-
-	public void setRelevance(Double relevance) {
-		this.relevance = relevance;
-	}
 	
 }

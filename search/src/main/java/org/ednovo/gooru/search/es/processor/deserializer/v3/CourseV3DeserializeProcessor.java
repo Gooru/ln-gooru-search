@@ -3,6 +3,7 @@ package org.ednovo.gooru.search.es.processor.deserializer.v3;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -12,10 +13,10 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.constant.IndexFields;
-import org.ednovo.gooru.search.es.model.License;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
 import org.ednovo.gooru.search.es.service.SearchSettingService;
+import org.ednovo.gooru.search.responses.Metadata;
 import org.ednovo.gooru.search.responses.v3.CourseSearchResult;
 import org.springframework.stereotype.Component;
 
@@ -40,7 +41,7 @@ public class CourseV3DeserializeProcessor extends DeserializeV3Processor<List<Co
 		} else {
 			for (Map<String, Object> hit : hits) {
 				Map<String, Object> fields = (Map<String, Object>) hit.get(SEARCH_SOURCE);
-				output.add(collect(fields, input, null));
+				output.add(collect(fields, input));
 			}
 			logger.debug("Proccessing time for featured courses of user tenant : {} ms", System.currentTimeMillis() - start);
 		}
@@ -49,19 +50,39 @@ public class CourseV3DeserializeProcessor extends DeserializeV3Processor<List<Co
 
 	@SuppressWarnings("unchecked")
 	@Override
-	CourseSearchResult collect(Map<String, Object> model, SearchData input, CourseSearchResult courseResult) {
-		if (courseResult == null) {
-			courseResult = new CourseSearchResult();
+	CourseSearchResult collect(Map<String, Object> source, SearchData searchData) {
+		
+		CourseSearchResult output = new CourseSearchResult();
+		output.setId((String) source.get(IndexFields.ID));
+		output.setTitle((String) source.get(IndexFields.TITLE));
+		output.setDescription((String) source.get(IndexFields.DESCRIPTION));
+		
+		if (source.containsKey(IndexFields.THUMBNAIL)) {
+			String thumbnail = (String) source.get(IndexFields.THUMBNAIL);
+			if (!thumbnail.startsWith(HTTP)) thumbnail = HTTP + COLON + searchData.getContentCdnUrl() + thumbnail;
+			output.setThumbnail(thumbnail);
+		}		
+		
+		output.setPlayerUrl(SearchSettingService.getByName(DNS_ENV) + "/content/courses/play/" + output.getId());
+
+		Date date = null;
+		try {
+			date = SIMPLE_DATE_FORMAT.parse((String) source.get(IndexFields.UPDATED_AT) + EMPTY_STRING);
+		} catch (Exception e) {
+			logger.error("modifiedAt field error: {}", e);
 		}
-		courseResult.setId((String) model.get(IndexFields.ID));
-		courseResult.setTitle((String) model.get(IndexFields.TITLE));
-		courseResult.setDescription((String) model.get(IndexFields.DESCRIPTION));
-		courseResult.setThumbnail((String) model.get(IndexFields.THUMBNAIL));
-		courseResult.setPublishStatus((String) model.get(IndexFields.PUBLISH_STATUS));
-		courseResult.setLastModified((String) model.get(IndexFields.UPDATED_AT));
-		courseResult.setCreatedAt((String) model.get(IndexFields.CREATED_AT));
-		courseResult.setLastModifiedBy((String) model.get(IndexFields.MODIFIER_ID));
-		if (model.containsKey(IndexFields.SEQUENCE)) {
+		output.setModifiedAt(date);
+
+		Date createdDate = null;
+		try {
+			createdDate = SIMPLE_DATE_FORMAT.parse((String) source.get(IndexFields.CREATED_AT) + EMPTY_STRING);
+		} catch (Exception e) {
+			logger.error("createdAt field error: {}", e);
+		}
+		output.setCreatedAt(createdDate);
+			
+		Metadata metadata = new Metadata();
+/*		if (model.containsKey(IndexFields.SEQUENCE)) {
 			courseResult.setSequence((Integer) model.get(IndexFields.SEQUENCE));
 		}
 		if (model.containsKey(IndexFields.SUBJECT_BUCKET)) {
@@ -69,86 +90,31 @@ public class CourseV3DeserializeProcessor extends DeserializeV3Processor<List<Co
 		}
 		if (model.containsKey(IndexFields.SUBJECT_SEQUENCE)) {
 			courseResult.setSubjectSequence((Integer) model.get(IndexFields.SUBJECT_SEQUENCE));
-		}
-		courseResult.setContentFormat((String) model.get(IndexFields.CONTENT_FORMAT));
-
-		// set counts
-		if (model.get(IndexFields.STATISTICS) != null) {
-			Map<String, Object> statistics = (Map<String, Object>) model.get(IndexFields.STATISTICS);
-			courseResult.setUnitCount(statistics.get(IndexFields.UNIT_COUNT) != null ? (Integer) statistics.get(IndexFields.UNIT_COUNT) : 0);
-			courseResult.setCourseRemixCount(statistics.get(IndexFields.COURSE_REMIXCOUNT) != null ? (Integer) statistics.get(IndexFields.COURSE_REMIXCOUNT) : 0);
-			courseResult.setCollaboratorCount(statistics.get(IndexFields.COLLABORATOR_COUNT) != null ? (Integer) statistics.get(IndexFields.COLLABORATOR_COUNT) : 0);
-			courseResult.setLessonCount(statistics.get(IndexFields.LESSON_COUNT) != null ? ((Number) statistics.get(IndexFields.LESSON_COUNT)).longValue() : 0);
-			courseResult.setCollectionCount(statistics.get(IndexFields.COLLECTION_COUNT) != null ? ((Number) statistics.get(IndexFields.COLLECTION_COUNT)).longValue() : 0L);
-			courseResult.setAssessmentCount(statistics.get(IndexFields.ASSESSMENT_COUNT) != null ? ((Number) statistics.get(IndexFields.ASSESSMENT_COUNT)).longValue() : 0L);
-			courseResult.setExternalAssessmentCount(statistics.get(IndexFields.EXTERNAL_ASSESSMENT_COUNT) != null ? ((Number) statistics.get(IndexFields.EXTERNAL_ASSESSMENT_COUNT)).longValue() : 0L);
-			courseResult.setIsFeatured(statistics.get(IndexFields.IS_FEATURED) != null ? (Boolean) statistics.get(IndexFields.IS_FEATURED) : false);
-			courseResult.setRemixedInClassCount(statistics.get(IndexFields.REMIXED_IN_CLASS_COUNT) != null ? ((Number) statistics.get(IndexFields.REMIXED_IN_CLASS_COUNT)).longValue() : 0L);
-			courseResult.setUsedByStudentCount(statistics.get(IndexFields.USED_BY_STUDENT_COUNT) != null ? ((Number) statistics.get(IndexFields.USED_BY_STUDENT_COUNT)).longValue() : 0L);
-			courseResult.setEfficacy((statistics.get(IndexFields.EFFICACY) != null) ? ((Number) statistics.get(IndexFields.EFFICACY)).doubleValue() : 0.5);
-			courseResult.setEngagement((statistics.get(IndexFields.ENGAGEMENT) != null) ? ((Number) statistics.get(IndexFields.ENGAGEMENT)).doubleValue() : 0.5);
-			courseResult.setRelevance((statistics.get(IndexFields.RELEVANCE) != null) ? ((Number) statistics.get(IndexFields.RELEVANCE)).doubleValue() : 0.5);
-    	
-			long viewsCount = 0L;
-			if (statistics.get(IndexFields.VIEWS_COUNT) != null) {
-				viewsCount = ((Number) statistics.get(IndexFields.VIEWS_COUNT)).longValue();
-				courseResult.setViewCount(viewsCount);
-			}
-		}
-
-		// set license
-		if (model.get(IndexFields.LICENSE) != null) {
-			Map<String, Object> licenseData = (Map<String, Object>) model.get(IndexFields.LICENSE);
-			License license = new License();
-			license.setCode((String) licenseData.get(IndexFields.LICENSE_CODE));
-			license.setDefinition((String) licenseData.get(IndexFields.LICENSE_DEFINITION));
-			license.setIcon((String) licenseData.get(IndexFields.LICENSE_ICON));
-			license.setName((String) licenseData.get(IndexFields.LICENSE_NAME));
-			license.setUrl((String) licenseData.get(IndexFields.LICENSE_URL));
-			courseResult.setLicense(license);
-		} else {
-			courseResult.setLicense(new License());
-		}
+		}*/
 
 		// set creator
-		if (model.get(IndexFields.CREATOR) != null) {
-			courseResult.setCreator(setUser((Map<String, Object>) model.get(IndexFields.CREATOR), input));
-		}
-
-		// set owner
-		if (model.get(IndexFields.OWNER) != null) {
-			courseResult.setOwner(setUser((Map<String, Object>) model.get(IndexFields.OWNER), input));
-		}
-
-		// set original creator
-		if (model.get(IndexFields.ORIGINAL_CREATOR) != null) {
-			courseResult.setOriginalCreator(setUser((Map<String, Object>) model.get(IndexFields.ORIGINAL_CREATOR), input));
+		if (source.get(IndexFields.OWNER) != null) {
+			output.setCreator(setUser((Map<String, Object>) source.get(IndexFields.OWNER), searchData));
 		}
 		
-		// set metadata 
-		List<String> audience = null;
-		if (model.get(IndexFields.METADATA) != null) {
-			Map<String, List<String>> metadata = (Map<String, List<String>>) model.get(IndexFields.METADATA);
-			if (metadata != null && metadata.get(IndexFields.AUDIENCE) != null) {
-				audience = metadata.get(IndexFields.AUDIENCE);
-			}
-		}
-		courseResult.setAudience(audience);
+		boolean curated = false;
+		Map<String, Object> statisticsMap = (Map<String, Object>) source.get(IndexFields.STATISTICS);
+		String publishStatus = (String) source.get(IndexFields.PUBLISH_STATUS);
+		if((publishStatus != null && publishStatus.equalsIgnoreCase(PublishedStatus.PUBLISHED.getStatus())) || (statisticsMap.containsKey(IndexFields.IS_FEATURED) && ((Boolean) statisticsMap.get(IndexFields.IS_FEATURED)))) curated = true;
+		metadata.setCurated(curated);
 		
 		// set taxonomy
-		Map<String, Object> taxonomyMap = (Map<String, Object>) model.get(IndexFields.TAXONOMY);
+		Map<String, Object> taxonomyMap = (Map<String, Object>) source.get(IndexFields.TAXONOMY);
 		if (taxonomyMap != null) {
-			Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
-			if (input.isCrosswalk() && input.getUserTaxonomyPreference() != null) {
+			if (searchData.isCrosswalk() && searchData.getUserTaxonomyPreference() != null) {
 				long start = System.currentTimeMillis();
-				taxonomySetAsMap = transformTaxonomy(taxonomyMap, input);
+				transformTaxonomy(taxonomyMap, searchData, metadata);
 				logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
 			}
-			if (!taxonomySetAsMap.containsKey(IndexFields.TAXONOMY_SET)) cleanUpTaxonomyCurriculumObject(taxonomySetAsMap);
-			courseResult.setTaxonomy(taxonomySetAsMap);
 		}
 
-		return courseResult;
+		output.setMetadata(metadata);
+		return output;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -181,7 +147,7 @@ public class CourseV3DeserializeProcessor extends DeserializeV3Processor<List<Co
 			}
 			tenantFeaturedSorted.entrySet().forEach(mergedFeaturedMap -> {
 				((List<Map<String, Object>>) mergedFeaturedMap.getValue()).forEach(hit -> {
-					courseResult.add(collect(hit, input, null));
+					courseResult.add(collect(hit, input));
 				});
 			});
 		}

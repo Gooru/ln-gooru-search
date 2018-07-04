@@ -3,6 +3,7 @@
  */
 package org.ednovo.gooru.search.es.processor;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,6 +47,8 @@ public abstract class SearchProcessor<I extends SearchData, O extends Object> im
 	
 	public static Map<String,String> INSTRUCTIONAL_USE_KEY_VALUE = new HashMap<String, String>();
 	
+	protected static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
 	protected static Pattern pattern;
 	
 	protected Matcher matcher;
