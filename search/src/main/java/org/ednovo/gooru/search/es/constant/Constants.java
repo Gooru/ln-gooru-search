@@ -561,5 +561,6 @@ public interface Constants {
     public static final String HOT_SPOT_IMAGE_QUESTION = "hot_spot_image_question";
     public static final String AUDIENCE_ALL_STUDENTS = "All Students";
 	public static final String EXTERNAL = "external";
+	public static final String UNDERSCORE = "_";
 
 }
