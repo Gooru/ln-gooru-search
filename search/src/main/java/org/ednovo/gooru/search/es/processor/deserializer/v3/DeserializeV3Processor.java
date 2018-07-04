@@ -176,27 +176,9 @@ public abstract class DeserializeV3Processor<O, S> extends SearchProcessor<Searc
 			user.setFirstName((String) userData.get(IndexFields.FIRST_NAME));
 			user.setLastName((String) userData.get(IndexFields.LAST_NAME));
 			if (RESOURCE_MATCH.matcher(input.getType()).matches()) user.setUsername((String) userData.get(IndexFields.USERNAME));
-			if (userData.get(IndexFields.PROFILE_IMAGE) != null) user.setProfileImageUrl("http:" + input.getUserCdnUrl() + (String) userData.get(IndexFields.PROFILE_IMAGE));
+			if (userData.get(IndexFields.PROFILE_IMAGE) != null) user.setProfileImageUrl(HTTP + COLON + input.getUserCdnUrl() + (String) userData.get(IndexFields.PROFILE_IMAGE));
 		}
 		return user;
 	}
 	
-	@SuppressWarnings("unchecked")
-	protected void cleanUpTaxonomyCurriculumObject(Map<String, Object> taxonomySetAsMap) {
-		Map<String, Object> curriculumAsMap = ((Map<String, Object>) taxonomySetAsMap.get(IndexFields.CURRICULUM));
-		if (curriculumAsMap != null && !curriculumAsMap.isEmpty()) {
-			curriculumAsMap.remove("curriculumCode");
-			curriculumAsMap.remove("curriculumDesc");
-			curriculumAsMap.remove("curriculumName");
-			List<Map<String, String>> curriculumInfoAsList = (List<Map<String, String>>) curriculumAsMap.get(IndexFields.CURRICULUM_INFO);
-			Map<String, Object> finalConvertedMap = new HashMap<>();
-			curriculumInfoAsList.forEach(codeAsMap -> {
-				String codeId = codeAsMap.get(IndexFields.ID);
-				codeAsMap.remove(IndexFields.ID);
-				finalConvertedMap.put(codeId, codeAsMap);
-			});
-			taxonomySetAsMap.put(IndexFields.TAXONOMY_SET, finalConvertedMap);
-			curriculumAsMap.remove(IndexFields.CURRICULUM_INFO);
-		}
-	}
 }

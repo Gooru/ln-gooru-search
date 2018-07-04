@@ -119,7 +119,7 @@ public class ResourceV3DeserializeProcessor extends DeserializeV3Processor<List<
 		}
 		
 		output.setFormat(contentFormat);
-		output.setSubFormat(contentSubFormat);
+		output.setSubFormat(contentSubFormat.replace(UNDERSCORE_COLON + RESOURCE, EMPTY_STRING));
 		output.setTitle(StringUtils.defaultString((String) source.get(IndexFields.TITLE), EMPTY_STRING));
 		if (source.containsKey(IndexFields.URL)) {
 			String url = (String) source.get(IndexFields.URL);
