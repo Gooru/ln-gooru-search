@@ -71,7 +71,8 @@ public class CollectionV3DeserializeProcessor extends DeserializeV3Processor<Lis
 			if (!url.startsWith(HTTP)) url = HTTP + COLON + searchData.getContentCdnUrl() + url;
 			output.setUrl(url);
 		}
-		output.setPlayerUrl(SearchSettingService.getByName(DNS_ENV) + "/content/" + output.getFormat() + "s/play/" + output.getId());
+		List<String> resourceIds = (List<String>)source.get(IndexFields.RESOURCE_IDS);
+		if (!resourceIds.isEmpty()) output.setPlayerUrl(SearchSettingService.getByName(DNS_ENV) + "/player/" + output.getId() + "?resourceId=" + resourceIds.get(0).toString());
 
 		if (source.containsKey(IndexFields.THUMBNAIL)) {
 			String thumbnail = (String) source.get(IndexFields.THUMBNAIL);

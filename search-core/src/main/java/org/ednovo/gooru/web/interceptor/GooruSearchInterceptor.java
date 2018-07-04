@@ -93,6 +93,7 @@ public class GooruSearchInterceptor extends HandlerInterceptorAdapter {
 		return true;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
 		Long endTime = System.currentTimeMillis();
@@ -114,7 +115,9 @@ public class GooruSearchInterceptor extends HandlerInterceptorAdapter {
 				}
 			}
 		}
+		String type = null;
 		if (request.getAttribute("type") != null) {
+			type =  (String) request.getAttribute("type");
 			payloadObject.put("itemType", request.getAttribute("type"));
 		}
 		payloadObject.put("filters", filter);
@@ -127,7 +130,7 @@ public class GooruSearchInterceptor extends HandlerInterceptorAdapter {
 		metrics.put("totalTimeSpentInMs", totalTimeSpentInMs);
 		SessionContextSupport.putLogParameter("metrics", metrics);
 		Map<String, Object> log = SessionContextSupport.getLog();
-		if (request.getRequestURL().toString().contains("scollection") || request.getRequestURL().toString().contains("resource")) {
+		if (type != null && Constants.RQCA_MATCH.matcher(type).matches()) {
 			if (log != null && !log.isEmpty() && request.getAttribute("action") != null && request.getAttribute("action").equals("search") && SessionContextSupport.getLog().get(EVENT_NAME) != null) {
 				try {
 					String logJson = new JSONObject(log).toString();
