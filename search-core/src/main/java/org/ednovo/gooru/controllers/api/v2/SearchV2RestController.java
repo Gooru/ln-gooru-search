@@ -1,5 +1,6 @@
 package org.ednovo.gooru.controllers.api.v2;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import org.ednovo.gooru.search.es.exception.SearchException;
 import org.ednovo.gooru.search.es.handler.SearchHandler;
 import org.ednovo.gooru.search.es.handler.SearchHandlerType;
 import org.ednovo.gooru.search.es.model.MapWrapper;
+import org.ednovo.gooru.search.es.model.Scope;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.SessionContextSupport;
 import org.ednovo.gooru.search.es.model.User;
@@ -129,6 +131,13 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			searchDataMap.put("aggBy.field", searchDataMap.getString(AGG_BY));
 			searchDataMap.remove(AGG_BY);
 		}
+		if (searchDataMap.containsKey("scopeKey")) {
+			Scope scope = new Scope();
+			scope.setKey(searchDataMap.getString("scopeKey"));
+			if (searchDataMap.containsKey("scopeTargetNames")) scope.setTargetNames(Arrays.asList(searchDataMap.getString("scopeTargetNames").split(TILDE)));
+			searchData.setScope(scope);
+		}
+		
 		// client controlled value to enable / disable spell check.
 		searchDataMap.put("disableSpellCheck", disableSpellCheck);
 		searchData.setParameters(searchDataMap);

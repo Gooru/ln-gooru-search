@@ -107,7 +107,7 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 		String contentCdnUrl = (String) request.getAttribute(Constants.CONTENT_CDN_URL);
 		searchData.setContentCdnUrl(contentCdnUrl);
 
-		// Set content cdn url
+		// Set user cdn url
 		String userCdnUrl = (String) request.getAttribute(Constants.USER_CDN_URL);
 		searchData.setUserCdnUrl(userCdnUrl);
 		
