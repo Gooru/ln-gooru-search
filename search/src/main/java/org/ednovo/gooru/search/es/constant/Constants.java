@@ -64,6 +64,10 @@ public interface Constants {
 
 	public static final String COLLECTION_ITEM_EXCLUDES[] = { "*.contentMetaAssoc", "*.indexType", "*.isFeatured", "*.isFeaturedBoolean", "*.isNew", "*.recordSource", "*.settings", "*.s3UploadFlag" };
 
+	public static final String V2_EXCLUDES[] = {"results", "query"};
+	
+	public static final String AGG_EXCLUDES[] = {"aggregations"};
+
 	public static final String COLLECTION_QUIZ = "collection-quiz";
 
 	public static final String TYPE_LIBRARY = "library";
