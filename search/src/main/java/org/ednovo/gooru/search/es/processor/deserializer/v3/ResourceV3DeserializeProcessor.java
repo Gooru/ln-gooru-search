@@ -119,7 +119,8 @@ public class ResourceV3DeserializeProcessor extends DeserializeV3Processor<List<
 		}
 		
 		output.setFormat(contentFormat);
-		contentSubFormat = contentSubFormat.replaceAll(UNDERSCORE + RESOURCE, EMPTY_STRING);
+		contentSubFormat = contentSubFormat.replaceAll(UNDERSCORE + TYPE_RESOURCE, EMPTY_STRING);
+		contentSubFormat = contentSubFormat.replaceAll(UNDERSCORE + TYPE_QUESTION, EMPTY_STRING);
 		output.setSubFormat(contentSubFormat);
 		output.setTitle(StringUtils.defaultString((String) source.get(IndexFields.TITLE), EMPTY_STRING));
 		if (source.containsKey(IndexFields.URL)) {

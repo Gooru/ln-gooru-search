@@ -49,7 +49,7 @@ public class CollectionV3DeserializeProcessor extends DeserializeV3Processor<Lis
 		return output;
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "unused" })
 	CollectionSearchResult collect(Map<String, Object> source, SearchData searchData) {
 		CollectionSearchResult output = new CollectionSearchResult();
 
@@ -70,9 +70,9 @@ public class CollectionV3DeserializeProcessor extends DeserializeV3Processor<Lis
 			String url = (String) source.get(IndexFields.URL);
 			if (!url.startsWith(HTTP)) url = HTTP + COLON + searchData.getContentCdnUrl() + url;
 			output.setUrl(url);
+			output.setPlayerUrl(url);
 		}
-		List<String> resourceIds = (List<String>)source.get(IndexFields.RESOURCE_IDS);
-		if (!resourceIds.isEmpty()) output.setPlayerUrl(SearchSettingService.getByName(DNS_ENV) + "/player/" + output.getId() + "?resourceId=" + resourceIds.get(0).toString());
+		if (!contentFormat.contains(EXTERNAL)) output.setPlayerUrl(SearchSettingService.getByName(DNS_ENV) + "/player/" + output.getId() + "?type=" + contentFormat);
 
 		if (source.containsKey(IndexFields.THUMBNAIL)) {
 			String thumbnail = (String) source.get(IndexFields.THUMBNAIL);
