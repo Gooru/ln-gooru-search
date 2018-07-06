@@ -275,6 +275,8 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		if (includeCIMetaData == true) {
 			excludeAttributeArray = (String[]) ArrayUtils.addAll(COLLECTION_ITEM_EXCLUDES, excludeAttributeArray);
 		}
+		excludeAttributeArray = (String[]) ArrayUtils.addAll(V2_EXCLUDES, excludeAttributeArray);
+		if (!searchData.isAggregationRequest()) excludeAttributeArray = (String[]) ArrayUtils.addAll(AGG_EXCLUDES, excludeAttributeArray);
 
 		payloadObject.put("pageSize", pageSize);
 		payloadObject.put("pageNum", pageNum);
