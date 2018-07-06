@@ -49,7 +49,7 @@ public class CollectionV3DeserializeProcessor extends DeserializeV3Processor<Lis
 		return output;
 	}
 	
-	@SuppressWarnings({ "unchecked", "unused" })
+	@SuppressWarnings({ "unchecked" })
 	CollectionSearchResult collect(Map<String, Object> source, SearchData searchData) {
 		CollectionSearchResult output = new CollectionSearchResult();
 

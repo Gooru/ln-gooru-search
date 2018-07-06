@@ -562,5 +562,6 @@ public interface Constants {
     public static final String AUDIENCE_ALL_STUDENTS = "All Students";
 	public static final String EXTERNAL = "external";
 	public static final String UNDERSCORE = "_";
+	public static final String TILDE = "~";
 
 }
