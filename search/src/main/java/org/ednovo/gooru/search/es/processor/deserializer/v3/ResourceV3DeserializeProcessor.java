@@ -130,7 +130,7 @@ public class ResourceV3DeserializeProcessor extends DeserializeV3Processor<List<
 		}
 		if (source.containsKey(IndexFields.THUMBNAIL)) {
 			String thumbnail = (String) source.get(IndexFields.THUMBNAIL);
-			if (!thumbnail.startsWith(HTTP)) thumbnail = HTTP + COLON + searchData.getContentCdnUrl() + thumbnail;
+			if (thumbnail != null && !thumbnail.startsWith(HTTP)) thumbnail = HTTP + COLON + searchData.getContentCdnUrl() + thumbnail;
 			output.setThumbnail(thumbnail);
 		}
 		output.setId((String) source.get(IndexFields.ID));

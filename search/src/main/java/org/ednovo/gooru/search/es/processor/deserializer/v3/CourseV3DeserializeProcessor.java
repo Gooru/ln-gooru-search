@@ -59,7 +59,7 @@ public class CourseV3DeserializeProcessor extends DeserializeV3Processor<List<Co
 		
 		if (source.containsKey(IndexFields.THUMBNAIL)) {
 			String thumbnail = (String) source.get(IndexFields.THUMBNAIL);
-			if (!thumbnail.startsWith(HTTP)) thumbnail = HTTP + COLON + searchData.getContentCdnUrl() + thumbnail;
+			if (thumbnail != null && !thumbnail.startsWith(HTTP)) thumbnail = HTTP + COLON + searchData.getContentCdnUrl() + thumbnail;
 			output.setThumbnail(thumbnail);
 		}		
 		

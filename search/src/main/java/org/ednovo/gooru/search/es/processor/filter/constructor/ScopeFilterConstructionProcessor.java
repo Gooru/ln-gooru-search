@@ -26,7 +26,7 @@ public class ScopeFilterConstructionProcessor extends FilterConstructionProcesso
     public void process(SearchData searchData, SearchResponse<Object> response) {
         super.process(searchData, response);
         Scope scope = searchData.getScope();
-        if (scope != null) {
+        if (scope != null && scope.getKey() != null && SCOPE_MATCH.matcher(scope.getKey()).matches()) {
             processScope(searchData, scope.getKey(), scope);
         }
     }
