@@ -131,6 +131,10 @@ public class SearchData implements Serializable {
 	
 	private boolean isAdmin = false;
 	
+	private Scope scope;
+	
+	private String userCdnUrl;
+
 	public boolean isShowCanonicalOnly() {
 		return showCanonicalOnly;
 	}
@@ -578,6 +582,22 @@ public class SearchData implements Serializable {
 
 	public void setAdmin(boolean isAdmin) {
 		this.isAdmin = isAdmin;
+	}
+
+    public Scope getScope() {
+        return scope;
+    }
+
+    public void setScope(Scope scope) {
+        this.scope = scope;
+    }
+
+	public String getUserCdnUrl() {
+		return userCdnUrl;
+	}
+
+	public void setUserCdnUrl(String userCdnUrl) {
+		this.userCdnUrl = userCdnUrl;
 	}
 
 }

@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.ednovo.gooru.search.domain.service.SearchResult;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.EsIndex;
 import org.ednovo.gooru.search.es.constant.IndexFields;
@@ -18,8 +17,9 @@ import org.ednovo.gooru.search.es.handler.SearchHandler;
 import org.ednovo.gooru.search.es.handler.SearchHandlerType;
 import org.ednovo.gooru.search.es.model.Code;
 import org.ednovo.gooru.search.es.model.SearchData;
-import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.processor.SearchProcessor;
+import org.ednovo.gooru.search.responses.SearchResponse;
+import org.ednovo.gooru.search.responses.SearchResult;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
@@ -69,7 +69,7 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 						query.put("current", searchData.getSpellCheckQueryString());
 						query.put("rewriteType", SPELLCHECKER);
 					}
-					response.setQuery(query);
+					response.setSearchQuery(query);
 
 					// response.setSpellCheckQueryString(searchData.getSpellCheckQueryString());
 				}
@@ -85,7 +85,7 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 			}*/
 
 		} catch (Exception e) {
-			LOG.error("Search Error", e);
+			logger.error("Search Error", e);
 			throw new SearchException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}

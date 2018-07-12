@@ -3,6 +3,7 @@
  */
 package org.ednovo.gooru.search.es.processor;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,8 +18,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.SearchSettingType;
 import org.ednovo.gooru.search.es.model.SearchData;
-import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.service.SearchSettingService;
+import org.ednovo.gooru.search.responses.SearchResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +35,6 @@ public abstract class SearchProcessor<I extends SearchData, O extends Object> im
 
 	protected static final ObjectMapper SERIAILIZER = new ObjectMapper();
 
-	protected static final Logger LOG = LoggerFactory.getLogger(SearchProcessor.class);
-
 	private boolean isTransactional = false;
 
 	private boolean isSessionInfoRequired = false;
@@ -48,6 +47,8 @@ public abstract class SearchProcessor<I extends SearchData, O extends Object> im
 	
 	public static Map<String,String> INSTRUCTIONAL_USE_KEY_VALUE = new HashMap<String, String>();
 	
+	protected static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
 	protected static Pattern pattern;
 	
 	protected Matcher matcher;

@@ -1,5 +1,6 @@
 package org.ednovo.gooru.controllers.api.v2;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,13 +20,14 @@ import org.ednovo.gooru.search.es.exception.SearchException;
 import org.ednovo.gooru.search.es.handler.SearchHandler;
 import org.ednovo.gooru.search.es.handler.SearchHandlerType;
 import org.ednovo.gooru.search.es.model.MapWrapper;
+import org.ednovo.gooru.search.es.model.Scope;
 import org.ednovo.gooru.search.es.model.SearchData;
-import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.model.SessionContextSupport;
 import org.ednovo.gooru.search.es.model.User;
 import org.ednovo.gooru.search.es.model.UserGroupSupport;
 import org.ednovo.gooru.search.es.processor.util.SerializerUtil;
 import org.ednovo.gooru.search.es.service.SearchService;
+import org.ednovo.gooru.search.responses.SearchResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -129,6 +131,13 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			searchDataMap.put("aggBy.field", searchDataMap.getString(AGG_BY));
 			searchDataMap.remove(AGG_BY);
 		}
+		if (searchDataMap.containsKey("scopeKey")) {
+			Scope scope = new Scope();
+			scope.setKey(searchDataMap.getString("scopeKey"));
+			if (searchDataMap.containsKey("scopeTargetNames")) scope.setTargetNames(Arrays.asList(searchDataMap.getString("scopeTargetNames").split(TILDE)));
+			searchData.setScope(scope);
+		}
+		
 		// client controlled value to enable / disable spell check.
 		searchDataMap.put("disableSpellCheck", disableSpellCheck);
 		searchData.setParameters(searchDataMap);
@@ -266,6 +275,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		if (includeCIMetaData == true) {
 			excludeAttributeArray = (String[]) ArrayUtils.addAll(COLLECTION_ITEM_EXCLUDES, excludeAttributeArray);
 		}
+		excludeAttributeArray = (String[]) ArrayUtils.addAll(V2_EXCLUDES, excludeAttributeArray);
 
 		payloadObject.put("pageSize", pageSize);
 		payloadObject.put("pageNum", pageNum);
@@ -281,6 +291,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			payloadObject.put("hitCount", searchResponse.getTotalHitCount());
 			payloadObject.put("searchExecutionTime", searchResponse.getExecutionTime());
 			SessionContextSupport.putLogParameter("payLoadObject", payloadObject);
+			if (!searchData.isAggregationRequest()) excludeAttributeArray = (String[]) ArrayUtils.addAll(AGG_EXCLUDES, excludeAttributeArray);
 
 			if (type.equalsIgnoreCase(RESOURCE)) {
 				if (!userDetails) {

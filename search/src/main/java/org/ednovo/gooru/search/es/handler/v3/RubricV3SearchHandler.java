@@ -1,0 +1,44 @@
+package org.ednovo.gooru.search.es.handler.v3;
+
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.BlackListQueryValidation;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.Elasticsearch;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.EsDslQueryBuild;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.LimitValidation;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.RubricV3DeserializeProcessor;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.RubricFilterConstruction;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.ScopeFilterConstruction;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.TenantFilterConstruction;
+
+import java.util.Map;
+
+import org.ednovo.gooru.search.es.constant.EsIndex;
+import org.ednovo.gooru.search.es.handler.SearchHandler;
+import org.ednovo.gooru.search.es.handler.SearchHandlerType;
+import org.ednovo.gooru.search.es.model.SearchData;
+import org.ednovo.gooru.search.es.processor.SearchProcessorType;
+import org.springframework.stereotype.Component;
+/**
+ * @author Renuka
+ * 
+ */
+@Component
+public class RubricV3SearchHandler extends SearchHandler<SearchData, Map<String, Object>> {
+
+	private static final SearchProcessorType[][] searchProcessorTypes = new SearchProcessorType[][] { { BlackListQueryValidation }, { LimitValidation }, { TenantFilterConstruction }, { ScopeFilterConstruction },
+			{ RubricFilterConstruction }, { EsDslQueryBuild }, { Elasticsearch }, { RubricV3DeserializeProcessor } };
+
+	@Override
+	protected SearchProcessorType[][] getProcessorTypeChain() {
+		return searchProcessorTypes;
+	}
+
+	@Override
+	protected SearchHandlerType getType() {
+		return SearchHandlerType.RUBRIC_V3;
+	}
+
+	@Override
+	protected EsIndex getIndexType() {
+		return EsIndex.RUBRIC;
+	}
+}

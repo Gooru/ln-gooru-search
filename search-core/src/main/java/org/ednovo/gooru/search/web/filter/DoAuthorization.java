@@ -68,6 +68,7 @@ public class DoAuthorization {
 					if (responseHolder.getAppId() != null) request.setAttribute(EventConstants.APP_ID, responseHolder.getAppId());
 					if (responseHolder.getPartnerId() != null) request.setAttribute(EventConstants.PARTNER_ID, responseHolder.getPartnerId());
 					request.setAttribute(Constants.CONTENT_CDN_URL, responseHolder.getContentCDN());
+					request.setAttribute(Constants.USER_CDN_URL, responseHolder.getUserCDN());
 					UserGroupSupport userGroup = new UserGroupSupport();
 					JSONObject tenant = responseHolder.getTenant();
 					userGroup.setTenantId(tenant.getString(EventConstants.TENANT_ID));

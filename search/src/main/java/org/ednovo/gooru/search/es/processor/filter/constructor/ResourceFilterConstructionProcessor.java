@@ -6,8 +6,8 @@ package org.ednovo.gooru.search.es.processor.filter.constructor;
 import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.constant.SearchFilterConstants;
 import org.ednovo.gooru.search.es.model.SearchData;
-import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
+import org.ednovo.gooru.search.responses.SearchResponse;
 import org.springframework.stereotype.Component;
 /**
  * @author SearchTeam
@@ -26,7 +26,7 @@ public class ResourceFilterConstructionProcessor extends ContentFilterConstructi
 			searchData.getFilters().remove("&^type");
 		}
 		
-		// Default filter to get non-broken
+		// Default filter to get non-broken and student content
 		searchData.putFilter(FLT_STATUS_BROKEN, 0);
 
 		if (searchData != null && searchData.getFilters() != null) {
@@ -35,7 +35,10 @@ public class ResourceFilterConstructionProcessor extends ContentFilterConstructi
 			if (searchData.getFilters().containsKey(AMPERSAND_CONTENT_FORMAT)) {
 				contentFormat = (String) searchData.getFilters().get(AMPERSAND_CONTENT_FORMAT);
 			}
-//			if (contentFormat != null && contentFormat.equalsIgnoreCase(TYPE_RESOURCE)) searchData.putFilter(FLT_PUBLISHER_QUALITY_INDICATOR, "3,4,5");
+			if (contentFormat != null && contentFormat.equalsIgnoreCase(TYPE_RESOURCE))  {
+				searchData.putFilter(FLT_PUBLISHER_QUALITY_INDICATOR, "3,4,5");
+				if (!searchData.getFilters().containsKey(AMPERSAND_AUDIENCE)) searchData.putFilter(AMPERSAND_AUDIENCE, AUDIENCE_ALL_STUDENTS);
+			}
 			
 			if (searchData.getFilters().containsKey(FLT_COURSE_ID)) {
 				courseId = (String) searchData.getFilters().get(FLT_COURSE_ID);

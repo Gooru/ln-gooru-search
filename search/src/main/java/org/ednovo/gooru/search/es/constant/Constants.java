@@ -64,6 +64,10 @@ public interface Constants {
 
 	public static final String COLLECTION_ITEM_EXCLUDES[] = { "*.contentMetaAssoc", "*.indexType", "*.isFeatured", "*.isFeaturedBoolean", "*.isNew", "*.recordSource", "*.settings", "*.s3UploadFlag" };
 
+	public static final String V2_EXCLUDES[] = {"results", "query"};
+	
+	public static final String AGG_EXCLUDES[] = {"aggregations"};
+
 	public static final String COLLECTION_QUIZ = "collection-quiz";
 
 	public static final String TYPE_LIBRARY = "library";
@@ -384,8 +388,10 @@ public interface Constants {
 	public static final String FLT_COURSE_ID = "&^courseId";
 	public static final String FLT_TENANT_ID = "&^tenant.tenantId";
 	public static final String FLT_PUBLISHER_QUALITY_INDICATOR = "&^statistics.publisherQualityIndicator";
+	public static final String AMPERSAND_AUDIENCE = "&^audience";
 
 	public static final String CONTENT_CDN_URL = "contentCDN";
+	public static final String USER_CDN_URL = "userCDN";
 	public static final String USER_PREFERENCES = "userPreferences";
 
 	public static final String SEARCH_REQ_20 = "2.0";
@@ -527,7 +533,7 @@ public interface Constants {
 	Pattern RQCA_MATCH = Pattern.compile("resource|question|collection|assessment|scollection");
 	Pattern RQC_MATCH = Pattern.compile("resource|question|collection|scollection");
 	Pattern RESOURCE_MATCH = Pattern.compile("resource|question");
-	Pattern COLLECTION_MATCH = Pattern.compile("scollection|collection|assessment");
+	Pattern COLLECTION_MATCH = Pattern.compile("scollection|collection|assessment|collection-external|assessment-external");
 	public static final String PEDAGOGY_UNDERSCORE = "pedagogy_";
 	public static final String TOTAL_HIT_COUNT = "totalHitCount";
 	public static final String RESULT_COUNT = "resultCount";
@@ -550,7 +556,17 @@ public interface Constants {
 	public static final String COLLECTIONS = "collections";
 	public static final String ASSESSMENTS = "assessments";
 	public static final String RESOURCES = "resources";
-	public static final String DOMAIN = "domain";
-	public static final String[] START_WITH_BOOLEAN_OPERATORS = new String[] { "AND NOT ", "OR NOT ", "NOT AND ", "NOT OR ", "OR ", "AND " };
-	public static final String[] END_WITH_BOOLEAN_OPERATORS = new String[] { " AND NOT", " OR NOT", " NOT AND", " NOT OR", " OR", " AND" };
+    public static final String DOMAIN = "domain";
+    public static final String[] START_WITH_BOOLEAN_OPERATORS = new String[] { "AND NOT ", "OR NOT ", "NOT AND ", "NOT OR ", "OR ", "AND " };
+    public static final String[] END_WITH_BOOLEAN_OPERATORS = new String[] { " AND NOT", " OR NOT", " NOT AND", " NOT OR", " OR", " AND" };
+    Pattern SCOPE_MYCONTENT_LIBRARY_MATCH = Pattern.compile("my-content|tenant-library|subtenant-library|open-library|course|open-featured");
+    Pattern SCOPE_MATCH = Pattern.compile("my-content|tenant-library|subtenant-library|open-library|course|open-featured|open-all");
+    public static final String LIBRARY = "library";
+    public static final String _V3 = "_v3";
+    public static final String HOT_SPOT_IMAGE_QUESTION = "hot_spot_image_question";
+    public static final String AUDIENCE_ALL_STUDENTS = "All Students";
+	public static final String EXTERNAL = "external";
+	public static final String UNDERSCORE = "_";
+	public static final String TILDE = "~";
+
 }

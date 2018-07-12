@@ -22,7 +22,7 @@ import org.apache.http.nio.entity.NStringEntity;
 import org.apache.http.util.EntityUtils;
 import org.ednovo.gooru.search.es.exception.BadRequestException;
 import org.ednovo.gooru.search.es.model.SearchData;
-import org.ednovo.gooru.search.es.model.SearchResponse;
+import org.ednovo.gooru.search.responses.SearchResponse;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.sniff.SniffOnFailureListener;
@@ -83,7 +83,9 @@ public class ElasticsearchProcessor extends SearchProcessor<SearchData, Object> 
 		String indexName = searchData.getIndexType().getName();
 		String indexType = searchData.getType().toLowerCase();
 		if (indexType.startsWith(PEDAGOGY_UNDERSCORE)) {
-			indexType = indexType.replaceFirst(PEDAGOGY_UNDERSCORE, "");
+			indexType = indexType.replaceFirst(PEDAGOGY_UNDERSCORE, EMPTY_STRING);
+		} else if (indexType.contains(_V3)) {
+			indexType = indexType.replaceFirst(_V3, EMPTY_STRING);
 		}
 		if (indexType.equalsIgnoreCase(TYPE_SCOLLECTION)) {
 			indexType = TYPE_COLLECTION;

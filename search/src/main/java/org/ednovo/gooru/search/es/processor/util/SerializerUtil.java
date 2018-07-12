@@ -32,9 +32,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.ArrayUtils;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.exception.MethodFailureException;
-import org.ednovo.gooru.search.es.model.ContentSearchResult;
 import org.ednovo.gooru.search.es.model.SessionContextSupport;
 import org.ednovo.gooru.search.es.model.User;
+import org.ednovo.gooru.search.responses.ContentSearchResult;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -282,7 +282,7 @@ public class SerializerUtil {
 					}
 					try {
 						if (data != null) {
-							payLoadObject.put("data", data);
+							payLoadObject.put("data", new JSONObject(data));
 						}
 					} catch (Exception e) {
 						LOGGER.error("Error: " + e);

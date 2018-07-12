@@ -12,8 +12,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.ednovo.gooru.search.es.exception.SearchException;
 import org.ednovo.gooru.search.es.model.SearchData;
-import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.model.GooruAuthenticationToken;
+import org.ednovo.gooru.search.responses.SearchResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;

@@ -6,9 +6,9 @@ import java.util.Map;
 import org.ednovo.gooru.search.es.filter.Query;
 import org.ednovo.gooru.search.es.model.MapWrapper;
 import org.ednovo.gooru.search.es.model.SearchData;
-import org.ednovo.gooru.search.es.model.SearchResponse;
 import org.ednovo.gooru.search.es.processor.SearchProcessor;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
+import org.ednovo.gooru.search.responses.SearchResponse;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -44,7 +44,7 @@ public class EsSpellCheckerDslQueryBuildProcessor extends SearchProcessor<Search
         searchData.getQueryDsl().put(SUGGEST, suggestStringQuery);
       }
     } catch (Exception e) {
-      LOG.error("SpellChecker query builder encountered an exception: ", e);
+    	logger.error("SpellChecker query builder encountered an exception: ", e);
     }
   }
 

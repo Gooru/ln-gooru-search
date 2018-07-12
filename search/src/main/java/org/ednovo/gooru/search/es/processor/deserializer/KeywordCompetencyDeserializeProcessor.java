@@ -6,10 +6,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.ednovo.gooru.search.domain.service.CompetencySearchResult;
 import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
+import org.ednovo.gooru.search.responses.CompetencySearchResult;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -33,7 +33,7 @@ public class KeywordCompetencyDeserializeProcessor extends DeserializeProcessor<
 					ids.add(id);
 				}
 			}
-			LOG.info("Matched Ids : {} GutCodes : {}", ids, gutCodes);
+			logger.info("Matched Ids : {} GutCodes : {}", ids, gutCodes);
 			if (gutCodes != null && gutCodes.size() > 0) {
 				output.setGutCodes(gutCodes.stream().collect(Collectors.toList()));
 			}
