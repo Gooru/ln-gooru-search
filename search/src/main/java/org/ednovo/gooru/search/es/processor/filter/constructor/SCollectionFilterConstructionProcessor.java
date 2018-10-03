@@ -21,7 +21,9 @@ public class SCollectionFilterConstructionProcessor extends ContentFilterConstru
 			SearchResponse<Object> response) {
 		super.process(searchData, response);
 		searchData.putFilter(NOT_SYMBOL + CARET_SYMBOL + IndexFields.CONTENT_SUB_FORMAT, CollectionSubFormat.BENCHMARK.name());
-		if (!searchData.getFilters().containsKey(AMPERSAND_AUDIENCE)) searchData.putFilter(AMPERSAND_AUDIENCE, AUDIENCE_ALL_STUDENTS);
+		String audience = null;
+		if (searchData.getFilters().containsKey(AMPERSAND_AUDIENCE)) audience = (String) searchData.getFilters().get(AMPERSAND_AUDIENCE);
+		if (audience == null || (audience != null && !audience.equalsIgnoreCase(AUDIENCE_TEACHERS))) searchData.putFilter(NOT_SYMBOL + CARET_SYMBOL + IndexFields.AUDIENCE, AUDIENCE_TEACHERS);
 	}
 
 	@Override
