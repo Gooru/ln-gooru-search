@@ -120,7 +120,10 @@ public class ElasticsearchProcessor extends SearchProcessor<SearchData, Object> 
 		} catch (BadRequestException e) {
 			throw new BadRequestException("Please check request input param values" + e);		
 		} catch (IOException ioe) {
-			LOG.error("IO Exception : {}" , ioe);		
+		    if (ioe.getMessage().contains("index.max_result_window")) {
+		        throw new BadRequestException("Maximum search limit exceeded!");
+		    }
+		    LOG.error("IO Exception : {}" , ioe);		
 		} catch (Exception e) {
 			LOG.error("Search Error : {}", e); 
 		}

@@ -45,6 +45,9 @@ public class LimitValidationProcessor extends SearchProcessor<SearchData, Object
 		}
 
 		if (!searchData.isAdmin()) {
+		    if (searchData.getFrom() > 10000) {
+		        throw new AccessDeniedException("Offset reached maximum limit. You are allowed only to search within 10K contents. Contact developer for further details!");
+		    }
 			if (searchData.getSize() != null && searchData.getSize() > maxResultSize) {
 				throw new AccessDeniedException("Maximum pageSize exceeded. Please try with maximum size of " + maxResultSize);
 			}

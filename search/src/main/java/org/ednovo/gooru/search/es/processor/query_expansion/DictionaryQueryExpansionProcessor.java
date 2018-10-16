@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 public class DictionaryQueryExpansionProcessor extends SearchProcessor<SearchData, Object> {
 
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void process(SearchData searchData, SearchResponse<Object> response) {
 		if (searchData.getQueryString().equals("*") || searchData.getQueryString().equals("*:*") || StringUtils.trimToEmpty(searchData.getQueryString()).length() == 0 || emailValidate(searchData.getQueryString().toLowerCase()) || uuidValidate(searchData.getQueryString().toLowerCase()) || expressionValidate(searchData.getQueryString()) || standardValidate(searchData)) {
@@ -33,8 +34,8 @@ public class DictionaryQueryExpansionProcessor extends SearchProcessor<SearchDat
 			}
 			return;
 		}
-
-		String[] words = searchData.getQueryString().toLowerCase().split("[^a-zA-Z0-9\\']");
+		String query = searchData.getQueryString().toLowerCase().replaceAll(PUNC_MATCH, " ");
+		String[] words = query.split("\\s+");
 		SearchData abbreviationRequest = new SearchData();
 		abbreviationRequest.setPretty(searchData.getPretty());
 		abbreviationRequest.setIndexType(EsIndex.DICTIONARY);
@@ -42,7 +43,7 @@ public class DictionaryQueryExpansionProcessor extends SearchProcessor<SearchDat
 
 		StringBuilder builder = new StringBuilder();
 		for (String word : words) {
-			if (word.length() == 0) {
+			if (word.trim().length() == 0) {
 				continue;
 			}
 			StringBuilder abbreviationsBuilder = new StringBuilder();
@@ -77,4 +78,5 @@ public class DictionaryQueryExpansionProcessor extends SearchProcessor<SearchDat
 	protected SearchProcessorType getType() {
 		return SearchProcessorType.DictionaryQueryExpansion;
 	}
+	
 }

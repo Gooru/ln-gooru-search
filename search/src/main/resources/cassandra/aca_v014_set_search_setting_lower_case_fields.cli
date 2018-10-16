@@ -1,5 +1,0 @@
- ASSUME search_setting COMPARATOR AS utf8;	
- ASSUME search_setting KEYS AS utf8;
- ASSUME search_setting VALIDATOR AS utf8;
- 
- SET search_setting ['filter-case@lowercase']['default']='category,standard,license,isbn,source,subjectName,courseName,topicName,unitName,lessonName,network,recordSource,mediaType,attribution';
