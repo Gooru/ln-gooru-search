@@ -1,1 +1,0 @@
-create keyspace gooru_local with placement_strategy = 'org.apache.cassandra.locator.SimpleStrategy' and strategy_options = {replication_factor:1};
