@@ -564,7 +564,7 @@ public interface Constants {
     public static final String LIBRARY = "library";
     public static final String _V3 = "_v3";
     public static final String HOT_SPOT_IMAGE_QUESTION = "hot_spot_image_question";
-    public static final String AUDIENCE_ALL_STUDENTS = "All Students";
+    public static final String AUDIENCE_TEACHERS = "Teachers";
 	public static final String EXTERNAL = "external";
 	public static final String UNDERSCORE = "_";
 	public static final String TILDE = "~";

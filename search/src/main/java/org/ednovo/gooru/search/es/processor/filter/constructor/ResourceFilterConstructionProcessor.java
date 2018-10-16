@@ -37,9 +37,11 @@ public class ResourceFilterConstructionProcessor extends ContentFilterConstructi
 			}
 			if (contentFormat != null && contentFormat.equalsIgnoreCase(TYPE_RESOURCE))  {
 				searchData.putFilter(FLT_PUBLISHER_QUALITY_INDICATOR, "3,4,5");
-				if (!searchData.getFilters().containsKey(AMPERSAND_AUDIENCE)) searchData.putFilter(AMPERSAND_AUDIENCE, AUDIENCE_ALL_STUDENTS);
 			}
-			
+			String audience = null;
+			if (searchData.getFilters().containsKey(AMPERSAND_AUDIENCE)) audience = (String) searchData.getFilters().get(AMPERSAND_AUDIENCE);
+			if (audience == null || (audience != null && !audience.equalsIgnoreCase(AUDIENCE_TEACHERS))) searchData.putFilter(NOT_SYMBOL + CARET_SYMBOL + IndexFields.AUDIENCE, AUDIENCE_TEACHERS);
+        			
 			if (searchData.getFilters().containsKey(FLT_COURSE_ID)) {
 				courseId = (String) searchData.getFilters().get(FLT_COURSE_ID);
 			}
