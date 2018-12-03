@@ -15,6 +15,7 @@ import org.ednovo.gooru.search.es.model.UserGroupSupport;
 import org.ednovo.gooru.search.es.service.RedisClient;
 import org.ednovo.gooru.search.model.GooruAuthenticationToken;
 import org.ednovo.gooru.search.model.UserCredential;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -78,6 +79,15 @@ public class DoAuthorization {
 					if(responseHolder.getPreferences() != null && responseHolder.getPreferences().has(Constants.STANDARD_PREFERENCE))
 						stdPref  = responseHolder.getPreferences().getJSONObject(Constants.STANDARD_PREFERENCE);
 					request.setAttribute(Constants.USER_PREFERENCES, stdPref);
+					if (responseHolder.getPreferences() != null && responseHolder.getPreferences().has(Constants.LANGUAGE_PREFERENCE)) {
+						JSONArray langPrefs = responseHolder.getPreferences().getJSONArray(Constants.LANGUAGE_PREFERENCE);
+						StringBuilder pl = new StringBuilder();
+						for (int i = 0; i < langPrefs.length(); i++) {
+							if (pl.length() > 0) pl.append(Constants.COMMA);
+							pl.append(langPrefs.getInt(i));
+						}
+						request.setAttribute(Constants.USER_LANGUAGE_PREFERENCES, pl.toString());
+					}
 					renewAccessToken(accessToken, sessionToken);
 				}
 			} catch (Exception e) {

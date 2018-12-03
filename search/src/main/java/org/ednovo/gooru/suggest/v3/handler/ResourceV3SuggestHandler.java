@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.EsIndex;
 import org.ednovo.gooru.search.es.exception.SearchException;
+import org.ednovo.gooru.search.es.processor.ContentUserPreferenceProcessor;
 import org.ednovo.gooru.search.es.processor.ElasticsearchProcessor;
 import org.ednovo.gooru.search.es.processor.deserializer.ResourceDeserializeProcessor;
 import org.ednovo.gooru.search.es.processor.deserializer.ResourceSuggestDeserializeProcessor;
@@ -68,6 +69,9 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 
 	@Autowired
 	private TenantFilterConstructionProcessor tenantFilterConstructionProcessor;
+	
+	@Autowired
+	private ContentUserPreferenceProcessor contentUserPreferenceProcessor;
 	
 	private SuggestDataProviderType[] suggestDataProviders = { SuggestDataProviderType.RESOURCE,SuggestDataProviderType.COLLECTION };
 
@@ -261,6 +265,7 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 					}
 					suggestData.setQueryString(queryString);
 
+					contentUserPreferenceProcessor.process(suggestData, searchRes);
 					tenantFilterConstructionProcessor.process(suggestData, searchRes);
 					resourceEsDslQueryProcessor.process(suggestData, searchRes);
 					elasticSearchProcessor.process(suggestData, searchRes);
