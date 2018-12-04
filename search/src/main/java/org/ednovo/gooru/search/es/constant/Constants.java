@@ -395,10 +395,10 @@ public interface Constants {
 	public static final String USER_PREFERENCES = "userPreferences";
 	public static final String USER_LANGUAGE_PREFERENCES = "userLanguagePreferences";
 	public static final String LANGUAGE_ID = "languageId";
-	public static final String ISO_ENG = "eng";
 	public static final String PRIMARY_LANG_BOOST = "primaryLangBoost";
 	public static final String SECONDARY_LANG_BOOST = "secondaryLangBoost";
 	public static final String TERTIARY_LANG_BOOST = "tertiaryLangBoost";
+	public static final String DEFAULT_GOORU_LANG_ID = "defaultGooruLangId";
 
 	public static final String SEARCH_REQ_20 = "2.0";
 	public static final String SESSION_TOKEN_20 = "special-token-2.0";

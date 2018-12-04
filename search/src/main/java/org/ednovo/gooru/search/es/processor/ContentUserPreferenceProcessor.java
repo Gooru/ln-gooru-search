@@ -33,7 +33,7 @@ public class ContentUserPreferenceProcessor extends SearchProcessor<SearchData, 
             }
         } else if (searchData.getUser().getGooruUId().equalsIgnoreCase(ANONYMOUS) && (searchData.getType().equalsIgnoreCase(TYPE_COURSE) && searchData.getFilters() != null
             && searchData.getFilters().containsKey(FLT_COURSE_TYPE) && searchData.getFilters().get(FLT_COURSE_TYPE).toString().equalsIgnoreCase(PublishedStatus.FEATURED.getStatus()))) {
-            searchData.putFilter(IndexFields.LANGUAGE, ISO_ENG);
+            searchData.putFilter(LANGUAGE_ID, SearchSettingService.getSettingAsInteger(DEFAULT_GOORU_LANG_ID, 1));
         }
     }
 
