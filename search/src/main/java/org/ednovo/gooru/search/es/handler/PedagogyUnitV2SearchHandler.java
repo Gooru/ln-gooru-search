@@ -1,6 +1,7 @@
 package org.ednovo.gooru.search.es.handler;
 
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.BlackListQueryValidation;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.ContentUserPreference;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.DictionaryQueryExpansion;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.Elasticsearch;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.EsDslQueryBuild;
@@ -23,7 +24,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PedagogyUnitV2SearchHandler extends SearchHandler<SearchData, Map<String, Object>> {
 
-	private static final SearchProcessorType[][] searchProcessorTypes = new SearchProcessorType[][] { { BlackListQueryValidation }, { LimitValidation }, { DictionaryQueryExpansion },
+	private static final SearchProcessorType[][] searchProcessorTypes = new SearchProcessorType[][] { { BlackListQueryValidation }, { LimitValidation }, { ContentUserPreference }, { DictionaryQueryExpansion },
 			{ TenantFilterConstruction }, { ScopeFilterConstruction }, { UnitFilterConstruction }, { EsDslQueryBuild }, { Elasticsearch }, { PedagogyUnitDeserializer } };
 
 	@Override

@@ -79,6 +79,7 @@ public class IndexFields {
 	public static final String TWENTY_ONE_CENTURY_SKILL = "21cs";
 	public static final String PREREQUISITES = "prerequisites";
 	public static final String LANGUAGE = "language";
+	public static final String PRIMARY_LANG_ID = "primaryLanguage.id";
 
 	// course fields 
 	public static final String COURSE_REMIXCOUNT = "courseRemixCount";

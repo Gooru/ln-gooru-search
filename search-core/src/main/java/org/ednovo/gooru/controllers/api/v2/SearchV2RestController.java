@@ -166,6 +166,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		SessionContextSupport.putLogParameter(EventConstants.SESSION, session);
 
 		searchData.setUserTaxonomyPreference((JSONObject) request.getAttribute(Constants.USER_PREFERENCES));
+		searchData.setUserLanguagePreference((String) request.getAttribute(Constants.USER_LANGUAGE_PREFERENCES));
 
 		if (query.contains("!")) {
 			query = query.replace("!", EMPTY_STRING);

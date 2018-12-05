@@ -9,6 +9,7 @@ import static org.ednovo.gooru.search.es.processor.SearchProcessorType.ScopeFilt
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.TenantFilterConstruction;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.UnitV3DeserializeProcessor;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.UnitFilterConstruction;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.ContentUserPreference;
 
 import java.util.Map;
 
@@ -25,7 +26,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class UnitV3SearchHandler extends SearchHandler<SearchData, Map<String, Object>> {
 
-	private static final SearchProcessorType[][] searchProcessorTypes = new SearchProcessorType[][] { { BlackListQueryValidation }, { LimitValidation }, { DictionaryQueryExpansion },
+	private static final SearchProcessorType[][] searchProcessorTypes = new SearchProcessorType[][] { { BlackListQueryValidation }, { LimitValidation }, { ContentUserPreference }, { DictionaryQueryExpansion },
 			{ TenantFilterConstruction }, { ScopeFilterConstruction }, { UnitFilterConstruction }, { EsDslQueryBuild }, { Elasticsearch }, { UnitV3DeserializeProcessor } };
 
 	@Override
