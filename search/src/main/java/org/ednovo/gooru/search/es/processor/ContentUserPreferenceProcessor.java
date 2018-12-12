@@ -18,24 +18,27 @@ import org.springframework.stereotype.Component;
 public class ContentUserPreferenceProcessor extends SearchProcessor<SearchData, Object> {
 
 	@Override
-    public void process(SearchData searchData, SearchResponse<Object> response) {
-        String langPreference = searchData.getUserLanguagePreference();
-        if (langPreference != null && !langPreference.isEmpty()) {
-            String[] preferredLanguages = langPreference.split(COMMA);
-            if (preferredLanguages.length > 0) {
-                searchData.putFilter(LANGUAGE_ID, preferredLanguages);
-                int primaryLangBoost = SearchSettingService.getSettingAsInteger(PRIMARY_LANG_BOOST, 5);
-                int secondaryLangBoost = SearchSettingService.getSettingAsInteger(SECONDARY_LANG_BOOST, 3);
-                int tertiaryLangBoost = SearchSettingService.getSettingAsInteger(TERTIARY_LANG_BOOST, 2);
-                searchData.getCustomFilters().add(IndexFields.PRIMARY_LANG_ID + CARET_SYMBOL + primaryLangBoost + COLON + preferredLanguages[0]);
-                if (preferredLanguages.length > 1) searchData.getCustomFilters().add(IndexFields.PRIMARY_LANG_ID + CARET_SYMBOL + secondaryLangBoost + COLON + preferredLanguages[1]);
-                if (preferredLanguages.length > 2) searchData.getCustomFilters().add(IndexFields.PRIMARY_LANG_ID + CARET_SYMBOL + tertiaryLangBoost + COLON + preferredLanguages[2]);
-            }
-        } else if (searchData.getUser().getGooruUId().equalsIgnoreCase(ANONYMOUS) && (searchData.getType().equalsIgnoreCase(TYPE_COURSE) && searchData.getFilters() != null
-            && searchData.getFilters().containsKey(FLT_COURSE_TYPE) && searchData.getFilters().get(FLT_COURSE_TYPE).toString().equalsIgnoreCase(PublishedStatus.FEATURED.getStatus()))) {
-            searchData.putFilter(LANGUAGE_ID, SearchSettingService.getSettingAsInteger(DEFAULT_GOORU_LANG_ID, 1));
-        }
-    }
+	public void process(SearchData searchData, SearchResponse<Object> response) {
+		if (searchData.getParameters() == null || !(searchData.getParameters() != null && (searchData.getParameters().containsKey(FLT_LANGUAGE) || searchData.getParameters().containsKey(FLT_LANGUAGE_ID)))) {
+			String langPreference = searchData.getUserLanguagePreference();
+			if (langPreference != null) {
+				String[] preferredLanguages = langPreference.split(COMMA);
+				if (preferredLanguages.length > 0) {
+					searchData.putFilter(LANGUAGE_ID, preferredLanguages);
+					if (preferredLanguages.length > 1) {
+						float langWeight = preferredLanguages.length;
+						for (int i = 0; i < preferredLanguages.length; i++) {
+							searchData.getCustomFilters().add(IndexFields.PRIMARY_LANG_ID + CARET_SYMBOL + langWeight + COLON + preferredLanguages[i]);
+							langWeight--;
+						}
+					}
+				}
+			} else if (searchData.getUser().getGooruUId().equalsIgnoreCase(ANONYMOUS) && (searchData.getType().equalsIgnoreCase(TYPE_COURSE) 
+					   && searchData.getFilters() != null && searchData.getFilters().containsKey(FLT_COURSE_TYPE) && searchData.getFilters().get(FLT_COURSE_TYPE).toString().equalsIgnoreCase(PublishedStatus.FEATURED.getStatus()))) {
+				searchData.putFilter(LANGUAGE_ID, SearchSettingService.getSettingAsInteger(DEFAULT_GOORU_LANG_ID, 1));
+			}
+		}
+	}
 
 	protected String getSearchUserGrades(String profileGrades) {
 		String[] grades = profileGrades.split(",");

@@ -1,5 +1,7 @@
 package org.ednovo.gooru.responses.auth;
 
+import org.ednovo.gooru.search.es.constant.Constants;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -96,6 +98,32 @@ class AuthPrefsMessageBusJsonResponseHolder implements AuthPrefsResponseHolder {
 	@Override
 	public JSONObject getTenant() throws JSONException {
 		return message.getJSONObject(MSG_TENANT);
+	}
+	
+	@Override
+	public JSONObject getTaxonomyPreference() throws JSONException {
+		JSONObject taxPref = null;
+		if (getPreferences() != null && getPreferences().has(Constants.STANDARD_PREFERENCE)) {
+			taxPref = getPreferences().getJSONObject(Constants.STANDARD_PREFERENCE);
+		}
+		return taxPref;
+	}
+
+	@Override
+	public String getLanguagePreference() throws JSONException {
+		String preferredLanguage = null;
+		if (getPreferences() != null && getPreferences().has(Constants.LANGUAGE_PREFERENCE)) {
+			JSONArray langPrefs = getPreferences().getJSONArray(Constants.LANGUAGE_PREFERENCE);
+			if (langPrefs.length() > 0) {
+				StringBuilder preferredLangBuilder = new StringBuilder();
+				for (int i = 0; i < langPrefs.length(); i++) {
+					if (preferredLangBuilder.length() > 0) preferredLangBuilder.append(Constants.COMMA);
+					preferredLangBuilder.append(langPrefs.getInt(i));
+				}
+				preferredLanguage = preferredLangBuilder.toString();
+			}
+		}
+		return preferredLanguage;
 	}
 
 }

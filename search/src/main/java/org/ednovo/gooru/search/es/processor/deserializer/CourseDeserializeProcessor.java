@@ -189,8 +189,6 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
 						featured.remove(subTenantId);
 					}
 				}
-			}
-			if (featured != null && !featured.isEmpty()) {
 				for (String key : featured.keySet()) {
 					tenantFeaturedSorted = sequenceAndMergeTenantCourses(featured, tenantFeaturedSorted, key);
 				}

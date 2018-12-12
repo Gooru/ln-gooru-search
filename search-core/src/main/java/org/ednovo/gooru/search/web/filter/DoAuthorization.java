@@ -75,19 +75,8 @@ public class DoAuthorization {
 					userGroup.setTenantId(tenant.getString(EventConstants.TENANT_ID));
 					if (tenant.getString(Constants.TENANT_ROOT) != null && !tenant.getString(Constants.TENANT_ROOT).equalsIgnoreCase(Constants.NULL_STRING)) userGroup.setTenantRoot(tenant.getString(Constants.TENANT_ROOT));
 					request.setAttribute(Constants.TENANT, userGroup);
-					JSONObject stdPref = null;
-					if(responseHolder.getPreferences() != null && responseHolder.getPreferences().has(Constants.STANDARD_PREFERENCE))
-						stdPref  = responseHolder.getPreferences().getJSONObject(Constants.STANDARD_PREFERENCE);
-					request.setAttribute(Constants.USER_PREFERENCES, stdPref);
-					if (responseHolder.getPreferences() != null && responseHolder.getPreferences().has(Constants.LANGUAGE_PREFERENCE)) {
-						JSONArray langPrefs = responseHolder.getPreferences().getJSONArray(Constants.LANGUAGE_PREFERENCE);
-						StringBuilder pl = new StringBuilder();
-						for (int i = 0; i < langPrefs.length(); i++) {
-							if (pl.length() > 0) pl.append(Constants.COMMA);
-							pl.append(langPrefs.getInt(i));
-						}
-						request.setAttribute(Constants.USER_LANGUAGE_PREFERENCES, pl.toString());
-					}
+					if (responseHolder.getTaxonomyPreference() != null) request.setAttribute(Constants.USER_PREFERENCES, responseHolder.getTaxonomyPreference());
+					if (responseHolder.getLanguagePreference() != null) request.setAttribute(Constants.USER_LANGUAGE_PREFERENCES, responseHolder.getLanguagePreference());
 					renewAccessToken(accessToken, sessionToken);
 				}
 			} catch (Exception e) {
@@ -117,5 +106,5 @@ public class DoAuthorization {
 			logger.error("Error while renewing sessionToken" + e);
 		}
 	}
-
+ 
 }

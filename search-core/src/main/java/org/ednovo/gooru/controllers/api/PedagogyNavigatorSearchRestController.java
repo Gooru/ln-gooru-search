@@ -79,6 +79,8 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		searchData.setUserPermits(userPermits.stream().distinct().collect(Collectors.toList()));
 
 		searchData.setUserTaxonomyPreference((JSONObject) request.getAttribute(Constants.USER_PREFERENCES));
+		searchData.setUserLanguagePreference((String) request.getAttribute(Constants.USER_LANGUAGE_PREFERENCES));
+
 		MapWrapper<Object> searchDataMap = new MapWrapper<Object>(request.getParameterMap());
 
 		if (searchDataMap.containsKey("flt.standard") || searchDataMap.containsKey("flt.standardDisplay") ) {
@@ -447,7 +449,8 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		searchData.setUserPermits(userPermits.stream().distinct().collect(Collectors.toList()));
 
 		searchData.setUserTaxonomyPreference((JSONObject) request.getAttribute(Constants.USER_PREFERENCES));
-
+		searchData.setUserLanguagePreference((String) request.getAttribute(Constants.USER_LANGUAGE_PREFERENCES));
+		
 		searchData.setOriginalQuery(query);
 		searchData.setQueryString(query);
 		searchData.setPretty(pretty);
