@@ -389,6 +389,8 @@ public interface Constants {
 	public static final String FLT_TENANT_ID = "&^tenant.tenantId";
 	public static final String FLT_PUBLISHER_QUALITY_INDICATOR = "&^statistics.publisherQualityIndicator";
 	public static final String AMPERSAND_AUDIENCE = "&^audience";
+	public static final String FLT_LANGUAGE = "flt.language";
+	public static final String FLT_LANGUAGE_ID = "flt.languageId";
 
 	public static final String CONTENT_CDN_URL = "contentCDN";
 	public static final String USER_CDN_URL = "userCDN";

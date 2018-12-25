@@ -28,7 +28,6 @@ import org.ednovo.gooru.search.es.model.UserGroupSupport;
 import org.ednovo.gooru.search.es.processor.util.SerializerUtil;
 import org.ednovo.gooru.search.es.service.SearchService;
 import org.ednovo.gooru.search.responses.SearchResponse;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -448,7 +447,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		}
 	}
 
-	private void setEventLogObject(HttpServletRequest request, SearchData searchData, SearchResponse<Object> searchResponse) throws JSONException {
+	private void setEventLogObject(HttpServletRequest request, SearchData searchData, SearchResponse<Object> searchResponse) {
 		Map<String, Object> payloadObject = new HashMap<>();
 		Map<String, Object> session = new HashMap<>();
 		SessionContextSupport.putLogParameter(EventConstants.EVENT_NAME, EventConstants.ITEM_DOT_SEARCH);

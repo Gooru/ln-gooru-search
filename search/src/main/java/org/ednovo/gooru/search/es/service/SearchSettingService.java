@@ -223,6 +223,11 @@ public final class SearchSettingService {
 		String value = getCache(settingConstant.getName());
 		return value != null ? Float.valueOf(value) : (Float) settingConstant.getDefaultValue();
 	}
+	
+	public static Boolean getSettingAsBoolean(String name, Boolean defaultValue) {
+		String value = getByName(name);
+		return value != null ? Boolean.valueOf(value) : defaultValue;
+	}
 
 	public static boolean isSplitBySingleTiltaForIndex(String name) {
 		return getCacheList(settingsListKeys[8]) != null ? getCacheList(settingsListKeys[8]).contains(name) : false;
