@@ -151,5 +151,6 @@ public class IndexFields {
 	public static final String SUBJECT_LABEL = "subjectLabel";
 	public static final String COURSE_LABEL = "courseLabel";
 	public static final String DOMAIN_LABEL = "domainLabel";
+	public static final String VERSION = "version";
 
 }
