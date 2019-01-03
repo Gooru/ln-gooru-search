@@ -62,6 +62,7 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
 		courseResult.setLastModified((String) model.get(IndexFields.UPDATED_AT));
 		courseResult.setAddDate((String) model.get(IndexFields.CREATED_AT));
 		courseResult.setLastModifiedBy((String) model.get(IndexFields.MODIFIER_ID));
+		courseResult.setVersion((String) model.get(IndexFields.VERSION));
 		if (model.containsKey(IndexFields.SEQUENCE)) {
 			courseResult.setSequence((Integer) model.get(IndexFields.SEQUENCE));
 		}
@@ -189,8 +190,6 @@ public class CourseDeserializeProcessor extends DeserializeProcessor<List<Course
 						featured.remove(subTenantId);
 					}
 				}
-			}
-			if (featured != null && !featured.isEmpty()) {
 				for (String key : featured.keySet()) {
 					tenantFeaturedSorted = sequenceAndMergeTenantCourses(featured, tenantFeaturedSorted, key);
 				}

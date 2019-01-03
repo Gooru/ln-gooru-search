@@ -21,7 +21,6 @@ import org.ednovo.gooru.search.responses.SuggestResponse;
 import org.ednovo.gooru.suggest.v3.model.SuggestContextData;
 import org.ednovo.gooru.suggest.v3.model.SuggestData;
 import org.ednovo.gooru.suggest.v3.service.SuggestV3Service;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,7 +126,8 @@ public class SuggestV3RestController extends BaseController {
 		User apiCaller = (User) request.getAttribute(Constants.USER);
 		suggestData.setType(type);
 		suggestData.setUserTaxonomyPreference((JSONObject) request.getAttribute(Constants.USER_PREFERENCES));
-
+		suggestData.setUserLanguagePreference((String) request.getAttribute(Constants.USER_LANGUAGE_PREFERENCES));
+		
 		@SuppressWarnings("unchecked")
 		MapWrapper<Object> suggestParamMap = new MapWrapper<Object>(request.getParameterMap());
 		suggestData.setParameters(suggestParamMap);
@@ -175,7 +175,7 @@ public class SuggestV3RestController extends BaseController {
 		return requestService;
 	}
 	
-	private void setEventLogObject(HttpServletRequest request, SuggestData suggestData, SearchResponse<Object> searchResponse) throws JSONException {
+	private void setEventLogObject(HttpServletRequest request, SuggestData suggestData, SearchResponse<Object> searchResponse) {
 		if (suggestData.getType() != null && suggestData.getType().equalsIgnoreCase(TYPE_SCOLLECTION)) {
 			request.setAttribute(SEARCH_TYPE, COLLECTION);
 		} else {

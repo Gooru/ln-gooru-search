@@ -134,6 +134,8 @@ public class SearchData implements Serializable {
 	private Scope scope;
 	
 	private String userCdnUrl;
+	
+	private String userLanguagePreference;
 
 	public boolean isShowCanonicalOnly() {
 		return showCanonicalOnly;
@@ -598,6 +600,14 @@ public class SearchData implements Serializable {
 
 	public void setUserCdnUrl(String userCdnUrl) {
 		this.userCdnUrl = userCdnUrl;
+	}
+	
+	public String getUserLanguagePreference() {
+		return userLanguagePreference;
+	}
+
+	public void setUserLanguagePreference(String userLanguagePreference) {
+		this.userLanguagePreference = userLanguagePreference;
 	}
 
 }

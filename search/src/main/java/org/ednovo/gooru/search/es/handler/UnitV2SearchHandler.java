@@ -1,9 +1,11 @@
 package org.ednovo.gooru.search.es.handler;
 
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.BlackListQueryValidation;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.ContentUserPreference;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.DictionaryQueryExpansion;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.Elasticsearch;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.EsDslQueryBuild;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.FilterDetection;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.LimitValidation;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.ScopeFilterConstruction;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.TenantFilterConstruction;
@@ -23,7 +25,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class UnitV2SearchHandler extends SearchHandler<SearchData, Map<String, Object>> {
 
-	private static final SearchProcessorType[][] searchProcessorTypes = new SearchProcessorType[][] { { BlackListQueryValidation }, { LimitValidation }, { DictionaryQueryExpansion },
+	private static final SearchProcessorType[][] searchProcessorTypes = new SearchProcessorType[][] { { BlackListQueryValidation }, { LimitValidation }, { ContentUserPreference }, { DictionaryQueryExpansion },
 			{ TenantFilterConstruction }, { ScopeFilterConstruction }, { UnitFilterConstruction }, { EsDslQueryBuild }, { Elasticsearch }, { UnitDeserializeProcessor } };
 
 	@Override

@@ -78,6 +78,8 @@ public class CourseSearchResult extends SearchResult implements Serializable {
 	private Double relevance;
 
 	private List<String> audience;
+	
+	private String version;
 
 	public String getLastModified() {
 		return lastModified;
@@ -341,6 +343,14 @@ public class CourseSearchResult extends SearchResult implements Serializable {
 
 	public void setAudience(List<String> audience) {
 		this.audience = audience;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+	
+	public void setVersion(String version) {
+		this.version = version;
 	}
 
 }

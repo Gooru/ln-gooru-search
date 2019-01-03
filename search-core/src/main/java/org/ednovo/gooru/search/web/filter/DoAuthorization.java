@@ -15,6 +15,7 @@ import org.ednovo.gooru.search.es.model.UserGroupSupport;
 import org.ednovo.gooru.search.es.service.RedisClient;
 import org.ednovo.gooru.search.model.GooruAuthenticationToken;
 import org.ednovo.gooru.search.model.UserCredential;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -74,10 +75,8 @@ public class DoAuthorization {
 					userGroup.setTenantId(tenant.getString(EventConstants.TENANT_ID));
 					if (tenant.getString(Constants.TENANT_ROOT) != null && !tenant.getString(Constants.TENANT_ROOT).equalsIgnoreCase(Constants.NULL_STRING)) userGroup.setTenantRoot(tenant.getString(Constants.TENANT_ROOT));
 					request.setAttribute(Constants.TENANT, userGroup);
-					JSONObject stdPref = null;
-					if(responseHolder.getPreferences() != null && responseHolder.getPreferences().has(Constants.STANDARD_PREFERENCE))
-						stdPref  = responseHolder.getPreferences().getJSONObject(Constants.STANDARD_PREFERENCE);
-					request.setAttribute(Constants.USER_PREFERENCES, stdPref);
+					if (responseHolder.getTaxonomyPreference() != null) request.setAttribute(Constants.USER_PREFERENCES, responseHolder.getTaxonomyPreference());
+					if (responseHolder.getLanguagePreference() != null) request.setAttribute(Constants.USER_LANGUAGE_PREFERENCES, responseHolder.getLanguagePreference());
 					renewAccessToken(accessToken, sessionToken);
 				}
 			} catch (Exception e) {
@@ -107,5 +106,5 @@ public class DoAuthorization {
 			logger.error("Error while renewing sessionToken" + e);
 		}
 	}
-
+ 
 }

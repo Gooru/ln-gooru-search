@@ -4,6 +4,7 @@
 package org.ednovo.gooru.search.es.handler;
 
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.BlackListQueryValidation;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.ContentUserPreference;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.DictionaryQueryExpansion;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.Elasticsearch;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.EsSuggestDslQueryBuild;
@@ -17,6 +18,7 @@ import static org.ednovo.gooru.search.es.processor.SearchProcessorType.SubjectFa
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.TaxonomyQueryExpansion;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.TenantFilterConstruction;
 import static org.ednovo.gooru.search.es.processor.SearchProcessorType.ScopeFilterConstruction;
+import static org.ednovo.gooru.search.es.processor.SearchProcessorType.ContentUserPreference;
 
 import java.util.Map;
 
@@ -33,7 +35,7 @@ import org.springframework.stereotype.Component;
 public class ResourceV2SearchHandler extends SearchHandler<SearchData, Map<String, Object>> {
 
 	private static final SearchProcessorType[][] searchProcessorTypes = new SearchProcessorType[][] {
-			{ BlackListQueryValidation }, { FilterDetection }, { LimitValidation }, { TaxonomyQueryExpansion }, { DictionaryQueryExpansion }, { TenantFilterConstruction },
+			{ BlackListQueryValidation }, { LimitValidation }, { FilterDetection }, { ContentUserPreference }, { TaxonomyQueryExpansion }, { DictionaryQueryExpansion }, { TenantFilterConstruction },
 			 { ScopeFilterConstruction },{ ResourceFilterConstruction }, {SubjectFacetFilter}, { EsDslQueryBuild }, { EsSuggestDslQueryBuild },{ FacetFilterConstruction }, { Elasticsearch },
 			{ ResourceDeserializer } };
 

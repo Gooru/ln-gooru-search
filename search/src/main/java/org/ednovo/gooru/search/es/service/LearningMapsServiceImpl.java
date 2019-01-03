@@ -53,6 +53,9 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 		inputSearchData.setUserPermits(searchData.getUserPermits());
 		inputSearchData.setType(type);
 		inputSearchData.setAdmin(searchData.isAdmin());
+		inputSearchData.setUser(searchData.getUser());
+		inputSearchData.setUserTaxonomyPreference(searchData.getUserTaxonomyPreference());
+		inputSearchData.setUserLanguagePreference(searchData.getUserLanguagePreference());
 		if (RQC_MATCH.matcher(type).matches()) {
 			inputSearchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_FORMAT, (type.equalsIgnoreCase(TYPE_SCOLLECTION) ? TYPE_COLLECTION : type));
 			if (type.equalsIgnoreCase(TYPE_QUESTION)) inputSearchData.setType(TYPE_RESOURCE);

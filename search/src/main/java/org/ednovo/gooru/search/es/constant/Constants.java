@@ -389,10 +389,18 @@ public interface Constants {
 	public static final String FLT_TENANT_ID = "&^tenant.tenantId";
 	public static final String FLT_PUBLISHER_QUALITY_INDICATOR = "&^statistics.publisherQualityIndicator";
 	public static final String AMPERSAND_AUDIENCE = "&^audience";
+	public static final String FLT_LANGUAGE = "flt.language";
+	public static final String FLT_LANGUAGE_ID = "flt.languageId";
 
 	public static final String CONTENT_CDN_URL = "contentCDN";
 	public static final String USER_CDN_URL = "userCDN";
 	public static final String USER_PREFERENCES = "userPreferences";
+	public static final String USER_LANGUAGE_PREFERENCES = "userLanguagePreferences";
+	public static final String LANGUAGE_ID = "languageId";
+	public static final String PRIMARY_LANG_BOOST = "primaryLangBoost";
+	public static final String SECONDARY_LANG_BOOST = "secondaryLangBoost";
+	public static final String TERTIARY_LANG_BOOST = "tertiaryLangBoost";
+	public static final String DEFAULT_GOORU_LANG_ID = "defaultGooruLangId";
 
 	public static final String SEARCH_REQ_20 = "2.0";
 	public static final String SESSION_TOKEN_20 = "special-token-2.0";
@@ -416,6 +424,7 @@ public interface Constants {
 	public static final String AMPERSAND_RELATED_GUT_CODES = "&^relatedGutCode";
 
 	public static final String STANDARD_PREFERENCE = "standard_preference";
+	public static final String LANGUAGE_PREFERENCE = "language_preference";
 	public static final String ACCESS_TOKEN_VALIDITY = "access_token_validity";
 	public static final String LEAF_INTERNAL_CODE = "leafInternalCode";
 
@@ -568,5 +577,7 @@ public interface Constants {
 	public static final String EXTERNAL = "external";
 	public static final String UNDERSCORE = "_";
 	public static final String TILDE = "~";
+	public static final String PUNC_MATCH = "[\\p{Punct}&&[^a-zA-Z0-9\\'\\.]]";
+	public static final String SPL_CHAR_MATCH = "[^a-zA-Z0-9\\']";
 
 }
