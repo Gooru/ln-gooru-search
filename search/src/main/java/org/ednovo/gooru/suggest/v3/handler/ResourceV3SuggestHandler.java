@@ -337,7 +337,9 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 	}
 
 	private void buildQuery(String queryString, StringBuilder queryStringBuilder) {
-		String[] queryWords = queryString.toLowerCase().split("[^a-zA-Z0-9\\']");
+		String query = queryString.toLowerCase().replaceAll(PUNC_MATCH, " ");
+		String[] queryWords = query.split("\\s+");
+		
 		String stopWords = SearchSettingService.getByName("search.query.stopwords"); 
 		for (String word : queryWords) {
 			if (!(Arrays.asList(stopWords.split(",")).contains(word))) {
@@ -352,5 +354,4 @@ public class ResourceV3SuggestHandler extends SuggestHandler<Map<String, Object>
 			}
 		}
 	}
-
 }
