@@ -124,6 +124,7 @@ public class SuggestV3RestController extends BaseController {
 			sessionToken = getSessionToken(request);
 		}
 		User apiCaller = (User) request.getAttribute(Constants.USER);
+		suggestData.setUser(apiCaller);
 		suggestData.setType(type);
 		suggestData.setUserTaxonomyPreference((JSONObject) request.getAttribute(Constants.USER_PREFERENCES));
 		suggestData.setUserLanguagePreference((String) request.getAttribute(Constants.USER_LANGUAGE_PREFERENCES));

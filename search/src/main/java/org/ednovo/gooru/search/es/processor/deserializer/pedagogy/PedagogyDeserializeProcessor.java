@@ -19,10 +19,11 @@ import org.ednovo.gooru.search.es.model.UserV2;
 import org.ednovo.gooru.search.es.processor.SearchProcessor;
 import org.ednovo.gooru.search.responses.PedagogySearchResult;
 import org.ednovo.gooru.search.responses.SearchResponse;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.common.base.CaseFormat;
 
 /**
  * @author SearchTeam
@@ -70,45 +71,26 @@ public abstract class PedagogyDeserializeProcessor<O, S> extends SearchProcessor
 	protected void setTaxonomy(Map<String, Object> taxonomyMap, SearchData input, PedagogySearchResult output) {
 		Map<String, Object> taxonomySetAsMap = (Map<String, Object>) taxonomyMap.get(IndexFields.TAXONOMY_SET);
 		Map<String, Object> finalConvertedMap = new HashMap<>();
-		Map<String, Object> finalCrosswalkMap = new HashMap<>();
 		List<String> leafInternalCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_INTERNAL_CODES);
 		if (taxonomySetAsMap != null && leafInternalCodes != null) {
+			JSONObject standardPrefs = input.getUserTaxonomyPreference();
 			Map<String, Object> curriculumAsMap = (Map<String, Object>) taxonomySetAsMap.get(IndexFields.CURRICULUM);
 			List<Map<String, String>> curriculumInfoAsList = (List<Map<String, String>>) curriculumAsMap.get(IndexFields.CURRICULUM_INFO);
 			if (curriculumInfoAsList != null && !curriculumInfoAsList.isEmpty()) {
 				List<Map<String, Object>> crosswalkResponse = searchCrosswalk(input, leafInternalCodes);
 				curriculumInfoAsList.forEach(codeAsMap -> {
-					finalConvertedMap.put(codeAsMap.get(IndexFields.ID), codeAsMap);
-					List<Map<String, String>> crosswalkCodes = null;
-					crosswalkCodes = deserializeCrosswalkResponse(crosswalkResponse, codeAsMap.get(IndexFields.ID), crosswalkCodes);
-					if (crosswalkCodes != null) {
-						for (Map<String, String> crosswalk : crosswalkCodes) {
-							if (!((String) crosswalk.get(IndexFields.ID)).equalsIgnoreCase((String) codeAsMap.get(IndexFields.ID))) {
-								crosswalk.put(IndexFields.PARENT_TITLE, codeAsMap.get(IndexFields.PARENT_TITLE));
-								crosswalk.put(CROSSWALK_ID, crosswalk.get(IndexFields.ID));
-								crosswalk.put(IndexFields.ID, codeAsMap.get(IndexFields.ID));
-								finalCrosswalkMap.put(crosswalk.get(IndexFields.ID), crosswalk);
-							}
-						}
-						String fltStandard = null;
-						String fltStandardDisplay = null;
-						String fltRelatedGutCodes = null;
-						if(input.getFilters().containsKey(AMPERSAND_EQ_INTERNAL_CODE)) fltStandard = input.getFilters().get(AMPERSAND_EQ_INTERNAL_CODE).toString();
-						if(input.getFilters().containsKey(AMPERSAND_EQ_DISPLAY_CODE)) fltStandardDisplay = input.getFilters().get(AMPERSAND_EQ_DISPLAY_CODE).toString();
-						if(input.getFilters().containsKey(AMPERSAND_RELATED_GUT_CODES)) fltRelatedGutCodes = input.getFilters().get(AMPERSAND_RELATED_GUT_CODES).toString();
-						Boolean isCrosswalked = false;
-						List<String> leafDisplayCodes = (List<String>) taxonomyMap.get(IndexFields.LEAF_DISPLAY_CODES);
-						if (!(leafInternalCodes != null && leafInternalCodes.size() > 0 && fltStandard != null && leafInternalCodes.contains(fltStandard.toUpperCase()))
-								&& !(leafDisplayCodes != null && leafDisplayCodes.size() > 0 && fltStandardDisplay != null && leafDisplayCodes.contains(fltStandardDisplay.toUpperCase())) && fltRelatedGutCodes == null) {
-							isCrosswalked = true;
-						}
-						output.setIsCrosswalked(isCrosswalked);
+					if (standardPrefs != null) {
+						String internalCode = codeAsMap.get(IndexFields.ID).toString();
+						List<Map<String, String>> crosswalkCodes = null;
+						crosswalkCodes = deserializeCrosswalkResponse(crosswalkResponse, internalCode, crosswalkCodes);
+						transformToPreferredCode(finalConvertedMap, standardPrefs, codeAsMap, crosswalkCodes);
+					} else {
+						finalConvertedMap.put(codeAsMap.get(IndexFields.ID), codeAsMap);
 					}
 				});
 			}
 		}
 		if(!finalConvertedMap.isEmpty()) output.setTaxonomy(finalConvertedMap);
-		//if(!finalCrosswalkMap.isEmpty()) output.setTaxonomyEquivalentCompetencies(finalCrosswalkMap);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -130,15 +112,6 @@ public abstract class PedagogyDeserializeProcessor<O, S> extends SearchProcessor
 		return crosswalkResult;
 	}
 
-	protected void convertKeysToSnakeCase(Map<String, Object> finalConvertedMap, Map<String, String> codeAsMap) {
-		Map<String, String> convertedMap = new HashMap<>();
-		codeAsMap.forEach((k, v) -> {
-			if (!k.equalsIgnoreCase(IndexFields.ID))
-				convertedMap.put(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, k), v);
-		});
-		finalConvertedMap.put(codeAsMap.get(IndexFields.ID), convertedMap);
-	}
-
 	@SuppressWarnings("unchecked")
 	protected List<Map<String, Object>> searchCrosswalk(SearchData input, List<String> leafInternalCodes) {
 		SearchData crosswalkRequest = new SearchData();
@@ -150,6 +123,37 @@ public abstract class PedagogyDeserializeProcessor<O, S> extends SearchProcessor
 		return searchResponse;
 	}
 
+	private void transformToPreferredCode(Map<String, Object> finalConvertedMap, JSONObject standardPrefs, Map<String, String> codeAsMap, List<Map<String, String>> crosswalkCodes) {
+		String internalCode = codeAsMap.get(IndexFields.ID);
+		final String subject = getSubjectFromCodeId(internalCode);
+		String framework = null;
+		try {
+			if (standardPrefs != null && subject != null && standardPrefs.has(subject)) {
+				framework = standardPrefs.getString(subject);
+				if (framework != null) {
+					if (!internalCode.startsWith(framework + DOT) && crosswalkCodes != null) {
+						for (Map<String, String> crosswalk : crosswalkCodes) {
+							if (!crosswalk.get(IndexFields.FRAMEWORK_CODE).equalsIgnoreCase(framework)) {
+								continue;
+							}
+							crosswalk.put(LEAF_INTERNAL_CODE, internalCode);
+							crosswalk.put(IndexFields.PARENT_TITLE, codeAsMap.get(IndexFields.PARENT_TITLE));
+							finalConvertedMap.put(crosswalk.get(IndexFields.ID), crosswalk);
+						}
+					} else if (internalCode.startsWith(framework + DOT)) {
+						finalConvertedMap.put(internalCode, codeAsMap);
+					}
+				}
+			}
+		} catch (JSONException e) {
+			logger.error("JsonException during taxonomy tranformation!", e.getMessage());
+		}
+	}
+	
+	private String getSubjectFromCodeId(String codeId) {
+		return codeId.contains(HYPHEN) ? codeId.substring((codeId.indexOf(DOT) + 1), codeId.indexOf(HYPHEN)) : null;
+	}
+	
 	protected UserV2 setUser(Map<String, Object> userData) {
 		UserV2 user = new UserV2();
 		user.setFirstname((String) userData.get(IndexFields.FIRST_NAME));

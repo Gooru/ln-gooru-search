@@ -112,7 +112,7 @@ class AuthPrefsMessageBusJsonResponseHolder implements AuthPrefsResponseHolder {
 	@Override
 	public String getLanguagePreference() throws JSONException {
 		String preferredLanguage = null;
-		if (getPreferences() != null && getPreferences().has(Constants.LANGUAGE_PREFERENCE)) {
+		if (getPreferences() != null && getPreferences().has(Constants.LANGUAGE_PREFERENCE) && !getPreferences().isNull(Constants.LANGUAGE_PREFERENCE)) {
 			JSONArray langPrefs = getPreferences().getJSONArray(Constants.LANGUAGE_PREFERENCE);
 			if (langPrefs.length() > 0) {
 				StringBuilder preferredLangBuilder = new StringBuilder();

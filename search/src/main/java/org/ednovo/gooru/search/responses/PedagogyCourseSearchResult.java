@@ -49,8 +49,6 @@ public class PedagogyCourseSearchResult extends PedagogySearchResult implements 
 
 	private Long usedByStudentCount;
 
-	private Map<String, Object> taxonomyEquivalentCompetencies;
-
 	private Double efficacy;
 	
 	private Double engagement;
@@ -191,14 +189,6 @@ public class PedagogyCourseSearchResult extends PedagogySearchResult implements 
 
 	public void setUsedByStudentCount(Long usedByStudentCount) {
 		this.usedByStudentCount = usedByStudentCount;
-	}
-
-	public Map<String, Object> getTaxonomyEquivalentCompetencies() {
-		return taxonomyEquivalentCompetencies;
-	}
-
-	public void setTaxonomyEquivalentCompetencies(Map<String, Object> taxonomyEquivalentCompetencies) {
-		this.taxonomyEquivalentCompetencies = taxonomyEquivalentCompetencies;
 	}
 
 	public Double getEfficacy() {

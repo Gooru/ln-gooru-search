@@ -94,25 +94,24 @@ public abstract class SuggestDeserializeProcessor<O, S> extends SearchProcessor<
 
 	private void transformToPreferredCode(Map<String, Object> finalConvertedMap, JSONObject standardPrefs, Map<String, String> codeAsMap, List<Map<String, String>> crosswalkCodes) {
 		String internalCode = codeAsMap.get(IndexFields.ID);
-		final String subject = internalCode.substring((internalCode.indexOf(DOT) + 1), internalCode.indexOf(HYPHEN));
+		final String subject = getSubjectFromCodeId(internalCode);
 		String framework = null;
-		Boolean isTransformed = false;
 		try {
-			if (standardPrefs != null && standardPrefs.has(subject)) {
+			if (standardPrefs != null && subject != null && standardPrefs.has(subject)) {
 				framework = standardPrefs.getString(subject);
-				if (framework != null && !internalCode.startsWith(framework + DOT) && crosswalkCodes != null) {
-					for (Map<String, String> crosswalk : crosswalkCodes) {
-						if (!crosswalk.get(IndexFields.FRAMEWORK_CODE).equalsIgnoreCase(framework)) {
-							continue;
+				if (framework != null) {
+					if (!internalCode.startsWith(framework + DOT) && crosswalkCodes != null) {
+						for (Map<String, String> crosswalk : crosswalkCodes) {
+							if (!crosswalk.get(IndexFields.FRAMEWORK_CODE).equalsIgnoreCase(framework)) {
+								continue;
+							}
+							crosswalk.put(IndexFields.PARENT_TITLE, codeAsMap.get(IndexFields.PARENT_TITLE));
+							convertKeysToSnakeCase(finalConvertedMap, crosswalk);
 						}
-						crosswalk.put(IndexFields.PARENT_TITLE, codeAsMap.get(IndexFields.PARENT_TITLE));
-						convertKeysToSnakeCase(finalConvertedMap, crosswalk);
-						isTransformed = true;
+					} else if (internalCode.startsWith(framework + DOT)) {
+						convertKeysToSnakeCase(finalConvertedMap, codeAsMap);
 					}
 				}
-			}
-			if (!isTransformed) {
-				convertKeysToSnakeCase(finalConvertedMap, codeAsMap);
 			}
 		} catch (JSONException e) {
 			LOG.error("JsonException during taxonomy tranformation!", e.getMessage());
@@ -142,6 +141,10 @@ public abstract class SuggestDeserializeProcessor<O, S> extends SearchProcessor<
 			LOG.error("No matching crosswalk for codes : {} : Exception : {}", leafInternalCodes, e.getMessage());
 		}
 		return searchResponse;
+	}
+	
+	private String getSubjectFromCodeId(String codeId) {
+		return codeId.contains(HYPHEN) ? codeId.substring((codeId.indexOf(DOT) + 1), codeId.indexOf(HYPHEN)) : null;
 	}
 
 	protected Map<String, Object> transformMetadata(Map<String, List<String>> metadata) {

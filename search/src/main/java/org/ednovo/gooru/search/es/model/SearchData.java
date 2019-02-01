@@ -136,6 +136,10 @@ public class SearchData implements Serializable {
 	private String userCdnUrl;
 	
 	private String userLanguagePreference;
+	
+	private Integer siFrom = 0;
+
+	private Integer siLimit = 10;
 
 	public boolean isShowCanonicalOnly() {
 		return showCanonicalOnly;
@@ -608,6 +612,22 @@ public class SearchData implements Serializable {
 
 	public void setUserLanguagePreference(String userLanguagePreference) {
 		this.userLanguagePreference = userLanguagePreference;
+	}
+	
+	public Integer getSIFrom() {
+		return siFrom;
+	}
+
+	public void setSIFrom(Integer siFrom) {
+		this.siFrom = siFrom;
+	}
+	
+	public Integer getSILimit() {
+		return siLimit;
+	}
+
+	public void setSILimit(Integer siLimit) {
+		this.siLimit = siLimit;
 	}
 
 }
