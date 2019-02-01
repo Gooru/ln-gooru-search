@@ -65,7 +65,7 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 			@RequestParam(required = false) String excludeAttributes, 
 			@RequestParam(required = false, defaultValue= "false") boolean userDetails, 
 			@PathVariable String type, 
-			@RequestParam(required = false, defaultValue= "true") boolean isCrosswalk,
+			@RequestParam(required = false) boolean isCrosswalk,
 			@RequestParam(required = false, defaultValue = "false") boolean disableSpellCheck, 
 			@RequestBody(required = false) SearchRequestBody searchRequestPayload) throws Exception {
 
@@ -88,10 +88,15 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 		}
 		
 		User apiCaller = (User) request.getAttribute(USER);
+		searchData.setUser(apiCaller);
         
 		// Process Parameters
 		MapWrapper<Object> searchDataMap = new MapWrapper<Object>(request.getParameterMap());
-		processParameters(disableSpellCheck, searchData, searchDataMap);
+		isCrosswalk = true;
+		processParameters(disableSpellCheck, searchData, searchDataMap, isCrosswalk);
+		if (searchDataMap.containsKey(IS_CROSSWALK)) {
+			isCrosswalk = searchDataMap.getBoolean(IS_CROSSWALK);
+		}
 		searchData.setParameters(searchDataMap);
 		searchData.setFrom(startAt > 0 ? startAt : 0);
  		searchData.setPageNum(pageNum > 0 ? pageNum : 1);
@@ -259,9 +264,10 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 		}
 	}
 
-	private void processParameters(boolean disableSpellCheck, SearchData searchData, MapWrapper<Object> searchDataMap) {
+	private void processParameters(boolean disableSpellCheck, SearchData searchData, MapWrapper<Object> searchDataMap, boolean isCrosswalk) {
 		searchDataMap.put("allowDuplicates", true);
 		if (searchDataMap.containsKey(FLT_STANDARD) || searchDataMap.containsKey(FLT_STANDARD_DISPLAY) ) {
+			isCrosswalk = false;
 			searchData.setTaxFilterType(TYPE_STANDARD);
 		}
 		if (searchDataMap.containsKey(FLT_COURSE)) {

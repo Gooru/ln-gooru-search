@@ -39,8 +39,6 @@ public class PedagogyLessonSearchResult extends PedagogySearchResult implements 
 	
 	private Long viewCount;
 
-	private Map<String, Object> taxonomyEquivalentCompetencies;
-
 	private Double efficacy;
 	
 	private Double engagement;
@@ -141,14 +139,6 @@ public class PedagogyLessonSearchResult extends PedagogySearchResult implements 
 
 	public void setViewCount(Long viewCount) {
 		this.viewCount = viewCount;
-	}
-
-	public Map<String, Object> getTaxonomyEquivalentCompetencies() {
-		return taxonomyEquivalentCompetencies;
-	}
-
-	public void setTaxonomyEquivalentCompetencies(Map<String, Object> taxonomyEquivalentCompetencies) {
-		this.taxonomyEquivalentCompetencies = taxonomyEquivalentCompetencies;
 	}
 
 	public Double getEfficacy() {

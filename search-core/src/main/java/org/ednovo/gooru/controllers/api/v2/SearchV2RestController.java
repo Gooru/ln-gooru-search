@@ -77,7 +77,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			@RequestParam(required = false, defaultValue= "false") boolean includeCIMetaData, 
 			@RequestParam(required = false, defaultValue= "false") boolean bsSearch,
 			@RequestParam(required = false, defaultValue= "true") boolean showCanonicalOnly,
-			@RequestParam(required = false, defaultValue= "true") boolean isCrosswalk,
+			@RequestParam(required = false) boolean isCrosswalk,
 			@RequestParam(required = false, defaultValue = "false") boolean disableSpellCheck) throws Exception {
 
 		SearchData searchData = new SearchData();
@@ -107,6 +107,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		payloadObject.put(TEXT, query);
 		long start = System.currentTimeMillis();
 		User apiCaller = (User) request.getAttribute(USER);
+		searchData.setUser(apiCaller);
 		
         // Set content cdn url 
 		String contentCdnUrl = (String) request.getAttribute(Constants.CONTENT_CDN_URL);
@@ -117,14 +118,16 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		searchDataMap.put("allowDuplicates", true);
 		searchDataMap.put("includeCollectionItem", includeCollectionItem);
 		searchDataMap.put("includeCIMin", includeCIMetaData);
+		isCrosswalk = true;
 		if (searchDataMap.containsKey(FLT_STANDARD) || searchDataMap.containsKey(FLT_STANDARD_DISPLAY) ) {
+			isCrosswalk = false;
 			searchData.setTaxFilterType(TYPE_STANDARD);
 		}
-		if (searchDataMap.containsKey("flt.course")) {
+		if (searchDataMap.containsKey(FLT_COURSE)) {
 			searchData.setTaxFilterType(TYPE_COURSE);
 		}
-		if (searchDataMap.containsKey("flt.domain")) {
-			searchData.setTaxFilterType("domain");
+		if (searchDataMap.containsKey(FLT_DOMAIN)) {
+			searchData.setTaxFilterType(DOMAIN);
 		}
 		if (searchDataMap.containsKey(AGG_BY)) {
 			searchDataMap.put("aggBy.field", searchDataMap.getString(AGG_BY));
@@ -135,6 +138,10 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			scope.setKey(searchDataMap.getString("scopeKey"));
 			if (searchDataMap.containsKey("scopeTargetNames")) scope.setTargetNames(Arrays.asList(searchDataMap.getString("scopeTargetNames").split(TILDE)));
 			searchData.setScope(scope);
+		}
+
+		if (searchDataMap.containsKey(IS_CROSSWALK)) {
+			isCrosswalk = searchDataMap.getBoolean(IS_CROSSWALK);
 		}
 		
 		// client controlled value to enable / disable spell check.

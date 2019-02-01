@@ -4,6 +4,7 @@
 package org.ednovo.gooru.search.es.processor.deserializer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import org.ednovo.gooru.search.es.model.Gut;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.UserV2;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
+import org.ednovo.gooru.search.es.service.SearchSettingService;
 import org.ednovo.gooru.search.model.GutPrerequisites;
 import org.ednovo.gooru.search.model.SignatureItems;
 import org.ednovo.gooru.search.model.SignatureResources;
@@ -24,7 +26,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class GutDeserializeProcessor extends DeserializeProcessor<List<Gut>, Gut> {
-
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	List<Gut> deserialize(Map<String, Object> model, SearchData searchData, List<Gut> output) {
@@ -55,9 +57,9 @@ public class GutDeserializeProcessor extends DeserializeProcessor<List<Gut>, Gut
 		code.setDomainLabel((String) model.get(IndexFields.DOMAIN_LABEL));
 
 		Map<String, Object> signatureContents = new HashMap<>();
-		signatureContents.put(COLLECTIONS, generateSignatureCollections(model, (List<Map<String, Object>>) model.get(IndexFields.SIGNATURE_COLLECTIONS)));
-		signatureContents.put(ASSESSMENTS, generateSignatureCollections(model, (List<Map<String, Object>>) model.get(IndexFields.SIGNATURE_ASSESSMENTS)));
-		signatureContents.put(RESOURCES, generateSignatureResources(model, (List<Map<String, Object>>) model.get(IndexFields.SIGNATURE_RESOURCES)));
+		signatureContents.put(COLLECTIONS, generateSignatureCollections(model, (List<Map<String, Object>>) model.get(IndexFields.SIGNATURE_COLLECTIONS), input));
+		signatureContents.put(ASSESSMENTS, generateSignatureCollections(model, (List<Map<String, Object>>) model.get(IndexFields.SIGNATURE_ASSESSMENTS), input));
+		signatureContents.put(RESOURCES, generateSignatureResources(model, (List<Map<String, Object>>) model.get(IndexFields.SIGNATURE_RESOURCES), input));
 		code.setSignatureContents(signatureContents);
 
 		List<GutPrerequisites> gutPrerequisites = new ArrayList<>();
@@ -76,10 +78,20 @@ public class GutDeserializeProcessor extends DeserializeProcessor<List<Gut>, Gut
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<SignatureItems> generateSignatureCollections(Map<String, Object> model, List<Map<String, Object>> items) {
+	private List<SignatureItems> generateSignatureCollections(Map<String, Object> model, List<Map<String, Object>> items, SearchData input) {
 		List<SignatureItems> signatureItems = new ArrayList<>(); 
 		if (items != null && items.size() > 0) {
-			items.forEach(item -> {
+			String[] langIds = {SearchSettingService.getByName(DEFAULT_GOORU_LANG_ID)};
+			if (input.getUserLanguagePreference() != null) {
+				langIds = input.getUserLanguagePreference().split(COMMA);
+			}
+			for (Map<String, Object> item : items) {
+				Map<String, Object> lang = (Map<String, Object>) item.get(IndexFields.PRIMARY_LANGUAGE);
+				if (lang != null) {
+					Integer langId = (Integer) lang.get(IndexFields.ID);
+					if (langIds != null && langIds.length > 0) {
+						if (!(Arrays.asList(langIds)).contains(langId.toString())) continue;
+					}
 				SignatureItems signatureItem = new SignatureItems();
 				signatureItem.setId((String) item.get(IndexFields.ID));
 				signatureItem.setTitle((String) item.get(IndexFields.TITLE));
@@ -91,16 +103,28 @@ public class GutDeserializeProcessor extends DeserializeProcessor<List<Gut>, Gut
 				signatureItem.setOwner(setUser((Map<String, Object>) item.get(IndexFields.OWNER)));
 				signatureItem.setCreator(setUser((Map<String, Object>) item.get(IndexFields.CREATOR)));
 				signatureItems.add(signatureItem);
-			});
+				}
+			}
+			if (signatureItems.size() > 0) signatureItems = signatureItems.subList(input.getSIFrom(), Math.min(input.getSIFrom() + input.getSILimit(), signatureItems.size()));
 		}
 		return signatureItems;
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<SignatureResources> generateSignatureResources(Map<String, Object> model, List<Map<String, Object>> resources) {
+	private List<SignatureResources> generateSignatureResources(Map<String, Object> model, List<Map<String, Object>> resources, SearchData input) {
 		List<SignatureResources> signatureResources = new ArrayList<>();
 		if (resources != null && resources.size() > 0) {
-			resources.forEach(resource -> {
+			String[] langIds = {SearchSettingService.getByName(DEFAULT_GOORU_LANG_ID)};
+			if (input.getUserLanguagePreference() != null) {
+				langIds = input.getUserLanguagePreference().split(COMMA);
+			}
+			for (Map<String, Object> resource : resources) {
+				Map<String, Object> lang = (Map<String, Object>) resource.get(IndexFields.PRIMARY_LANGUAGE);
+				if (lang != null) {
+					Integer langId = (Integer) lang.get(IndexFields.ID);
+					if (langIds != null && langIds.length > 0) {
+						if (!(Arrays.asList(langIds)).contains(langId.toString())) continue;
+					}
 				SignatureResources signatureResource = new SignatureResources();
 				signatureResource.setId((String) resource.get(IndexFields.ID));
 				signatureResource.setTitle((String) resource.get(IndexFields.TITLE));
@@ -113,7 +137,9 @@ public class GutDeserializeProcessor extends DeserializeProcessor<List<Gut>, Gut
 				signatureResource.setRelevance((resource.get(IndexFields.RELEVANCE) != null) ? ((Number) resource.get(IndexFields.RELEVANCE)).doubleValue() : 0.5);
 				signatureResource.setCreator(setUser((Map<String, Object>) resource.get(IndexFields.CREATOR)));
 				signatureResources.add(signatureResource);
-			});
+				}
+			}
+			if (signatureResources.size() > 0) signatureResources = signatureResources.subList(input.getSIFrom(), Math.min(input.getSIFrom() + input.getSILimit(), signatureResources.size()));
 		}
 		return signatureResources;
 	}

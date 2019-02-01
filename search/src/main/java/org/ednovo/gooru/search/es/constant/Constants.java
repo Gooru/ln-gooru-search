@@ -579,5 +579,6 @@ public interface Constants {
 	public static final String TILDE = "~";
 	public static final String PUNC_MATCH = "[\\p{Punct}&&[^a-zA-Z0-9\\'\\.]]";
 	public static final String SPL_CHAR_MATCH = "[^a-zA-Z0-9\\']";
+	public static final String IS_CROSSWALK = "isCrosswalk";
 
 }

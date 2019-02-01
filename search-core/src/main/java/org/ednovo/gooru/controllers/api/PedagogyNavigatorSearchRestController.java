@@ -52,12 +52,12 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 	public ModelAndView search(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) String sessionToken,
 			@RequestParam(defaultValue = "5", value = "length") Integer limit, @RequestParam(defaultValue = "0") Integer startAt, @RequestParam(defaultValue = "1", value = "start") Integer pageNum,
 			@RequestParam(defaultValue = "0") String pretty, @RequestParam(value = "q", defaultValue = "*") String query, @PathVariable String type,
-			@RequestParam(required = false, defaultValue = "true") boolean isCrosswalk) throws Exception {
+			@RequestParam(required = false, defaultValue = "false") boolean isCrosswalk) throws Exception {
 		long start = System.currentTimeMillis();
 
 		SearchData searchData = new SearchData();
 		User apiCaller = (User) request.getAttribute(USER);
-
+		searchData.setUser(apiCaller);
 		/**
 		 * Here, when no filter is chosen, * search and keyword request with length less than 3 without * are skipped.
 		 **/
@@ -160,7 +160,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			@RequestParam(defaultValue = "1", value = "start") Integer pageNum,
 			@RequestParam(defaultValue = "0") String pretty, 
 			@RequestParam(required = false, defaultValue = "*", value = "q") String query,
-			@RequestParam(defaultValue = "true") boolean isCrosswalk,
+			@RequestParam(defaultValue = "false") boolean isCrosswalk,
 			@RequestParam(defaultValue = "true") boolean isDisplayCode) throws Exception {
 		long start = System.currentTimeMillis();
 		int dotCount = StringUtils.countMatches(subjectCode, DOT);
@@ -191,7 +191,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			@RequestParam(defaultValue = "1", value = "start") Integer pageNum,
 			@RequestParam(defaultValue = "0") String pretty, 
 			@RequestParam(required = false, defaultValue = "*", value = "q") String query,
-			@RequestParam(defaultValue = "true") boolean isCrosswalk,
+			@RequestParam(defaultValue = "false") boolean isCrosswalk,
 			@RequestParam(defaultValue = "true") boolean isDisplayCode) throws Exception {
 		long start = System.currentTimeMillis();
 		int hyphenCount = StringUtils.countMatches(courseCode, HYPHEN);
@@ -221,7 +221,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			@RequestParam(defaultValue = "1", value = "start") Integer pageNum,
 			@RequestParam(defaultValue = "0") String pretty, 
 			@RequestParam(required = false, defaultValue = "*", value = "q") String query,
-			@RequestParam(defaultValue = "true") boolean isCrosswalk,
+			@RequestParam(defaultValue = "false") boolean isCrosswalk,
 			@RequestParam(defaultValue = "true") boolean isDisplayCode) throws Exception {
 		long start = System.currentTimeMillis();
 		int hyphenCount = StringUtils.countMatches(domainCode, HYPHEN);
@@ -251,7 +251,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			@RequestParam(defaultValue = "1", value = "start") Integer pageNum,
 			@RequestParam(defaultValue = "0") String pretty, 
 			@RequestParam(required = false, defaultValue = "*", value = "q") String query,
-			@RequestParam(defaultValue = "true") boolean isCrosswalk,
+			@RequestParam(defaultValue = "false") boolean isCrosswalk,
 			@RequestParam(defaultValue = "true") boolean isDisplayCode) throws Exception {
 		long start = System.currentTimeMillis();
 		
@@ -377,7 +377,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			@RequestParam(defaultValue = "1", value = "start") Integer pageNum,
 			@RequestParam(defaultValue = "0") String pretty, 
 			@RequestParam(value = "q", defaultValue = "*") String query,
-			@RequestParam(required = false, defaultValue = "true") boolean isCrosswalk) throws Exception {
+			@RequestParam(defaultValue = "false") boolean isCrosswalk) throws Exception {
 		long start = System.currentTimeMillis();
 		SearchResponse<Object> searchResponse = new SearchResponse<Object>();
 		try {
@@ -412,7 +412,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			@RequestParam(defaultValue = "1", value = "start") Integer pageNum,
 			@RequestParam(defaultValue = "0") String pretty, 
 			@RequestParam(required = false, defaultValue = "*", value = "q") String query,
-			@RequestParam(defaultValue = "true") boolean isCrosswalk,
+			@RequestParam(defaultValue = "false") boolean isCrosswalk,
 			@RequestParam(defaultValue = "true") boolean isDisplayCode) throws Exception {
 		long start = System.currentTimeMillis();
 		
