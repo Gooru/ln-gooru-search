@@ -132,6 +132,13 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 		SearchData taxonomyRequest = new SearchData();
 		taxonomyRequest.setPretty(searchData.getPretty());
 		taxonomyRequest.setIndexType(EsIndex.GUT);
+		if (searchData.getParameters() != null && searchData.getParameters().containsKey(FLT_LANGUAGE_ID)) {
+			taxonomyRequest.setUserLanguagePreference(searchData.getParameters().getString(FLT_LANGUAGE_ID));
+		} else {
+			taxonomyRequest.setUserLanguagePreference(searchData.getUserLanguagePreference());
+		}
+		taxonomyRequest.setSIFrom(searchData.getFrom());
+		taxonomyRequest.setSILimit(searchData.getSize());
 		if (key.equalsIgnoreCase(TAXONOMY_GUT_CODE)) { 
 			taxonomyRequest.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.ID, (StringUtils.join(codes, COMMA)));
 			gutCode = codes[0];

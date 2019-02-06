@@ -152,5 +152,6 @@ public class IndexFields {
 	public static final String COURSE_LABEL = "courseLabel";
 	public static final String DOMAIN_LABEL = "domainLabel";
 	public static final String VERSION = "version";
+	public static final String PRIMARY_LANGUAGE = "primaryLanguage";
 
 }

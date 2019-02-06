@@ -17,8 +17,6 @@ public class PedagogySearchResult implements Serializable {
 
 	private Map<String, Object> taxonomy;
 
-	private Map<String, Object> taxonomyEquivalentCompetencies;
-
 	private Boolean isFeatured = false;
 
 	public String getTitle() {
@@ -59,14 +57,6 @@ public class PedagogySearchResult implements Serializable {
 
 	public void setTaxonomy(Map<String, Object> taxonomy) {
 		this.taxonomy = taxonomy;
-	}
-
-	public Map<String, Object> getTaxonomyEquivalentCompetencies() {
-		return taxonomyEquivalentCompetencies;
-	}
-
-	public void setTaxonomyEquivalentCompetencies(Map<String, Object> taxonomyEquivalentCompetencies) {
-		this.taxonomyEquivalentCompetencies = taxonomyEquivalentCompetencies;
 	}
 
 	public Boolean getIsFeatured() {
