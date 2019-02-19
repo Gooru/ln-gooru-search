@@ -42,8 +42,10 @@ public class DictionaryQueryExpansionProcessor extends SearchProcessor<SearchDat
 		abbreviationRequest.putFilter("&^type", "abbreviation,synonyms");
 
 		StringBuilder builder = new StringBuilder();
+		String stopWords = getSearchSetting("search.query.stopwords"); 
+		List<String> stopWordList = Arrays.asList(stopWords.split(COMMA));
 		for (String word : words) {
-			if (word.trim().length() == 0) {
+			if (word.length() == 0 || stopWordList.contains(word)) {
 				continue;
 			}
 			StringBuilder abbreviationsBuilder = new StringBuilder();
@@ -54,9 +56,8 @@ public class DictionaryQueryExpansionProcessor extends SearchProcessor<SearchDat
 			}
 			boolean hasNewAbbreviation = false;
 			if (searchResponse != null && !searchResponse.isEmpty()) {
-				String stopWords = getSearchSetting("search.query.stopwords"); 
 				String result = (String) ((Map<?, ?>) searchResponse.get(0).get("_source")).get("definitions");
-				if ((result != null && (result = result.trim()).length() > 0) && (!word.equalsIgnoreCase(result.trim())) && !(Arrays.asList(stopWords.split(",")).contains(word))) {
+				if ((result != null && (result = result.trim()).length() > 0) && (!word.equalsIgnoreCase(result.trim()))) {
 					abbreviationsBuilder.append(" OR " + "\"" + result + "\"");
 					hasNewAbbreviation = true;
 				}
