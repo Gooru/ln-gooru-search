@@ -9,11 +9,10 @@ public class SearchRequestBody implements Serializable {
      */
     private static final long serialVersionUID = -2962322595275238671L;
 
-    private Integer pageSize = 8;
-    private Integer length = 8;
-    private Integer startAt = 0;
-    private Integer pageNum = 1;
-    private Integer start = 1;
+    private Integer pageSize = null;
+    private Integer length = null;
+    private Integer startAt = null;
+    private Integer pageNum = null;
     private String pretty = "0";
     private String query;
     private String q;
@@ -54,14 +53,6 @@ public class SearchRequestBody implements Serializable {
 
     public void setPageNum(Integer pageNum) {
         this.pageNum = pageNum;
-    }
-
-    public Integer getStart() {
-        return start;
-    }
-
-    public void setStart(Integer start) {
-        this.start = start;
     }
 
     public String getPretty() {

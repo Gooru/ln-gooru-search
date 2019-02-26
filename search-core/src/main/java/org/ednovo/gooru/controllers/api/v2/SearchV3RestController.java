@@ -251,9 +251,9 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 			searchData.setScope(requestBody.getScope());
 			searchData.setPretty(searchData.getPretty().equalsIgnoreCase("1") ? searchData.getPretty() : requestBody.getPretty());
 			searchData.setCrosswalk(!searchData.isCrosswalk() ? searchData.isCrosswalk() : requestBody.getIsCrosswalk());
-			searchData.setFrom(requestBody.getStartAt() > 0 ? requestBody.getStartAt() : searchData.getFrom());
-			searchData.setPageNum(requestBody.getPageNum() > 0 ? requestBody.getPageNum() : searchData.getPageNum());
-			searchData.setSize(requestBody.getPageSize() >= 0 ? requestBody.getPageSize() : searchData.getSize());
+			searchData.setFrom(requestBody.getStartAt() != null ? requestBody.getStartAt() : searchData.getFrom());
+			searchData.setPageNum(requestBody.getPageNum() != null ? requestBody.getPageNum() : searchData.getPageNum());
+			searchData.setSize(requestBody.getPageSize() != null ? requestBody.getPageSize() : searchData.getSize());
 			if (requestBody.getFilters() != null) {
 				MapWrapper<Object> searchDataMap = searchData.getParameters();
 				requestBody.getFilters().forEach((k, v) -> {
