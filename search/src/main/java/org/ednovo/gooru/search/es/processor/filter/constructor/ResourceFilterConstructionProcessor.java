@@ -40,9 +40,13 @@ public class ResourceFilterConstructionProcessor extends ContentFilterConstructi
 			}
 			String audience = null;
 			if (searchData.getFilters().containsKey(AMPERSAND_AUDIENCE)) audience = (String) searchData.getFilters().get(AMPERSAND_AUDIENCE);
-			if (audience == null || (audience != null && !audience.equalsIgnoreCase(AUDIENCE_TEACHERS) && !(audience.contains(AUDIENCE_TEACHERS) && audience.contains(AUDIENCE_ALL_STUDENTS) && audience.trim().length() == 21))) {
-				searchData.putFilter(NOT_SYMBOL + CARET_SYMBOL + IndexFields.AUDIENCE, AUDIENCE_TEACHERS);
-				if (audience != null) searchData.getFilters().remove(AMPERSAND_AUDIENCE);
+			if (audience == null || (audience != null && !audience.equalsIgnoreCase(AUDIENCE_TEACHERS))) {
+				if (audience.contains(AUDIENCE_TEACHERS) && audience.contains(AUDIENCE_ALL_STUDENTS) && audience.trim().length() == 21) {
+					searchData.getFilters().remove(AMPERSAND_AUDIENCE);
+				} else {
+					searchData.putFilter(NOT_SYMBOL + CARET_SYMBOL + IndexFields.AUDIENCE, AUDIENCE_TEACHERS);
+					if (audience != null) searchData.getFilters().remove(AMPERSAND_AUDIENCE);
+				}
 			}
         			
 			if (searchData.getFilters().containsKey(FLT_COURSE_ID)) {
