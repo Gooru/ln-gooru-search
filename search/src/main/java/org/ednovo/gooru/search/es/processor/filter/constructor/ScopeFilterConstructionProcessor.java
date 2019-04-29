@@ -34,7 +34,9 @@ public class ScopeFilterConstructionProcessor extends FilterConstructionProcesso
     private void processScope(SearchData searchData, String target, Scope scope) {
 		switch (target) {
 		case "my-content":
-			searchData.putFilter("&^creator.userId", searchData.getUser().getGooruUId());
+			if (!searchData.getFilters().containsKey(AMPERSAND_CREATOR_ID)) {
+				searchData.putFilter("&^creator.userId", searchData.getUser().getGooruUId());
+			}
 			break;
 		case "tenant-library":
 			searchData.putFilter("&^tenant.tenantId", (searchData.getUserTenantRootId() != null) ? searchData.getUserTenantRootId() : searchData.getUserTenantId());
