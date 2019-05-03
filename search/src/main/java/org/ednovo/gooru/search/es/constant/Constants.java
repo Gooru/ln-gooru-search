@@ -391,6 +391,7 @@ public interface Constants {
 	public static final String AMPERSAND_AUDIENCE = "&^audience";
 	public static final String FLT_LANGUAGE = "flt.language";
 	public static final String FLT_LANGUAGE_ID = "flt.languageId";
+	public static final String AMPERSAND_CREATOR_ID = "&^creatorId";
 
 	public static final String CONTENT_CDN_URL = "contentCDN";
 	public static final String USER_CDN_URL = "userCDN";
@@ -574,11 +575,13 @@ public interface Constants {
     public static final String _V3 = "_v3";
     public static final String HOT_SPOT_IMAGE_QUESTION = "hot_spot_image_question";
     public static final String AUDIENCE_TEACHERS = "Teachers";
+    public static final String AUDIENCE_ALL_STUDENTS = "All Students";
 	public static final String EXTERNAL = "external";
 	public static final String UNDERSCORE = "_";
 	public static final String TILDE = "~";
 	public static final String PUNC_MATCH = "[\\p{Punct}&&[^a-zA-Z0-9\\'\\.]]";
 	public static final String SPL_CHAR_MATCH = "[^a-zA-Z0-9\\']";
 	public static final String IS_CROSSWALK = "isCrosswalk";
+	public static final String SCOPE_KEY = "scopeKey";
 
 }

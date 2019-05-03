@@ -5,6 +5,7 @@ package org.ednovo.gooru.search.es.processor.filter.constructor;
 
 import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.constant.SearchFilterConstants;
+import org.ednovo.gooru.search.es.constant.Constants.PublishedStatus;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
 import org.ednovo.gooru.search.responses.SearchResponse;
@@ -28,6 +29,11 @@ public class ResourceFilterConstructionProcessor extends ContentFilterConstructi
 		
 		// Default filter to get non-broken and student content
 		searchData.putFilter(FLT_STATUS_BROKEN, 0);
+		
+		String scopeKey = null;
+		if (searchData.getScope() != null && searchData.getScope().getKey() != null && SCOPE_MATCH.matcher(searchData.getScope().getKey()).matches()) {
+			scopeKey = searchData.getScope().getKey();
+		}
 
 		if (searchData != null && searchData.getFilters() != null) {
 			String contentFormat = null;
@@ -35,12 +41,20 @@ public class ResourceFilterConstructionProcessor extends ContentFilterConstructi
 			if (searchData.getFilters().containsKey(AMPERSAND_CONTENT_FORMAT)) {
 				contentFormat = (String) searchData.getFilters().get(AMPERSAND_CONTENT_FORMAT);
 			}
-			if (contentFormat != null && contentFormat.equalsIgnoreCase(TYPE_RESOURCE))  {
+			if ((contentFormat != null && contentFormat.equalsIgnoreCase(TYPE_RESOURCE)) && (scopeKey == null || (scopeKey != null && !SCOPE_MYCONTENT_LIBRARY_MATCH.matcher(scopeKey).matches())) 
+				&& (searchData.getFilters().containsKey(FLT_PUBLISH_STATUS) && ((String) searchData.getFilters().get(FLT_PUBLISH_STATUS)).equalsIgnoreCase(PublishedStatus.PUBLISHED.getStatus()))) {
 				searchData.putFilter(FLT_PUBLISHER_QUALITY_INDICATOR, "3,4,5");
 			}
 			String audience = null;
 			if (searchData.getFilters().containsKey(AMPERSAND_AUDIENCE)) audience = (String) searchData.getFilters().get(AMPERSAND_AUDIENCE);
-			if (audience == null || (audience != null && !audience.equalsIgnoreCase(AUDIENCE_TEACHERS))) searchData.putFilter(NOT_SYMBOL + CARET_SYMBOL + IndexFields.AUDIENCE, AUDIENCE_TEACHERS);
+			if (audience == null || (audience != null && !audience.equalsIgnoreCase(AUDIENCE_TEACHERS))) {
+				if (audience != null && audience.contains(AUDIENCE_TEACHERS) && audience.contains(AUDIENCE_ALL_STUDENTS) && audience.trim().length() == 21) {
+					searchData.getFilters().remove(AMPERSAND_AUDIENCE);
+				} else {
+					searchData.putFilter(NOT_SYMBOL + CARET_SYMBOL + IndexFields.AUDIENCE, AUDIENCE_TEACHERS);
+					if (audience != null) searchData.getFilters().remove(AMPERSAND_AUDIENCE);
+				}
+			}
         			
 			if (searchData.getFilters().containsKey(FLT_COURSE_ID)) {
 				courseId = (String) searchData.getFilters().get(FLT_COURSE_ID);
