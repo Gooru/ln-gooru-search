@@ -392,6 +392,7 @@ public interface Constants {
 	public static final String FLT_LANGUAGE = "flt.language";
 	public static final String FLT_LANGUAGE_ID = "flt.languageId";
 	public static final String AMPERSAND_CREATOR_ID = "&^creatorId";
+	public static final String FLT_CREATOR_ID = "flt.creatorId";
 
 	public static final String CONTENT_CDN_URL = "contentCDN";
 	public static final String USER_CDN_URL = "userCDN";
