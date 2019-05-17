@@ -24,6 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.google.common.base.CaseFormat;
 /**
  * @author Renuka
  * 
@@ -56,10 +58,10 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 		inputSearchData.setUser(searchData.getUser());
 		inputSearchData.setUserTaxonomyPreference(searchData.getUserTaxonomyPreference());
 		inputSearchData.setUserLanguagePreference(searchData.getUserLanguagePreference());
-		if (RQC_MATCH.matcher(type).matches()) {
-			inputSearchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_FORMAT, (type.equalsIgnoreCase(TYPE_SCOLLECTION) ? TYPE_COLLECTION : type));
-			if (type.equalsIgnoreCase(TYPE_QUESTION)) inputSearchData.setType(TYPE_RESOURCE);
-		} else if (type.equalsIgnoreCase(TYPE_ASSESSMENT)) {
+		if (RQ_MATCH.matcher(type).matches()) {
+			inputSearchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_FORMAT, type);
+			inputSearchData.setType(TYPE_RESOURCE);
+		} else if (C_A_EA_EC_OA_MATCH.matcher(type).matches()) {
 			inputSearchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_FORMAT, type);
 			inputSearchData.setType(TYPE_SCOLLECTION);
 		}
@@ -76,11 +78,7 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 		searchMap.put(TOTAL_HIT_COUNT, searchResponse.getStats().get(TOTAL_HIT_COUNT));
 		searchMap.put(RESULT_COUNT, searchResponse.getStats().get(RESULT_COUNT));
 		searchMap.put(SEARCH_RESULTS, searchResponse.getSearchResults());
-		if (type.equalsIgnoreCase(TYPE_SCOLLECTION)) {
-			resultAsMap.put(TYPE_COLLECTION, searchMap);
-		} else {
-			resultAsMap.put(type, searchMap);
-		}
+		resultAsMap.put(CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, type), searchMap);
 		logger.info("Elapsed time to complete {} search process : {} ms", type , (System.currentTimeMillis() - uStart));
 		return resultAsMap;
 	}

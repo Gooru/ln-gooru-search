@@ -522,27 +522,25 @@ public interface Constants {
 
 	public enum ContentFormat {
 
-		RESOURCE("resource"), 
-		QUESTION("question"), 
-		COLLECTION("collection"), 
-		ASSESSMENT("assessment"),
-		;
+		RESOURCE("resource"), QUESTION("question"), COLLECTION("collection"), ASSESSMENT("assessment"), ASSESSMENT_EXTERNAL("assessment-external"), COLLECTION_EXTERNAL("collection-external"),
+		OFFLINE_ACTIVITY("offline-activity"), RUBRIC("rubric"), COURSE("course"), UNIT("unit"), LESSON("lesson");
 
-		private String contentFormat;
+		private String value;
 
-		ContentFormat(String contentFormat) {
-			this.contentFormat = contentFormat;
+		ContentFormat(String value) {
+			this.value = value;
 		}
 
-		public String getContentFormat() {
-			return this.contentFormat;
+		public String getValue() {
+			return this.value;
 		}
 
 	}
 	public static final String CONTENTS = "contents";
 	Pattern CUL_MATCH = Pattern.compile("course|unit|lesson");
 	Pattern RQCA_MATCH = Pattern.compile("resource|question|collection|assessment|scollection");
-	Pattern RQC_MATCH = Pattern.compile("resource|question|collection|scollection");
+	Pattern RQ_MATCH = Pattern.compile("resource|question");
+	Pattern C_A_EA_EC_OA_MATCH = Pattern.compile("scollection|assessment|assessment-external|collection|collection-external|offline-activity");
 	Pattern RESOURCE_MATCH = Pattern.compile("resource|question");
 	Pattern COLLECTION_MATCH = Pattern.compile("scollection|collection|assessment|collection-external|assessment-external");
 	public static final String PEDAGOGY_UNDERSCORE = "pedagogy_";
