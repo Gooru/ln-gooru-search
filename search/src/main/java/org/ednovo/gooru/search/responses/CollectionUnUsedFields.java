@@ -23,6 +23,7 @@ public class CollectionUnUsedFields extends SearchResult {
     private String description;
 	private String languageObjective;
 	private Boolean isFeatured;
+	private String url;
 	
 	public String getAssetURI() {
 		return assetURI;
@@ -132,7 +133,11 @@ public class CollectionUnUsedFields extends SearchResult {
   public void setIsFeatured(Boolean isFeatured) {
     this.isFeatured = isFeatured;
   }
-
-
+  public String getUrl() {
+	return url;
+  }
+  public void setUrl(String url) {
+	this.url = url;
+  }
 
 }

@@ -58,10 +58,10 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 		inputSearchData.setUser(searchData.getUser());
 		inputSearchData.setUserTaxonomyPreference(searchData.getUserTaxonomyPreference());
 		inputSearchData.setUserLanguagePreference(searchData.getUserLanguagePreference());
-		if (RQ_MATCH.matcher(type).matches()) {
+		if (RESOURCE_MATCH.matcher(type).matches()) {
 			inputSearchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_FORMAT, type);
 			inputSearchData.setType(TYPE_RESOURCE);
-		} else if (C_A_EA_EC_OA_MATCH.matcher(type).matches()) {
+		} else if (COLLECTION_MATCH.matcher(type).matches()) {
 			inputSearchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_FORMAT, type);
 			inputSearchData.setType(TYPE_SCOLLECTION);
 		}

@@ -265,6 +265,8 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 			}
 			output.setTaxonomySet(taxonomySetAsMap);			
 		}
+		
+		output.setUrl(IndexFields.URL);
 
 		return output;
 	}
