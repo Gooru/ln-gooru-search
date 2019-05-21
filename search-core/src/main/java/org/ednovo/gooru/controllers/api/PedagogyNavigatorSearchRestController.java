@@ -64,6 +64,10 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		if (type.equalsIgnoreCase(TYPE_COMPETENCY_GRAPH) || type.equalsIgnoreCase(LEARNING_MAPS)) {
 			query = checkQueryValidity(query, (Map<String, Object>) request.getParameterMap());
 		}
+		
+		// Set content cdn url 
+		String contentCdnUrl = (String) request.getAttribute(Constants.CONTENT_CDN_URL);
+		searchData.setContentCdnUrl(contentCdnUrl);
 
 		// Set user permits
 		UserGroupSupport userGroup = (UserGroupSupport) request.getAttribute(Constants.TENANT);
@@ -435,6 +439,10 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			String query, boolean isCrosswalk, String codeType, boolean isDisplayCode) {
 		User apiCaller = (User) request.getAttribute(USER);
 
+		// Set content cdn url 
+		String contentCdnUrl = (String) request.getAttribute(Constants.CONTENT_CDN_URL);
+		searchData.setContentCdnUrl(contentCdnUrl);
+		
 		// Set user permits
 		UserGroupSupport userGroup = (UserGroupSupport) request.getAttribute(Constants.TENANT);
 		List<String> userPermits = new ArrayList<>();

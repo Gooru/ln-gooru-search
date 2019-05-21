@@ -16,6 +16,8 @@ public class PedagogyCollectionSearchResult extends PedagogySearchResult impleme
 	*/
 	private static final long serialVersionUID = 5673214015280665109L;
 
+	private String url;
+
 	private String format;
 
 	private Integer viewCount;
@@ -201,5 +203,13 @@ public class PedagogyCollectionSearchResult extends PedagogySearchResult impleme
 
 	public void setRelevance(Double relevance) {
 		this.relevance = relevance;
+	}
+	
+	public String getUrl() {
+		return url;
+	}
+	
+	public void setUrl(String url) {
+		this.url = url;
 	}
 }
