@@ -36,7 +36,7 @@ public class ResourceSuggestDeserializeProcessor extends SuggestDeserializeProce
 				// Check for Duplicates
 				String url = (String) fields.get(IndexFields.URL);
 				String title = (String) fields.get(IndexFields.TITLE);
-				if (((String) fields.get(IndexFields.CONTENT_FORMAT)) != null && fields.get(IndexFields.CONTENT_FORMAT).equals(ContentFormat.QUESTION.getContentFormat())) {
+				if (((String) fields.get(IndexFields.CONTENT_FORMAT)) != null && fields.get(IndexFields.CONTENT_FORMAT).equals(ContentFormat.QUESTION.getValue())) {
 					Map<String, Object> questionMap = (Map<String, Object>) fields.get(IndexFields.QUESTION);
 					if (questionMap != null) {
 						title = (String) (questionMap.get(IndexFields.QUESTION));

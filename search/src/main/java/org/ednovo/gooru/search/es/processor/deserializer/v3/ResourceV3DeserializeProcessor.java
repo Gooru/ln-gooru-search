@@ -57,7 +57,7 @@ public class ResourceV3DeserializeProcessor extends DeserializeV3Processor<List<
 				// Check for Duplicates
 				String url = (String) fields.get(IndexFields.URL);
 				String title = (String) fields.get(IndexFields.TITLE);
-				if (((String) fields.get(IndexFields.CONTENT_FORMAT)) != null && fields.get(IndexFields.CONTENT_FORMAT).equals(ContentFormat.QUESTION.getContentFormat())) {
+				if (((String) fields.get(IndexFields.CONTENT_FORMAT)) != null && fields.get(IndexFields.CONTENT_FORMAT).equals(ContentFormat.QUESTION.getValue())) {
 					Map<String, Object> questionMap = (Map<String, Object>) fields.get(IndexFields.QUESTION);
 					if (questionMap != null) {
 						title = (String) (questionMap.get(IndexFields.QUESTION));
@@ -111,7 +111,7 @@ public class ResourceV3DeserializeProcessor extends DeserializeV3Processor<List<
 		String contentSubFormat = (String) source.get(IndexFields.CONTENT_SUB_FORMAT);
 
 		ContentSearchResult output = null;
-		if (contentFormat != null && contentFormat.equalsIgnoreCase(ContentFormat.QUESTION.getContentFormat())) {
+		if (contentFormat != null && contentFormat.equalsIgnoreCase(ContentFormat.QUESTION.getValue())) {
 			QuestionV3 question = convertToQuestion(source, searchData);
 			output = question;
 		} else {

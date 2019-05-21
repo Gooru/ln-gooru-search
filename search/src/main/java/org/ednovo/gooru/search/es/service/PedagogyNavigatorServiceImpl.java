@@ -58,16 +58,10 @@ public class PedagogyNavigatorServiceImpl implements PedagogyNavigatorService, C
 			else getLearningMapsService().generateRequestedCodesInfo(searchData, key, codes, fwCode, searchResult);
 			getLearningMapsService().generateStandardFilter(searchData, key, codes, fwCode);
 		}
+		for (ContentFormat format : ContentFormat.values()) {
+			getLearningMapsService().search(searchData, format.getValue(), contentResultAsMap);
+		}
 
-		getLearningMapsService().search(searchData, TYPE_RESOURCE, contentResultAsMap);
-		getLearningMapsService().search(searchData, TYPE_QUESTION, contentResultAsMap);
-		getLearningMapsService().search(searchData, TYPE_SCOLLECTION, contentResultAsMap);
-		getLearningMapsService().search(searchData, TYPE_ASSESSMENT, contentResultAsMap);
-		getLearningMapsService().search(searchData, TYPE_RUBRIC, contentResultAsMap);
-		getLearningMapsService().search(searchData, TYPE_COURSE, contentResultAsMap);
-		getLearningMapsService().search(searchData, TYPE_UNIT, contentResultAsMap);
-		getLearningMapsService().search(searchData, TYPE_LESSON, contentResultAsMap);
-		
 		searchResult.put(Constants.CONTENTS, contentResultAsMap);
 		searchResponse.setSearchResults(searchResult);
 		return searchResponse;

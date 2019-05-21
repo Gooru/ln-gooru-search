@@ -29,7 +29,7 @@ public class LearningMapStatsRepositoryImpl extends BaseRepository implements Le
 	public List<Map<String, Object>> getStats(String subjectClassification, String subjectCode, String courseCode, String domainCode, String codeType, int offset, int limit) {
 		List<Map<String, Object>> resultSet = null;
 		try {
-			String sql = "select id, subject_code, course_code, domain_code, resource_count, question_count,collection_count, assessment_count, rubric_count, course_count, unit_count, lesson_count, signature_resource_count, signature_collection_count, signature_assessment_count, code_type, parent_id, sequence_id from learning_maps where subject_classification = '"+subjectClassification+"'";
+			String sql = "select id, subject_code, course_code, domain_code, resource_count, question_count,collection_count, assessment_count, rubric_count, course_count, unit_count, lesson_count, signature_resource_count, signature_collection_count, signature_assessment_count, code_type, parent_id, sequence_id, ext_collection_count, ext_assessment_count, offline_activity_count from learning_maps where subject_classification = '"+subjectClassification+"'";
 
 			if (StringUtils.isNotBlank(subjectCode))  sql += " and subject_code in (:SUBJECT_CODE)";
 			if (StringUtils.isNotBlank(courseCode)) sql += " and course_code in (:COURSE_CODE)";
@@ -57,7 +57,7 @@ public class LearningMapStatsRepositoryImpl extends BaseRepository implements Le
 		List<Map<String, Object>> resultSet = null;
 		try {
 			if (StringUtils.isNotBlank(gutIds)) {
-				String sql = "select id, subject_code, course_code, domain_code, resource_count, question_count,collection_count, assessment_count, rubric_count, course_count, unit_count, lesson_count, signature_resource_count, signature_collection_count, signature_assessment_count, code_type, parent_id, sequence_id from learning_maps WHERE id IN (:GUT_IDS)";
+				String sql = "select id, subject_code, course_code, domain_code, resource_count, question_count,collection_count, assessment_count, rubric_count, course_count, unit_count, lesson_count, signature_resource_count, signature_collection_count, signature_assessment_count, code_type, parent_id, sequence_id, ext_collection_count, ext_assessment_count, offline_activity_count from learning_maps WHERE id IN (:GUT_IDS)";
 				if (codeType != null) {
 					if (codeType.equalsIgnoreCase("competency"))
 						sql += " and code_type in ('standard_level_1','standard_level_2')";
@@ -102,6 +102,9 @@ public class LearningMapStatsRepositoryImpl extends BaseRepository implements Le
 			resultMap.put("codeType", object[15].toString());
 			resultMap.put("parentId", object[16] == null ? null : object[16].toString());
 			resultMap.put("sequenceId", Integer.valueOf(object[17].toString()));
+			resultMap.put("collectionExternal", Integer.valueOf(object[18].toString()));
+			resultMap.put("assessmentExternal", Integer.valueOf(object[19].toString()));
+			resultMap.put("offlineActivity", Integer.valueOf(object[20].toString()));
 			resultSet.add(resultMap);
 		}
 		return resultSet;
@@ -152,13 +155,12 @@ public class LearningMapStatsRepositoryImpl extends BaseRepository implements Le
 		return totalHitCount;
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, Object> getLearningMapsById(String gutIds) {
 		Map<String, Object> resultMap = null;
 		try {
 			if (StringUtils.isNotBlank(gutIds)) {
-				String sql = "select id, resource, question, collection, assessment, rubric, course, unit, lesson from learning_maps WHERE id IN (:GUT_IDS)";
+				String sql = "select id, resource, question, collection, assessment, rubric, course, unit, lesson, ext_assessment, ext_collection, offline_activity from learning_maps WHERE id IN (:GUT_IDS)";
 				Query query = getSessionFactory().getCurrentSession().createSQLQuery(sql)
 						.addScalar("id", StringType.INSTANCE)
 						.addScalar("resource", StringType.INSTANCE)
@@ -168,7 +170,10 @@ public class LearningMapStatsRepositoryImpl extends BaseRepository implements Le
 						.addScalar("rubric", StringType.INSTANCE)				
 						.addScalar("course", StringType.INSTANCE)
 						.addScalar("unit", StringType.INSTANCE)
-						.addScalar("lesson", StringType.INSTANCE);
+						.addScalar("lesson", StringType.INSTANCE)
+						.addScalar("ext_assessment", StringType.INSTANCE)
+						.addScalar("ext_collection", StringType.INSTANCE)
+						.addScalar("offline_activity", StringType.INSTANCE);
 				if (StringUtils.isNotBlank(gutIds)) query.setParameterList("GUT_IDS", gutIds.split(","));
 				if (query != null && arrayList(query).size() > 0) {
 					resultMap = new HashMap<>();
@@ -189,6 +194,12 @@ public class LearningMapStatsRepositoryImpl extends BaseRepository implements Le
 						resultMap.put("unit", (unitString != null) ? serializeJsonToMap(unitString) : null);
 						String lessonString = object[8] != null ? object[8].toString() : null;
 						resultMap.put("lesson", (lessonString != null) ? serializeJsonToMap(lessonString) : null);
+						String extAsmtString = object[9] != null ? object[9].toString() : null;
+						resultMap.put("assessmentExternal", (extAsmtString != null) ? serializeJsonToMap(extAsmtString) : null);
+						String extCollString = object[10] != null ? object[10].toString() : null;
+						resultMap.put("collectionExternal", (extCollString != null) ? serializeJsonToMap(extCollString) : null);
+						String oaString = object[11] != null ? object[11].toString() : null;
+						resultMap.put("offlineActivity", (oaString != null) ? serializeJsonToMap(oaString) : null);
 					}
 				}
 			}

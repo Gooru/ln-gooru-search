@@ -58,7 +58,7 @@ public class PedagogyResourceDeserializeProcessor extends PedagogyDeserializePro
 				// Check for Duplicates
 				String url = (String) fields.get(IndexFields.URL);
 				String title = (String) fields.get(IndexFields.TITLE);
-				if (((String) fields.get(IndexFields.CONTENT_FORMAT)) != null && fields.get(IndexFields.CONTENT_FORMAT).equals(ContentFormat.QUESTION.getContentFormat())) {
+				if (((String) fields.get(IndexFields.CONTENT_FORMAT)) != null && fields.get(IndexFields.CONTENT_FORMAT).equals(ContentFormat.QUESTION.getValue())) {
 					Map<String, Object> questionMap = (Map<String, Object>) fields.get(IndexFields.QUESTION);
 					if (questionMap != null) {
 						title = (String) (questionMap.get(IndexFields.QUESTION));
@@ -117,7 +117,7 @@ public class PedagogyResourceDeserializeProcessor extends PedagogyDeserializePro
 
 		PedagogyContentSearchResult resource = null;
 
-		if (contentFormat != null && contentFormat.equalsIgnoreCase(ContentFormat.QUESTION.getContentFormat())) {
+		if (contentFormat != null && contentFormat.equalsIgnoreCase(ContentFormat.QUESTION.getValue())) {
 			PedagogyQuestion question = convertToQuestion(dataMap);
 			resource = question;
 		} else {

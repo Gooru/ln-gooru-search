@@ -68,7 +68,7 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 				// Check for Duplicates
 				String url = (String) fields.get(IndexFields.URL);
 				String title = (String) fields.get(IndexFields.TITLE);
-				if (((String) fields.get(IndexFields.CONTENT_FORMAT)) != null && fields.get(IndexFields.CONTENT_FORMAT).equals(ContentFormat.QUESTION.getContentFormat())) {
+				if (((String) fields.get(IndexFields.CONTENT_FORMAT)) != null && fields.get(IndexFields.CONTENT_FORMAT).equals(ContentFormat.QUESTION.getValue())) {
 					Map<String, Object> questionMap = (Map<String, Object>) fields.get(IndexFields.QUESTION);
 					if (questionMap != null) {
 						title = (String) (questionMap.get(IndexFields.QUESTION));
@@ -128,13 +128,13 @@ public class ResourceDeserializeProcessor extends DeserializeProcessor<List<Cont
 
 		ContentSearchResult resource = null;
 
-		if (contentFormat != null && contentFormat.equalsIgnoreCase(ContentFormat.QUESTION.getContentFormat())) {
+		if (contentFormat != null && contentFormat.equalsIgnoreCase(ContentFormat.QUESTION.getValue())) {
 			Question question = convertToQuestion(dataMap);
 			resource = question;
 			Map<String, String> resourceFormatValueAsMap = new HashMap<>(1);
 			resourceFormatValueAsMap.put(VALUE, contentFormat);
 			resource.setResourceFormat(resourceFormatValueAsMap);
-			resource.setCategory(ContentFormat.QUESTION.getContentFormat());
+			resource.setCategory(ContentFormat.QUESTION.getValue());
 		} else {
 			resource = new ContentSearchResult();
 			Map<String, String> resourceFormatValueAsMap = new HashMap<>(1);
