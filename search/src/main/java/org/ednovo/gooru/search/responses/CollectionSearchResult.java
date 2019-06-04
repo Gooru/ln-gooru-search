@@ -69,6 +69,8 @@ public class CollectionSearchResult extends CollectionUnUsedFields implements Se
 	
 	private Double relevance;
 	
+	private Long taskCount;
+	
 	public CollectionSearchResult() {
 	}
 
@@ -474,5 +476,13 @@ public class CollectionSearchResult extends CollectionUnUsedFields implements Se
 	
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	public Long getTaskCount() {
+		return taskCount;
+	}
+	
+	public void setTaskCount(Long taskCount) {
+		this.taskCount = taskCount;	
 	}
 }
