@@ -153,5 +153,6 @@ public class IndexFields {
 	public static final String DOMAIN_LABEL = "domainLabel";
 	public static final String VERSION = "version";
 	public static final String PRIMARY_LANGUAGE = "primaryLanguage";
+	public static final String OA_TASK_COUNT = "oaTaskCount";
 
 }

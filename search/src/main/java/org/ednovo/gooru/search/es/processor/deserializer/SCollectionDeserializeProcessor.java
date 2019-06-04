@@ -270,6 +270,7 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 			if (!url.startsWith(HTTP)) url = HTTP + COLON + searchData.getContentCdnUrl() + url;
 			output.setUrl(url);
 		}
+		output.setTaskCount(statisticsMap.get(IndexFields.OA_TASK_COUNT) != null ? ((Number) statisticsMap.get(IndexFields.OA_TASK_COUNT)).longValue() : null);
 
 		return output;
 	}
