@@ -34,24 +34,12 @@ public class ScopeFilterConstructionProcessor extends FilterConstructionProcesso
     private void processScope(SearchData searchData, String target, Scope scope) {
 		switch (target) {
 		case "my-content":
-			if (searchData.getType().toLowerCase().contains(TYPE_COLLECTION) || searchData.getType().toLowerCase().contains(TYPE_COURSE)) {
-				if (!searchData.getFilters().containsKey(AMPERSAND_OWNER_ID)) {
-					searchData.putFilter("&^orFilters", "owner.userId:" + searchData.getUser().getGooruUId() + "|collaboratorIds:" + searchData.getUser().getGooruUId());
-				} else if (searchData.getFilters().containsKey(AMPERSAND_OWNER_ID) && StringUtils.isNotBlank(searchData.getFilters().get(AMPERSAND_OWNER_ID).toString())) {
-					searchData.putFilter("&^orFilters", "owner.userId:" + searchData.getFilters().get(AMPERSAND_OWNER_ID).toString() 
-												      + "|collaboratorIds:" + searchData.getFilters().get(AMPERSAND_OWNER_ID).toString());
-					searchData.getFilters().remove(AMPERSAND_OWNER_ID);
-					searchData.getParameters().remove(FLT_OWNER_ID);
-				}
-			} else {
-				if (!searchData.getFilters().containsKey(AMPERSAND_CREATOR_ID)) {
-					searchData.putFilter("&^orFilters", "creator.userId:" + searchData.getUser().getGooruUId() + "|collaboratorIds:" + searchData.getUser().getGooruUId());
-				} else if (searchData.getFilters().containsKey(AMPERSAND_CREATOR_ID) && StringUtils.isNotBlank(searchData.getFilters().get(AMPERSAND_CREATOR_ID).toString())) {
-					searchData.putFilter("&^orFilters", "creator.userId:" + searchData.getFilters().get(AMPERSAND_CREATOR_ID).toString() + "|collaboratorIds:" + searchData.getFilters()
-																																			.get(AMPERSAND_CREATOR_ID).toString());
-					searchData.getFilters().remove(AMPERSAND_CREATOR_ID);
-					searchData.getParameters().remove(FLT_CREATOR_ID);
-				}
+			if (!searchData.getFilters().containsKey(AMPERSAND_CREATOR_ID)) {
+				searchData.putFilter("&^orFilters", "creator.userId:" + searchData.getUser().getGooruUId() + "|owner.userId:" + searchData.getUser().getGooruUId() + "|collaboratorIds:" + searchData.getUser().getGooruUId());
+			} else if (searchData.getFilters().containsKey(AMPERSAND_CREATOR_ID) && StringUtils.isNotBlank(searchData.getFilters().get(AMPERSAND_CREATOR_ID).toString())) {
+				searchData.putFilter("&^orFilters", "creator.userId:" + searchData.getUser().getGooruUId() + "|owner.userId:" + searchData.getFilters().get(AMPERSAND_CREATOR_ID).toString() + "|collaboratorIds:" + searchData.getFilters().get(AMPERSAND_CREATOR_ID).toString());
+				searchData.getFilters().remove(AMPERSAND_CREATOR_ID);
+				searchData.getParameters().remove(FLT_CREATOR_ID);
 			}
 			break;
 		case "tenant-library":
