@@ -133,6 +133,4 @@ public class CollectionUnUsedFields extends SearchResult {
     this.isFeatured = isFeatured;
   }
 
-
-
 }

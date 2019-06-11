@@ -1,7 +1,5 @@
 package org.ednovo.gooru.search.es.constant;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.regex.Pattern;
 
 public interface Constants {
@@ -78,27 +76,7 @@ public interface Constants {
 
 	public static final String AUTO_COMPLETE = "autocomplete";
 
-	public static final String HTTPS_PROTOCOL_TYPE = "https";
-
-	public static final String HTTP_PROTOCOL_TYPE = "http";
-
-	public static final String SEARCH_REFERER = "referer";
-
-	public static final String REQUEST_PROTOCOL = "requestProtocol";
-
-	public static final ArrayList<String> API_KEYS = new ArrayList<String>(Arrays.asList("ASERTYUIOMNHBGFDXSDWERT123RTGHYT"));
-
 	public static final String SEARCH_FORMAT[] = { "subjects", "resourceFormat" };
-
-	public static final String X_FORWARDED_PROTO = "X-FORWARDED-PROTO";
-
-	public static final String TAXONOMY_ROOT_CODE_USER = "user_taxonomy_root_code";
-
-	public static final String Level = "level";
-
-	public static final String LIST = "list";
-
-	public static final String RELOAD = "reload";
 
 	public static final String TYPE_SCOLLECTION = "scollection";
 
@@ -121,8 +99,6 @@ public interface Constants {
 	public static final String UNDERSCORE_COLON = "_colon";
 
 	public static final String SEARCH_FILTER_NAME = "filter-name";
-
-	public static final String AND = "and";
 
 	public static final String TERMS = "terms";
 
@@ -152,9 +128,6 @@ public interface Constants {
 
 	public static final String HYPHEN = "-";
 
-	public static final String[] BS_CATEGORY_LIST = { "Video", "Images", "Interactive", "Website", "Slide", "Textbook", "Handout", "Lesson", "Exam", "Cases", "Documents", "Activities", "Audio",
-			"Maps", "Readings", "File", "Laps", "StudyGuides", "Homework", "ProjectPlan" };
-
 	public static final String FLT = "flt";
 
 	public static final String BOOST_FIELD = "boostField";
@@ -169,15 +142,7 @@ public interface Constants {
 
 	public static final String SIZE = "size";
 
-	public static final String FIELDS = "fields";
-
-	public static final String PRETTY = "pretty";
-
 	public static final String GOORU_SESSION_TOKEN = "gooru-session-token";
-
-	public static final String ERROR_INCLUDE[] = { "*.fieldError", "*.errorCount", "*.code", "*.defaultMessage", "*.field", "*.objectName", "*.rejectedValue" };
-
-	public static final String BLACK_LIST_WORD_RESPONSE_MESSAGE = "Remember:This is a search engine for learning. To ensure a safe search experience, Gooru does not provide any results for the search term you entered.";
 
 	public static final String INCLUDE_COLLECTION_ITEM = "includeCollectionItem";
 
@@ -187,35 +152,13 @@ public interface Constants {
 
 	public static final String UUID = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
 
-	public static final String newFormats = "{\"data\":[{\"website\": { \"resourceFormat\": \"webpage\", \"instructionalUse\": null }}, {\"video\": { \"resourceFormat\": \"video\", \"instructionalUse\": null }}, {\"interactive\": { \"resourceFormat\": \"interactive\", \"instructionalUse\": null }}, {\"audio\": { \"resourceFormat\": \"audio\", \"instructionalUse\": null }}, {\"question\": { \"resourceFormat\": \"question\", \"instructionalUse\": null }}, {\"website,recipes\": { \"resourceFormat\": \"webpage\", \"instructionalUse\": null }}, {\"text\": { \"resourceFormat\": \"text\", \"instructionalUse\": null }}, {\"exam\": [ { \"resourceFormat\": \"text\", \"instructionalUse\": \"quiz\", \"validate\": \"not_http\" }, { \"resourceFormat\": \"interactive\", \"instructionalUse\": \"quiz\", \"validate\": \"http\" } ]}, {\"lesson\": { \"resourceFormat\": \"text\", \"instructionalUse\": \"curriculum plan\" }}, {\"slide\": { \"resourceFormat\": \"image\", \"instructionalUse\": \"presentation\" }},{ \"handout\": { \"resourceFormat\": \"text\", \"instructionalUse\": \"handout\" }}, {\"textbook\": { \"resourceFormat\": \"text\", \"instructionalUse\": \"reading\" }}, {\"image\": { \"resourceFormat\": \"image\", \"instructionalUse\": null }}, {\"assessment\": [ { \"resourceFormat\": \"text\", \"instructionalUse\": \"quiz\", \"validate\": \"not_http\" }, { \"resourceFormat\": \"interactive\", \"instructionalUse\": \"quiz\", \"validate\": \"http\" } ]}, {\"challenge\": { \"resourceFormat\": \"interactive\", \"instructionalUse\": \"quiz\" }}, {\"animation\": { \"resourceFormat\": \"interactive\", \"instructionalUse\": null }}, {\"app\": { \"resourceFormat\": \"webpage\", \"instructionalUse\": null }}, {\"mooc\": { \"resourceFormat\": \"webpage\", \"instructionalUse\": null }}, {\"book\": { \"resourceFormat\": \"text\", \"instructionalUse\": \"book\" }}, {\"reference material\": { \"resourceFormat\": \"webpage\", \"instructionalUse\": \"reference material\" }}, {\"presentation\": { \"resourceFormat\": \"image\", \"instructionalUse\": \"presentation\" }},{ \"activity\": [ { \"resourceFormat\": \"text\", \"instructionalUse\": \"activity\", \"validate\": \"not_http\" }, { \"resourceFormat\": \"interactive\", \"instructionalUse\": \"activity\", \"validate\": \"http\" } ]}, {\"curriculum plan\": { \"resourceFormat\": \"text\", \"instructionalUse\": \"curriculum plan\" }}, {\"quiz\": [ { \"resourceFormat\": \"text\", \"instructionalUse\": \"quiz\", \"validate\": \"not_http\" }, { \"resourceFormat\": \"interactive\", \"instructionalUse\": \"quiz\", \"validate\": \"http\" } ]}, {\"gooru/classplan\": { \"resourceFormat\": \"gooru classplan\", \"instructionalUse\": null }},{ \"gooru/classbook\": { \"resourceFormat\": \"gooru classbook\", \"instructionalUse\": null }}, {\"gooru/studyshelf\": { \"resourceFormat\": \"gooru studyshelf\", \"instructionalUse\": null }},{ \"gooru/notebook\": { \"resourceFormat\": \"gooru notebook\", \"instructionalUse\": null }}, {\"qb/response\": { \"resourceFormat\": \"Qb Response\", \"instructionalUse\": null }}, {\"qb/question\": { \"resourceFormat\": \"qb question\", \"instructionalUse\": null }},{ \"question\": { \"resourceFormat\": \"question\", \"instructionalUse\": null }}, {\"assessment-exam\": { \"resourceFormat\": \"assessment exam\", \"instructionalUse\": null }}, {\"scollection\": { \"resourceFormat\": \"scollection\", \"instructionalUse\": null }}, {\"classpage\": { \"resourceFormat\": \"classpage\", \"instructionalUse\": null }}, {\"assignment\": { \"resourceFormat\": \"assignment\", \"instructionalUse\": null }}, {\"folder\": { \"resourceFormat\": \"folder\", \"instructionalUse\": null } }]}";
-
-	public static final String UN_RESTRICTED_SEARCH = "unrestrictedSearch";
-
 	public static final String ALLOW_DUPLICATES = "allowDuplicates";
-
-	public static final String DETAIL_TYPE = "detailType";
-
-	public static final String CONTENT_DELIVERY_NETWORK_PATH = "ContentDeliveryNetworkPath";
-
-	public static final String ASSESSMENT_URL = "assessment/url";
 
 	public static final String USER = "USER";
 
 	public static final String TYPE_USER = "user";
 
-	public static final String OAUTH_ACCESS_TOKEN = "oauthAccessToken";
-
 	public static final String ANONYMOUS = "anonymous";
-
-	public static final String APPLICATION_KEY = "applicationKey";
-
-	public static final int AUTHENTICATION_CACHE_EXPIRY_TIME_IN_SEC = 28800;
-
-	public static final String INSIGHT_QUERY_URI_RAWDATA = "insights.activitystream.url.rawdata";
-
-	public static final String INSIGHT_QUERY_URI = "insights.activity.query.url";
-
-	public static final String RESOURCE_FORMAT_INSTRUCTIONAL_DATA = "resource.format.instructional.data";
 
 	public static final String VALUE = "value";
 
@@ -243,8 +186,6 @@ public interface Constants {
 
 	public static final String SEARCH_TOTAL = "total";
 
-	public static final String TAXONOMYDATASET = "taxonomyDataSet";
-
 	public static final String SEARCH_SOURCE = "_source";
 	public static final String SEARCH_CATEGORY = "category";
 	public static final String SEARCH_GRADE = "grade";
@@ -262,8 +203,6 @@ public interface Constants {
 	public static final String SEARCH_ORGANIZATION = "organization";
 	public static final String SEARCH_CODE = "code";
 	public static final String SEARCH_NAME = "name";
-
-	public static final String SEARCH_ASSESSMENT_GOORU_OID = "assessmentGooruOid";
 
 	public static final String SEARCH_ORGANIZATION_UID = "organizationUId";
 	public static final String SEARCH_QUESTION = "question";
@@ -318,9 +257,6 @@ public interface Constants {
 	public static final String SEARCH_HAS_ATTRIBUTION = "hasAttribution";
 	public static final String SEARCH_HASNO_DESCRIPTION = "hasNoDescription";
 	public static final String SEARCH_HASNO_TAXONOMY = "hasNoTaxonomy";
-	public static final String SEARCH_RESPONSE = "responses";
-	public static final String SEARCH_QUERY_VALUES = "queryValues";
-	public static final String SEARCH_STATUS = "status";
 	public static final String SEARCH_SEARCH_COUNT = "searchCount";
 	public static final String SEARCH_LAST_ACCESSTIME = "lastAccessTime";
 	public static final String SEARCH_HAS_NOSTANDARDS = "hasNoStandard";
@@ -343,8 +279,6 @@ public interface Constants {
 	String GOORU_HEADER_AUTHORIZATION = "Authorization";
 	String HEADER_CODEPATH = "CodePath";
 	String STR_ZERO = "0";
-	String STR_ONE = "1";
-	String STR_ZERO_COMMA_ONE = "0,1";
 	String SEARCH_USER_TYPE = "userType";
 	String COMMA = ",";
 	String ESCAPED_STAR = "\\*";
@@ -353,7 +287,6 @@ public interface Constants {
 	String INVALID_KEYWORD_ERROR_MESSAGE = "Please search with valid keyword having atleast 3 letters without * or search with some filter for relevant results";
 	String FLT_RATING = "flt.rating";
 	String FLT_COLLECTION_TYPE = "flt.collectionType";
-	String TWENTY_FIRST_CENTURY_SKILLS_CODE = "21_CS_";
 	String HIGHER_EDUCATION_MATCH = "higher education|highereducation|h";
 	String HIGHER_EDUCATION = "Higher Education";
 	String KINDERGARTEN = "Kindergarten";
@@ -365,7 +298,6 @@ public interface Constants {
 	String COLLECTION = "collection";
 	String REDIS_SERVER_HOST = "redis.server.host";
 	String REDIS_SERVER_PORT = "redis.server.port";
-	String BOOL = "bool";
 	String TYPE_QUESTION = "question";
 	String FLT_RESOURCE_FORMAT = "flt.resourceFormat";
 
@@ -383,7 +315,6 @@ public interface Constants {
 	public static final String FLT_STATUS_BROKEN = "&^statistics.statusIsBroken";
 	public static final String AMPERSAND_CONTENT_FORMAT = "&^contentFormat";
 	public static final String FLT_CONTENT_FORMAT = "flt.contentFormat";
-	public static final String AMPERSAND_RESOURCE_FORMAT = "&^resourceFormat";
 	public static final String AMPERSAND_COLLECTION_TYPE = "&^collectionType";
 	public static final String FLT_COURSE_ID = "&^courseId";
 	public static final String FLT_TENANT_ID = "&^tenant.tenantId";
@@ -399,9 +330,6 @@ public interface Constants {
 	public static final String USER_PREFERENCES = "userPreferences";
 	public static final String USER_LANGUAGE_PREFERENCES = "userLanguagePreferences";
 	public static final String LANGUAGE_ID = "languageId";
-	public static final String PRIMARY_LANG_BOOST = "primaryLangBoost";
-	public static final String SECONDARY_LANG_BOOST = "secondaryLangBoost";
-	public static final String TERTIARY_LANG_BOOST = "tertiaryLangBoost";
 	public static final String DEFAULT_GOORU_LANG_ID = "defaultGooruLangId";
 
 	public static final String SEARCH_REQ_20 = "2.0";
@@ -413,17 +341,12 @@ public interface Constants {
 
 	public static final String ALL_DISCOVERABLE_TENANT_IDS = "allDiscoverableTenantIds";
 
-	public static final String AMPERSAND_COURSE = "&^course";
-	public static final String AMPERSAND_DOMAIN = "&^domain";
 	public static final String AMPERSAND_STANDARD = "&^standard";
 	public static final String AMPERSAND_STANDARD_DISPLAY = "&^standardDisplay";
 	public static final String AMPERSAND_RELATED_LEAF_INTERNAL_CODES = "&^relatedLeafInternalCodes";
 	public static final String AMPERSAND_EQ_INTERNAL_CODE = "&^taxonomy.allEquivalentInternalCodes";
 	public static final String AMPERSAND_EQ_DISPLAY_CODE = "&^taxonomy.allEquivalentDisplayCodes";
 	public static final String AMPERSAND_EQ_RELATED_INTERNAL_CODE = "&^taxonomy.allEqRelatedInternalCodes";
-	public static final String AMPERSAND_EQ_COURSE_INTERNAL_CODE = "&^taxonomy.allEqCourseInternalCodes";
-	public static final String AMPERSAND_EQ_DOMAIN_INTERNAL_CODE = "&^taxonomy.allEqDomainInternalCodes";
-	public static final String AMPERSAND_RELATED_GUT_CODES = "&^relatedGutCode";
 
 	public static final String STANDARD_PREFERENCE = "standard_preference";
 	public static final String LANGUAGE_PREFERENCE = "language_preference";
@@ -452,9 +375,6 @@ public interface Constants {
 	public static final String AVERAGE = "average";
 
 	public static final String TOKEN = "Token";
-	public static final String GUT_COMPETENCY_ID = "gutCompetencyId";
-	public static final String AUTHORIZATION = "Authorization";
-	public static final String TOKEN_SPACE = "Token ";
 	public static final String API_COMPETENCY_NODE = "api.competency.node";
 	public static final String DNS_ENV = "dns.env";
 	public static final String KEYWORDS = "keywords";
@@ -478,16 +398,10 @@ public interface Constants {
 	public static final String COLON = ":";
 	public static final String HTTP = "http";
 	public static final String GLOBAL = "global";
-	public static final String DISCOVERABLE = "discoverable";
-	public static final String GLOBAL_TENANT_IDS = "globalTenantIds";
-	public static final String DISCOVERABLE_TENANT_IDS = "discoverableTenantIds";
 	public static final String OR_SYMBOL = "|";
 	public static final String TENANT_TREE = "tenant_tree";
 	public static final String DEFAULT_FC_VISIBILITY = "default.fc_visibility";
-	public static final String TYPE_UNIT = "unit";
-	public static final String TYPE_LESSON = "lesson";
 	public static final String LEARNING_MAPS = "learning-maps";
-	public static final String CROSSWALK_ID = "crosswalkId";
 
 	public enum PublishedStatus {
 
@@ -522,29 +436,25 @@ public interface Constants {
 
 	public enum ContentFormat {
 
-		RESOURCE("resource"), 
-		QUESTION("question"), 
-		COLLECTION("collection"), 
-		ASSESSMENT("assessment"),
-		;
+		RESOURCE("resource"), QUESTION("question"), COLLECTION("collection"), ASSESSMENT("assessment"), ASSESSMENT_EXTERNAL("assessment-external"), COLLECTION_EXTERNAL("collection-external"),
+		OFFLINE_ACTIVITY("offline-activity"), RUBRIC("rubric"), COURSE("course"), UNIT("unit"), LESSON("lesson");
 
-		private String contentFormat;
+		private String value;
 
-		ContentFormat(String contentFormat) {
-			this.contentFormat = contentFormat;
+		ContentFormat(String value) {
+			this.value = value;
 		}
 
-		public String getContentFormat() {
-			return this.contentFormat;
+		public String getValue() {
+			return this.value;
 		}
 
 	}
 	public static final String CONTENTS = "contents";
 	Pattern CUL_MATCH = Pattern.compile("course|unit|lesson");
-	Pattern RQCA_MATCH = Pattern.compile("resource|question|collection|assessment|scollection");
-	Pattern RQC_MATCH = Pattern.compile("resource|question|collection|scollection");
+	Pattern RQCA_MATCH = Pattern.compile("resource|question|collection|assessment|scollection|offline-activity");
 	Pattern RESOURCE_MATCH = Pattern.compile("resource|question");
-	Pattern COLLECTION_MATCH = Pattern.compile("scollection|collection|assessment|collection-external|assessment-external");
+	Pattern COLLECTION_MATCH = Pattern.compile("scollection|collection|assessment|collection-external|assessment-external|offline-activity");
 	public static final String PEDAGOGY_UNDERSCORE = "pedagogy_";
 	public static final String TOTAL_HIT_COUNT = "totalHitCount";
 	public static final String RESULT_COUNT = "resultCount";
@@ -555,7 +465,6 @@ public interface Constants {
 	public static final String TAXONOMY_GUT_CODE = "taxonomyGutCode";
 	Pattern TAX_FILTERS = Pattern.compile("standard");
 	public static final String AGG_FIELDNAME = "<>-^field";
-	public static final String TYPE_CROSSWALK = "crosswalk";
 	Pattern SEARCH_TYPES_MATCH = Pattern.compile("resource|question|collection|assessment|scollection|rubric|course|unit|lesson|publisher|searchQuery|autocomplete");
 	public static final String AGG_BY = "aggBy";
 	public static final String AGG_RESPONSE_LIMIT = "aggSize";

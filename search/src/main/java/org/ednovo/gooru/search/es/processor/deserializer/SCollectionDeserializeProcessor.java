@@ -265,6 +265,12 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 			}
 			output.setTaxonomySet(taxonomySetAsMap);			
 		}
+		if (model.containsKey(IndexFields.URL)) {
+			String url = (String) model.get(IndexFields.URL);
+			if (!url.startsWith(HTTP)) url = HTTP + COLON + searchData.getContentCdnUrl() + url;
+			output.setUrl(url);
+		}
+		output.setTaskCount(statisticsMap.get(IndexFields.OA_TASK_COUNT) != null ? ((Number) statisticsMap.get(IndexFields.OA_TASK_COUNT)).longValue() : null);
 
 		return output;
 	}

@@ -141,6 +141,11 @@ public class PedagogySCollectionDeserializeProcessor extends PedagogyDeserialize
 			setTaxonomy(taxonomyMap, searchData, output);
 			logger.debug("Latency of Taxonomy Transformation : {} ms", (System.currentTimeMillis() - start));
 		}
+		if (model.containsKey(IndexFields.URL)) {
+			String url = (String) model.get(IndexFields.URL);
+			if (!url.startsWith(HTTP)) url = HTTP + COLON + searchData.getContentCdnUrl() + url;
+			output.setUrl(url);
+		}
 		return output;
 	}
 

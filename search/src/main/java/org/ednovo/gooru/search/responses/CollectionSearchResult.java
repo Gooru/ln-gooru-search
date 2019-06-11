@@ -14,6 +14,7 @@ public class CollectionSearchResult extends CollectionUnUsedFields implements Se
 	*/
 	private static final long serialVersionUID = 5673214015280665109L;
 
+	private String url;
 	private String type;
 	private String lastModified;
 	private String addDate;
@@ -67,6 +68,8 @@ public class CollectionSearchResult extends CollectionUnUsedFields implements Se
 	private Double engagement;
 	
 	private Double relevance;
+	
+	private Long taskCount;
 	
 	public CollectionSearchResult() {
 	}
@@ -465,5 +468,21 @@ public class CollectionSearchResult extends CollectionUnUsedFields implements Se
 
 	public void setRelevance(Double relevance) {
 		this.relevance = relevance;
+	}
+	
+	public String getUrl() {
+		return url;
+	}
+	
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public Long getTaskCount() {
+		return taskCount;
+	}
+	
+	public void setTaskCount(Long taskCount) {
+		this.taskCount = taskCount;	
 	}
 }
