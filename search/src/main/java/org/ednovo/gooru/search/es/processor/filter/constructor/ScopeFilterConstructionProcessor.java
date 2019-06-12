@@ -35,10 +35,9 @@ public class ScopeFilterConstructionProcessor extends FilterConstructionProcesso
 		switch (target) {
 		case "my-content":
 			if (!searchData.getFilters().containsKey(AMPERSAND_CREATOR_ID)) {
-				searchData.putFilter("&^orFilters", "creator.userId:" + searchData.getUser().getGooruUId() + "|collaboratorIds:" + searchData.getUser().getGooruUId());
+				searchData.putFilter("&^orFilters", (CONTAINER_MATCH.matcher(searchData.getType().toLowerCase()).matches() ? "owner" : "creator") + ".userId:" + searchData.getUser().getGooruUId() + "|collaboratorIds:" + searchData.getUser().getGooruUId());
 			} else if (searchData.getFilters().containsKey(AMPERSAND_CREATOR_ID) && StringUtils.isNotBlank(searchData.getFilters().get(AMPERSAND_CREATOR_ID).toString())) {
-				searchData.putFilter("&^orFilters", "creator.userId:" + searchData.getFilters().get(AMPERSAND_CREATOR_ID).toString() 
-											      + "|collaboratorIds:" + searchData.getFilters().get(AMPERSAND_CREATOR_ID).toString());
+				searchData.putFilter("&^orFilters", (CONTAINER_MATCH.matcher(searchData.getType().toLowerCase()).matches() ? "owner" : "creator") + ".userId:" + searchData.getFilters().get(AMPERSAND_CREATOR_ID).toString() + "|collaboratorIds:" + searchData.getFilters().get(AMPERSAND_CREATOR_ID).toString());
 				searchData.getFilters().remove(AMPERSAND_CREATOR_ID);
 				searchData.getParameters().remove(FLT_CREATOR_ID);
 			}

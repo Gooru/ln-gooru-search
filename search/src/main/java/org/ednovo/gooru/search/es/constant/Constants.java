@@ -324,6 +324,8 @@ public interface Constants {
 	public static final String FLT_LANGUAGE_ID = "flt.languageId";
 	public static final String AMPERSAND_CREATOR_ID = "&^creatorId";
 	public static final String FLT_CREATOR_ID = "flt.creatorId";
+	public static final String AMPERSAND_OWNER_ID = "&^ownerId";
+	public static final String FLT_OWNER_ID = "flt.ownerId";
 
 	public static final String CONTENT_CDN_URL = "contentCDN";
 	public static final String USER_CDN_URL = "userCDN";
@@ -493,5 +495,6 @@ public interface Constants {
 	public static final String SPL_CHAR_MATCH = "[^a-zA-Z0-9\\']";
 	public static final String IS_CROSSWALK = "isCrosswalk";
 	public static final String SCOPE_KEY = "scopeKey";
+	public static final Pattern CONTAINER_MATCH = Pattern.compile("collection|course");
 
 }
