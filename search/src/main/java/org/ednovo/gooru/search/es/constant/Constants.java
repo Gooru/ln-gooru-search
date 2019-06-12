@@ -495,5 +495,6 @@ public interface Constants {
 	public static final String SPL_CHAR_MATCH = "[^a-zA-Z0-9\\']";
 	public static final String IS_CROSSWALK = "isCrosswalk";
 	public static final String SCOPE_KEY = "scopeKey";
+	public static final Pattern CONTAINER_MATCH = Pattern.compile("collection|course");
 
 }
