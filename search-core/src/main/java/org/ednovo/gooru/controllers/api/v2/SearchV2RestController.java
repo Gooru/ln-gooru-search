@@ -33,13 +33,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping(value = { "/v2/search" })
@@ -50,16 +51,18 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 
 	protected static final Logger logger = LoggerFactory.getLogger(SearchV2RestController.class);
 	
-	@RequestMapping(method = RequestMethod.GET, value = { "/index/filters"})
-	public ModelAndView getSearchFilters(HttpServletRequest request,@RequestParam(required = false) String sessionToken, @RequestParam(value = "codeId", required = false) Integer codeId, @RequestParam(value = "type", required = false, defaultValue = "resource") String type, HttpServletResponse response,
+	@RequestMapping(method = RequestMethod.GET, value = { "/index/filters"}, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String getSearchFilters(HttpServletRequest request,@RequestParam(required = false) String sessionToken, @RequestParam(value = "codeId", required = false) Integer codeId, @RequestParam(value = "type", required = false, defaultValue = "resource") String type, HttpServletResponse response,
 			final ModelMap model) throws Exception {
 		
-		return toModelAndView(serializeToJson(searchService.getSearchFilters(codeId, type), SEARCH_FORMAT));
+		return setResponse(serializeToJson(searchService.getSearchFilters(codeId, type), SEARCH_FORMAT), response);
 	}
 	  
 	@SuppressWarnings("unchecked")
-	@RequestMapping(method = {RequestMethod.GET}, value = "/{type}")
-	public ModelAndView search(HttpServletRequest request, HttpServletResponse response, 
+	@RequestMapping(method = {RequestMethod.GET}, value = "/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String search(HttpServletRequest request, HttpServletResponse response, 
 			@RequestParam(required = false) String sessionToken,
 			@RequestParam(defaultValue = "8", value="length") Integer pageSize, 
 			@RequestParam(defaultValue = "0") String pretty, 
@@ -299,13 +302,12 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			payloadObject.put("searchExecutionTime", searchResponse.getExecutionTime());
 			SessionContextSupport.putLogParameter("payLoadObject", payloadObject);
 			if (!searchData.isAggregationRequest()) excludeAttributeArray = (String[]) ArrayUtils.addAll(AGG_EXCLUDES, excludeAttributeArray);
-
 			if (type.equalsIgnoreCase(RESOURCE)) {
 				if (!userDetails) {
 					// excludeAttributeArray = (String[]) ArrayUtils.addAll(excludeAttributeArray, new String[]{"*.user"});
 					excludeAttributeArray = (String[]) ArrayUtils.addAll(excludeAttributeArray, new String[] {});
 				}
-				return toModelAndView(serialize(searchResponse, JSON, (String[]) ArrayUtils.addAll(SINGLE_EXCLUDES, excludeAttributeArray), true, true));
+				return setResponse(serialize(searchResponse, JSON, (String[]) ArrayUtils.addAll(SINGLE_EXCLUDES, excludeAttributeArray), true, true), response);
 			} else if (type.equalsIgnoreCase(SearchHandlerType.MULTI_RESOURCE.name()) && searchDataMap.getString(QUERY_TYPE) != null) {
 				Object serializeResult = searchResponse;
 				if (searchDataMap.getString(SearchInputType.FETCH_HITS_IN_MULTI.getName()).equals(SearchInputType.FETCH_HITS_IN_MULTI.getDefaultValue())) {
@@ -320,18 +322,18 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 				if (resultsJSON != null && !resultsJSON.startsWith("[") && resultsJSON.length() > 2) {
 					resultsJSON = resultsJSON.substring(0, resultsJSON.length() - 1) + " , \"executionTime\" : " + searchResponse.getExecutionTime() + "}";
 				}
-				return toModelAndView(resultsJSON);
+				return setResponse(resultsJSON.toString(), response);
 			} else if (type.equalsIgnoreCase(TYPE_LIBRARY)) {
-				return toModelAndView(searchResponse.getSearchResults().toString());
+				return setResponse(searchResponse.getSearchResults().toString(), response);
 			} else if (type.equalsIgnoreCase(TYPE_ATTRIBUTION) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(TYPE_PUBLISHER) || type.equalsIgnoreCase(TYPE_AGGREGATOR) || type.equalsIgnoreCase(KEYWORD_COMPETENCY)) {
-				return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
+				return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 			} else if (CUL_MATCH.matcher(type).matches()) {
-				return toModelAndView(serialize(searchResponse, JSON, excludeAttributeArray, true, true));
+				return setResponse(serialize(searchResponse, JSON, excludeAttributeArray, true, true), response);
 			}
-			return toModelAndView(serialize(searchResponse, JSON, excludeAttributeArray, true, false));
+			return setResponse(serialize(searchResponse, JSON, excludeAttributeArray, true, false), response);
 		} catch (SearchException searchException) {
 			response.setStatus(searchException.getStatus().value());
-			return toModelAndView(searchException.getMessage());
+			return setResponse(searchException.getMessage(), response);
 		}
 	}
  
@@ -365,8 +367,9 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		searchService.refreshGlobalTenantsInCache();
 	}
 	
-	@RequestMapping(method = {RequestMethod.GET}, value = "/autocomplete/{type}")
-	public ModelAndView searchAutoComplete(HttpServletRequest request, HttpServletResponse response, 
+	@RequestMapping(method = {RequestMethod.GET}, value = "/autocomplete/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String searchAutoComplete(HttpServletRequest request, HttpServletResponse response, 
 			@RequestParam(required = false) String sessionToken,
 			@RequestParam(defaultValue = "8", value="length") Integer pageSize, 
 			@RequestParam(defaultValue = "0") String pretty, 
@@ -445,12 +448,12 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			setEventLogObject(request, searchData, searchResponse);
 
 			if (type.equalsIgnoreCase(SearchHandlerType.AUTOCOMPLETE_KEYWORD.name()) || type.equalsIgnoreCase(TYPE_ATTRIBUTION) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(TYPE_PUBLISHER) || type.equalsIgnoreCase(TYPE_AGGREGATOR)) {
-				return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
+				return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 			}
-			return toModelAndView(serialize(searchResponse, JSON, excludeAttributeArray, true, false));
+			return setResponse(serialize(searchResponse, JSON, excludeAttributeArray, true, false), response);
 		} catch (SearchException searchException) {
 			response.setStatus(searchException.getStatus().value());
-			return toModelAndView(searchException.getMessage());
+			return setResponse(searchException.getMessage(), response);
 		}
 	}
 

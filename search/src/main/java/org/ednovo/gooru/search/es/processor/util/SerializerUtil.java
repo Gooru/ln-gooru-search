@@ -23,11 +23,13 @@
 /////////////////////////////////////////////////////////////
 package org.ednovo.gooru.search.es.processor.util;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.ednovo.gooru.search.es.constant.Constants;
@@ -58,6 +60,11 @@ public class SerializerUtil {
 		ModelAndView jsonmodel = new ModelAndView(Constants.REST_MODEL);
 		jsonmodel.addObject(Constants.MODEL, object);
 		return jsonmodel;
+	}
+	
+	public static String setResponse(final String object, HttpServletResponse response) {
+		response.setContentLength(object.getBytes(StandardCharsets.UTF_8).length);
+		return object;
 	}
 
 	public static ModelAndView toJsonModelAndView(final Object model, final boolean deepSerialize) {

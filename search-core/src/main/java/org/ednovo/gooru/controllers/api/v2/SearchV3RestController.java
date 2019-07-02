@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,7 +40,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.ResponseBody;
 /**
  * @author Renuka
  * 
@@ -54,8 +55,9 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 	protected static final Logger logger = LoggerFactory.getLogger(SearchV3RestController.class);
 
 	@SuppressWarnings("unchecked")
-	@RequestMapping(method = {RequestMethod.POST}, value = "/{type}")
-	public ModelAndView search(HttpServletRequest request, HttpServletResponse response, 
+	@RequestMapping(method = {RequestMethod.POST}, value = "/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String search(HttpServletRequest request, HttpServletResponse response, 
 			@RequestParam(required = false) String sessionToken,
 			@RequestParam(defaultValue = "8", value="length") Integer pageSize, 
 			@RequestParam(defaultValue = "0") String pretty, 
@@ -217,7 +219,7 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 					// excludeAttributeArray = (String[]) ArrayUtils.addAll(excludeAttributeArray, new String[]{"*.user"});
 					excludeAttributeArray = (String[]) ArrayUtils.addAll(excludeAttributeArray, new String[] {});
 				}
-				return toModelAndView(serialize(searchResponse, JSON, (String[]) ArrayUtils.addAll(SINGLE_EXCLUDES, excludeAttributeArray), true, true));
+				return setResponse(serialize(searchResponse, JSON, (String[]) ArrayUtils.addAll(SINGLE_EXCLUDES, excludeAttributeArray), true, true), response);
 			} else if (type.equalsIgnoreCase(SearchHandlerType.MULTI_RESOURCE.name()) && searchDataMap.getString(QUERY_TYPE) != null) {
 				Object serializeResult = searchResponse;
 				if (searchDataMap.getString(SearchInputType.FETCH_HITS_IN_MULTI.getName()).equals(SearchInputType.FETCH_HITS_IN_MULTI.getDefaultValue())) {
@@ -232,16 +234,16 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 				if (resultsJSON != null && !resultsJSON.startsWith("[") && resultsJSON.length() > 2) {
 					resultsJSON = resultsJSON.substring(0, resultsJSON.length() - 1) + " , \"executionTime\" : " + searchResponse.getExecutionTime() + "}";
 				}
-				return toModelAndView(resultsJSON);
+				return setResponse(resultsJSON, response);
 			} else if (type.equalsIgnoreCase(KEYWORD_COMPETENCY)) {
-				return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
+				return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 			} else if (CUL_MATCH.matcher(type).matches()) {
-				return toModelAndView(serialize(searchResponse, JSON, excludeAttributeArray, true, true));
+				return setResponse(serialize(searchResponse, JSON, excludeAttributeArray, true, true), response);
 			}
-			return toModelAndView(serialize(searchResponse, JSON, excludeAttributeArray, true, true));
+			return setResponse(serialize(searchResponse, JSON, excludeAttributeArray, true, true), response);
 		} catch (SearchException searchException) {
 			response.setStatus(searchException.getStatus().value());
-			return toModelAndView(searchException.getMessage());
+			return setResponse(searchException.getMessage(), response);
 		}
 	}
 
@@ -314,8 +316,9 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 		searchService.refreshGlobalTenantsInCache();
 	}
 	
-	@RequestMapping(method = {RequestMethod.GET}, value = "/autocomplete/{type}")
-	public ModelAndView searchAutoComplete(HttpServletRequest request, HttpServletResponse response, 
+	@RequestMapping(method = {RequestMethod.GET}, value = "/autocomplete/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Object searchAutoComplete(HttpServletRequest request, HttpServletResponse response, 
 			@RequestParam(required = false) String sessionToken,
 			@RequestParam(defaultValue = "8", value="length") Integer pageSize, 
 			@RequestParam(defaultValue = "0") String pretty, 
@@ -391,12 +394,12 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 			setEventLogObject(request, searchData, searchResponse);
 
 			if (type.equalsIgnoreCase(SearchHandlerType.AUTOCOMPLETE_KEYWORD.name()) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(TYPE_PUBLISHER)) {
-				return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
+				return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 			}
-			return toModelAndView(serialize(searchResponse, JSON, excludeAttributeArray, true, false));
+			return setResponse(serialize(searchResponse, JSON, excludeAttributeArray, true, false), response);
 		} catch (SearchException searchException) {
 			response.setStatus(searchException.getStatus().value());
-			return toModelAndView(searchException.getMessage());
+			return setResponse(searchException.getMessage(), response);
 		}
 	}
 
