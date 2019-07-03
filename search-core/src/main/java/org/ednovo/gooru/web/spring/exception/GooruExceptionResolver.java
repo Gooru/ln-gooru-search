@@ -73,7 +73,11 @@ public class GooruExceptionResolver extends SimpleMappingExceptionResolver {
 		if (ex instanceof UnauthorizedException) {
 			response.setHeader("Unauthorized", errorJsonResponse);
 		}
-		jsonModel.addObject("model", errorJsonResponse);
+		jsonModel.addObject("code", errorObject.getCode());
+		jsonModel.addObject("status", errorObject.getStatus());
+		//below two attributes To be deprecated after checking with FE & partners
+		jsonModel.addObject("errorCode", errorObject.getErrorCode());
+		jsonModel.addObject("errorMessage", errorObject.getErrorMessage());
 		return jsonModel;
 	}
 
