@@ -28,12 +28,13 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.ResponseBody;
 /**
  * @author Renuka
  * 
@@ -48,8 +49,9 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 	private PedagogyNavigatorService pedagogySearchService;
 		
 	@SuppressWarnings("unchecked")
-	@RequestMapping(method = { RequestMethod.GET }, value = "/{type}")
-	public ModelAndView search(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) String sessionToken,
+	@RequestMapping(method = { RequestMethod.GET }, value = "/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String search(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) String sessionToken,
 			@RequestParam(defaultValue = "5", value = "length") Integer limit, @RequestParam(defaultValue = "0") Integer startAt, @RequestParam(defaultValue = "1", value = "start") Integer pageNum,
 			@RequestParam(defaultValue = "0") String pretty, @RequestParam(value = "q", defaultValue = "*") String query, @PathVariable String type,
 			@RequestParam(required = false, defaultValue = "false") boolean isCrosswalk) throws Exception {
@@ -145,17 +147,18 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
 			if (type.equalsIgnoreCase(KEYWORD_COMPETENCY)) searchResponse.setExecutionTime(System.currentTimeMillis() - start);
 			if (type.equalsIgnoreCase(KEYWORD_COMPETENCY) || type.equalsIgnoreCase(LEARNING_MAPS)) {
-				return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, true));
+				return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, true), response);
 			}
-			return toModelAndView(serialize(searchResponse, JSON, excludeAttributeArray, true, false));
+			return setResponse(serialize(searchResponse, JSON, excludeAttributeArray, true, false), response);
 		} catch (SearchException searchException) {
 			response.setStatus(searchException.getStatus().value());
-			return toModelAndView(searchException.getMessage());
+			return setResponse(searchException.getMessage(), response);
 		}
 	}
 	
-	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/subject/{subjectCode:.+}")
-	public ModelAndView searchLearningMapsBySubject(HttpServletRequest request, HttpServletResponse response,
+	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/subject/{subjectCode:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String searchLearningMapsBySubject(HttpServletRequest request, HttpServletResponse response,
 			@PathVariable String subjectCode,
 			@RequestParam(required = false) String fwCode,
 			@RequestParam(required = false) String sessionToken,
@@ -178,15 +181,16 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		try {
 			SearchResponse<Object> searchResponse = pedagogySearchService.searchPedagogy(searchData);
 			logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
-			return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
+			return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 		} catch (SearchException searchException) {
 			response.setStatus(searchException.getStatus().value());
-			return toModelAndView(searchException.getMessage());
+			return setResponse(searchException.getMessage(), response);
 		}
 	}
 	
-	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/course/{courseCode:.+}")
-	public ModelAndView searchLearningMapsByCourse(HttpServletRequest request, HttpServletResponse response,
+	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/course/{courseCode:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String searchLearningMapsByCourse(HttpServletRequest request, HttpServletResponse response,
 			@PathVariable String courseCode,
 			@RequestParam(required = false) String fwCode,
 			@RequestParam(required = false) String sessionToken,
@@ -208,15 +212,16 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		try {
 			SearchResponse<Object> searchResponse = pedagogySearchService.searchPedagogy(searchData);
 			logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
-			return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
+			return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 		} catch (SearchException searchException) {
 			response.setStatus(searchException.getStatus().value());
-			return toModelAndView(searchException.getMessage());
+			return setResponse(searchException.getMessage(), response);
 		}
 	}
 	
-	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/domain/{domainCode:.+}")
-	public ModelAndView searchLearningMapsByDomain(HttpServletRequest request, HttpServletResponse response,
+	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/domain/{domainCode:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String searchLearningMapsByDomain(HttpServletRequest request, HttpServletResponse response,
 			@PathVariable String domainCode,
 			@RequestParam(required = false) String fwCode,
 			@RequestParam(required = false) String sessionToken,
@@ -238,15 +243,16 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		try {
 			SearchResponse<Object> searchResponse = pedagogySearchService.searchPedagogy(searchData);
 			logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
-			return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
+			return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 		} catch (SearchException searchException) {
 			response.setStatus(searchException.getStatus().value());
-			return toModelAndView(searchException.getMessage());
+			return setResponse(searchException.getMessage(), response);
 		}
 	}
 	
-	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/competency/{standardCode:.+}")
-	public ModelAndView searchLearningMapsByCompetency(HttpServletRequest request, HttpServletResponse response,
+	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/competency/{standardCode:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String searchLearningMapsByCompetency(HttpServletRequest request, HttpServletResponse response,
 			@PathVariable String standardCode,
 			@RequestParam(required = false) String fwCode,
 			@RequestParam(required = false) String sessionToken,
@@ -267,15 +273,16 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		try {
 			SearchResponse<Object> searchResponse = pedagogySearchService.searchPedagogy(searchData);
 			logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
-			return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
+			return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 		} catch (SearchException searchException) {
 			response.setStatus(searchException.getStatus().value());
-			return toModelAndView(searchException.getMessage());
+			return setResponse(searchException.getMessage(), response);
 		}
 	}
 	
-	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/stats")
-	public ModelAndView fetchLearningMapStats(HttpServletRequest request, HttpServletResponse response,
+	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/stats", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String fetchLearningMapStats(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(required = true) String subjectClassification,
 			@RequestParam(required = false) String subjectCode,
 			@RequestParam(required = false) String courseCode,
@@ -325,16 +332,17 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		try {
 			SearchResponse<Object> searchResponse = pedagogySearchService.fetchLearningMapStats(searchData, subjectClassification, subjectCode, courseCode, domainCode, null, codeType);
 			logger.info("Elapsed time to fetch LM Stats :" + (System.currentTimeMillis() - start) + " ms");
-			return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
+			return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 		} catch (SearchException searchException) {
 			response.setStatus(searchException.getStatus().value());
-			return toModelAndView(searchException.getMessage());
+			return setResponse(searchException.getMessage(), response);
 		}
 	}
 	
 	@SuppressWarnings("unchecked")
-	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/stats/search")
-	public ModelAndView fetchLearningMapStats(HttpServletRequest request, HttpServletResponse response,
+	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/stats/search", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String fetchLearningMapStats(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(value = "q", defaultValue = "*") String query,
 			@RequestParam(required = false) String codeType,
 			@RequestParam(required = false) String sessionToken,
@@ -365,16 +373,17 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			}
 			String excludeAttributeArray[] = {};
 			logger.info("Elapsed time to fetch LM Stats Search :" + (System.currentTimeMillis() - start) + " ms");
-			return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
+			return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 		} catch (SearchException searchException) {
 			response.setStatus(searchException.getStatus().value());
-			return toModelAndView(searchException.getMessage());
+			return setResponse(searchException.getMessage(), response);
 		}
 	}
 	
 	@SuppressWarnings("unchecked")
-	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/search")
-	public ModelAndView learningMapSearch(HttpServletRequest request, HttpServletResponse response, 
+	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/search", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String learningMapSearch(HttpServletRequest request, HttpServletResponse response, 
 			@RequestParam(required = false) String sessionToken,
 			@RequestParam(defaultValue = "10", value = "length") Integer limit, 
 			@RequestParam(defaultValue = "0") Integer startAt, 
@@ -399,15 +408,16 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			}
 			String excludeAttributeArray[] = {};
 			logger.info("Elapsed time to complete KwToComp LM search process :" + (System.currentTimeMillis() - start) + " ms");
-			return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
+			return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 		} catch (SearchException searchException) {
 			response.setStatus(searchException.getStatus().value());
-			return toModelAndView(searchException.getMessage());
+			return setResponse(searchException.getMessage(), response);
 		}
 	}
 	
-	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/standard/{standardCode:.+}")
-	public ModelAndView searchLearningMapsByStandard(HttpServletRequest request, HttpServletResponse response,
+	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/standard/{standardCode:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String searchLearningMapsByStandard(HttpServletRequest request, HttpServletResponse response,
 			@PathVariable String standardCode,
 			@RequestParam(required = false) String fwCode,
 			@RequestParam(required = false) String sessionToken,
@@ -428,10 +438,10 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		try {
 			SearchResponse<Object> searchResponse = pedagogySearchService.searchPedagogyFromStaticTable(searchData);
 			logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
-			return toModelAndView(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false));
+			return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 		} catch (SearchException searchException) {
 			response.setStatus(searchException.getStatus().value());
-			return toModelAndView(searchException.getMessage());
+			return setResponse(searchException.getMessage(), response);
 		}
 	}
 	

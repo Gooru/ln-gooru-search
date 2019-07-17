@@ -25,13 +25,14 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping(value = { "/v3/suggest" })
@@ -50,8 +51,9 @@ public class SuggestV3RestController extends BaseController {
 	@Autowired
 	private RequestService requestService;
 
-	@RequestMapping(method = RequestMethod.POST , value = "/{type}", headers = "Content-Type=application/json")
-	public ModelAndView suggest(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) String sessionToken,
+	@RequestMapping(method = RequestMethod.POST, value = "/{type}", headers = "Content-Type=application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String suggest(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) String sessionToken,
 			@RequestParam(defaultValue = "10", value = "limit") Integer pageSize, @RequestParam(defaultValue = "0") String pretty, 
 			@RequestParam(required = false, defaultValue = "false") Boolean isInternalSuggest, @PathVariable String type, @RequestBody String contextPayload,
 			@RequestParam(required = false, defaultValue= "true") boolean isCrosswalk)
@@ -73,17 +75,17 @@ public class SuggestV3RestController extends BaseController {
 			}
 			suggestData.setIsInternalSuggest(isInternalSuggest);
 			SuggestResponse<Object> suggestResults = suggestService.suggest(suggestData).get(0);
-			String result = serialize(suggestResults, JSON, SINGLE_EXCLUDES, true);
 			LOG.info("Total latency of suggest " + (System.currentTimeMillis() - start));
-			return toModelAndView(result);
+			return setResponse(serialize(suggestResults, JSON, SINGLE_EXCLUDES, true), response);
 		} catch (SearchException searchException) {
 			response.setStatus(searchException.getStatus().value());
-			return toModelAndView(searchException.getMessage());
+			return setResponse(searchException.getMessage(), response);
 		}
 	}
 	
-	@RequestMapping(method = RequestMethod.POST , value = "taxonomy/{type}", headers = "Content-Type=application/json")
-	public ModelAndView suggestForCode(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) String sessionToken,
+	@RequestMapping(method = RequestMethod.POST , value = "taxonomy/{type}", headers = "Content-Type=application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String suggestForCode(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) String sessionToken,
 			@RequestParam(defaultValue = "10", value = "limit") Integer pageSize, @RequestParam(defaultValue = "0") String pretty, @RequestParam(required = false, defaultValue = "false") Boolean inputTypeInternalCode, @RequestParam(required = false, defaultValue = "false") Boolean isInternalSuggest, @PathVariable String type, @RequestBody String contextPayload,
 			@RequestParam(required = false, defaultValue= "true") boolean isCrosswalk)
 			throws Exception {
@@ -110,12 +112,11 @@ public class SuggestV3RestController extends BaseController {
 			suggestData.setIsInternalSuggest(isInternalSuggest);
 			suggestData.setCrosswalk(isCrosswalk);
 			SuggestResponse<Object> suggestResults = suggestService.suggest(suggestData).get(0);
-			String result = serialize(suggestResults, JSON, SINGLE_EXCLUDES, true);
 			LOG.info("Total latency of suggest " + (System.currentTimeMillis() - start));
-			return toModelAndView(result);
+			return setResponse(serialize(suggestResults, JSON, SINGLE_EXCLUDES, true), response);
 		} catch (SearchException searchException) {
 			response.setStatus(searchException.getStatus().value());
-			return toModelAndView(searchException.getMessage());
+			return setResponse(searchException.getMessage(), response);
 		}
 	}
 
