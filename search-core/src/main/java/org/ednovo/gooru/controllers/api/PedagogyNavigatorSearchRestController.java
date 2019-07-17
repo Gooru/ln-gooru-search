@@ -137,23 +137,18 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		}
 
 		String excludeAttributeArray[] = {};
-		try {
-			SearchResponse<Object> searchResponse = new SearchResponse<>();
-			if (type.equalsIgnoreCase(LEARNING_MAPS)) {
-				searchResponse = pedagogySearchService.searchPedagogy(searchData);
-			} else {
-				searchResponse = SearchHandler.getSearcher(type.toUpperCase()).search(searchData);
-			}
-			logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
-			if (type.equalsIgnoreCase(KEYWORD_COMPETENCY)) searchResponse.setExecutionTime(System.currentTimeMillis() - start);
-			if (type.equalsIgnoreCase(KEYWORD_COMPETENCY) || type.equalsIgnoreCase(LEARNING_MAPS)) {
-				return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, true), response);
-			}
-			return setResponse(serialize(searchResponse, JSON, excludeAttributeArray, true, false), response);
-		} catch (SearchException searchException) {
-			response.setStatus(searchException.getStatus().value());
-			return setResponse(searchException.getMessage(), response);
+		SearchResponse<Object> searchResponse = new SearchResponse<>();
+		if (type.equalsIgnoreCase(LEARNING_MAPS)) {
+			searchResponse = pedagogySearchService.searchPedagogy(searchData);
+		} else {
+			searchResponse = SearchHandler.getSearcher(type.toUpperCase()).search(searchData);
 		}
+		logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
+		if (type.equalsIgnoreCase(KEYWORD_COMPETENCY)) searchResponse.setExecutionTime(System.currentTimeMillis() - start);
+		if (type.equalsIgnoreCase(KEYWORD_COMPETENCY) || type.equalsIgnoreCase(LEARNING_MAPS)) {
+			return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, true), response);
+		}
+		return setResponse(serialize(searchResponse, JSON, excludeAttributeArray, true, false), response);
 	}
 	
 	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/subject/{subjectCode:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -178,14 +173,9 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		searchData = generateLMSearchData(request, searchData, subjectCode, fwCode, sessionToken, limit, startAt, pageNum, pretty, query, isCrosswalk, SUBJECT, isDisplayCode);
 		
 		String excludeAttributeArray[] = {};
-		try {
-			SearchResponse<Object> searchResponse = pedagogySearchService.searchPedagogy(searchData);
-			logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
-			return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
-		} catch (SearchException searchException) {
-			response.setStatus(searchException.getStatus().value());
-			return setResponse(searchException.getMessage(), response);
-		}
+		SearchResponse<Object> searchResponse = pedagogySearchService.searchPedagogy(searchData);
+		logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
+		return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 	}
 	
 	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/course/{courseCode:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -209,14 +199,9 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		searchData = generateLMSearchData(request, searchData, courseCode, fwCode, sessionToken, limit, startAt, pageNum, pretty, query, isCrosswalk, TYPE_COURSE, isDisplayCode);
 		
 		String excludeAttributeArray[] = {};
-		try {
-			SearchResponse<Object> searchResponse = pedagogySearchService.searchPedagogy(searchData);
-			logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
-			return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
-		} catch (SearchException searchException) {
-			response.setStatus(searchException.getStatus().value());
-			return setResponse(searchException.getMessage(), response);
-		}
+		SearchResponse<Object> searchResponse = pedagogySearchService.searchPedagogy(searchData);
+		logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
+		return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 	}
 	
 	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/domain/{domainCode:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -240,14 +225,9 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		searchData = generateLMSearchData(request, searchData, domainCode, fwCode, sessionToken, limit, startAt, pageNum, pretty, query, isCrosswalk, DOMAIN, isDisplayCode);
 		
 		String excludeAttributeArray[] = {};
-		try {
-			SearchResponse<Object> searchResponse = pedagogySearchService.searchPedagogy(searchData);
-			logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
-			return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
-		} catch (SearchException searchException) {
-			response.setStatus(searchException.getStatus().value());
-			return setResponse(searchException.getMessage(), response);
-		}
+		SearchResponse<Object> searchResponse = pedagogySearchService.searchPedagogy(searchData);
+		logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
+		return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 	}
 	
 	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/competency/{standardCode:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -270,14 +250,9 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		SearchData searchData = new SearchData();
 		searchData = generateLMSearchData(request, searchData, standardCode, fwCode, sessionToken, limit, startAt, pageNum, pretty, query, isCrosswalk, TYPE_STANDARD, isDisplayCode);
 		String excludeAttributeArray[] = {};
-		try {
-			SearchResponse<Object> searchResponse = pedagogySearchService.searchPedagogy(searchData);
-			logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
-			return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
-		} catch (SearchException searchException) {
-			response.setStatus(searchException.getStatus().value());
-			return setResponse(searchException.getMessage(), response);
-		}
+		SearchResponse<Object> searchResponse = pedagogySearchService.searchPedagogy(searchData);
+		logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
+		return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 	}
 	
 	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/stats", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -329,14 +304,9 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			searchData.setFrom((searchData.getPageNum() - 1) * searchData.getSize());
 		}
 		String excludeAttributeArray[] = {};
-		try {
-			SearchResponse<Object> searchResponse = pedagogySearchService.fetchLearningMapStats(searchData, subjectClassification, subjectCode, courseCode, domainCode, null, codeType);
-			logger.info("Elapsed time to fetch LM Stats :" + (System.currentTimeMillis() - start) + " ms");
-			return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
-		} catch (SearchException searchException) {
-			response.setStatus(searchException.getStatus().value());
-			return setResponse(searchException.getMessage(), response);
-		}
+		SearchResponse<Object> searchResponse = pedagogySearchService.fetchLearningMapStats(searchData, subjectClassification, subjectCode, courseCode, domainCode, null, codeType);
+		logger.info("Elapsed time to fetch LM Stats :" + (System.currentTimeMillis() - start) + " ms");
+		return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -352,32 +322,27 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			@RequestParam(defaultValue = "0") String pretty) throws Exception {
 		long start = System.currentTimeMillis();
 		SearchResponse<Object> searchResponse = new SearchResponse<Object>();
-		try {
-			SearchData searchData = new SearchData();
-			searchData.setPretty(pretty);
-			searchData.setFrom(startAt > 0 ? startAt : 0);
-			searchData.setPageNum(pageNum > 0 ? pageNum : 1);
-			searchData.setSize(limit >= 0 ? limit : 10);
-			if (searchData.getFrom() < 1) {
-				searchData.setFrom((searchData.getPageNum() - 1) * searchData.getSize());
-			}
-			/**
-			 * Here, when no filter is chosen, * search and keyword request with length less than 3 without * are skipped.
-			 **/
-			query = checkQueryValidity(query, (Map<String, Object>) request.getParameterMap());
-			String standardCode = pedagogySearchService.fetchKwToCompetency(query, pretty, 0, 100);
-			if (StringUtils.isNotBlank(standardCode)) {
-				searchResponse = pedagogySearchService.fetchLearningMapStats(searchData, null, null, null, null, standardCode, codeType);
-			} else {
-				throw new NotFoundException("No matching GUT found for requested search term : " + query);
-			}
-			String excludeAttributeArray[] = {};
-			logger.info("Elapsed time to fetch LM Stats Search :" + (System.currentTimeMillis() - start) + " ms");
-			return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
-		} catch (SearchException searchException) {
-			response.setStatus(searchException.getStatus().value());
-			return setResponse(searchException.getMessage(), response);
+		SearchData searchData = new SearchData();
+		searchData.setPretty(pretty);
+		searchData.setFrom(startAt > 0 ? startAt : 0);
+		searchData.setPageNum(pageNum > 0 ? pageNum : 1);
+		searchData.setSize(limit >= 0 ? limit : 10);
+		if (searchData.getFrom() < 1) {
+			searchData.setFrom((searchData.getPageNum() - 1) * searchData.getSize());
 		}
+		/**
+		 * Here, when no filter is chosen, * search and keyword request with length less than 3 without * are skipped.
+		 **/
+		query = checkQueryValidity(query, (Map<String, Object>) request.getParameterMap());
+		String standardCode = pedagogySearchService.fetchKwToCompetency(query, pretty, 0, 100);
+		if (StringUtils.isNotBlank(standardCode)) {
+			searchResponse = pedagogySearchService.fetchLearningMapStats(searchData, null, null, null, null, standardCode, codeType);
+		} else {
+			throw new NotFoundException("No matching GUT found for requested search term : " + query);
+		}
+		String excludeAttributeArray[] = {};
+		logger.info("Elapsed time to fetch LM Stats Search :" + (System.currentTimeMillis() - start) + " ms");
+		return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -393,26 +358,21 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			@RequestParam(defaultValue = "false") boolean isCrosswalk) throws Exception {
 		long start = System.currentTimeMillis();
 		SearchResponse<Object> searchResponse = new SearchResponse<Object>();
-		try {
-			/**
-			 * Here, when no filter is chosen, * search and keyword request with length less than 3 without * are skipped.
-			 **/
-			query = checkQueryValidity(query, (Map<String, Object>) request.getParameterMap());
-			String standardCode = pedagogySearchService.fetchKwToCompetency(query, pretty, 0, 40);
-			SearchData searchData = new SearchData();
-			if (StringUtils.isNotBlank(standardCode)) {
-				searchData = generateLMSearchData(request, searchData, standardCode, null, sessionToken, limit, startAt, pageNum, pretty, query, isCrosswalk, KEYWORD_COMPETENCY, false);
-				searchResponse = pedagogySearchService.searchPedagogy(searchData);
-			} else {
-				throw new NotFoundException("No matching GUT found for requested search term : "+ query);
-			}
-			String excludeAttributeArray[] = {};
-			logger.info("Elapsed time to complete KwToComp LM search process :" + (System.currentTimeMillis() - start) + " ms");
-			return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
-		} catch (SearchException searchException) {
-			response.setStatus(searchException.getStatus().value());
-			return setResponse(searchException.getMessage(), response);
+		/**
+		 * Here, when no filter is chosen, * search and keyword request with length less than 3 without * are skipped.
+		 **/
+		query = checkQueryValidity(query, (Map<String, Object>) request.getParameterMap());
+		String standardCode = pedagogySearchService.fetchKwToCompetency(query, pretty, 0, 40);
+		SearchData searchData = new SearchData();
+		if (StringUtils.isNotBlank(standardCode)) {
+			searchData = generateLMSearchData(request, searchData, standardCode, null, sessionToken, limit, startAt, pageNum, pretty, query, isCrosswalk, KEYWORD_COMPETENCY, false);
+			searchResponse = pedagogySearchService.searchPedagogy(searchData);
+		} else {
+			throw new NotFoundException("No matching GUT found for requested search term : "+ query);
 		}
+		String excludeAttributeArray[] = {};
+		logger.info("Elapsed time to complete KwToComp LM search process :" + (System.currentTimeMillis() - start) + " ms");
+		return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 	}
 	
 	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/standard/{standardCode:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -435,14 +395,9 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		SearchData searchData = new SearchData();
 		searchData = generateLMSearchData(request, searchData, standardCode, fwCode, sessionToken, limit, startAt, pageNum, pretty, query, isCrosswalk, TYPE_STANDARD, isDisplayCode);
 		String excludeAttributeArray[] = {};
-		try {
-			SearchResponse<Object> searchResponse = pedagogySearchService.searchPedagogyFromStaticTable(searchData);
-			logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
-			return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
-		} catch (SearchException searchException) {
-			response.setStatus(searchException.getStatus().value());
-			return setResponse(searchException.getMessage(), response);
-		}
+		SearchResponse<Object> searchResponse = pedagogySearchService.searchPedagogyFromStaticTable(searchData);
+		logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
+		return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 	}
 	
 	private SearchData generateLMSearchData(HttpServletRequest request, SearchData searchData, String code, String fwCode, String sessionToken, Integer limit, Integer startAt, Integer pageNum, String pretty,

@@ -208,43 +208,38 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 		}
 
 		request.setAttribute("action", "search");
-		try {
-			SearchResponse<Object> searchResponse = SearchHandler.getSearcher(type.toUpperCase() + _V3.toUpperCase()).search(searchData);
-			logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
+		SearchResponse<Object> searchResponse = SearchHandler.getSearcher(type.toUpperCase() + _V3.toUpperCase()).search(searchData);
+		logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
 
-			setEventLogObject(request, searchData, searchResponse);
+		setEventLogObject(request, searchData, searchResponse);
 
-			if (type.equalsIgnoreCase(RESOURCE)) {
-				if (!userDetails) {
-					// excludeAttributeArray = (String[]) ArrayUtils.addAll(excludeAttributeArray, new String[]{"*.user"});
-					excludeAttributeArray = (String[]) ArrayUtils.addAll(excludeAttributeArray, new String[] {});
-				}
-				return setResponse(serialize(searchResponse, JSON, (String[]) ArrayUtils.addAll(SINGLE_EXCLUDES, excludeAttributeArray), true, true), response);
-			} else if (type.equalsIgnoreCase(SearchHandlerType.MULTI_RESOURCE.name()) && searchDataMap.getString(QUERY_TYPE) != null) {
-				Object serializeResult = searchResponse;
-				if (searchDataMap.getString(SearchInputType.FETCH_HITS_IN_MULTI.getName()).equals(SearchInputType.FETCH_HITS_IN_MULTI.getDefaultValue())) {
-					if (searchResponse.getSearchResults() instanceof List && ((List<?>) searchResponse.getSearchResults()).size() > 0) {
-						serializeResult = ((List<?>) searchResponse.getSearchResults()).get(0);
-					} else {
-						serializeResult = null;
-					}
-				}
-
-				String resultsJSON = serialize(serializeResult, JSON, (String[]) ArrayUtils.addAll(MULTI_EXCLUDES, excludeAttributeArray), true, false);
-				if (resultsJSON != null && !resultsJSON.startsWith("[") && resultsJSON.length() > 2) {
-					resultsJSON = resultsJSON.substring(0, resultsJSON.length() - 1) + " , \"executionTime\" : " + searchResponse.getExecutionTime() + "}";
-				}
-				return setResponse(resultsJSON, response);
-			} else if (type.equalsIgnoreCase(KEYWORD_COMPETENCY)) {
-				return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
-			} else if (CUL_MATCH.matcher(type).matches()) {
-				return setResponse(serialize(searchResponse, JSON, excludeAttributeArray, true, true), response);
+		if (type.equalsIgnoreCase(RESOURCE)) {
+			if (!userDetails) {
+				// excludeAttributeArray = (String[]) ArrayUtils.addAll(excludeAttributeArray, new String[]{"*.user"});
+				excludeAttributeArray = (String[]) ArrayUtils.addAll(excludeAttributeArray, new String[] {});
 			}
+			return setResponse(serialize(searchResponse, JSON, (String[]) ArrayUtils.addAll(SINGLE_EXCLUDES, excludeAttributeArray), true, true), response);
+		} else if (type.equalsIgnoreCase(SearchHandlerType.MULTI_RESOURCE.name()) && searchDataMap.getString(QUERY_TYPE) != null) {
+			Object serializeResult = searchResponse;
+			if (searchDataMap.getString(SearchInputType.FETCH_HITS_IN_MULTI.getName()).equals(SearchInputType.FETCH_HITS_IN_MULTI.getDefaultValue())) {
+				if (searchResponse.getSearchResults() instanceof List && ((List<?>) searchResponse.getSearchResults()).size() > 0) {
+					serializeResult = ((List<?>) searchResponse.getSearchResults()).get(0);
+				} else {
+					serializeResult = null;
+				}
+			}
+
+			String resultsJSON = serialize(serializeResult, JSON, (String[]) ArrayUtils.addAll(MULTI_EXCLUDES, excludeAttributeArray), true, false);
+			if (resultsJSON != null && !resultsJSON.startsWith("[") && resultsJSON.length() > 2) {
+				resultsJSON = resultsJSON.substring(0, resultsJSON.length() - 1) + " , \"executionTime\" : " + searchResponse.getExecutionTime() + "}";
+			}
+			return setResponse(resultsJSON, response);
+		} else if (type.equalsIgnoreCase(KEYWORD_COMPETENCY)) {
+			return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
+		} else if (CUL_MATCH.matcher(type).matches()) {
 			return setResponse(serialize(searchResponse, JSON, excludeAttributeArray, true, true), response);
-		} catch (SearchException searchException) {
-			response.setStatus(searchException.getStatus().value());
-			return setResponse(searchException.getMessage(), response);
 		}
+		return setResponse(serialize(searchResponse, JSON, excludeAttributeArray, true, true), response);
 	}
 
 	private void processRequestBody(SearchRequestBody requestBody, SearchData searchData) {
@@ -386,21 +381,16 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 		}
 
 		String excludeAttributeArray[] = {};
-		try {
-			SearchResponse<Object> searchResponse = SearchHandler.getSearcher(type.toUpperCase()).search(searchData);
-			logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
-			searchResponse.setExecutionTime(System.currentTimeMillis() - start);
+		SearchResponse<Object> searchResponse = SearchHandler.getSearcher(type.toUpperCase()).search(searchData);
+		logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
+		searchResponse.setExecutionTime(System.currentTimeMillis() - start);
 
-			setEventLogObject(request, searchData, searchResponse);
+		setEventLogObject(request, searchData, searchResponse);
 
-			if (type.equalsIgnoreCase(SearchHandlerType.AUTOCOMPLETE_KEYWORD.name()) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(TYPE_PUBLISHER)) {
-				return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
-			}
-			return setResponse(serialize(searchResponse, JSON, excludeAttributeArray, true, false), response);
-		} catch (SearchException searchException) {
-			response.setStatus(searchException.getStatus().value());
-			return setResponse(searchException.getMessage(), response);
+		if (type.equalsIgnoreCase(SearchHandlerType.AUTOCOMPLETE_KEYWORD.name()) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(TYPE_PUBLISHER)) {
+			return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 		}
+		return setResponse(serialize(searchResponse, JSON, excludeAttributeArray, true, false), response);
 	}
 
 	private void setEventLogObject(HttpServletRequest request, SearchData searchData, SearchResponse<Object> searchResponse) {

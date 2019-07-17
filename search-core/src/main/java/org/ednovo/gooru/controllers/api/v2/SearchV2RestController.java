@@ -292,7 +292,6 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		payloadObject.put("startAt", startAt);
 
 		request.setAttribute("action", "search");
-		try {
 			SearchResponse<Object> searchResponse = SearchHandler.getSearcher(type.toUpperCase()).search(searchData);
 			logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
 			searchResponse.setExecutionTime(System.currentTimeMillis() - start);
@@ -331,10 +330,6 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 				return setResponse(serialize(searchResponse, JSON, excludeAttributeArray, true, true), response);
 			}
 			return setResponse(serialize(searchResponse, JSON, excludeAttributeArray, true, false), response);
-		} catch (SearchException searchException) {
-			response.setStatus(searchException.getStatus().value());
-			return setResponse(searchException.getMessage(), response);
-		}
 	}
  
 	private String checkQueryValidity(String query, Map<String, Object> parameterMap) {
@@ -440,21 +435,16 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		}
 
 		String excludeAttributeArray[] = {};
-		try {
-			SearchResponse<Object> searchResponse = SearchHandler.getSearcher(type.toUpperCase()).search(searchData);
-			logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
-			searchResponse.setExecutionTime(System.currentTimeMillis() - start);
+		SearchResponse<Object> searchResponse = SearchHandler.getSearcher(type.toUpperCase()).search(searchData);
+		logger.info("Elapsed time to complete search process :" + (System.currentTimeMillis() - start) + " ms");
+		searchResponse.setExecutionTime(System.currentTimeMillis() - start);
 
-			setEventLogObject(request, searchData, searchResponse);
+		setEventLogObject(request, searchData, searchResponse);
 
-			if (type.equalsIgnoreCase(SearchHandlerType.AUTOCOMPLETE_KEYWORD.name()) || type.equalsIgnoreCase(TYPE_ATTRIBUTION) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(TYPE_PUBLISHER) || type.equalsIgnoreCase(TYPE_AGGREGATOR)) {
-				return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
-			}
-			return setResponse(serialize(searchResponse, JSON, excludeAttributeArray, true, false), response);
-		} catch (SearchException searchException) {
-			response.setStatus(searchException.getStatus().value());
-			return setResponse(searchException.getMessage(), response);
+		if (type.equalsIgnoreCase(SearchHandlerType.AUTOCOMPLETE_KEYWORD.name()) || type.equalsIgnoreCase(TYPE_ATTRIBUTION) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(TYPE_PUBLISHER) || type.equalsIgnoreCase(TYPE_AGGREGATOR)) {
+			return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 		}
+		return setResponse(serialize(searchResponse, JSON, excludeAttributeArray, true, false), response);
 	}
 
 	private void setEventLogObject(HttpServletRequest request, SearchData searchData, SearchResponse<Object> searchResponse) {
