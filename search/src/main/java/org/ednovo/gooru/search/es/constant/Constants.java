@@ -333,6 +333,7 @@ public interface Constants {
 	public static final String USER_LANGUAGE_PREFERENCES = "userLanguagePreferences";
 	public static final String LANGUAGE_ID = "languageId";
 	public static final String DEFAULT_GOORU_LANG_ID = "defaultGooruLangId";
+	public static final String AMPERSAND_PQI_GTE = "&^publisherQualityIndicatorGTE";
 
 	public static final String SEARCH_REQ_20 = "2.0";
 	public static final String SESSION_TOKEN_20 = "special-token-2.0";
@@ -403,6 +404,7 @@ public interface Constants {
 	public static final String OR_SYMBOL = "|";
 	public static final String TENANT_TREE = "tenant_tree";
 	public static final String DEFAULT_FC_VISIBILITY = "default.fc_visibility";
+	public static final String ET_MAX_VAL = "et.max.value";
 	public static final String LEARNING_MAPS = "learning-maps";
 
 	public enum PublishedStatus {
