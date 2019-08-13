@@ -53,6 +53,8 @@ public class PedagogyCollectionSearchResult extends PedagogySearchResult impleme
 	private Double engagement;
 
 	private Double relevance;
+	
+	private Long taskCount;
 
 	public PedagogyCollectionSearchResult() {
 	}
@@ -211,5 +213,13 @@ public class PedagogyCollectionSearchResult extends PedagogySearchResult impleme
 	
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	public Long getTaskCount() {
+		return taskCount;
+	}
+
+	public void setTaskCount(Long taskCount) {
+		this.taskCount = taskCount;
 	}
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.ednovo.gooru.search.es.constant.IndexFields;
+import org.ednovo.gooru.search.es.constant.Constants.ContentFormat;
 import org.ednovo.gooru.search.es.model.License;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
@@ -199,7 +200,7 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 		String type = (String) model.get(IndexFields.CONTENT_FORMAT);
 		output.setType(type);
 		if (type != null) {
-			if (type.equalsIgnoreCase(ContentFormat.ASSESSMENT.name())) {
+			if (type.equalsIgnoreCase(ContentFormat.ASSESSMENT.getValue())) {
 				output.setCategory(ONLY_QUESTION);
 			} else if (questionCount == 0) {
 				output.setCategory(NO_QUESTION);
@@ -270,8 +271,9 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 			if (!url.startsWith(HTTP)) url = HTTP + COLON + searchData.getContentCdnUrl() + url;
 			output.setUrl(url);
 		}
-		output.setTaskCount(statisticsMap.get(IndexFields.OA_TASK_COUNT) != null ? ((Number) statisticsMap.get(IndexFields.OA_TASK_COUNT)).longValue() : null);
-
+		if (type.equalsIgnoreCase(ContentFormat.OFFLINE_ACTIVITY.getValue())) {
+			output.setTaskCount(statisticsMap.get(IndexFields.OA_TASK_COUNT) != null ? ((Number) statisticsMap.get(IndexFields.OA_TASK_COUNT)).longValue() : 0L);
+		}
 		return output;
 	}
 
