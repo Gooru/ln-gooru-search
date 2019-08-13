@@ -69,18 +69,13 @@ public class SuggestV3RestController extends BaseController {
 		SuggestData suggestData = new SuggestData();
 		suggestData.setCrosswalk(isCrosswalk);
 		suggestData = suggestRequest(suggestData, request, type, pageSize, requestContext, pretty, sessionToken);
-		try {
-			if (!(type.equalsIgnoreCase(RESOURCE) || type.equalsIgnoreCase(COLLECTION))) {
-				throw new BadRequestException("Invalid Type is passed. For now, the support types are resource and collection.");
-			}
-			suggestData.setIsInternalSuggest(isInternalSuggest);
-			SuggestResponse<Object> suggestResults = suggestService.suggest(suggestData).get(0);
-			LOG.info("Total latency of suggest " + (System.currentTimeMillis() - start));
-			return setResponse(serialize(suggestResults, JSON, SINGLE_EXCLUDES, true), response);
-		} catch (SearchException searchException) {
-			response.setStatus(searchException.getStatus().value());
-			return setResponse(searchException.getMessage(), response);
+		if (!(type.equalsIgnoreCase(RESOURCE) || type.equalsIgnoreCase(COLLECTION))) {
+			throw new BadRequestException("Invalid Type is passed. For now, the support types are resource and collection.");
 		}
+		suggestData.setIsInternalSuggest(isInternalSuggest);
+		SuggestResponse<Object> suggestResults = suggestService.suggest(suggestData).get(0);
+		LOG.info("Total latency of suggest " + (System.currentTimeMillis() - start));
+		return setResponse(serialize(suggestResults, JSON, SINGLE_EXCLUDES, true), response);
 	}
 	
 	@RequestMapping(method = RequestMethod.POST , value = "taxonomy/{type}", headers = "Content-Type=application/json", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -99,25 +94,20 @@ public class SuggestV3RestController extends BaseController {
 		SuggestData suggestData = new SuggestData();
 		suggestData.setSuggestInputType("code");
 		suggestRequest(suggestData, request, type, pageSize, requestContext, pretty, sessionToken);
-		try {
-			if (!(type.equalsIgnoreCase(RESOURCE) || type.equalsIgnoreCase(COLLECTION))) {
-				throw new BadRequestException("Invalid Type is passed. For now, the support types are resource and collection.");
-			}
-			if (type.equalsIgnoreCase(RESOURCE)) {
-				type = TAXONOMY_RESOURCE;
-			} else if (type.equalsIgnoreCase(COLLECTION)) {
-				type = TAXONOMY_COLLECTION;
-			}
-			suggestData.setType(type);
-			suggestData.setIsInternalSuggest(isInternalSuggest);
-			suggestData.setCrosswalk(isCrosswalk);
-			SuggestResponse<Object> suggestResults = suggestService.suggest(suggestData).get(0);
-			LOG.info("Total latency of suggest " + (System.currentTimeMillis() - start));
-			return setResponse(serialize(suggestResults, JSON, SINGLE_EXCLUDES, true), response);
-		} catch (SearchException searchException) {
-			response.setStatus(searchException.getStatus().value());
-			return setResponse(searchException.getMessage(), response);
+		if (!(type.equalsIgnoreCase(RESOURCE) || type.equalsIgnoreCase(COLLECTION))) {
+			throw new BadRequestException("Invalid Type is passed. For now, the support types are resource and collection.");
 		}
+		if (type.equalsIgnoreCase(RESOURCE)) {
+			type = TAXONOMY_RESOURCE;
+		} else if (type.equalsIgnoreCase(COLLECTION)) {
+			type = TAXONOMY_COLLECTION;
+		}
+		suggestData.setType(type);
+		suggestData.setIsInternalSuggest(isInternalSuggest);
+		suggestData.setCrosswalk(isCrosswalk);
+		SuggestResponse<Object> suggestResults = suggestService.suggest(suggestData).get(0);
+		LOG.info("Total latency of suggest " + (System.currentTimeMillis() - start));
+		return setResponse(serialize(suggestResults, JSON, SINGLE_EXCLUDES, true), response);
 	}
 
 	private SuggestData suggestRequest(SuggestData suggestData, HttpServletRequest request, String type, Integer pageSize, JSONObject requestContext, String pretty, String sessionToken) throws Exception {

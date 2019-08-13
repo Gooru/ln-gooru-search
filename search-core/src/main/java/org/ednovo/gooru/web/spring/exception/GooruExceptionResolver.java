@@ -12,6 +12,7 @@ import org.ednovo.gooru.search.es.exception.BadRequestException;
 import org.ednovo.gooru.search.es.exception.MethodFailureException;
 import org.ednovo.gooru.search.es.exception.NotAllowedException;
 import org.ednovo.gooru.search.es.exception.NotFoundException;
+import org.ednovo.gooru.search.es.exception.SearchException;
 import org.ednovo.gooru.search.es.exception.UnauthorizedException;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -56,6 +57,10 @@ public class GooruExceptionResolver extends SimpleMappingExceptionResolver {
 			response.setStatus(420);
 			errorObject = new ErrorObject(420, ex.getMessage());
 			logger.error("Error in Resolver -- ", ex);
+			logger.error("input parameters --- " + getRequestInfo(request).toString());
+		} else if (ex instanceof SearchException) {
+			errorObject = new ErrorObject(((SearchException) ex).getStatus().value(), ex.getMessage());
+			response.setStatus(((SearchException) ex).getStatus().value());
 			logger.error("input parameters --- " + getRequestInfo(request).toString());
 		} else {
 			errorObject = new ErrorObject(500, "Internal Server Error");

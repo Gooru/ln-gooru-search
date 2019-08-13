@@ -3,12 +3,18 @@
  */
 package org.ednovo.gooru.search.es.processor.filter.constructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.constant.IndexFields;
 import org.ednovo.gooru.search.es.constant.SearchFilterConstants;
-import org.ednovo.gooru.search.es.constant.Constants.PublishedStatus;
+import org.ednovo.gooru.search.es.exception.BadRequestException;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
+import org.ednovo.gooru.search.es.service.SearchSettingService;
 import org.ednovo.gooru.search.responses.SearchResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 /**
  * @author SearchTeam
@@ -41,9 +47,14 @@ public class ResourceFilterConstructionProcessor extends ContentFilterConstructi
 			if (searchData.getFilters().containsKey(AMPERSAND_CONTENT_FORMAT)) {
 				contentFormat = (String) searchData.getFilters().get(AMPERSAND_CONTENT_FORMAT);
 			}
-			if ((contentFormat != null && contentFormat.equalsIgnoreCase(TYPE_RESOURCE)) && (scopeKey == null || (scopeKey != null && !SCOPE_MYCONTENT_LIBRARY_MATCH.matcher(scopeKey).matches())) 
-				&& (searchData.getFilters().containsKey(FLT_PUBLISH_STATUS) && ((String) searchData.getFilters().get(FLT_PUBLISH_STATUS)).equalsIgnoreCase(PublishedStatus.PUBLISHED.getStatus()))) {
-				searchData.putFilter(FLT_PUBLISHER_QUALITY_INDICATOR, "3,4,5");
+			if ((contentFormat != null && contentFormat.equalsIgnoreCase(TYPE_RESOURCE))) {
+				if (searchData.getFilters().containsKey(AMPERSAND_PQI_GTE) && StringUtils.isNotBlank((String) searchData.getFilters().get(AMPERSAND_PQI_GTE))) {
+					searchData.putFilter(FLT_PUBLISHER_QUALITY_INDICATOR, StringUtils.join(parseEditorialTag((String) searchData.getFilters().get(AMPERSAND_PQI_GTE)), COMMA));
+					searchData.getFilters().remove(AMPERSAND_PQI_GTE);
+				} else if ((scopeKey == null || (scopeKey != null && !SCOPE_MYCONTENT_LIBRARY_MATCH.matcher(scopeKey).matches())) 
+					&& (searchData.getFilters().containsKey(FLT_PUBLISH_STATUS) && ((String) searchData.getFilters().get(FLT_PUBLISH_STATUS)).equalsIgnoreCase(PublishedStatus.PUBLISHED.getStatus()))) {
+					searchData.putFilter(FLT_PUBLISHER_QUALITY_INDICATOR, "3,4,5");
+				}
 			}
 			String audience = null;
 			if (searchData.getFilters().containsKey(AMPERSAND_AUDIENCE)) audience = (String) searchData.getFilters().get(AMPERSAND_AUDIENCE);
@@ -102,6 +113,22 @@ public class ResourceFilterConstructionProcessor extends ContentFilterConstructi
 			searchData.getFilters().remove("&^subFormat");
 		}
 		
+	}
+	
+	private List<String> parseEditorialTag(String etTag) {
+		List<String> etSet = new ArrayList<>();
+		if (StringUtils.isNotBlank(etTag)) {
+			try {
+				int start = Integer.parseInt(etTag);
+				int stop = Integer.parseInt(SearchSettingService.getByName(ET_MAX_VAL));
+				for (int i = start; i <= stop; i++) {
+					etSet.add(i + EMPTY_STRING);
+				}
+			} catch (NumberFormatException npe) {
+				throw new BadRequestException("Number format Exception at publisherQualityIndicator filter");
+			}
+		}
+		return etSet;
 	}
 
 	@Override
