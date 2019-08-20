@@ -55,7 +55,7 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 	protected static final Logger logger = LoggerFactory.getLogger(SearchV3RestController.class);
 
 	@SuppressWarnings("unchecked")
-	@RequestMapping(method = {RequestMethod.POST}, value = "/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(method = {RequestMethod.POST}, value = "/{type}", produces = APPLICATION_JSON_UTF_8_VALUE)
 	@ResponseBody
 	public String search(HttpServletRequest request, HttpServletResponse response, 
 			@RequestParam(required = false) String sessionToken,
@@ -311,7 +311,7 @@ public class SearchV3RestController  extends SerializerUtil implements Constants
 		searchService.refreshGlobalTenantsInCache();
 	}
 	
-	@RequestMapping(method = {RequestMethod.GET}, value = "/autocomplete/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(method = {RequestMethod.GET}, value = "/autocomplete/{type}", produces = APPLICATION_JSON_UTF_8_VALUE)
 	@ResponseBody
 	public Object searchAutoComplete(HttpServletRequest request, HttpServletResponse response, 
 			@RequestParam(required = false) String sessionToken,
