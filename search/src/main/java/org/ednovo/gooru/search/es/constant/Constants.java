@@ -498,5 +498,6 @@ public interface Constants {
 	public static final String IS_CROSSWALK = "isCrosswalk";
 	public static final String SCOPE_KEY = "scopeKey";
 	public static final Pattern CONTAINER_MATCH = Pattern.compile("collection|course");
+	public static final String APPLICATION_JSON_UTF_8_VALUE = "application/json; charset=UTF-8";
 
 }
