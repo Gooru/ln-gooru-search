@@ -51,7 +51,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 
 	protected static final Logger logger = LoggerFactory.getLogger(SearchV2RestController.class);
 	
-	@RequestMapping(method = RequestMethod.GET, value = { "/index/filters"}, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(method = RequestMethod.GET, value = { "/index/filters"}, produces = APPLICATION_JSON_UTF_8_VALUE)
 	@ResponseBody
 	public String getSearchFilters(HttpServletRequest request,@RequestParam(required = false) String sessionToken, @RequestParam(value = "codeId", required = false) Integer codeId, @RequestParam(value = "type", required = false, defaultValue = "resource") String type, HttpServletResponse response,
 			final ModelMap model) throws Exception {
@@ -60,7 +60,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 	}
 	  
 	@SuppressWarnings("unchecked")
-	@RequestMapping(method = {RequestMethod.GET}, value = "/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(method = {RequestMethod.GET}, value = "/{type}", produces = APPLICATION_JSON_UTF_8_VALUE)
 	@ResponseBody
 	public String search(HttpServletRequest request, HttpServletResponse response, 
 			@RequestParam(required = false) String sessionToken,
@@ -362,7 +362,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		searchService.refreshGlobalTenantsInCache();
 	}
 	
-	@RequestMapping(method = {RequestMethod.GET}, value = "/autocomplete/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(method = {RequestMethod.GET}, value = "/autocomplete/{type}", produces = APPLICATION_JSON_UTF_8_VALUE)
 	@ResponseBody
 	public String searchAutoComplete(HttpServletRequest request, HttpServletResponse response, 
 			@RequestParam(required = false) String sessionToken,

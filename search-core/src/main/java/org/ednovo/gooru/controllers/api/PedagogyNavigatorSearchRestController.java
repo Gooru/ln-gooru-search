@@ -49,7 +49,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 	private PedagogyNavigatorService pedagogySearchService;
 		
 	@SuppressWarnings("unchecked")
-	@RequestMapping(method = { RequestMethod.GET }, value = "/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(method = { RequestMethod.GET }, value = "/{type}", produces = APPLICATION_JSON_UTF_8_VALUE)
 	@ResponseBody
 	public String search(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) String sessionToken,
 			@RequestParam(defaultValue = "5", value = "length") Integer limit, @RequestParam(defaultValue = "0") Integer startAt, @RequestParam(defaultValue = "1", value = "start") Integer pageNum,
@@ -151,7 +151,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		return setResponse(serialize(searchResponse, JSON, excludeAttributeArray, true, false), response);
 	}
 	
-	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/subject/{subjectCode:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/subject/{subjectCode:.+}", produces = APPLICATION_JSON_UTF_8_VALUE)
 	@ResponseBody
 	public String searchLearningMapsBySubject(HttpServletRequest request, HttpServletResponse response,
 			@PathVariable String subjectCode,
@@ -178,7 +178,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 	}
 	
-	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/course/{courseCode:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/course/{courseCode:.+}", produces = APPLICATION_JSON_UTF_8_VALUE)
 	@ResponseBody
 	public String searchLearningMapsByCourse(HttpServletRequest request, HttpServletResponse response,
 			@PathVariable String courseCode,
@@ -204,7 +204,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 	}
 	
-	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/domain/{domainCode:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/domain/{domainCode:.+}", produces = APPLICATION_JSON_UTF_8_VALUE)
 	@ResponseBody
 	public String searchLearningMapsByDomain(HttpServletRequest request, HttpServletResponse response,
 			@PathVariable String domainCode,
@@ -230,7 +230,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 	}
 	
-	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/competency/{standardCode:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/competency/{standardCode:.+}", produces = APPLICATION_JSON_UTF_8_VALUE)
 	@ResponseBody
 	public String searchLearningMapsByCompetency(HttpServletRequest request, HttpServletResponse response,
 			@PathVariable String standardCode,
@@ -255,7 +255,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 	}
 	
-	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/stats", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/stats", produces = APPLICATION_JSON_UTF_8_VALUE)
 	@ResponseBody
 	public String fetchLearningMapStats(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(required = true) String subjectClassification,
@@ -310,7 +310,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 	}
 	
 	@SuppressWarnings("unchecked")
-	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/stats/search", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/stats/search", produces = APPLICATION_JSON_UTF_8_VALUE)
 	@ResponseBody
 	public String fetchLearningMapStats(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(value = "q", defaultValue = "*") String query,
@@ -346,7 +346,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 	}
 	
 	@SuppressWarnings("unchecked")
-	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/search", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/search", produces = APPLICATION_JSON_UTF_8_VALUE)
 	@ResponseBody
 	public String learningMapSearch(HttpServletRequest request, HttpServletResponse response, 
 			@RequestParam(required = false) String sessionToken,
@@ -375,7 +375,7 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 		return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 	}
 	
-	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/standard/{standardCode:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(method = { RequestMethod.GET }, value = "/learning-maps/standard/{standardCode:.+}", produces = APPLICATION_JSON_UTF_8_VALUE)
 	@ResponseBody
 	public String searchLearningMapsByStandard(HttpServletRequest request, HttpServletResponse response,
 			@PathVariable String standardCode,

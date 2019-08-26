@@ -51,7 +51,7 @@ public class SuggestV3RestController extends BaseController {
 	@Autowired
 	private RequestService requestService;
 
-	@RequestMapping(method = RequestMethod.POST, value = "/{type}", headers = "Content-Type=application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(method = RequestMethod.POST, value = "/{type}", headers = "Content-Type=application/json", produces = APPLICATION_JSON_UTF_8_VALUE)
 	@ResponseBody
 	public String suggest(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) String sessionToken,
 			@RequestParam(defaultValue = "10", value = "limit") Integer pageSize, @RequestParam(defaultValue = "0") String pretty, 
@@ -78,7 +78,7 @@ public class SuggestV3RestController extends BaseController {
 		return setResponse(serialize(suggestResults, JSON, SINGLE_EXCLUDES, true), response);
 	}
 	
-	@RequestMapping(method = RequestMethod.POST , value = "taxonomy/{type}", headers = "Content-Type=application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(method = RequestMethod.POST , value = "taxonomy/{type}", headers = "Content-Type=application/json", produces = APPLICATION_JSON_UTF_8_VALUE)
 	@ResponseBody
 	public String suggestForCode(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) String sessionToken,
 			@RequestParam(defaultValue = "10", value = "limit") Integer pageSize, @RequestParam(defaultValue = "0") String pretty, @RequestParam(required = false, defaultValue = "false") Boolean inputTypeInternalCode, @RequestParam(required = false, defaultValue = "false") Boolean isInternalSuggest, @PathVariable String type, @RequestBody String contextPayload,
