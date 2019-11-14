@@ -12,7 +12,7 @@ public class Query {
 
 	private Float boost;
 
-	private Boolean use_dis_max;
+	private Integer tie_breaker;
 
 	private String default_operator;
 
@@ -54,26 +54,26 @@ public class Query {
 
 	public Query(String query,
 			String[] fields,
-			Boolean use_dis_max,
+			Integer tie_breaker,
 			String default_operator,
 			Boolean allow_leading_wildcard) {
 		setQuery(query);
 		setFields(fields);
-		setUse_dis_max(use_dis_max);
+		setTie_breaker(tie_breaker);
 		setDefault_operator(default_operator);
 		setAllow_leading_wildcard(allow_leading_wildcard);
 	}
 
 	public Query(String query,
 			String[] fields,
-			Boolean use_dis_max,
+			Integer tie_breaker,
 			String default_operator,
 			Boolean allow_leading_wildcard,
 			String analyzer,
 			Float boost) {
 		setQuery(query);
 		setFields(fields);
-		setUse_dis_max(use_dis_max);
+		setTie_breaker(tie_breaker);
 		setDefault_operator(default_operator);
 		setAllow_leading_wildcard(allow_leading_wildcard);
 		setAnalyzer(analyzer);
@@ -104,12 +104,12 @@ public class Query {
 		this.boost = boost;
 	}
 
-	public Boolean getUse_dis_max() {
-		return use_dis_max;
+	public Integer getTie_breaker() {
+		return tie_breaker;
 	}
 
-	public void setUse_dis_max(Boolean use_dis_max) {
-		this.use_dis_max = use_dis_max;
+	public void setTie_breaker(Integer tie_breaker) {
+		this.tie_breaker = tie_breaker;
 	}
 
 	public String getDefault_operator() {

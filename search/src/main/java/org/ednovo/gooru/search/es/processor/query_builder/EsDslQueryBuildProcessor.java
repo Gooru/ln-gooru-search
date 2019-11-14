@@ -85,7 +85,7 @@ public class EsDslQueryBuildProcessor extends SearchProcessor<SearchData, Object
 			}
 		}
 
-		Query mainQuery = new Query(searchData.getQueryString(), queryFields, true, searchData.getDefaultOperator(), searchData.isAllowLeadingWildcard(), analyzer,
+		Query mainQuery = new Query(searchData.getQueryString(), queryFields, 0, searchData.getDefaultOperator(), searchData.isAllowLeadingWildcard(), analyzer,
 				getCassandraSettingAsFloat("search." + typeLower + ".query.user_query.boost"));
 		QueryString queryString = new QueryString(mainQuery);
 		String lang = getSearchSetting("search." + searchData.getType().toLowerCase() + ".query.nativescore.lang");
