@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TaxonomyQueryExpansionProcessor extends SearchProcessor<SearchData, Object> {
 
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Override
 	public void process(SearchData searchData,
 			SearchResponse<Object> response) {
@@ -50,7 +51,7 @@ public class TaxonomyQueryExpansionProcessor extends SearchProcessor<SearchData,
 		if(searchResponse!=null && !searchResponse.isEmpty()){
 			String nextLevels = (String) ((Map)searchResponse.get(0).get("_source")).get("definitions");
 			if (nextLevels != null && (nextLevels = nextLevels.trim()).length() > 0 && !nextLevels.equalsIgnoreCase(searchData.getQueryString())) {
-				searchData.putQuery(new MultiMatchQuery(nextLevels, queryFields.split(","), getSettingAsFloat("S_" + searchData.getIndexType().name() + "_QUERY_EXAPNSION_TAXONOMY_LABEL_BOOST"), getSetting("S_" + searchData.getType() + "_MULTIMATCH_MINSHOULDMATCH"), getSettingAsFloat("S_" + searchData.getType() + "_MULTIMATCH_CUTOFF_FREQUENCY")));
+				searchData.putQuery(new MultiMatchQuery(nextLevels, queryFields.split(","), getSettingAsFloat("S_" + searchData.getIndexType().name() + "_QUERY_EXAPNSION_TAXONOMY_LABEL_BOOST"), getSetting("S_" + searchData.getType() + "_MULTIMATCH_MINSHOULDMATCH")));
 			}
 		}
 	}

@@ -59,7 +59,6 @@ public enum SearchSettingType {
 	S_RESOURCE_USER_LESSON_PROFICIENCY_BOOST("search.resource.user.lesson.proficiency.boost", 1.0F),
 	S_RESOURCE_USER_CONCEPT_PROFICIENCY_BOOST("search.resource.user.concept.proficiency.boost", 1.0F),
 	S_RESOURCE_MULTIMATCH_MINSHOULDMATCH("search.resource.multimatch.min_should_match", "60%"),
-	S_RESOURCE_MULTIMATCH_CUTOFF_FREQUENCY("search.resource.multimatch.cutoff_frequency", 0.001F),
 	S_RESOURCE_SCORE_DEMOTEVALUE("search.resource.score.demote_value", 5.0F),
 
 	
