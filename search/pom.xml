@@ -11,7 +11,7 @@
 	<artifactId>gooru-search</artifactId>
 	<properties>
 		<org.springframework.version>4.1.0.RELEASE</org.springframework.version>
-		<elasticsearch.version>6.8.0</elasticsearch.version>
+		<elasticsearch.version>7.4.2</elasticsearch.version>
 		<httpComponent.version>4.4.5</httpComponent.version>
 		<httpClient.version>4.5.2</httpClient.version>
 		<httpAsyncClient.version>4.1.2</httpAsyncClient.version>

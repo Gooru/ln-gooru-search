@@ -406,6 +406,7 @@ public interface Constants {
 	public static final String DEFAULT_FC_VISIBILITY = "default.fc_visibility";
 	public static final String ET_MAX_VAL = "et.max.value";
 	public static final String LEARNING_MAPS = "learning-maps";
+	public static final String _DOC = "_doc";
 
 	public enum PublishedStatus {
 

@@ -50,12 +50,13 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 				Map<String, Object> hit = (Map<String, Object>) responseAsMap.get(SEARCH_HITS);
 				if (((List<Map<String, Object>>) (hit).get(SEARCH_HITS)) != null) {
 					List<Map<String, Object>> hits = (List<Map<String, Object>>) (hit).get(SEARCH_HITS);
+					Map<String, Object> hitsTotal = (Map<String, Object>) hit.get(SEARCH_TOTAL);
 					if (!searchData.isAggregationRequest()) {
-						response.setTotalHitCount(((Integer) hit.get(SEARCH_TOTAL)).longValue());
+						response.setTotalHitCount(Long.valueOf(hitsTotal.getOrDefault("value", 0).toString()));
 						response.setResultCount(hits.size());
 					}
 					Map<String, Object> stats = new HashMap<String, Object>(3);
-					stats.put("totalHitCount", ((Integer) hit.get(SEARCH_TOTAL)).longValue());
+					stats.put("totalHitCount", Long.valueOf(hitsTotal.getOrDefault("value", 0).toString()));
 					if (!searchData.isAggregationRequest()) {
 						stats.put("pageSize", searchData.getSize());
 						stats.put("pageNumber", searchData.getPageNum());

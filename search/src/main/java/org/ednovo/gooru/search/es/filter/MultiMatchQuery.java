@@ -19,12 +19,8 @@ public class MultiMatchQuery {
 	
 	public MultiMatchQuery(String query,
 			String[] fields,
-			Float boost, String minimumShouldMatch, Float cutoffFrequency) {
-		if(cutoffFrequency == null){
+			Float boost, String minimumShouldMatch) {
 			setMulti_match(new Query(query, fields, boost, minimumShouldMatch));
-		} else {
-			setMulti_match(new Query(query, fields, boost, minimumShouldMatch, cutoffFrequency));
-		}
 	}
 
 	public Query getMulti_match() {

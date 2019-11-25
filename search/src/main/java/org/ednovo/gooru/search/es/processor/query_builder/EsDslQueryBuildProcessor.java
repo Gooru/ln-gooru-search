@@ -98,13 +98,11 @@ public class EsDslQueryBuildProcessor extends SearchProcessor<SearchData, Object
 		Map<String, Object> customQuery = new HashMap<String, Object>(1);
 		if (score != null && searchDataType.equalsIgnoreCase(SearchType.SIMPLE_COLLECTION.getType())) {
 			Map<String, Object> query = new HashMap<String, Object>(3);
-			Map<String, Object> scriptScore = new HashMap<String, Object>(1);
 			Map<String, Object> script = new HashMap<String, Object>(2);
-			customQuery.put("function_score", query);
+			customQuery.put("script_score", query);
 			query.put("query", queryString);
 			if (searchDataType.equalsIgnoreCase(SearchType.SIMPLE_COLLECTION.getType()) && lang != null && !(lang.equalsIgnoreCase("native"))) {
-				query.put("script_score", scriptScore);
-				scriptScore.put("script", script);
+				query.put("script", script);
 				script.put("source", score);
 				script.put("lang", getSearchSetting("search." + searchData.getType().toLowerCase() + ".query.script.lang"));
 			}

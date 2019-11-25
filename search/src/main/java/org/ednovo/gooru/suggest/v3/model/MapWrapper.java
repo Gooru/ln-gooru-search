@@ -38,6 +38,7 @@ public class MapWrapper<T extends Object> implements Serializable{
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<String> getList(String key) {
 		Object result = values.get(key);
 		if (result != null && result instanceof List) {

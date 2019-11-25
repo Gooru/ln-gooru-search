@@ -22,8 +22,6 @@ public class Query {
 	
 	private String minimum_should_match;
 	
-	private Float cutoff_frequency;
-
 	public Query() {
 
 	}
@@ -42,14 +40,6 @@ public class Query {
 		setFields(fields);
 		setMinimum_should_match(minimumShouldMatch);
 		setBoost(boost);
-	}
-	
-	public Query(String query, String[] fields, Float boost, String minimumShouldMatch, Float cutoffFrequency){
-		setQuery(query);
-		setFields(fields);
-		setMinimum_should_match(minimumShouldMatch);
-		setBoost(boost);
-		setCutoff_frequency(cutoffFrequency);
 	}
 
 	public Query(String query,
@@ -142,14 +132,6 @@ public class Query {
 
 	public String getMinimum_should_match() {
 		return minimum_should_match;
-	}
-
-	public void setCutoff_frequency(Float cutoff_frequency) {
-		this.cutoff_frequency = cutoff_frequency;
-	}
-
-	public Float getCutoff_frequency() {
-		return cutoff_frequency;
 	}
 
 }

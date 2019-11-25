@@ -126,7 +126,7 @@ public class ElasticsearchProcessor extends SearchProcessor<SearchData, Object> 
 		HttpEntity entity = new NStringEntity(searchQuery, ContentType.APPLICATION_JSON);
 		Request request = new Request(GET_METHOD,
 		        SLASH_SEPARATOR + getSetting(S_ES_INDEX_PREFIX) + indexName + getSetting(S_ES_INDEX_SUFFIX)
-		            + SLASH_SEPARATOR + indexType + SLASH_SEPARATOR + UNDERSCORE_SEARCH);
+		             + SLASH_SEPARATOR + UNDERSCORE_SEARCH);
 		request.setEntity(entity);
 		Response searchResponse = getClient().performRequest(request);
 		return searchResponse;
