@@ -14,7 +14,6 @@ import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
 import org.ednovo.gooru.search.es.service.SearchSettingService;
 import org.ednovo.gooru.search.responses.SearchResponse;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 /**
  * @author SearchTeam

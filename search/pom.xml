@@ -11,7 +11,7 @@
 	<artifactId>gooru-search</artifactId>
 	<properties>
 		<org.springframework.version>4.1.0.RELEASE</org.springframework.version>
-		<elasticsearch.version>5.6.0</elasticsearch.version>
+		<elasticsearch.version>6.8.0</elasticsearch.version>
 		<httpComponent.version>4.4.5</httpComponent.version>
 		<httpClient.version>4.5.2</httpClient.version>
 		<httpAsyncClient.version>4.1.2</httpAsyncClient.version>
@@ -169,7 +169,7 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>9.4.1208</version>
+			<version>42.2.6</version>
 		</dependency>
 
 		<!-- Elasticsearch dependencies -->
