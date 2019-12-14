@@ -38,8 +38,6 @@ public interface Constants {
 
 	public static final String TYPE_PUBLISHER = "publisher";
 
-	public static final String TYPE_AGGREGATOR = "Aggregator";
-
 	public static final String PUBLISHER = "publisher";
 
 	public static final String AGGREGATOR = "Aggregator";
@@ -55,7 +53,7 @@ public interface Constants {
 	public static final String SINGLE_EXCLUDES[] = { "*.organization", "fileData", "fileHash", "fromQa", "isFeaturedBoolean", "isLive", "isNew", "lessonsString", "new", "parentUrl",
 			"resourceInstances", "resourceLearnguides", "resourceMetaData", "resourceOid", "resourceSegments", "responses", "score", "siteName", "sourceReference", "subscriptions", "taxonomySet.*",
 			"text", "userPermSet", "userUploadedImage", "vocaularyString", "*.class", "*.answerId", "*.answerType", "*.isCorrect", "*.matchingAnswer", "*.question", "*.sequence", "*.unit", "*.hintId",
-			"*.assessmentCode", "*.assessmentGooruId", "*.assets", "*.codes", "*.difficultyLevel", "*.helpContentLink", "*.importCode", "*.instruction", "*.isFolderAbsent", "*.quizNetwork",
+			"*.assessmentCode", "*.assessmentGooruId", "*.assets", "*.codes", "*.difficultyLevel", "*.helpContentLink", "*.importCode", "*.instruction", "*.isFolderAbsent",
 			"*.scorePoints", "*.sourceContentInfo", "*.userVote", "*.queryUId", "*.answers.question", "*.hints.question", "*.resource.contentMetaAssoc", "*.resource.indexType",
 			"*.resource.isFeatured", "*.resource.isFeaturedBoolean", "*.resource.isNew", "*.resource.recordSource", "*.resource.settings", "*.resource.s3UploadFlag", "*.resource.taxonomySet",
 			"*.resource.views", "*.resource.thumbnails" };

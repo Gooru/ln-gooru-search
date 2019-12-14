@@ -52,9 +52,7 @@ public enum SearchProcessorType {
 	FilterDetection(),
 
 	EsDslQueryBuild(),
-	
-	LibraryEsDslQueryBuild(),
-	
+		
 	ResourceEsDslQueryBuild(),
 
 	Elasticsearch(),
@@ -76,9 +74,7 @@ public enum SearchProcessorType {
 	QuestionDeserializer(),
 
 	UserDeserializer(),
-	
-	LibraryDeserializer(),
-	
+		
 	SearchQueryDeserializer(),
 	
 	AttributionDeserializer(),
@@ -92,9 +88,7 @@ public enum SearchProcessorType {
 	FacetFilterConstruction(),
 	
 	PublisherDeserializer(),
-	
-	AggregatorDeserializer(),
-	
+		
 	SubjectFacetFilter(),
 	
 	FacetDeserializer(),

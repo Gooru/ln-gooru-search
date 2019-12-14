@@ -16,11 +16,9 @@ public enum EsIndexType {
 	, USER("user")
 	, SEARCH_QUERY("searchquery")
 	, TAXONOMY("taxonomy")
-	, LIBRARY("library")
 	, DICTIONARY("dictionary")
 	, QUESTION("question"),
 	  PUBLISHER("publisher"),
-	  AGGREGATOR("aggregator"),
 	  SCHOOLDISTRICT("schooldistrict");
 	
 	String type;
