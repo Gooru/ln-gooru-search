@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.ednovo.gooru.search.es.constant.IndexFields;
-import org.ednovo.gooru.search.es.constant.Constants.ContentFormat;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.UserV2;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
@@ -132,10 +131,14 @@ public class PedagogySCollectionDeserializeProcessor extends PedagogyDeserialize
 		if (statisticsMap.get(IndexFields.COLLABORATOR_COUNT) != null) {
 			output.setCollaboratorCount((Integer) statisticsMap.get(IndexFields.COLLABORATOR_COUNT));
 		}
-		output.setEfficacy((statisticsMap.get(IndexFields.EFFICACY) != null) ? ((Number) statisticsMap.get(IndexFields.EFFICACY)).doubleValue() : 0.5);
+		/*output.setEfficacy((statisticsMap.get(IndexFields.EFFICACY) != null) ? ((Number) statisticsMap.get(IndexFields.EFFICACY)).doubleValue() : 0.5);
 		output.setEngagement((statisticsMap.get(IndexFields.ENGAGEMENT) != null) ? ((Number) statisticsMap.get(IndexFields.ENGAGEMENT)).doubleValue() : 0.5);
 		output.setRelevance((statisticsMap.get(IndexFields.RELEVANCE) != null) ? ((Number) statisticsMap.get(IndexFields.RELEVANCE)).doubleValue() : 0.5);
-	
+		*/ //TODO to be reverted
+		output.setEfficacy(randFloat(0.4F, 0.6F));
+		output.setEngagement(randFloat(0.4F, 0.6F));
+		output.setRelevance(randFloat(0.4F, 0.6F));
+		
 		Map<String, Object> taxonomyMap = (Map<String, Object>) model.get(IndexFields.TAXONOMY);
 		if (taxonomyMap != null) {
 			long start = System.currentTimeMillis();
