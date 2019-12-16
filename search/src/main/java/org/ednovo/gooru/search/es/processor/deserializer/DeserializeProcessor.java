@@ -3,10 +3,13 @@
  */
 package org.ednovo.gooru.search.es.processor.deserializer;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.constant.Constants;
@@ -216,4 +219,10 @@ public abstract class DeserializeProcessor<O, S> extends SearchProcessor<SearchD
 		return null;
 	}
 
+	public static double randFloat(float min, float max) {
+		Random rand = new Random();
+		Double input = Double.valueOf(rand.nextFloat() * (max - min) + min);
+		BigDecimal bd = new BigDecimal(input).setScale(2, RoundingMode.DOWN);
+		return bd.doubleValue();
+	}
 }
