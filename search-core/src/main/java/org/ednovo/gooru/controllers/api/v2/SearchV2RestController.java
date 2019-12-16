@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -204,7 +203,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 			}
 			searchData.setParameters(searchDataMap);
 			type = TYPE_TAXONOMY;
-		} else if (type.equalsIgnoreCase(TYPE_PUBLISHER) || type.equalsIgnoreCase(TYPE_AGGREGATOR)) {
+		} else if (type.equalsIgnoreCase(TYPE_PUBLISHER)) {
 			searchData.setType(type);
 			searchData.setQueryString(searchData.getQueryString() + "*");
 		} else if (type.equalsIgnoreCase(TYPE_ATTRIBUTION) || type.equalsIgnoreCase(TYPE_SOURCE)) {
@@ -225,8 +224,6 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 				type = SearchHandlerType.MULTI_RESOURCE.name();
 				searchData.setQueryType(MULTI_RESOURCE_FORMAT);
 			}
-		} else if (type.equalsIgnoreCase(COLLECTION_QUIZ)) {
-			type = TYPE_LIBRARY;
 		} else if (type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(AUTO_COMPLETE)) {
 			String expandedQuery = searchData.getQueryString().replace("\"", EMPTY_STRING).replace(" ", "_").replaceAll("([^a-z0-9A-Z_])", "\\\\$1");
 			if (expandedQuery == EMPTY_STRING) {
@@ -322,9 +319,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 					resultsJSON = resultsJSON.substring(0, resultsJSON.length() - 1) + " , \"executionTime\" : " + searchResponse.getExecutionTime() + "}";
 				}
 				return setResponse(resultsJSON.toString(), response);
-			} else if (type.equalsIgnoreCase(TYPE_LIBRARY)) {
-				return setResponse(searchResponse.getSearchResults().toString(), response);
-			} else if (type.equalsIgnoreCase(TYPE_ATTRIBUTION) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(TYPE_PUBLISHER) || type.equalsIgnoreCase(TYPE_AGGREGATOR) || type.equalsIgnoreCase(KEYWORD_COMPETENCY)) {
+			} else if (type.equalsIgnoreCase(TYPE_ATTRIBUTION) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(TYPE_PUBLISHER) || type.equalsIgnoreCase(KEYWORD_COMPETENCY)) {
 				return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 			} else if (CUL_MATCH.matcher(type).matches()) {
 				return setResponse(serialize(searchResponse, JSON, excludeAttributeArray, true, true), response);
@@ -398,10 +393,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 		searchData.setUserTenantId(((UserGroupSupport) request.getAttribute(TENANT)).getTenantId());
 		searchData.setUserTenantRootId(((UserGroupSupport) request.getAttribute(TENANT)).getTenantRoot());
 
-		if (type.equalsIgnoreCase(TYPE_AGGREGATOR)) {
-			searchData.setType(type);
-			searchData.setQueryString(searchData.getQueryString() + STAR);
-		} else if (type.equalsIgnoreCase(TYPE_PUBLISHER) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(KEYWORD)) {
+		if (type.equalsIgnoreCase(TYPE_PUBLISHER) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(KEYWORD)) {
 			String expandedQuery = searchData.getQueryString().replace("\"", EMPTY_STRING).replace(" ", "_").replaceAll("([^a-z0-9A-Z_])", "\\\\$1");
 			if (expandedQuery == EMPTY_STRING) {
 				expandedQuery = STAR;
@@ -441,7 +433,7 @@ public class SearchV2RestController  extends SerializerUtil implements Constants
 
 		setEventLogObject(request, searchData, searchResponse);
 
-		if (type.equalsIgnoreCase(SearchHandlerType.AUTOCOMPLETE_KEYWORD.name()) || type.equalsIgnoreCase(TYPE_ATTRIBUTION) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(TYPE_PUBLISHER) || type.equalsIgnoreCase(TYPE_AGGREGATOR)) {
+		if (type.equalsIgnoreCase(SearchHandlerType.AUTOCOMPLETE_KEYWORD.name()) || type.equalsIgnoreCase(TYPE_ATTRIBUTION) || type.equalsIgnoreCase(SEARCH_QUERY) || type.equalsIgnoreCase(TYPE_PUBLISHER)) {
 			return setResponse(serialize(searchResponse.getSearchResults(), JSON, excludeAttributeArray, true, false), response);
 		}
 		return setResponse(serialize(searchResponse, JSON, excludeAttributeArray, true, false), response);

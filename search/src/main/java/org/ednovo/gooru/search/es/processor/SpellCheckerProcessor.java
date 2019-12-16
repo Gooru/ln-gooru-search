@@ -70,7 +70,7 @@ public class SpellCheckerProcessor extends SearchProcessor<SearchData, Object> {
       //TODO:also check for chem reps?
       if (searchData.getQueryString().equals("*") || searchData.getQueryString().equals("*:*") ||
           StringUtils.trimToEmpty(searchData.getQueryString()).length() == 0 || emailValidate(searchData.getQueryString().toLowerCase()) ||
-          uuidValidate(searchData.getQueryString().toLowerCase()) || chemicalFormulaValidate(searchData) || libararyNameValidate(searchData.getQueryString().toLowerCase())) {
+          uuidValidate(searchData.getQueryString().toLowerCase()) || chemicalFormulaValidate(searchData)) {
     	  if(logger.isDebugEnabled()){  
     		  logger.debug("Skipping SpellChecker Processor due to special cases for query string!");
     	  }
