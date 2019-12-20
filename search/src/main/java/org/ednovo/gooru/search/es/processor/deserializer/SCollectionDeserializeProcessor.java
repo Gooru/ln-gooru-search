@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.ednovo.gooru.search.es.constant.IndexFields;
-import org.ednovo.gooru.search.es.constant.Constants.ContentFormat;
 import org.ednovo.gooru.search.es.model.License;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.processor.SearchProcessorType;
@@ -193,9 +192,13 @@ public class SCollectionDeserializeProcessor extends DeserializeProcessor<List<C
 		Integer itemCount = (Integer) statisticsMap.get(IndexFields.CONTENT_COUNT);
 		output.setCollectionItemCount(itemCount != null ? itemCount : 0);
 		output.setNumberOfResources(itemCount);
-		output.setEfficacy((statisticsMap.get(IndexFields.EFFICACY) != null) ? ((Number) statisticsMap.get(IndexFields.EFFICACY)).doubleValue() : 0.5);
+/*		output.setEfficacy((statisticsMap.get(IndexFields.EFFICACY) != null) ? ((Number) statisticsMap.get(IndexFields.EFFICACY)).doubleValue() : 0.5);
 		output.setEngagement((statisticsMap.get(IndexFields.ENGAGEMENT) != null) ? ((Number) statisticsMap.get(IndexFields.ENGAGEMENT)).doubleValue() : 0.5);
 		output.setRelevance((statisticsMap.get(IndexFields.RELEVANCE) != null) ? ((Number) statisticsMap.get(IndexFields.RELEVANCE)).doubleValue() : 0.5);
+		*/ //TODO to be reverted
+		output.setEfficacy(randFloat(0.4F, 0.6F));
+		output.setEngagement(randFloat(0.4F, 0.6F));
+		output.setRelevance(randFloat(0.4F, 0.6F));
 		
 		String type = (String) model.get(IndexFields.CONTENT_FORMAT);
 		output.setType(type);

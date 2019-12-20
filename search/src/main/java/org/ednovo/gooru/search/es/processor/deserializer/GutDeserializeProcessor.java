@@ -105,7 +105,14 @@ public class GutDeserializeProcessor extends DeserializeProcessor<List<Gut>, Gut
 				signatureItems.add(signatureItem);
 				}
 			}
-			if (signatureItems.size() > 0) signatureItems = signatureItems.subList(input.getSIFrom(), Math.min(input.getSIFrom() + input.getSILimit(), signatureItems.size()));
+			if (signatureItems.size() > 0) {
+			  if (input.getSIFrom() > signatureItems.size()) {
+			    signatureItems = new ArrayList<>();
+			  } else {
+			    signatureItems = signatureItems.subList(input.getSIFrom(),
+		              (Math.min(input.getSIFrom() + input.getSILimit(), signatureItems.size())));
+			  }
+			}
 		}
 		return signatureItems;
 	}
@@ -139,7 +146,14 @@ public class GutDeserializeProcessor extends DeserializeProcessor<List<Gut>, Gut
 				signatureResources.add(signatureResource);
 				}
 			}
-			if (signatureResources.size() > 0) signatureResources = signatureResources.subList(input.getSIFrom(), Math.min(input.getSIFrom() + input.getSILimit(), signatureResources.size()));
+			if (signatureResources.size() > 0) {
+			  if (input.getSIFrom() > signatureResources.size()) {
+			    signatureResources = new ArrayList<>();
+			  } else {
+			    signatureResources = signatureResources.subList(input.getSIFrom(), 
+			        (Math.min(input.getSIFrom() + input.getSILimit(), signatureResources.size())));
+			  }
+			}
 		}
 		return signatureResources;
 	}
