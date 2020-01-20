@@ -6,23 +6,19 @@ package org.ednovo.gooru.search.es.processor;
 import static org.ednovo.gooru.search.es.constant.SearchSettingType.S_ES_INDEX_PREFIX;
 import static org.ednovo.gooru.search.es.constant.SearchSettingType.S_ES_INDEX_SUFFIX;
 import static org.ednovo.gooru.search.es.constant.SearchSettingType.S_ES_POINT;
-
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Map;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.entity.ContentType;
-import org.apache.http.message.BasicHeader;
 import org.apache.http.nio.entity.NStringEntity;
 import org.apache.http.util.EntityUtils;
 import org.ednovo.gooru.search.es.exception.BadRequestException;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.responses.SearchResponse;
+import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.sniff.SniffOnFailureListener;
@@ -30,7 +26,6 @@ import org.elasticsearch.client.sniff.Sniffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
@@ -56,7 +51,7 @@ public class ElasticsearchProcessor extends SearchProcessor<SearchData, Object> 
 		RestClient restClient = RestClient.builder(httpHosts)
 				.setRequestConfigCallback(requestConfigBuilder -> requestConfigBuilder.setConnectTimeout(5000)
 						.setConnectionRequestTimeout(30000).setSocketTimeout(60000))
-				.setMaxRetryTimeoutMillis(60000).setFailureListener(sniffOnFailureListener).build();
+				.setFailureListener(sniffOnFailureListener).build();
 		Sniffer sniffer = Sniffer.builder(restClient).setSniffAfterFailureDelayMillis(30000).build();
 		sniffOnFailureListener.setSniffer(sniffer);
 
@@ -105,10 +100,7 @@ public class ElasticsearchProcessor extends SearchProcessor<SearchData, Object> 
 			}
 			long start = System.currentTimeMillis();
 
-			HttpEntity entity = new NStringEntity(searchQuery, ContentType.APPLICATION_JSON);
-			Response searchResponse = getClient().performRequest(GET_METHOD,
-					SLASH_SEPARATOR + getSetting(S_ES_INDEX_PREFIX) + indexName + getSetting(S_ES_INDEX_SUFFIX) + SLASH_SEPARATOR + indexType + SLASH_SEPARATOR + UNDERSCORE_SEARCH,
-					Collections.<String, String>emptyMap(), entity, new BasicHeader("Content-Type", "application/json"));
+			Response searchResponse = performRequest(indexName, indexType, searchQuery);
 			if (searchResponse.getStatusLine().getStatusCode() == 400 || searchResponse.getStatusLine().getStatusCode() == 503) {
 				throw new BadRequestException("Please check request param input values");
 			}
@@ -127,6 +119,17 @@ public class ElasticsearchProcessor extends SearchProcessor<SearchData, Object> 
 		} catch (Exception e) {
 			LOG.error("Search Error : {}", e); 
 		}
+	}
+	
+	private Response performRequest(String indexName, String indexType, String searchQuery)
+		      throws IOException {
+		HttpEntity entity = new NStringEntity(searchQuery, ContentType.APPLICATION_JSON);
+		Request request = new Request(GET_METHOD,
+		        SLASH_SEPARATOR + getSetting(S_ES_INDEX_PREFIX) + indexName + getSetting(S_ES_INDEX_SUFFIX)
+		            + SLASH_SEPARATOR + indexType + SLASH_SEPARATOR + UNDERSCORE_SEARCH);
+		request.setEntity(entity);
+		Response searchResponse = getClient().performRequest(request);
+		return searchResponse;
 	}
 
 	@Override
