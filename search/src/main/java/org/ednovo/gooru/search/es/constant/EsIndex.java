@@ -9,14 +9,13 @@ package org.ednovo.gooru.search.es.constant;
  */
 public enum EsIndex {
 	
-	RESOURCE("resource" , new String[] {"resource"}),
-	COLLECTION("collection" , new String[] {"collection"}),
-	TAXONOMY("taxonomy",new String [] {"taxonomy","skills"} ),
-	LIBRARY("library"),
+	RESOURCE("resource"),
+	COLLECTION("collection"),
+	TAXONOMY("taxonomy"),
 	SEARCH_QUERY("searchquery"),
 	DICTIONARY("dictionary"),
 	USER("user"),
-    CONTENT_PROVIDER("content_provider", new String[] {"publisher","aggregator"}),
+    CONTENT_PROVIDER("content_provider", new String[] {"publisher"}),
     SCHOOL_DISTRICT("schooldistrict"),
 	ORGANIZATION("organization"),
 	COURSE("course"),

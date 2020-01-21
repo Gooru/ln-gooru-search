@@ -13,9 +13,7 @@ public enum SearchType{
 	, QUIZ("quiz")
 	, USER("user")
 	, NETWORK("network")
-	, QUESTION_BOARD("qb")
 	, SEARCH_QUERY("searchquery")
-	, LIBRARY("library")
 	, TAXONOMY ("taxonomy")
 	, ALL("all")
 	,SIMPLE_COLLECTION("scollection")
@@ -23,7 +21,6 @@ public enum SearchType{
 	RESOURCE_BY_STATUS("resource_by_status"),
 	STANDARD_CODE("standardCode"),
 	STANDARD("standard"),
-	ATTRIBUTION("attribution"),
 	COLLECTION_QUIZ("collection-quiz"),
 	QUIZ_SUGGEST("quiz-suggest"),
 	COLLECTION_SUGGEST("collection-suggest"),

@@ -63,54 +63,10 @@ public abstract class SearchProcessor<I extends SearchData, O extends Object> im
 	static {
 		SERIAILIZER.setSerializationInclusion(Include.NON_NULL);
 	}
-
-	protected static final Map<String,String> libraryName = new HashMap<String, String>();
-	
-	static {
-	    
-	    libraryName.put("rusd", "rusd");
-	    libraryName.put("riverside unified", "riversideunified");
-	    libraryName.put("sausd", "sausd");
-	    libraryName.put("susd", "susd");
-	    libraryName.put("valverde", "valverde");
-	    libraryName.put("lusd", "lusd");
-	    libraryName.put("lpslibrary", "lpslibrary");
-	    libraryName.put("lps library", "lpslibrary");
-	    libraryName.put("lps" , "lpslibrary");
-	    libraryName.put("core library", "coreLibrary");
-	    libraryName.put("corelibrary", "coreLibrary");
-	    libraryName.put("core", "coreLibrary");
-	    libraryName.put("autodesk", "Autodesk");
-	    libraryName.put("ccstcaltac", "CCSTCalTAC");
-	    libraryName.put("ngc", "New Global Citizens");
-	    libraryName.put("new global citizens","New Global Citizens");
-	    libraryName.put("newglobalcitizens", "New Global Citizens");
-	    libraryName.put("onr","Office Of Naval Research");
-	    libraryName.put("office of naval research","Office Of Naval Research");
-	    libraryName.put("psd","Partners For Sustainable Development");
-	    libraryName.put("esyp","Edible School Yard Project");
-	    libraryName.put("ediblschoolyardproject", "Edible School Yard Project");
-	    libraryName.put("fte", "Foundation For Teaching Economics");
-	    libraryName.put("geoeducators","National Geographics GeoEducator Community");
-	    libraryName.put("lessonopoly","SVEFs Lessonopoly");
-	    libraryName.put("svefs lessonopoly", "SVEFs Lessonopoly");
-	    libraryName.put("svefslessonopoly", "SVEFs Lessonopoly");
-	    libraryName.put("lifeboard", "Life Board");
-	    libraryName.put("life board", "Life Board");
-	    libraryName.put("lb", "Life Board");
-	    libraryName.put("tical","Technology Information Center For Administrative Leadership");
-	    libraryName.put("wspwh","What So Proudly We Hail");
-	    libraryName.put("youthvoices", "Youth Voices");
-	    libraryName.put("youth voices","Youth Voices");
-	    libraryName.put("epacs","AspireEPACS");
-	}
-	
 	
 	
 	@PostConstruct
 	public void init(){
-		//registerResourceFormat();
-		//updateNewFormatAndInstructional();
 	}
 	
 	// Holds all the instance of processors
@@ -274,14 +230,6 @@ public abstract class SearchProcessor<I extends SearchData, O extends Object> im
 			expressionFound = true;
 		}
 		return expressionFound;
-	}
-	
-	public boolean libararyNameValidate(final String query) {
-		boolean libraryNameFound = false;
-		if(libraryName.get(query) != null){
-			libraryNameFound = true;
-		}
-		return libraryNameFound;
 	}
 
 	public boolean standardValidate(SearchData searchData) {

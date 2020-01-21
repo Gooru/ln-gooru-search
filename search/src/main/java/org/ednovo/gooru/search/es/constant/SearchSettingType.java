@@ -154,27 +154,6 @@ public enum SearchSettingType {
 	S_SCOLLECTION_QUERY_NATIVESCORE_DEBUG("search.scollection.query.nativescore.debug","false"),
 	S_SCOLLECTION_QUERY_NATIVESCORE_FIELD("search.scollection.query.nativescore.field","statistics.preComputedWeight"),
 
-    S_QUIZ_FIELD_SEGMENT_TITLE_BOOST("search.quiz.field.segment.title.boost", 1.0F),
-	S_QUIZ_FIELD_LEARNING_OBJECTIVES_BOOST("search.quiz.field.learning_objectives.boost", 1.0F),
-	S_QUIZ_FIELD_TITLE_BOOST("search.quiz.field.title.boost", 1.1F),
-	S_QUIZ_FIELD_TAGS_BOOST("search.quiz.field.tags.boost", 1.1F),
-	S_QUIZ_FIELD_DESCRIPTION_BOOST("search.quiz.field.description.boost", 1.1F),
-	S_QUIZ_FIELD_TAXONOMY_SUBJECT_LABEL_BOOST("search.quiz.field.taxonomy.subject.label.boost", 1.1F),
-	S_QUIZ_FIELD_TAXONOMY_COURSE_LABEL_BOOST("search.quiz.field.taxonomy.course.label.boost", 1.4F),
-	S_QUIZ_FIELD_TAXONOMY_UNIT_LABEL_BOOST("search.quiz.field.taxonomy.unit.label.boost", 1.6F),
-	S_QUIZ_FIELD_TAXONOMY_TOPIC_LABEL_BOOST("search.quiz.field.taxonomy.topic.label.boost", 1.8F),
-	S_QUIZ_FIELD_TAXONOMY_LESSON_LABEL_BOOST("search.quiz.field.taxonomy.lesson.label.boost", 2.0F),
-	S_QUIZ_FIELDS("search.quiz.fields", "gooruOId,contentId,sharing,goals,description,category,batchId,grade,title,collaborators,folder,thumbnail,type,lastModified,addDate,network,creator,owner,statistics,socialData,taxonomy,segment,distinguish,isFeatured,assetURI,organization,collaboratorEmails,name,learningObjectives,quizCollection,vocabulary,collectionGooruOid,assessmentGooruOid"),
-	S_QUIZ_QUERY_FIELDS("search.quiz.query.fields", "_all,taxonomyDataSet,title,taxonomyCourse,segmentTitles,taxonomySubject,taxonomyLesson,taxonomyUnit,learningObjectives,taxonomyTopic"),
-
-	S_QUIZ_QUERY_USERQUERY_BOOST("search.quiz.query.user_query.boost", 3.0F),
-	S_QUIZ_QUERY_EXAPNSION_TAXONOMY_LABEL_BOOST("search.quiz.query.expansion.taxonomy.label.boost", 1.0F),
-	S_QUIZ_USER_PROFILE_GRADE_BOOST("search.quiz.user.profile.grade.boost", 1.0F),
-	S_QUIZ_USER_PROFILE_SUBJECT_BOOST("search.quiz.user.profile.subject.boost", 1.0F),
-	S_QUIZ_QUERY_EXPANSION("search.quiz.query.expansion", "false"),
-	S_QUIZ_QUERY_SCORE("search.quiz.query.score", "_score"),
-	S_QUIZ_QUERY_MINSCORE("search.quiz.query.min_score", 0.1F),
-
 	S_TAXONOMY_FIELDS("search.taxonomy.fields", "id,codeId,codeUId,label,code,displayOrder,parentId,typeId,description,depth,rootNodeId,codeImage,s3UploadFlag"),
 	S_TAXONOMY_QUERY_FIELDS("search.taxonomy.query.fields", "codeQuery,label"),
 	S_TAXONOMY_SUB_LEVEL_FIELDS("search.taxonomy_sub_level.fields", "nextLevelLabels"),
@@ -189,9 +168,6 @@ public enum SearchSettingType {
 	S_QUESTION_FIELDS("search.question.fields", "resultUid,gooruOId,owner,creator,sharing,type,isFeatured,distinguish,collaborators,grade,taxonomy,question,contentId,assetURI,lastModified,addDate,socialData,statistics,organization,category"),
 	S_QUESTION_QUERY_FIELDS("search.question.query.fields", "_all"),
 
-	S_LIBRARY_FIELDS("search.library.fields", "collections,quizzes,simple_collections,simple_quizzes"),
-	S_LIBRARY_QUERY_FIELDS("search.library.query.fields", "_all"),
-
 	S_DICTIONARY_FIELDS("search.dictionary.fields", "type,word,difinition"),
 	S_DICTIONARY_QUERY_FIELDS("search.dictionary.query.fields", "_all"),
 
@@ -201,18 +177,9 @@ public enum SearchSettingType {
 	S_AUTOCOMPLETE_FIELDS("search.searchquery.fields", "searchquery"),
 	S_AUTOCOMPLETE_QUERY_FIELDS("search.searchquery.query.fields", "_all"),
 		
-	S_CONTRIBUTOR_FIELDS("search.contributor.fields", "userName,organizationName,userProfileImage,publishername,aggregatorname"),
-	S_CONTRIBUTOR_QUERY_FIELDS("search.contributor.query.fields", "userName,organizationName,publishername,aggregatorname"),
-
-	S_ATTRIBUTION_FIELDS("search.attribution.fields", "resourceSource.attribution,customField.customFields.cfHost"),
-	S_ATTRIBUTION_QUERY_FIELDS("search.attribution.query.fields", "resourceSource.attributionSuggestion,customField.customFields.cfHost"),
- //publisher & aggregator
+	//publisher
 	S_PUBLISHER_FIELDS("search.publisher.fields","publishername"),
 	S_PUBLISHER_QUERY_FIELDS("search.publisher.query.fields","publishername"),
-	
-
-	S_AGGREGATOR_FIELDS("search.aggregator.fields","aggregatorname"),
-	S_AGGREGATOR_QUERY_FIELDS("search.aggregator.query.fields","aggregatorname"),
 	
 	S_RESOURCE_QUERY_ANALYZER("search.resource.query.analyzer", "standard"),
 	S_COLLECTION_QUERY_ANALYZER("search.collection.query.analyzer", "standard"),
@@ -272,7 +239,7 @@ public enum SearchSettingType {
     S_FILTER_ALAIS_OWNER("filter-alias@owner","owner.firstName|owner.lastName|owner.usernameDisplay|owner.fullName"),
     S_FILTER_SPLITBY_APPROX("filter-splitBy@approx","subjectName,courseName,topicName,unitName,lessonName"),
     S_FILTER_SKIPWORDS_ALL("filter-skipWords@all","contentSubFormat,contentFormat,category,resourceFormat"),
-    S_FILTER_LOWERCASE("filter-case@lowercase","contentSubFormat,contentFormat,standard,subjectName,courseName,topicName,unitName,lessonName,mediaType,attribution,creatorEmailId,ownerEmailId,creatorUsername,ownerUsername,owner,creator,category,resourceFormat,instructional,title,questionType,collectionType,publisher,aggregator"),
+    S_FILTER_LOWERCASE("filter-case@lowercase","contentSubFormat,contentFormat,standard,subjectName,courseName,topicName,unitName,lessonName,mediaType,attribution,creatorEmailId,ownerEmailId,creatorUsername,ownerUsername,owner,creator,category,resourceFormat,instructional,title,questionType,collectionType,publisher"),
     S_RESOURCE_FIELD_TITLESTANDARD_BOOST("search.resource.field.titleStandard.boost",5.0F),
     S_RESOURCE_RESCORE_SCRIPT_LANG("search.resource.rescore.script.lang","groovy"),
     S_RESOURCE_FIELD_TITLE_STANDARD_BOOST("search.resource.field.title.standard.boost",5.0F),
