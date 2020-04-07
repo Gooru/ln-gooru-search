@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.commons.lang3.StringUtils;
 import org.ednovo.gooru.search.es.constant.Constants;
 import org.ednovo.gooru.search.es.constant.EsIndex;
@@ -24,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.google.common.base.CaseFormat;
 /**
  * @author Renuka
@@ -58,6 +56,8 @@ public class LearningMapsServiceImpl implements LearningMapsService, Constants {
 		inputSearchData.setUser(searchData.getUser());
 		inputSearchData.setUserTaxonomyPreference(searchData.getUserTaxonomyPreference());
 		inputSearchData.setUserLanguagePreference(searchData.getUserLanguagePreference());
+		inputSearchData.setScope(searchData.getScope());
+		
 		if (RESOURCE_MATCH.matcher(type).matches()) {
 			inputSearchData.putFilter(AMPERSAND + CARET_SYMBOL + IndexFields.CONTENT_FORMAT, type);
 			inputSearchData.setType(TYPE_RESOURCE);
