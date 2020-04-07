@@ -504,6 +504,9 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 				if (parameterKey.contains(FLT) && (!parameterKey.equalsIgnoreCase(FLT_COLLECTION_TYPE) && !(parameterKey.equalsIgnoreCase(FLT_RESOURCE_FORMAT) && parameterMap.get(FLT_RESOURCE_FORMAT).toString().equalsIgnoreCase(TYPE_QUESTION)) && !(parameterKey.equalsIgnoreCase(FLT_RATING) && parameterMap.get(FLT_RATING).toString().contains(STR_ZERO)))) {
 					hasFilter = true;
 					break;
+				} else if (parameterKey.contains(SCOPE_KEY)) {
+					hasFilter = true;
+					break;
 				}
 			}
 			query = query.replaceAll(ESCAPED_STAR, EMPTY_STRING);
