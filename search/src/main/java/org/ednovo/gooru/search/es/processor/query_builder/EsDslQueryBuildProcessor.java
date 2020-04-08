@@ -37,7 +37,7 @@ public class EsDslQueryBuildProcessor extends SearchProcessor<SearchData, Object
 		}
 		String typeLower = searchDataType.toLowerCase();
 		if (typeLower.startsWith(PEDAGOGY_UNDERSCORE)) {
-			typeLower = typeLower.replaceFirst(PEDAGOGY_UNDERSCORE, "");
+			typeLower = typeLower.replaceFirst(PEDAGOGY_UNDERSCORE, EMPTY_STRING);
 		} else if (typeLower.contains(_V3)) {
 			typeLower = typeLower.replaceFirst(_V3, EMPTY_STRING);
 		}
@@ -96,13 +96,13 @@ public class EsDslQueryBuildProcessor extends SearchProcessor<SearchData, Object
 		}
 
 		Map<String, Object> customQuery = new HashMap<String, Object>(1);
-		if (score != null && searchDataType.equalsIgnoreCase(SearchType.SIMPLE_COLLECTION.getType())) {
+		if (score != null && typeLower.equalsIgnoreCase(SearchType.SIMPLE_COLLECTION.getType())) {
 			Map<String, Object> query = new HashMap<String, Object>(3);
 			Map<String, Object> scriptScore = new HashMap<String, Object>(1);
 			Map<String, Object> script = new HashMap<String, Object>(2);
 			customQuery.put("function_score", query);
 			query.put("query", queryString);
-			if (searchDataType.equalsIgnoreCase(SearchType.SIMPLE_COLLECTION.getType()) && lang != null && !(lang.equalsIgnoreCase("native"))) {
+			if (typeLower.equalsIgnoreCase(SearchType.SIMPLE_COLLECTION.getType()) && lang != null && !(lang.equalsIgnoreCase("native"))) {
 				query.put("script_score", scriptScore);
 				scriptScore.put("script", script);
 				script.put("source", score);
@@ -134,7 +134,7 @@ public class EsDslQueryBuildProcessor extends SearchProcessor<SearchData, Object
 				searchData.getQueryDsl().put("query", customFiltersScore);
 			}
 		}
-		if (searchDataType.equalsIgnoreCase(SearchType.RESOURCE.getType())) {
+		if (typeLower.equalsIgnoreCase(SearchType.RESOURCE.getType())) {
 			Map<String, Object> rescoreQuery = new HashMap<String, Object>(2);
 			Map<String, Object> queryObj = new HashMap<String, Object>(2);
 			Map<String, Object> customScoreQuery = new HashMap<String, Object>(1);

@@ -1,6 +1,7 @@
 package org.ednovo.gooru.controllers.api;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,6 +17,7 @@ import org.ednovo.gooru.search.es.exception.BadRequestException;
 import org.ednovo.gooru.search.es.exception.NotFoundException;
 import org.ednovo.gooru.search.es.handler.SearchHandler;
 import org.ednovo.gooru.search.es.model.MapWrapper;
+import org.ednovo.gooru.search.es.model.Scope;
 import org.ednovo.gooru.search.es.model.SearchData;
 import org.ednovo.gooru.search.es.model.User;
 import org.ednovo.gooru.search.es.model.UserGroupSupport;
@@ -102,6 +104,12 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			searchDataMap.remove("flt.gutCode");
 		}
 		if (searchDataMap.containsKey("isAdmin") && searchDataMap.getBoolean("isAdmin")) searchData.setAdmin(true);
+		if (searchDataMap.containsKey(SCOPE_KEY)) {
+			Scope scope = new Scope();
+			scope.setKey(searchDataMap.getString(SCOPE_KEY));
+			if (searchDataMap.containsKey(SCOPE_TARGET_NAMES)) scope.setTargetNames(Arrays.asList(searchDataMap.getString(SCOPE_TARGET_NAMES).split(TILDE)));
+			searchData.setScope(scope);
+		}
 		searchData.setParameters(searchDataMap);
 
 		if (query.contains("!")) {
@@ -478,6 +486,12 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			searchData.setTaxFilterType(DOMAIN);
 		}
 		if (searchDataMap.containsKey("isAdmin") && searchDataMap.getBoolean("isAdmin")) searchData.setAdmin(true);
+		if (searchDataMap.containsKey(SCOPE_KEY)) {
+			Scope scope = new Scope();
+			scope.setKey(searchDataMap.getString(SCOPE_KEY));
+			if (searchDataMap.containsKey(SCOPE_TARGET_NAMES)) scope.setTargetNames(Arrays.asList(searchDataMap.getString(SCOPE_TARGET_NAMES).split(TILDE)));
+			searchData.setScope(scope);
+		}
 		searchData.setParameters(searchDataMap);
 	}
 	
@@ -488,6 +502,9 @@ public class PedagogyNavigatorSearchRestController extends SerializerUtil implem
 			for (String parameterKey : parameterSet) {
 				parameterKey = parameterKey.trim();
 				if (parameterKey.contains(FLT) && (!parameterKey.equalsIgnoreCase(FLT_COLLECTION_TYPE) && !(parameterKey.equalsIgnoreCase(FLT_RESOURCE_FORMAT) && parameterMap.get(FLT_RESOURCE_FORMAT).toString().equalsIgnoreCase(TYPE_QUESTION)) && !(parameterKey.equalsIgnoreCase(FLT_RATING) && parameterMap.get(FLT_RATING).toString().contains(STR_ZERO)))) {
+					hasFilter = true;
+					break;
+				} else if (parameterKey.contains(SCOPE_KEY)) {
 					hasFilter = true;
 					break;
 				}
